@@ -1,3 +1,4 @@
 # microservice specific routes
 
-GET        /             controllers.HomePage.home
+GET        /                                controllers.HomePage.home
+GET        /register/organisation-details   controllers.Registration.organisationDetails
