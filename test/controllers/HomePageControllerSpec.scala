@@ -16,17 +16,31 @@
 
 package controllers
 
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-import play.api.mvc._
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.http.Status
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-import scala.concurrent.Future
 
-object HelloWorld extends HelloWorld
+class HomePageControllerSpec extends UnitSpec with WithFakeApplication {
 
-trait HelloWorld extends FrontendController {
-  val helloWorld: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.helloworld.hello_world()))
+  val fakeRequest = FakeRequest("GET", "/")
+
+
+  "GET /" should {
+    "return 200" in {
+      val result = HomePage.home(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
+    "return HTML" in {
+      val result = HomePage.home(fakeRequest)
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+    }
+
+
   }
+
+
 }
