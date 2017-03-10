@@ -16,17 +16,35 @@
 
 package controllers
 
+import config.FrontendAuthConnector
+import play.api.{Environment, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-object Registration extends Registration
+object Registration extends Registration {
+  val authConnector = FrontendAuthConnector
+  val config = Play.current.configuration
+  val env = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+}
 
-trait Registration extends FrontendController {
+trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
+
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.organisationDetails()))
+    authorised() {
+      Future.successful(Ok(views.html.registration.organisationDetails()))
+    } recoverWith {
+      handleFailure
+    }
   }
+
+  private def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
+    case _ => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
+  }
+
 }

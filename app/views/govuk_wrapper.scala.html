@@ -21,14 +21,13 @@
 }
 
 @headerNavLinks = {
-  <li><a id="homeNavHref" href="http://www.google.com"
-         data-journey-click="primary-navigation:Click:Home">Home</a></li>
+
 }
 
 @insideHeader = {
     @uiLayouts.header_nav(
       navTitle = Some("Lifetime ISA"),
-      navTitleLink = None,
+      navTitleLink = Some(routes.HomePage.home),
       showBetaLink = false,
       navLinks = Some(headerNavLinks))
 }
