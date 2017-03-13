@@ -26,20 +26,12 @@ class RegistrationControllerSpec extends UnitSpec with WithFakeApplication {
 
   val fakeRequest = FakeRequest("GET", "/")
 
-
   "GET Organisation Details" should {
-    "return 200" in {
+    "redirect to login" in {
       val result = Registration.organisationDetails(fakeRequest)
-      status(result) shouldBe Status.OK
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result) shouldBe Some("/gg/sign-in?continue=%2Flifetime-isa%2Fregister%2Forganisation-details&origin=lisa-frontend")
     }
-
-    "return HTML" in {
-      val result = Registration.organisationDetails(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-    }
-
-
   }
 
 
