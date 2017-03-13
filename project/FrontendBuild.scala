@@ -26,14 +26,14 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-ui" % "7.0.0"
   )
 
-  val test = Seq(
-    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % "test,it",
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test,it",
-    "org.pegdown" % "pegdown" % "1.6.0" % "test,it",
-    "org.jsoup" % "jsoup" % "1.8.1" % "test,it",
-    "com.typesafe.play" %% "play-test" % PlayVersion.current % "test,it"
+  def test(scope: String = "test") = Seq(
+    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % scope,
+    "org.scalatest" %% "scalatest" % "2.2.6" % scope,
+    "org.pegdown" % "pegdown" % "1.6.0" % scope,
+    "org.jsoup" % "jsoup" % "1.8.1" % scope,
+    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
   )
 
-  def apply() = compile ++ test
+  def apply() = compile ++ test()
 
 }
