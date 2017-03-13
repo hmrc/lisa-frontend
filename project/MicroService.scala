@@ -50,7 +50,6 @@ trait MicroService {
     .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
     .settings(resolvers ++= Seq(
       Resolver.bintrayRepo("hmrc", "releases"),
-      Resolver.bintrayRepo("hmrc", "release-candidates"),
       Resolver.jcenterRepo
     ))
 }
