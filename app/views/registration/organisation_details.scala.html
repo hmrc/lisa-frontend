@@ -1,21 +1,24 @@
-@()(implicit request: Request[_], messages: Messages)
+@import helper._
+
+@(form: Form[OrganisationDetails])(implicit request: Request[_], messages: Messages)
 
 @views.html.main_template(title = "Lifetime ISA", bodyClasses = None) {
 
     <h1>Organisation details</h1>
 
     <form method="post">
+        @CSRF.formField
         <fieldset>
             <div class="form-group">
                 <label class="form-label" for="company-name">Company name</label>
-                <input class="form-control" id="company-name" type="text">
+                <input class="form-control" id="company-name" type="text" name="companyName" value="">
             </div>
             <div class="form-group">
-                <label class="form-label" for="ctr-num">Corporation Tax reference number</label>
-                <input class="form-control" id="ctr-num" type="text">
+                <label class="form-label" for="ctr-number">Corporation Tax reference number</label>
+                <input class="form-control" id="ctr-number" type="text" name="ctrNumber" value="">
             </div>
             <div class="form-group">
-                <a class="button" href="#">Continue</a>
+                <input type="submit" class="button" value="Continue">
             </div>
         </fieldset>
     </form>

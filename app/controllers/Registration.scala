@@ -17,10 +17,13 @@
 package controllers
 
 import config.FrontendAuthConnector
+import models.OrganisationDetails
 import play.api.{Environment, Play}
 import play.api.Play.current
+import play.api.data._
+import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
-import play.api.mvc._
+import play.api.mvc.{Action, _}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.frontend.Redirects
@@ -36,9 +39,31 @@ object Registration extends Registration {
 
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
 
+  private val organisationForm = Form(
+    mapping(
+      "companyName" -> nonEmptyText,
+      "ctrNumber" -> nonEmptyText
+    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
+  )
+
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
     authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
-      Future.successful(Ok(views.html.registration.organisation_details()))
+      Future.successful(Ok(views.html.registration.organisation_details(organisationForm)))
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val submitOrganisationDetails: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+      organisationForm.bindFromRequest.fold(
+        formWithErrors => {
+          Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
+        },
+        data => {
+          Future.successful(Ok(views.html.registration.organisation_details(organisationForm)))
+        }
+      )
     } recoverWith {
       handleFailure
     }
