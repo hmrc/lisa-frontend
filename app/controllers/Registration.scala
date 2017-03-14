@@ -37,7 +37,7 @@ object Registration extends Registration {
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
 
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised(Enrolment("IR-CT") and AuthProviders(GovernmentGateway)) {
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
       Future.successful(Ok(views.html.registration.organisation_details()))
     } recoverWith {
       handleFailure
