@@ -21,7 +21,8 @@ import play.api.{Environment, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -36,15 +37,16 @@ object Registration extends Registration {
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
 
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised() {
-      Future.successful(Ok(views.html.registration.organisationDetails()))
+    authorised(Enrolment("IR-CT") and AuthProviders(GovernmentGateway)) {
+      Future.successful(Ok(views.html.registration.organisation_details()))
     } recoverWith {
       handleFailure
     }
   }
 
   private def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
-    case _ => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
+    case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
+    case _ => Future.successful(Forbidden(views.html.error.access_denied()))
   }
 
 }
