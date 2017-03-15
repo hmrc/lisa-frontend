@@ -17,7 +17,7 @@
 package controllers
 
 import config.{FrontendAuthConnector, ShortLivedCache}
-import models.{OrganisationDetails, TradingDetails, YourDetails}
+import models.{OrganisationDetails, LisaRegistration, TradingDetails, YourDetails}
 import play.api.{Environment, Play}
 import play.api.Play.current
 import play.api.data._
@@ -40,9 +40,12 @@ object Registration extends Registration {
 
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
 
+  val cacheId = "cacheID" // to be made dynamic later
+
   implicit val organisationDetailsFormats = Json.format[OrganisationDetails]
   implicit val tradingDetailsFormats = Json.format[TradingDetails]
   implicit val yourDetailsFormats = Json.format[YourDetails]
+  implicit val registrationFormats = Json.format[LisaRegistration]
 
   private val organisationForm = Form(
     mapping(
@@ -71,7 +74,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
     authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
-      ShortLivedCache.fetchAndGetEntry[OrganisationDetails]("cacheID", "organisationDetails").map {
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").map {
         case Some(data) => Ok(views.html.registration.organisation_details(organisationForm.fill(data)))
         case None => Ok(views.html.registration.organisation_details(organisationForm))
       }
@@ -88,7 +91,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
         },
         data => {
-          ShortLivedCache.cache[OrganisationDetails]("cacheID", "organisationDetails", data)
+          ShortLivedCache.cache[OrganisationDetails](cacheId, "organisationDetails", data)
 
           Future.successful(Redirect(routes.Registration.tradingDetails()))
         }
@@ -100,7 +103,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
   val tradingDetails: Action[AnyContent] = Action.async { implicit request =>
     authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
-      ShortLivedCache.fetchAndGetEntry[TradingDetails]("cacheID", "tradingDetails").map {
+      ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").map {
         case Some(data) => Ok(views.html.registration.trading_details(tradingForm.fill(data)))
         case None => Ok(views.html.registration.trading_details(tradingForm))
       }
@@ -117,7 +120,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
         },
         data => {
-          ShortLivedCache.cache[TradingDetails]("cacheID", "tradingDetails", data)
+          ShortLivedCache.cache[TradingDetails](cacheId, "tradingDetails", data)
 
           Future.successful(Redirect(routes.Registration.yourDetails()))
         }
@@ -129,7 +132,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
   val yourDetails: Action[AnyContent] = Action.async { implicit request =>
     authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
-      ShortLivedCache.fetchAndGetEntry[YourDetails]("cacheID", "yourDetails").map {
+      ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
         case Some(data) => Ok(views.html.registration.your_details(yourForm.fill(data)))
         case None => Ok(views.html.registration.your_details(yourForm))
       }
@@ -146,7 +149,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
         },
         data => {
-          ShortLivedCache.cache[YourDetails]("cacheID", "yourDetails", data)
+          ShortLivedCache.cache[YourDetails](cacheId, "yourDetails", data)
 
           Future.successful(Redirect(routes.Registration.summary()))
         }
@@ -159,16 +162,51 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   val summary: Action[AnyContent] = Action.async { implicit request =>
     authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
 
-      ShortLivedCache.fetchAndGetEntry[OrganisationDetails]("cacheID", "organisationDetails").flatMap {
+      // get organisation details
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").flatMap {
         case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
         case Some(orgData) => {
-          ShortLivedCache.fetchAndGetEntry[TradingDetails]("cacheID", "tradingDetails").flatMap {
+
+          // get trading details
+          ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").flatMap {
             case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
             case Some(tradData) => {
-              ShortLivedCache.fetchAndGetEntry[YourDetails]("cacheID", "yourDetails").map {
+
+              // get user details
+              ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
                 case None => Redirect(routes.Registration.yourDetails())
                 case Some(yourData) => {
-                  Ok(views.html.registration.summary(orgData, tradData, yourData))
+                  Ok(views.html.registration.summary(new LisaRegistration(orgData, tradData, yourData)))
+                }
+              }
+            }
+          }
+        }
+      }
+
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val submit: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+
+      // get organisation details
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").flatMap {
+        case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
+        case Some(orgData) => {
+
+          // get trading details
+          ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").flatMap {
+            case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
+            case Some(tradData) => {
+
+              // get user details
+              ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
+                case None => Redirect(routes.Registration.yourDetails())
+                case Some(yourData) => {
+                  NotImplemented(Json.toJson[LisaRegistration](new LisaRegistration(orgData, tradData, yourData)))
                 }
               }
             }
@@ -183,6 +221,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
   private def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
     case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
+
+    // todo: dont assume any controller exception is related to auth - it may be an error in the application code
     case _ => Future.successful(Forbidden(views.html.error.access_denied()))
   }
 

@@ -1,7 +1,7 @@
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@(org: OrganisationDetails, trad: TradingDetails, you: YourDetails)(implicit request: Request[_], messages: Messages)
+@(data: LisaRegistration)(implicit request: Request[_], messages: Messages)
 
 @views.html.main_template(title = "Lifetime ISA", bodyClasses = None) {
 
@@ -24,8 +24,8 @@
                     Corporation Tax reference number<br>
                 </td>
                 <td>
-                    @org.companyName<br>
-                    @org.ctrNumber<br>
+                    @data.organisationDetails.companyName<br>
+                    @data.organisationDetails.ctrNumber<br>
                 </td>
                 <td>
                     <a href="@routes.Registration.organisationDetails">
@@ -39,9 +39,9 @@
                 ISA provider reference number
             </td>
                 <td>
-                    @trad.tradingName<br>
-                    @trad.fsrRefNumber<br>
-                    @trad.isaProviderRefNumber<br>
+                    @data.tradingDetails.tradingName<br>
+                    @data.tradingDetails.fsrRefNumber<br>
+                    @data.tradingDetails.isaProviderRefNumber<br>
                 </td>
                 <td>
                     <a href="@routes.Registration.tradingDetails">
@@ -58,11 +58,11 @@
                     Email address
                 </td>
                 <td>
-                    @you.firstName<br>
-                    @you.lastName<br>
-                    @you.role<br>
-                    @you.phone<br>
-                    @you.email
+                    @data.yourDetails.firstName<br>
+                    @data.yourDetails.lastName<br>
+                    @data.yourDetails.role<br>
+                    @data.yourDetails.phone<br>
+                    @data.yourDetails.email
                 </td>
                 <td>
                     <a href="@routes.Registration.yourDetails">
@@ -77,6 +77,6 @@
 
     <p>By submitting this notification you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
 
-    <p><a href="#" class="button">Accept and send application</a></p>
+    <p><a href="@routes.Registration.submit" class="button">Accept and send application</a></p>
 
 }
