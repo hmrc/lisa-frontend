@@ -17,7 +17,7 @@
 package controllers
 
 import config.{FrontendAuthConnector, ShortLivedCache}
-import models.{OrganisationDetails, LisaRegistration, TradingDetails, YourDetails}
+import models.{LisaRegistration, OrganisationDetails, TradingDetails, YourDetails}
 import play.api.{Environment, Play}
 import play.api.Play.current
 import play.api.data._
@@ -30,6 +30,7 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -71,10 +72,14 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
     )(YourDetails.apply)(YourDetails.unapply)
   )
 
+  private val organisationDetailsCacheKey = "organisationDetails"
+  private val tradingDetailsCacheKey = "tradingDetails"
+  private val yourDetailsCacheKey = "yourDetails"
+
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
 
-      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").map {
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.organisation_details(organisationForm.fill(data)))
         case None => Ok(views.html.registration.organisation_details(organisationForm))
       }
@@ -90,7 +95,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
         },
         data => {
-          ShortLivedCache.cache[OrganisationDetails](cacheId, "organisationDetails", data)
+          ShortLivedCache.cache[OrganisationDetails](cacheId, organisationDetailsCacheKey, data)
 
           Future.successful(Redirect(routes.Registration.tradingDetails()))
         }
@@ -102,7 +107,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   val tradingDetails: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
 
-      ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").map {
+      ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.trading_details(tradingForm.fill(data)))
         case None => Ok(views.html.registration.trading_details(tradingForm))
       }
@@ -118,7 +123,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
         },
         data => {
-          ShortLivedCache.cache[TradingDetails](cacheId, "tradingDetails", data)
+          ShortLivedCache.cache[TradingDetails](cacheId, tradingDetailsCacheKey, data)
 
           Future.successful(Redirect(routes.Registration.yourDetails()))
         }
@@ -130,7 +135,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   val yourDetails: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
 
-      ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
+      ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.your_details(yourForm.fill(data)))
         case None => Ok(views.html.registration.your_details(yourForm))
       }
@@ -146,7 +151,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
         },
         data => {
-          ShortLivedCache.cache[YourDetails](cacheId, "yourDetails", data)
+          ShortLivedCache.cache[YourDetails](cacheId, yourDetailsCacheKey, data)
 
           Future.successful(Redirect(routes.Registration.summary()))
         }
@@ -159,17 +164,17 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
     authorisedForLisa { cacheId =>
 
       // get organisation details
-      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").flatMap {
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).flatMap {
         case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
         case Some(orgData) => {
 
           // get trading details
-          ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").flatMap {
+          ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).flatMap {
             case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
             case Some(tradData) => {
 
               // get user details
-              ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
+              ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
                 case None => Redirect(routes.Registration.yourDetails())
                 case Some(yourData) => {
                   Ok(views.html.registration.summary(new LisaRegistration(orgData, tradData, yourData)))
@@ -180,6 +185,16 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
         }
       }
 
+      /*
+      getOrganisationDetails {
+        getTradingDetails {
+          getUserDetails {
+            // show summary page
+          }
+        }
+      }
+       */
+
     }
   }
 
@@ -187,20 +202,24 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
     authorisedForLisa { cacheId =>
 
       // get organisation details
-      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").flatMap {
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).flatMap {
         case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
         case Some(orgData) => {
 
           // get trading details
-          ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").flatMap {
+          ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).flatMap {
             case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
             case Some(tradData) => {
 
               // get user details
-              ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
+              ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
                 case None => Redirect(routes.Registration.yourDetails())
                 case Some(yourData) => {
-                  NotImplemented(Json.toJson[LisaRegistration](new LisaRegistration(orgData, tradData, yourData)))
+                  val registrationDetails = new LisaRegistration(orgData, tradData, yourData)
+
+                  ShortLivedCache.remove(cacheId)
+
+                  NotImplemented(Json.toJson[LisaRegistration](registrationDetails))
                 }
               }
             }
@@ -211,7 +230,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
     }
   }
 
-  private def authorisedForLisa(callback: (String) => Future[Result]) = {
+  private def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]) = {
     authorised(
       (
         Enrolment("IR-CT") or
@@ -221,9 +240,9 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
       AuthProviders(GovernmentGateway)
     ).retrieve(internalId) { internalId =>
 
-      val cacheId = internalId.getOrElse(throw new RuntimeException("No internalId for logged in user"))
+      val userId = internalId.getOrElse(throw new RuntimeException("No internalId for logged in user"))
 
-      callback(cacheId)
+      callback(s"${userId}-lisa-registration")
 
     } recoverWith {
       handleFailure
