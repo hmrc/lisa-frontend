@@ -27,6 +27,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -39,8 +40,6 @@ object Registration extends Registration {
 }
 
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
-
-  val cacheId = "cacheID" // to be made dynamic later
 
   implicit val organisationDetailsFormats = Json.format[OrganisationDetails]
   implicit val tradingDetailsFormats = Json.format[TradingDetails]
@@ -73,19 +72,19 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   )
 
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
+
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").map {
         case Some(data) => Ok(views.html.registration.organisation_details(organisationForm.fill(data)))
         case None => Ok(views.html.registration.organisation_details(organisationForm))
       }
 
-    } recoverWith {
-      handleFailure
     }
   }
 
   val submitOrganisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
+
       organisationForm.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
@@ -96,25 +95,24 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(Redirect(routes.Registration.tradingDetails()))
         }
       )
-    } recoverWith {
-      handleFailure
+
     }
   }
 
   val tradingDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
+
       ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, "tradingDetails").map {
         case Some(data) => Ok(views.html.registration.trading_details(tradingForm.fill(data)))
         case None => Ok(views.html.registration.trading_details(tradingForm))
       }
 
-    } recoverWith {
-      handleFailure
     }
   }
 
   val submitTradingDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
+
       tradingForm.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
@@ -125,25 +123,24 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(Redirect(routes.Registration.yourDetails()))
         }
       )
-    } recoverWith {
-      handleFailure
+
     }
   }
 
   val yourDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
+
       ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, "yourDetails").map {
         case Some(data) => Ok(views.html.registration.your_details(yourForm.fill(data)))
         case None => Ok(views.html.registration.your_details(yourForm))
       }
 
-    } recoverWith {
-      handleFailure
     }
   }
 
   val submitYourDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
+
       yourForm.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
@@ -154,13 +151,12 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(Redirect(routes.Registration.summary()))
         }
       )
-    } recoverWith {
-      handleFailure
+
     }
   }
 
   val summary: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
 
       // get organisation details
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").flatMap {
@@ -184,13 +180,11 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
         }
       }
 
-    } recoverWith {
-      handleFailure
     }
   }
 
   val submit: Action[AnyContent] = Action.async { implicit request =>
-    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+    authorisedForLisa { cacheId =>
 
       // get organisation details
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, "organisationDetails").flatMap {
@@ -213,6 +207,23 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           }
         }
       }
+
+    }
+  }
+
+  private def authorisedForLisa(callback: (String) => Future[Result]) = {
+    authorised(
+      (
+        Enrolment("IR-CT") or
+        Enrolment("HMCE-VATDEC-ORG") or
+        Enrolment("HMCE-VATVAR-ORG")
+      ) and
+      AuthProviders(GovernmentGateway)
+    ).retrieve(internalId) { internalId =>
+
+      val cacheId = internalId.getOrElse(throw new RuntimeException("No internalId for logged in user"))
+
+      callback(cacheId)
 
     } recoverWith {
       handleFailure
