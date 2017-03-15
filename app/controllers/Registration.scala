@@ -16,8 +16,8 @@
 
 package controllers
 
-import config.FrontendAuthConnector
-import models.OrganisationDetails
+import config.{FrontendAuthConnector, ShortLivedCache}
+import models.{OrganisationDetails, TradingDetails, YourDetails}
 import play.api.{Environment, Play}
 import play.api.Play.current
 import play.api.data._
@@ -41,6 +41,8 @@ object Registration extends Registration {
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
 
   implicit val organisationDetailsFormats = Json.format[OrganisationDetails]
+  implicit val tradingDetailsFormats = Json.format[TradingDetails]
+  implicit val yourDetailsFormats = Json.format[YourDetails]
 
   private val organisationForm = Form(
     mapping(
@@ -49,9 +51,31 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 
+  private val tradingForm = Form(
+    mapping(
+      "tradingName" -> nonEmptyText,
+      "fsrRefNumber" -> nonEmptyText,
+      "isaProviderRefNumber" -> nonEmptyText
+    )(TradingDetails.apply)(TradingDetails.unapply)
+  )
+
+  private val yourForm = Form(
+    mapping(
+      "firstName" -> nonEmptyText,
+      "lastName" -> nonEmptyText,
+      "role" -> nonEmptyText,
+      "phone" -> nonEmptyText,
+      "email" -> nonEmptyText
+    )(YourDetails.apply)(YourDetails.unapply)
+  )
+
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
     authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
-      Future.successful(Ok(views.html.registration.organisation_details(organisationForm)))
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails]("cacheID", "organisationDetails").map {
+        case Some(data) => Ok(views.html.registration.organisation_details(organisationForm.fill(data)))
+        case None => Ok(views.html.registration.organisation_details(organisationForm))
+      }
+
     } recoverWith {
       handleFailure
     }
@@ -64,11 +88,94 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
         },
         data => {
-          // at this point we need to submit / store the data
-          // not implemented for now - to be done in future tasks / stories
-          Future.successful(NotImplemented(Json.toJson[OrganisationDetails](data)))
+          ShortLivedCache.cache[OrganisationDetails]("cacheID", "organisationDetails", data)
+
+          Future.successful(Redirect(routes.Registration.tradingDetails()))
         }
       )
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val tradingDetails: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+      ShortLivedCache.fetchAndGetEntry[TradingDetails]("cacheID", "tradingDetails").map {
+        case Some(data) => Ok(views.html.registration.trading_details(tradingForm.fill(data)))
+        case None => Ok(views.html.registration.trading_details(tradingForm))
+      }
+
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val submitTradingDetails: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+      tradingForm.bindFromRequest.fold(
+        formWithErrors => {
+          Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
+        },
+        data => {
+          ShortLivedCache.cache[TradingDetails]("cacheID", "tradingDetails", data)
+
+          Future.successful(Redirect(routes.Registration.yourDetails()))
+        }
+      )
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val yourDetails: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+      ShortLivedCache.fetchAndGetEntry[YourDetails]("cacheID", "yourDetails").map {
+        case Some(data) => Ok(views.html.registration.your_details(yourForm.fill(data)))
+        case None => Ok(views.html.registration.your_details(yourForm))
+      }
+
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val submitYourDetails: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+      yourForm.bindFromRequest.fold(
+        formWithErrors => {
+          Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
+        },
+        data => {
+          ShortLivedCache.cache[YourDetails]("cacheID", "yourDetails", data)
+
+          Future.successful(Redirect(routes.Registration.summary()))
+        }
+      )
+    } recoverWith {
+      handleFailure
+    }
+  }
+
+  val summary: Action[AnyContent] = Action.async { implicit request =>
+    authorised((Enrolment("IR-CT") or Enrolment("HMCE-VATDEC-ORG") or Enrolment("HMCE-VATVAR-ORG")) and AuthProviders(GovernmentGateway)) {
+
+      ShortLivedCache.fetchAndGetEntry[OrganisationDetails]("cacheID", "organisationDetails").flatMap {
+        case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
+        case Some(orgData) => {
+          ShortLivedCache.fetchAndGetEntry[TradingDetails]("cacheID", "tradingDetails").flatMap {
+            case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
+            case Some(tradData) => {
+              ShortLivedCache.fetchAndGetEntry[YourDetails]("cacheID", "yourDetails").map {
+                case None => Redirect(routes.Registration.yourDetails())
+                case Some(yourData) => {
+                  Ok(views.html.registration.summary(orgData, tradData, yourData))
+                }
+              }
+            }
+          }
+        }
+      }
+
     } recoverWith {
       handleFailure
     }
