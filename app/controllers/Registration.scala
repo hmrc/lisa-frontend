@@ -23,6 +23,7 @@ import play.api.Play.current
 import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
+import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -38,6 +39,8 @@ object Registration extends Registration {
 }
 
 trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
+
+  implicit val organisationDetailsFormats = Json.format[OrganisationDetails]
 
   private val organisationForm = Form(
     mapping(
@@ -61,7 +64,9 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
         },
         data => {
-          Future.successful(Ok(views.html.registration.organisation_details(organisationForm)))
+          // at this point we need to submit / store the data
+          // not implemented for now - to be done in future tasks / stories
+          Future.successful(NotImplemented(Json.toJson[OrganisationDetails](data)))
         }
       )
     } recoverWith {
