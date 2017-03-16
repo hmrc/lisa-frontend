@@ -170,7 +170,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
           // get trading details
           ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
+            case None => Future.successful(Redirect(routes.Registration.tradingDetails()))
             case Some(tradData) => {
 
               // get user details
@@ -208,7 +208,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
           // get trading details
           ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.Registration.organisationDetails()))
+            case None => Future.successful(Redirect(routes.Registration.tradingDetails()))
             case Some(tradData) => {
 
               // get user details
