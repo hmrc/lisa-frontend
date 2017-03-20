@@ -1,0 +1,25 @@
+@import helper.CSRF
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@(form: Form[OrganisationDetails])(implicit request: Request[_], messages: Messages)
+
+@views.html.main_template(title = "Lifetime ISA", bodyClasses = None) {
+
+    <h1>Organisation details</h1>
+
+    <form method="post">
+        @CSRF.formField
+        <fieldset>
+            <div class="form-group">
+                @input(form("companyName"), '_label -> "Company Name", '_inputClass -> "input--cleared")
+            </div>
+            <div class="form-group">
+                @input(form("ctrNumber"), '_label -> "Company Tax Reference Number", '_inputClass -> "input--cleared")
+            </div>
+            <div class="form-group">
+                <input type="submit" class="button" value="Continue">
+            </div>
+        </fieldset>
+    </form>
+
+}

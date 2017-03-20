@@ -1,0 +1,82 @@
+@import helper.CSRF
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@(data: LisaRegistration)(implicit request: Request[_], messages: Messages)
+
+@views.html.main_template(title = "Lifetime ISA", bodyClasses = None) {
+
+    <h1>Check your answers before sending your application</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th colspan="3">
+                    <h2>
+                        Organisation details
+                    </h2>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    Company name<br>
+                    Corporation Tax reference number<br>
+                </td>
+                <td>
+                    @data.organisationDetails.companyName<br>
+                    @data.organisationDetails.ctrNumber<br>
+                </td>
+                <td>
+                    <a href="@routes.Registration.organisationDetails">
+                        Change <span class="visuallyhidden">Organisation Details</span>
+                    </a>
+                </td>
+            </tr>
+            <tr><td>
+                Trading name<br>
+                Financial Services Register reference number<br>
+                ISA provider reference number
+            </td>
+                <td>
+                    @data.tradingDetails.tradingName<br>
+                    @data.tradingDetails.fsrRefNumber<br>
+                    @data.tradingDetails.isaProviderRefNumber<br>
+                </td>
+                <td>
+                    <a href="@routes.Registration.tradingDetails">
+                        Change <span class="visuallyhidden">Trading Details</span>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    First name<br>
+                    Last name<br>
+                    Role in organisation<br>
+                    Phone number<br>
+                    Email address
+                </td>
+                <td>
+                    @data.yourDetails.firstName<br>
+                    @data.yourDetails.lastName<br>
+                    @data.yourDetails.role<br>
+                    @data.yourDetails.phone<br>
+                    @data.yourDetails.email
+                </td>
+                <td>
+                    <a href="@routes.Registration.yourDetails">
+                        Change <span class="visuallyhidden">Your Details</span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Now send your application</h2>
+
+    <p>By submitting this notification you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
+
+    <p><a href="@routes.Registration.submit" class="button">Accept and send application</a></p>
+
+}

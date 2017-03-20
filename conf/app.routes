@@ -2,3 +2,10 @@
 
 GET        /                                controllers.HomePage.home
 GET        /register/organisation-details   controllers.Registration.organisationDetails
+POST       /register/organisation-details   controllers.Registration.submitOrganisationDetails
+GET        /register/trading-details        controllers.Registration.tradingDetails
+POST       /register/trading-details        controllers.Registration.submitTradingDetails
+GET        /register/your-details           controllers.Registration.yourDetails
+POST       /register/your-details           controllers.Registration.submitYourDetails
+GET        /register/summary                controllers.Registration.summary
+GET        /register/submit                 controllers.Registration.submit
