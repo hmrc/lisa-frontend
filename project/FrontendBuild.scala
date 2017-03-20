@@ -1,21 +1,24 @@
 import sbt._
-import play.sbt.PlayImport._
-import play.core.PlayVersion
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
 object FrontendBuild extends Build with MicroService {
+  import scala.util.Properties.envOrElse
 
   val appName = "lisa-frontend"
+  val appVersion = envOrElse("LISA_FRONTEND_VERSION", "999-SNAPSHOT")
 
-  override lazy val appDependencies: Seq[ModuleID] = compile ++ test()
+  override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
+}
+
+private object AppDependencies {
+
+  import play.sbt.PlayImport._
+  import play.core.PlayVersion
 
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "frontend-bootstrap" % "7.14.0",
     "uk.gov.hmrc" %% "play-partials" % "5.3.0",
-    "uk.gov.hmrc" %% "play-authorised-frontend" % "6.3.0",
+    "uk.gov.hmrc" %% "play-auth" % "1.0.0",
     "uk.gov.hmrc" %% "play-config" % "4.2.0",
     "uk.gov.hmrc" %% "logback-json-logger" % "3.1.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.1.0",
@@ -30,5 +33,7 @@ object FrontendBuild extends Build with MicroService {
     "org.jsoup" % "jsoup" % "1.8.1" % scope,
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
   )
+
+  def apply() = compile ++ test()
 
 }
