@@ -16,4 +16,10 @@
 
 package models
 
+import play.api.libs.json.Json
+
 case class RosmRegistration(regime: String, requiresNameMatch: Boolean, isAnAgent: Boolean)
+
+object RosmRegistration {
+  implicit val formats = Json.format[RosmRegistration]
+}

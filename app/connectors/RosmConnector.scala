@@ -17,13 +17,15 @@
 package connectors
 
 import config.WSHttp
-import models.RosmRegistration
+import models.{RosmRegistration, RosmRegistrationFailureResponse, RosmRegistrationResponse, RosmRegistrationSuccessResponse}
+import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait RosmConnector extends ServicesConfig {
+trait RosmConnector extends ServicesConfig with RosmJsonFormats {
 
   val httpPost:HttpPost = WSHttp
   lazy val rosmUrl = baseUrl("rosm")
@@ -32,8 +34,25 @@ trait RosmConnector extends ServicesConfig {
     override def read(method: String, url: String, response: HttpResponse) = response
   }
 
-  def registerOnce(request:RosmRegistration)(implicit hc: HeaderCarrier): Future[String] = {
-    Future.successful("Ok")
+  def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[RosmRegistrationResponse] = {
+    val uri = s"$rosmUrl/registration/organisation/utr/$utr"
+    val result = httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+
+    result map (r =>
+      r.json.validate[RosmRegistrationSuccessResponse] match {
+        case success: JsSuccess[RosmRegistrationSuccessResponse] => success.get
+        case error: JsError => parseError(r.json)
+      }
+    )
+  }
+
+  private def parseError(json:JsValue):RosmRegistrationFailureResponse = {
+    json.validate[RosmRegistrationFailureResponse] match {
+      case success: JsSuccess[RosmRegistrationFailureResponse] => success.get
+      case failure: JsError => RosmRegistrationFailureResponse(
+        code = "INTERNAL_SERVER_ERROR",
+        reason = "Internal Server Error")
+    }
   }
 
 }
