@@ -91,7 +91,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val submitOrganisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, userDetailsUri) =>
+    authorisedForLisa { (cacheId, _) =>
 
       organisationForm.bindFromRequest.fold(
         formWithErrors => {
@@ -100,14 +100,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
         data => {
           ShortLivedCache.cache[OrganisationDetails](cacheId, organisationDetailsCacheKey, data)
 
-          // ROSM integration goes here
-          Future.successful(Ok(userDetailsUri))
-
-          //val rosmReg = s"""{"regime": "LISA", "requiresNameMatch": false, "isAnAgent": $isAnAgent}"""
-
-          //Json.parse(rosmReg)
-
-          //Future.successful(Redirect(routes.Registration.tradingDetails()))
+          Future.successful(Redirect(routes.Registration.tradingDetails()))
         }
       )
 
@@ -198,7 +191,7 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val submit: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (cacheId, userDetailsUri) =>
 
       // get organisation details
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).flatMap {
@@ -217,6 +210,13 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
                   val registrationDetails = LisaRegistration(orgData, tradData, yourData)
 
                   ShortLivedCache.remove(cacheId)
+
+                  // ROSM integration goes here
+                  //Future.successful(Ok(userDetailsUri))
+
+                  //val rosmReg = s"""{"regime": "LISA", "requiresNameMatch": false, "isAnAgent": $isAnAgent}"""
+
+                  //Json.parse(rosmReg)
 
                   NotImplemented(Json.toJson[LisaRegistration](registrationDetails))
                 }
