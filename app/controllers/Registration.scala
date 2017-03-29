@@ -17,32 +17,29 @@
 package controllers
 
 import config.{FrontendAuthConnector, ShortLivedCache}
-import connectors.RosmConnector
+import connectors.{RosmConnector, RosmJsonFormats}
 import models._
-import play.api.{Environment, Play}
 import play.api.Play.current
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
-import uk.gov.hmrc.auth.core._
+import play.api.{Environment, Play}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals._
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-object Registration extends Registration {
-  val authConnector = FrontendAuthConnector
-  val rosmConnector = RosmConnector
-  val config = Play.current.configuration
-  val env = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-}
+trait Registration extends FrontendController
+  with AuthorisedFunctions
+  with Redirects
+  with RosmJsonFormats {
 
-trait Registration extends FrontendController with AuthorisedFunctions with Redirects {
+  val rosmConnector:RosmConnector
 
   implicit val organisationDetailsFormats = Json.format[OrganisationDetails]
   implicit val tradingDetailsFormats = Json.format[TradingDetails]
@@ -80,7 +77,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   private val yourDetailsCacheKey = "yourDetails"
 
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.organisation_details(organisationForm.fill(data)))
@@ -91,7 +89,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val submitOrganisationDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       organisationForm.bindFromRequest.fold(
         formWithErrors => {
@@ -108,7 +107,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val tradingDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       ShortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.trading_details(tradingForm.fill(data)))
@@ -119,7 +119,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val submitTradingDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       tradingForm.bindFromRequest.fold(
         formWithErrors => {
@@ -136,7 +137,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val yourDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       ShortLivedCache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.your_details(yourForm.fill(data)))
@@ -147,7 +149,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val submitYourDetails: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       yourForm.bindFromRequest.fold(
         formWithErrors => {
@@ -164,7 +167,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val summary: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, _) =>
+    authorisedForLisa { (userId, _) =>
+      val cacheId = getCacheId(userId)
 
       // get organisation details
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).flatMap {
@@ -191,7 +195,8 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
   }
 
   val submit: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId, userDetailsUri) =>
+    authorisedForLisa { (userId, userDetailsUri) =>
+      val cacheId = getCacheId(userId)
 
       // get organisation details
       ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).flatMap {
@@ -211,14 +216,13 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
 
                   ShortLivedCache.remove(cacheId)
 
-                  // ROSM integration goes here
-                  //Future.successful(Ok(userDetailsUri))
+                  val rosmReg = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false)
+                  val regResult = rosmConnector.registerOnce(userId, rosmReg)
 
-                  //val rosmReg = s"""{"regime": "LISA", "requiresNameMatch": false, "isAnAgent": $isAnAgent}"""
-
-                  //Json.parse(rosmReg)
-
-                  NotImplemented(Json.toJson[LisaRegistration](registrationDetails))
+                  regResult match {
+                    case s: RosmRegistrationSuccessResponse => NotImplemented(Json.toJson[RosmRegistrationSuccessResponse](s))
+                    case e: RosmRegistrationFailureResponse => InternalServerError(Json.toJson[RosmRegistrationFailureResponse](e))
+                  }
                 }
               }
             }
@@ -241,10 +245,14 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
       val userId = internalId.getOrElse(throw new RuntimeException("No internalId for logged in user"))
       val userDetails = userDetailsUri.getOrElse(throw new RuntimeException("No userDetailsUri for logged in user"))
 
-      callback(s"${userId}-lisa-registration", userDetails)
+      callback(userId, userDetails)
     } recoverWith {
       handleFailure
     }
+  }
+
+  private def getCacheId(userId: String): String = {
+    s"${userId}-lisa-registration"
   }
 
   private def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
@@ -254,4 +262,11 @@ trait Registration extends FrontendController with AuthorisedFunctions with Redi
     case _ => Future.successful(Forbidden(views.html.error.access_denied()))
   }
 
+}
+
+object Registration extends Registration {
+  val authConnector = FrontendAuthConnector
+  override val rosmConnector = RosmConnector
+  val config = Play.current.configuration
+  val env = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 }
