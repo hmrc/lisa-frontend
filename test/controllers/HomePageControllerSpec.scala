@@ -29,12 +29,12 @@ class HomePageControllerSpec extends UnitSpec with WithFakeApplication {
 
   "GET /" should {
     "return 200" in {
-      val result = HomePage.home(fakeRequest)
+      val result = HomePageController.home(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return HTML" in {
-      val result = HomePage.home(fakeRequest)
+      val result = HomePageController.home(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }

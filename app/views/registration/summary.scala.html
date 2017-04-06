@@ -28,7 +28,7 @@
                     @data.organisationDetails.ctrNumber<br>
                 </td>
                 <td>
-                    <a href="@routes.Registration.organisationDetails">
+                    <a href="@routes.OrganisationDetailsController.get">
                         Change <span class="visuallyhidden">Organisation Details</span>
                     </a>
                 </td>
@@ -44,7 +44,7 @@
                     @data.tradingDetails.isaProviderRefNumber<br>
                 </td>
                 <td>
-                    <a href="@routes.Registration.tradingDetails">
+                    <a href="@routes.TradingDetailsController.get">
                         Change <span class="visuallyhidden">Trading Details</span>
                     </a>
                 </td>
@@ -65,7 +65,7 @@
                     @data.yourDetails.email
                 </td>
                 <td>
-                    <a href="@routes.Registration.yourDetails">
+                    <a href="@routes.YourDetailsController.get">
                         Change <span class="visuallyhidden">Your Details</span>
                     </a>
                 </td>
@@ -77,6 +77,6 @@
 
     <p>By submitting this notification you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
 
-    <p><a href="@routes.Registration.submit" class="button">Accept and send application</a></p>
+    <p><a href="@routes.RosmController.get" class="button">Accept and send application</a></p>
 
 }

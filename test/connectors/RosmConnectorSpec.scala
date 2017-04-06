@@ -20,8 +20,9 @@ import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
@@ -31,7 +32,7 @@ import scala.concurrent.{Await, Future}
 
 class RosmConnectorSpec extends PlaySpec
   with MockitoSugar
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with RosmJsonFormats {
 
   "Register Once endpoint" must {

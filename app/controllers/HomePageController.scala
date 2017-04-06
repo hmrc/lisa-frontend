@@ -23,10 +23,10 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-object HomePage extends HomePage
-
-trait HomePage extends FrontendController {
+trait HomePageController extends FrontendController {
   val home: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(views.html.home.home()))
   }
 }
+
+object HomePageController extends HomePageController
