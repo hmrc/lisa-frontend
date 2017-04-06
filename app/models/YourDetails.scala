@@ -16,10 +16,14 @@
 
 package models
 
-case class YourDetails(
-  firstName: String,
-  lastName: String,
-  role: String,
-  phone: String,
-  email: String
-)
+import play.api.libs.json.{Json, OFormat}
+
+case class YourDetails(firstName: String,
+                       lastName: String,
+                       role: String,
+                       phone: String,
+                       email: String)
+
+object YourDetails {
+  implicit val formats: OFormat[YourDetails] = Json.format[YourDetails]
+}

@@ -25,11 +25,12 @@ import play.api.data._
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
-import play.api.{Environment, Play}
+import play.api.{Configuration, Environment, Play}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.frontend.Redirects
+import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
@@ -40,46 +41,12 @@ trait Registration extends FrontendController
   with RosmJsonFormats {
 
   val rosmConnector:RosmConnector
-
-  implicit val organisationDetailsFormats = Json.format[OrganisationDetails]
-  implicit val tradingDetailsFormats = Json.format[TradingDetails]
-  implicit val yourDetailsFormats = Json.format[YourDetails]
-  implicit val registrationFormats = Json.format[LisaRegistration]
-  implicit val rosmRegistrationFormats = Json.format[RosmRegistration]
-
-  private val organisationForm = Form(
-    mapping(
-      "companyName" -> nonEmptyText,
-      "ctrNumber" -> nonEmptyText
-    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
-  )
-
-  private val tradingForm = Form(
-    mapping(
-      "tradingName" -> nonEmptyText,
-      "fsrRefNumber" -> nonEmptyText,
-      "isaProviderRefNumber" -> nonEmptyText
-    )(TradingDetails.apply)(TradingDetails.unapply)
-  )
-
-  private val yourForm = Form(
-    mapping(
-      "firstName" -> nonEmptyText,
-      "lastName" -> nonEmptyText,
-      "role" -> nonEmptyText,
-      "phone" -> nonEmptyText,
-      "email" -> nonEmptyText
-    )(YourDetails.apply)(YourDetails.unapply)
-  )
-
-  private val organisationDetailsCacheKey = "organisationDetails"
-  private val tradingDetailsCacheKey = "tradingDetails"
-  private val yourDetailsCacheKey = "yourDetails"
+  val cache:ShortLivedCache
 
   val organisationDetails: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      ShortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).map {
+      cache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).map {
         case Some(data) => Ok(views.html.registration.organisation_details(organisationForm.fill(data)))
         case None => Ok(views.html.registration.organisation_details(organisationForm))
       }
@@ -235,9 +202,8 @@ trait Registration extends FrontendController
         Enrolment("HMCE-VATVAR-ORG")
       ) and
       AuthProviders(GovernmentGateway)
-    ).retrieve(internalId and userDetailsUri) { case internalId ~ userDetailsUri =>
+    ).retrieve(internalId) { case internalId =>
       val userId = internalId.getOrElse(throw new RuntimeException("No internalId for logged in user"))
-      val userDetails = userDetailsUri.getOrElse(throw new RuntimeException("No userDetailsUri for logged in user"))
 
       callback(s"$userId-lisa-registration")
     } recoverWith {
@@ -248,15 +214,47 @@ trait Registration extends FrontendController
   private def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
     case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
 
+    case ex:Exception => Future.successful(InternalServerError(ex.getMessage + ex.getStackTrace.mkString))
+
     // todo: dont assume any controller exception is related to auth - it may be an error in the application code
     case _ => Future.successful(Forbidden(views.html.error.access_denied()))
   }
+
+  private val organisationDetailsCacheKey = "organisationDetails"
+  private val tradingDetailsCacheKey = "tradingDetails"
+  private val yourDetailsCacheKey = "yourDetails"
+
+  private val organisationForm = Form(
+    mapping(
+      "companyName" -> nonEmptyText,
+      "ctrNumber" -> nonEmptyText
+    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
+  )
+
+  private val tradingForm = Form(
+    mapping(
+      "tradingName" -> nonEmptyText,
+      "fsrRefNumber" -> nonEmptyText,
+      "isaProviderRefNumber" -> nonEmptyText
+    )(TradingDetails.apply)(TradingDetails.unapply)
+  )
+
+  private val yourForm = Form(
+    mapping(
+      "firstName" -> nonEmptyText,
+      "lastName" -> nonEmptyText,
+      "role" -> nonEmptyText,
+      "phone" -> nonEmptyText,
+      "email" -> nonEmptyText
+    )(YourDetails.apply)(YourDetails.unapply)
+  )
 
 }
 
 object Registration extends Registration {
   val authConnector = FrontendAuthConnector
   override val rosmConnector = RosmConnector
-  val config = Play.current.configuration
-  val env = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+  override val cache = ShortLivedCache
+  val config: Configuration = Play.current.configuration
+  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 }
