@@ -16,8 +16,6 @@
 
 package controllers
 
-import javax.swing.SpringLayout.Constraints
-
 import config.{FrontendAuthConnector, ShortLivedCache}
 import connectors.{RosmConnector, RosmJsonFormats}
 import models._
