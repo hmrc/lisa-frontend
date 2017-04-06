@@ -16,6 +16,8 @@
 
 package controllers
 
+import javax.swing.SpringLayout.Constraints
+
 import config.{FrontendAuthConnector, ShortLivedCache}
 import connectors.{RosmConnector, RosmJsonFormats}
 import models._
@@ -31,7 +33,7 @@ import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-
+import play.api.data.validation.Constraints._
 import scala.concurrent.Future
 
 trait Registration extends FrontendController
@@ -50,7 +52,7 @@ trait Registration extends FrontendController
   private val organisationForm = Form(
     mapping(
       "companyName" -> nonEmptyText,
-      "ctrNumber" -> nonEmptyText
+      "ctrNumber" -> text.verifying(pattern("""^\d{10}$""".r, error="Numeric 10 character value required"))
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 
