@@ -30,10 +30,8 @@ import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
-trait YourDetailsController extends LisaBaseController
-  with RosmJsonFormats {
+trait YourDetailsController extends LisaBaseController {
 
-  val rosmConnector:RosmConnector
   val cache:ShortLivedCache
 
   private val cacheKey = "yourDetails"
@@ -82,6 +80,5 @@ object YourDetailsController extends YourDetailsController {
   val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val rosmConnector = RosmConnector
   override val cache = LisaShortLivedCache
 }

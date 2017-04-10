@@ -139,14 +139,12 @@ class OrganisationDetailsControllerSpec extends PlaySpec
   }
 
   val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
-  val mockRosmConnector: RosmConnector = mock[RosmConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
 
   object SUT extends OrganisationDetailsController {
     override val authConnector: PlayAuthConnector = mockAuthConnector
-    override val rosmConnector: RosmConnector = mockRosmConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
