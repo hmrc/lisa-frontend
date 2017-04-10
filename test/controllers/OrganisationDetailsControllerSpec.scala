@@ -22,7 +22,7 @@ import connectors.RosmConnector
 import helpers.CSRFTest
 import models.OrganisationDetails
 import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -34,6 +34,7 @@ import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -119,6 +120,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
         val result = SUT.post(request)
 
+        verify(mockCache, times(1)).cache[OrganisationDetails] _
+
         status(result) mustBe Status.SEE_OTHER
 
         redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
@@ -126,6 +129,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     }
 
   }
+
+  implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
