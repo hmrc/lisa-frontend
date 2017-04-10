@@ -27,8 +27,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Headers}
+import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.auth.core._
@@ -83,7 +84,54 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
   }
 
+  "POST Organisation Details" must {
+
+    "return validation errors" when {
+      "the submitted data is incomplete" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        val result = SUT.post()(request)
+
+        status(result) mustBe Status.BAD_REQUEST
+
+        val content = contentAsString(result)
+
+        content must include ("<h1>Organisation details</h1>")
+        content must include ("This field is required")
+      }
+      "the company tax reference number is invalid" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        val result = SUT.post(request)
+
+        status(result) mustBe Status.BAD_REQUEST
+
+        val content = contentAsString(result)
+
+        content must include ("<h1>Organisation details</h1>")
+        content must include ("Numeric 10 character value required")
+      }
+    }
+
+    "redirect the user to trading details" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+        val result = SUT.post(request)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
+      }
+    }
+
+  }
+
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
+
+  def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
+    addToken(FakeRequest("POST", uri, FakeHeaders(), body))
+  }
 
   val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockRosmConnector: RosmConnector = mock[RosmConnector]
