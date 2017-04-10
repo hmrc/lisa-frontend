@@ -22,6 +22,7 @@ import models._
 import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
+import play.api.data.validation.Constraints._
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
@@ -40,7 +41,7 @@ trait OrganisationDetailsController extends LisaBaseController
   private val form = Form(
     mapping(
       "companyName" -> nonEmptyText,
-      "ctrNumber" -> nonEmptyText
+      "ctrNumber" -> text.verifying(pattern("""^\d{10}$""".r, error="Numeric 10 character value required"))
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 
