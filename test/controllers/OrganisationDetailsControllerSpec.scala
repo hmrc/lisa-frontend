@@ -120,9 +120,9 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
         val result = SUT.post(request)
 
-        verify(mockCache, times(1)).cache[OrganisationDetails] _
-
         status(result) mustBe Status.SEE_OTHER
+
+        verify(mockCache, times(1)).cache[OrganisationDetails](any(), any(), any())(any(), any())
 
         redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
       }

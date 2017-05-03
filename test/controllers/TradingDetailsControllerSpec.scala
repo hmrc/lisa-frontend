@@ -113,9 +113,9 @@ class TradingDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
         val result = SUT.post(request)
 
-        verify(mockCache, times(1)).cache[TradingDetails] _
-
         status(result) mustBe Status.SEE_OTHER
+
+        verify(mockCache, times(1)).cache[TradingDetails](any(), any(), any())(any(), any())
 
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
       }
