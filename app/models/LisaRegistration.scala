@@ -16,4 +16,12 @@
 
 package models
 
-case class LisaRegistration(organisationDetails: OrganisationDetails, tradingDetails: TradingDetails, yourDetails: YourDetails)
+import play.api.libs.json.{Json, OFormat}
+
+case class LisaRegistration(organisationDetails: OrganisationDetails,
+                            tradingDetails: TradingDetails,
+                            yourDetails: YourDetails)
+
+object LisaRegistration {
+  implicit val formats: OFormat[LisaRegistration] = Json.format[LisaRegistration]
+}

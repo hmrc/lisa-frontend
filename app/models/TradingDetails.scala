@@ -16,4 +16,12 @@
 
 package models
 
-case class TradingDetails(tradingName: String, fsrRefNumber: String, isaProviderRefNumber: String)
+import play.api.libs.json.{Json, OFormat}
+
+case class TradingDetails(tradingName: String,
+                          fsrRefNumber: String,
+                          isaProviderRefNumber: String)
+
+object TradingDetails {
+  implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
+}

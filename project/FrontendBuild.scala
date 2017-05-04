@@ -34,7 +34,7 @@ private object AppDependencies {
     "org.jsoup" % "jsoup" % "1.8.1" % scope,
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
     "org.mockito" % "mockito-core" % "1.9.0" % scope,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"  % scope
+    "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0"  % scope
   )
 
   def apply() = compile ++ test()

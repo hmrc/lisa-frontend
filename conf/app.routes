@@ -1,11 +1,11 @@
 # microservice specific routes
 
-GET        /                                controllers.HomePage.home
-GET        /register/organisation-details   controllers.Registration.organisationDetails
-POST       /register/organisation-details   controllers.Registration.submitOrganisationDetails
-GET        /register/trading-details        controllers.Registration.tradingDetails
-POST       /register/trading-details        controllers.Registration.submitTradingDetails
-GET        /register/your-details           controllers.Registration.yourDetails
-POST       /register/your-details           controllers.Registration.submitYourDetails
-GET        /register/summary                controllers.Registration.summary
-GET        /register/submit                 controllers.Registration.submit
+GET        /                                controllers.HomePageController.home
+GET        /register/organisation-details   controllers.OrganisationDetailsController.get
+POST       /register/organisation-details   controllers.OrganisationDetailsController.post
+GET        /register/trading-details        controllers.TradingDetailsController.get
+POST       /register/trading-details        controllers.TradingDetailsController.post
+GET        /register/your-details           controllers.YourDetailsController.get
+POST       /register/your-details           controllers.YourDetailsController.post
+GET        /register/summary                controllers.SummaryController.get
+GET        /register/submit                 controllers.RosmController.get
