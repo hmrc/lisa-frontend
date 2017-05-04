@@ -23,6 +23,7 @@ import helpers.CSRFTest
 import models.OrganisationDetails
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -41,7 +42,8 @@ import scala.concurrent.Future
 class OrganisationDetailsControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
   with MockitoSugar
-  with CSRFTest {
+  with CSRFTest
+  with BeforeAndAfter {
 
   "GET Organisation Details" must {
 
@@ -87,6 +89,10 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
   "POST Organisation Details" must {
 
+    before {
+      reset(mockCache)
+    }
+
     "return validation errors" when {
       "the submitted data is incomplete" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
@@ -122,9 +128,18 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
         status(result) mustBe Status.SEE_OTHER
 
-        verify(mockCache, times(1)).cache[OrganisationDetails](any(), any(), any())(any(), any())
-
         redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
+      }
+    }
+
+    "store organisation details in cache" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
+        await(SUT.post(request))
+
+        verify(mockCache).cache[OrganisationDetails](any(), any(), any())(any(), any())
       }
     }
 

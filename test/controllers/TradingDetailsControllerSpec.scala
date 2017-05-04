@@ -22,6 +22,7 @@ import helpers.CSRFTest
 import models.{OrganisationDetails, TradingDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -40,7 +41,8 @@ import scala.concurrent.Future
 class TradingDetailsControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
   with MockitoSugar
-  with CSRFTest {
+  with CSRFTest
+  with BeforeAndAfter {
 
   "GET Trading Details" must {
 
@@ -86,6 +88,10 @@ class TradingDetailsControllerSpec extends PlaySpec
 
   "POST Trading Details" must {
 
+    before {
+      reset(mockCache)
+    }
+
     "return validation errors" when {
       "the submitted data is incomplete" in {
         val uri = controllers.routes.TradingDetailsController.post().url
@@ -115,9 +121,23 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         status(result) mustBe Status.SEE_OTHER
 
-        verify(mockCache, times(1)).cache[TradingDetails](any(), any(), any())(any(), any())
-
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+      }
+    }
+
+    "store trading details in cache" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.TradingDetailsController.post().url
+        val validJson = Json.obj(
+          "tradingName" -> "Test Trading Name",
+          "fsrRefNumber" -> "123",
+          "isaProviderRefNumber" -> "123"
+        )
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
+
+        await(SUT.post(request))
+
+        verify(mockCache).cache[TradingDetails](any(), any(), any())(any(), any())
       }
     }
 

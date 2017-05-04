@@ -22,6 +22,7 @@ import helpers.CSRFTest
 import models.{TradingDetails, YourDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -40,7 +41,8 @@ import scala.concurrent.Future
 class YourDetailsControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
   with MockitoSugar
-  with CSRFTest {
+  with CSRFTest
+  with BeforeAndAfter {
 
   "GET Your Details" must {
 
@@ -91,6 +93,10 @@ class YourDetailsControllerSpec extends PlaySpec
 
   "POST Your Details" must {
 
+    before {
+      reset(mockCache)
+    }
+
     "return validation errors" when {
       "the submitted data is incomplete" in {
         val uri = controllers.routes.YourDetailsController.post().url
@@ -119,12 +125,28 @@ class YourDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
         val result = SUT.post(request)
 
-        verify(mockCache, times(1)).cache[YourDetails] _
-
         status(result) mustBe Status.SEE_OTHER
 
         redirectLocation(result) mustBe Some(controllers.routes.SummaryController.get().url)
       }
+    }
+
+    "store your details in cache" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.YourDetailsController.post().url
+        val validJson = Json.obj(
+          "firstName" -> "Test",
+          "lastName" -> "User",
+          "role" -> "Role",
+          "phone" -> "0191 123 4567",
+          "email" -> "test@test.com"
+        )
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
+        await(SUT.post(request))
+
+        verify(mockCache).cache[YourDetails](any(), any(), any())(any(), any())
+      }
+
     }
 
   }
