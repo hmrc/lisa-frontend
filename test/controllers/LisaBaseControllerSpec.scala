@@ -106,9 +106,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.FORBIDDEN
-
-        contentAsString(result) must include(accessDeniedHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
       }
 
       "a insufficient enrolments response is returned from auth" in {
@@ -117,9 +115,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.FORBIDDEN
-
-        contentAsString(result) must include(accessDeniedHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
       }
 
       "a internal error response is returned from auth" in {
@@ -128,9 +124,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.FORBIDDEN
-
-        contentAsString(result) must include(accessDeniedHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
       }
 
       "a unsupported affinity group response is returned from auth" in {
@@ -139,9 +133,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.FORBIDDEN
-
-        contentAsString(result) must include(accessDeniedHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
       }
 
       "a unsupported auth provider response is returned from auth" in {
@@ -150,9 +142,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.FORBIDDEN
-
-        contentAsString(result) must include(accessDeniedHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
       }
 
       "a unsupported credential role response is returned from auth" in {
@@ -161,9 +151,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.FORBIDDEN
-
-        contentAsString(result) must include(accessDeniedHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
       }
 
     }
@@ -176,9 +164,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.INTERNAL_SERVER_ERROR
-
-        contentAsString(result) must include(errorHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.error().url)
       }
 
       "an error occurs within the controller body" in {
@@ -187,9 +173,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        status(result) mustBe Status.INTERNAL_SERVER_ERROR
-
-        contentAsString(result) must include(errorHtmlFragment)
+        redirectLocation(result) mustBe Some(routes.ErrorController.error().url)
       }
 
     }
@@ -216,9 +200,6 @@ class LisaBaseControllerSpec extends PlaySpec
   val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-
-  val accessDeniedHtmlFragment = "<h1>Access Denied</h1>"
-  val errorHtmlFragment = "<h1>An error occurred</h1>"
 
   trait SUT extends LisaBaseController {
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>

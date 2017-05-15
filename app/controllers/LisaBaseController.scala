@@ -33,11 +33,7 @@ trait LisaBaseController extends FrontendController
 
   def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     authorised(
-      (
-        Enrolment("IR-CT") or
-        Enrolment("HMCE-VATDEC-ORG") or
-        Enrolment("HMCE-VATVAR-ORG")
-      ) and AuthProviders(GovernmentGateway)
+      AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
     ).retrieve(internalId) { id =>
       val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
 
@@ -49,8 +45,8 @@ trait LisaBaseController extends FrontendController
 
   def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
     case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
-    case _ : AuthorisationException => Future.successful(Forbidden(views.html.error.access_denied()))
-    case _ => Future.successful(InternalServerError(views.html.error.internal_server_error()))
+    case _ : AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
+    case _ => Future.successful(Redirect(routes.ErrorController.error()))
   }
 
 }
