@@ -3,9 +3,11 @@
 
 @(data: LisaRegistration)(implicit request: Request[_], messages: Messages)
 
-@views.html.main_template(title = "Lifetime ISA", bodyClasses = None) {
-
+@contentHeader = {
     <h1>Check your answers before sending your application</h1>
+}
+
+@views.html.main_template(title = "Register as a Lifetime ISA manager", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
     <table>
         <thead>
