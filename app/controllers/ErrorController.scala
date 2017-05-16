@@ -16,17 +16,21 @@
 
 package controllers
 
+import play.api.{Configuration, Environment, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait ErrorController extends FrontendController {
+trait ErrorController extends FrontendController
+  with Redirects {
 
   val accessDenied: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Forbidden(views.html.error.access_denied()))
+    Future.successful(Forbidden(views.html.error.access_denied(ggLoginUrl + "?origin=lisa-api&continue=/lifetime-isa/register/organisation-details")))
   }
 
   val error: Action[AnyContent] = Action.async { implicit request =>
@@ -35,5 +39,7 @@ trait ErrorController extends FrontendController {
 
 }
 
-object ErrorController extends ErrorController
-
+object ErrorController extends ErrorController {
+  val config: Configuration = Play.current.configuration
+  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+}

@@ -1,16 +1,23 @@
-@()(implicit request: Request[_], messages: Messages)
+@(ggLoginUrl: String)(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
     <h1>You can&apos;t access this service with this account</h1>
 }
 
 @views.html.main_template(title = "Access denied", bodyClasses = None, contentHeader = Some(contentHeader)) {
-    <p>
-        To use this service you should sign in with an &apos;organisation&apos; account, but it looks
-        like you&apos;ve tried to use either an &apos;individual&apos; or &apos;agent&apos; account.
-    </p>
+
+    <section class="subsection">
+        <p>
+            To use this service you should sign in with an &apos;organisation&apos; account, but it looks
+            like you&apos;ve tried to use either an &apos;individual&apos; or &apos;agent&apos; account.
+        </p>
+
+        <p>
+            If you don&apos;t have an organisation account you can register for a new one.
+        </p>
+    </section>
 
     <p>
-        If you don&apos;t have an organisation account you can <a href="#">register for a new one</a>.
+        <a class="button" href="@ggLoginUrl">Sign in or register</a>
     </p>
 }
