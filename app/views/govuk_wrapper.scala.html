@@ -1,3 +1,4 @@
+@import config.AppConfig
 @(appConfig: config.AppConfig,
   title: String,
   mainClass: Option[String] = None,
@@ -26,7 +27,7 @@
 
 @insideHeader = {
     @uiLayouts.header_nav(
-      navTitle = Some("Lifetime ISA"),
+      navTitle = Some("Register as a Lifetime ISA manager"),
       navTitleLink = Some(routes.HomePageController.home),
       showBetaLink = false,
       navLinks = None)
@@ -46,9 +47,17 @@
 @footerTop = {}
 @footerLinks = {}
 
+@betaBanner = {
+    @uiLayouts.betaBanner(
+        userLoggedIn = false,
+        betaFeedbackUrl = appConfig.betaFeedbackUrl,
+        betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
+        showFeedbackLinkInBetaBanner = true)
+}
+
 @serviceInfo = {
     @uiLayouts.serviceInfo(
-      betaBanner = HtmlFormat.empty,
+      betaBanner = betaBanner,
       includeGridWrapper = false,
       serviceInfoContent = Some(serviceInfoContent))
 }
