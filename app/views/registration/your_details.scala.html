@@ -3,9 +3,11 @@
 
 @(form: Form[YourDetails])(implicit request: Request[_], messages: Messages)
 
-@views.html.main_template(title = "Lifetime ISA", bodyClasses = None) {
-
+@contentHeader = {
     <h1>Your details</h1>
+}
+
+@views.html.main_template(title = "Register as a Lifetime ISA manager", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
     <form method="post">
         @CSRF.formField
