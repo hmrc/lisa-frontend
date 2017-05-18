@@ -42,7 +42,7 @@ trait BusinessStructureController extends LisaBaseController {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      Future.successful(Ok("business structuregit st"))
+      Future.successful(Ok("business structure"))
     }
   }
 
