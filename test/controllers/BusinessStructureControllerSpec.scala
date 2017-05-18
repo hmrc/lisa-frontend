@@ -50,43 +50,32 @@ class BusinessStructureControllerSpec extends PlaySpec
   with CSRFTest
   with BeforeAndAfter {
 
-  "GET /" should {
-    "return 200" in {
+  "GET Business Structure" should {
+    "return 200 ok" in {
       when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
         thenReturn(Future.successful(None))
 
       val result = SUT.get(fakeRequest)
+
       status(result) mustBe Status.OK
-    }
-
-    "return HTML" in {
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
-        thenReturn(Future.successful(None))
-
-      val result = SUT.get(fakeRequest)
-      contentAsString(result) must include("Select your business structure")
       contentType(result) mustBe Some("text/html")
       charset(result) mustBe Some("utf-8")
+
+      contentAsString(result) must include("Select your business structure")
     }
   }
 
-  "POST /" should {
-    "return 200" in {
+  "POST Business Structure" should {
+    "return 400 for an empty POST" in {
       val uri = controllers.routes.BusinessStructureController.post().url
       val req = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
       val result = SUT.post()(req)
 
       status(result) mustBe Status.BAD_REQUEST
-    }
-
-    "return HTML" in {
-      val uri = controllers.routes.BusinessStructureController.post().url
-      val req = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
-      val result = SUT.post()(req)
-
-      contentAsString(result) must include("Select your business structure")
       contentType(result) mustBe Some("text/html")
       charset(result) mustBe Some("utf-8")
+
+      contentAsString(result) must include("Select your business structure")
     }
   }
 
