@@ -38,7 +38,7 @@ trait TradingDetailsController extends LisaBaseController {
 
   private val form = Form(
     mapping(
-      "tradingName" -> nonEmptyText,
+      "ctrNumber" -> nonEmptyText,
       "fsrRefNumber" -> nonEmptyText,
       "isaProviderRefNumber" -> nonEmptyText
     )(TradingDetails.apply)(TradingDetails.unapply)
@@ -65,7 +65,7 @@ trait TradingDetailsController extends LisaBaseController {
         data => {
           cache.cache[TradingDetails](cacheId, cacheKey, data)
 
-          Future.successful(Redirect(routes.YourDetailsController.get()))
+          Future.successful(Redirect(routes.BusinessStructureController.get()))
         }
       )
 

@@ -30,50 +30,25 @@ import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
-trait OrganisationDetailsController extends LisaBaseController {
+trait BusinessStructureController extends LisaBaseController {
 
   val cache:ShortLivedCache
 
-  private val cacheKey = "organisationDetails"
-
-  private val form = Form(
-    mapping(
-      "companyName" -> text.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{1,105}$""".r, error="Invalid company name")),
-      "tradingName" -> nonEmptyText
-    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
-  )
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
-      cache.fetchAndGetEntry[OrganisationDetails](cacheId, cacheKey).map {
-        case Some(data) => Ok(views.html.registration.organisation_details(form.fill(data)))
-        case None => Ok(views.html.registration.organisation_details(form))
-      }
-
+      Future.successful(Ok("business structure"))
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
-      form.bindFromRequest.fold(
-        formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
-        },
-        data => {
-          cache.cache[OrganisationDetails](cacheId, cacheKey, data)
-
-          Future.successful(Redirect(routes.TradingDetailsController.get()))
-        }
-      )
-
+      Future.successful(Ok("business structure"))
     }
   }
 
 }
 
-object OrganisationDetailsController extends OrganisationDetailsController {
+object BusinessStructureController extends BusinessStructureController {
   val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)

@@ -43,13 +43,13 @@ trait RosmController extends LisaBaseController
   private val organisationForm = Form(
     mapping(
       "companyName" -> nonEmptyText,
-      "ctrNumber" -> nonEmptyText
+      "tradingName" -> nonEmptyText
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 
   private val tradingForm = Form(
     mapping(
-      "tradingName" -> nonEmptyText,
+      "ctrNumber" -> nonEmptyText,
       "fsrRefNumber" -> nonEmptyText,
       "isaProviderRefNumber" -> nonEmptyText
     )(TradingDetails.apply)(TradingDetails.unapply)
@@ -87,7 +87,7 @@ trait RosmController extends LisaBaseController
                   cache.remove(cacheId)
 
                   val rosmReg = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false)
-                  val regResult = rosmConnector.registerOnce(orgData.ctrNumber, rosmReg)
+                  val regResult = rosmConnector.registerOnce(tradData.ctrNumber, rosmReg)
 
                   regResult map {
                     case s: RosmRegistrationSuccessResponse => NotImplemented(Json.toJson[RosmRegistrationSuccessResponse](s))
