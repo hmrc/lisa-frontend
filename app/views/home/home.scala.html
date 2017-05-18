@@ -1,40 +1,40 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
-    <h1>Lifetime ISA</h1>
+    <h1>Register as a Lifetime ISA manager</h1>
 }
 
 @views.html.main_template(title = "Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
-    <h2>Register as a lifetime isa provider</h2>
+    <section class="subsection">
 
-    <p>You can use this service to register with HM Revenue and Customs (HMRC) as a lifetime ISA provider.</p>
+        <p>Use this service to:</p>
 
-    <h3>Check your status</h3>
+        <ul class="list list-bullet">
+            <li>apply to register with HM Revenue and Customs (HMRC) as a Lifetime ISA manager</li>
+            <li>check the status of a submitted application</li>
+        </ul>
 
-    <p>You can also use this service to check the status of a submitted registration. </p>
+    </section>
 
     <p><a class="button button--get-started" href="@routes.OrganisationDetailsController.get()" role="button">Start now</a></p>
 
-    <h2>Before you start</h2>
+    <section class="subsection">
 
-    <p>You must:</p>
+        <h2>Before you start</h2>
 
-    <ul class="list-bullet">
-        <li>be registered with the Financial Conduct Authority</li>
-        <li>be registered with HMRC as an ISA provider</li>
-    </ul>
+        <p>You must be registered with HMRC as an ISA manager.</p>
 
-    <p>You will need your:</p>
+        <p>You'll need your:</p>
 
-    <ul class="list-bullet">
-        <li>corporation tax reference number</li>
-        <li>financial services register reference number</li>
-        <li>ISA provider reference number</li>
-    </ul>
+        <ul class="list list-bullet">
+            <li>ISA manager reference number</li>
+            <li>Corporation Tax reference number</li>
+            <li>Financial Conduct Authority reference number</li>
+        </ul>
 
-    <p>If you do not have a Government Gateway ID, or need to re-register for an account, you can set one up as part of this service.</p>
+        <p>If you don't have a Government Gateway ID, or need to re-register for an account, you can set one up as part of this service.</p>
 
-
+    </section>
 
 }
