@@ -19,27 +19,21 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{BusinessStructure, OrganisationDetails}
-import play.api.{Configuration, Environment, Mode}
-import play.api.http.Status
-import play.api.test.{FakeHeaders, FakeRequest}
-import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.PlayAuthConnector
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import models.BusinessStructure
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
-import play.api.data.validation.Constraints.pattern
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
-import play.api.data.Forms._
-import play.api.data._
+import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
+import play.api.test.Helpers._
+import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.{Configuration, Environment, Mode}
+import uk.gov.hmrc.auth.core.PlayAuthConnector
+import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
