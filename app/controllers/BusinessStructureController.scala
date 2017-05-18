@@ -22,59 +22,33 @@ import models._
 import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
+import play.api.data.validation.Constraints._
 import play.api.i18n.Messages.Implicits._
-import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
-trait TradingDetailsController extends LisaBaseController {
+trait BusinessStructureController extends LisaBaseController {
 
   val cache:ShortLivedCache
 
-  private val cacheKey = "tradingDetails"
-
-  private val form = Form(
-    mapping(
-      "ctrNumber" -> nonEmptyText,
-      "fsrRefNumber" -> nonEmptyText,
-      "isaProviderRefNumber" -> nonEmptyText
-    )(TradingDetails.apply)(TradingDetails.unapply)
-  )
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
-      cache.fetchAndGetEntry[TradingDetails](cacheId, cacheKey).map {
-        case Some(data) => Ok(views.html.registration.trading_details(form.fill(data)))
-        case None => Ok(views.html.registration.trading_details(form))
-      }
-
+      Future.successful(Ok("business structure"))
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
-      form.bindFromRequest.fold(
-        formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
-        },
-        data => {
-          cache.cache[TradingDetails](cacheId, cacheKey, data)
-
-          Future.successful(Redirect(routes.BusinessStructureController.get()))
-        }
-      )
-
+      Future.successful(Ok("business structuregit st"))
     }
   }
 
 }
 
-object TradingDetailsController extends TradingDetailsController {
+object BusinessStructureController extends BusinessStructureController {
   val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)

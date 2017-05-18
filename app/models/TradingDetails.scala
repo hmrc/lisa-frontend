@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class TradingDetails(tradingName: String,
+case class TradingDetails(ctrNumber: String,
                           fsrRefNumber: String,
                           isaProviderRefNumber: String)
 

@@ -92,8 +92,8 @@ class RosmControllerSpec extends PlaySpec
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -115,8 +115,8 @@ class RosmControllerSpec extends PlaySpec
     "submit the registration" when {
       "all required details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
         val yourForm = new YourDetails(
           firstName = "Test",
           lastName = "User",
@@ -141,8 +141,8 @@ class RosmControllerSpec extends PlaySpec
 
     "handle a successful rosm registration" in {
       val uri = controllers.routes.RosmController.get().url
-      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-      val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+      val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
       val yourForm = new YourDetails(
         firstName = "Test",
         lastName = "User",
@@ -180,8 +180,8 @@ class RosmControllerSpec extends PlaySpec
     "handle a failed rosm registration" when {
       "the proper failure response is returned" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
         val yourForm = new YourDetails(
           firstName = "Test",
           lastName = "User",
@@ -210,8 +210,8 @@ class RosmControllerSpec extends PlaySpec
       }
       "the future fails" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
         val yourForm = new YourDetails(
           firstName = "Test",
           lastName = "User",

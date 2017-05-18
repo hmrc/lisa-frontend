@@ -90,8 +90,8 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -113,8 +113,8 @@ class SummaryControllerSpec extends PlaySpec
     "show the summary" when {
       "all required details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
         val yourForm = new YourDetails(
           firstName = "Test",
           lastName = "User",

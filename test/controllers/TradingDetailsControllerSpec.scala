@@ -49,7 +49,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val tradingForm = new TradingDetails(tradingName = "Test Trading Name", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
@@ -60,8 +60,8 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
-        content must include ("Test Trading Name")
+        content must include (pageTitle)
+        content must include ("1234567890")
       }
 
     }
@@ -78,7 +78,7 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
+        content must include (pageTitle)
         content must include ("value=\"\"")
       }
 
@@ -102,17 +102,16 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
-        content must include ("Trading name")
+        content must include (pageTitle)
         content must include ("This field is required")
       }
     }
 
-    "redirect the user to your details" when {
+    "redirect the user to business structure" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
-          "tradingName" -> "Test Trading Name",
+          "ctrNumber" -> "1234567890",
           "fsrRefNumber" -> "123",
           "isaProviderRefNumber" -> "123"
         )
@@ -121,7 +120,7 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
       }
     }
 
@@ -129,7 +128,7 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
-          "tradingName" -> "Test Trading Name",
+          "ctrNumber" -> "1234567890",
           "fsrRefNumber" -> "123",
           "isaProviderRefNumber" -> "123"
         )
@@ -145,6 +144,7 @@ class TradingDetailsControllerSpec extends PlaySpec
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
+  val pageTitle = "<h1>Your organisation's reference numbers</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {

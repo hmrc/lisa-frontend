@@ -23,11 +23,11 @@
             <tr>
                 <td>
                     Company name<br>
-                    Corporation Tax reference number<br>
+                    Trading name<br>
                 </td>
                 <td>
                     @data.organisationDetails.companyName<br>
-                    @data.organisationDetails.ctrNumber<br>
+                    @data.organisationDetails.tradingName<br>
                 </td>
                 <td>
                     <a href="@routes.OrganisationDetailsController.get">
@@ -36,12 +36,12 @@
                 </td>
             </tr>
             <tr><td>
-                Trading name<br>
+                Corporation Tax reference number<br>
                 Financial Services Register reference number<br>
                 ISA provider reference number
             </td>
                 <td>
-                    @data.tradingDetails.tradingName<br>
+                    @data.tradingDetails.ctrNumber<br>
                     @data.tradingDetails.fsrRefNumber<br>
                     @data.tradingDetails.isaProviderRefNumber<br>
                 </td>
