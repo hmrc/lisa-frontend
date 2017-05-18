@@ -38,8 +38,8 @@ trait OrganisationDetailsController extends LisaBaseController {
 
   private val form = Form(
     mapping(
-      "companyName" -> nonEmptyText,
-      "ctrNumber" -> text.verifying(pattern("""^\d{10}$""".r, error="Numeric 10 character value required"))
+      "companyName" -> text.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{1,105}$""".r, error="Invalid company name")),
+      "tradingName" -> nonEmptyText
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 

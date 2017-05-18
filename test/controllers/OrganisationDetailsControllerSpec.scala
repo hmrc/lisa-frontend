@@ -50,7 +50,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -61,7 +61,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
+        content must include (pageTitle)
         content must include ("Test Company Name")
       }
 
@@ -79,7 +79,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
+        content must include (pageTitle)
         content must include ("value=\"\"")
       }
 
@@ -103,27 +103,28 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
+        content must include (pageTitle)
         content must include ("This field is required")
       }
-      "the company tax reference number is invalid" in {
+
+      "the company name is invalid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "tradingName" -> "X")))
         val result = SUT.post(request)
 
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Organisation details</h1>")
-        content must include ("Numeric 10 character value required")
+        content must include (pageTitle)
+        content must include ("Invalid company name")
       }
     }
 
     "redirect the user to trading details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "tradingName" -> "X")))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -135,7 +136,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "store organisation details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "tradingName" -> "X")))
 
         await(SUT.post(request))
 
@@ -147,6 +148,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
+  val pageTitle = "<h1>Your organisation's name</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
