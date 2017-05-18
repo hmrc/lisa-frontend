@@ -3,10 +3,10 @@
 GET        /                                controllers.HomePageController.home
 GET        /access-denied                   controllers.ErrorController.accessDenied
 GET        /error                           controllers.ErrorController.error
-GET        /register/organisation-details   controllers.OrganisationDetailsController.get
-POST       /register/organisation-details   controllers.OrganisationDetailsController.post
-GET        /register/trading-details        controllers.TradingDetailsController.get
-POST       /register/trading-details        controllers.TradingDetailsController.post
+GET        /organisation-name               controllers.OrganisationDetailsController.get
+POST       /organisation-name               controllers.OrganisationDetailsController.post
+GET        /reference-numbers               controllers.TradingDetailsController.get
+POST       /reference-numbers               controllers.TradingDetailsController.post
 GET        /register/your-details           controllers.YourDetailsController.get
 POST       /register/your-details           controllers.YourDetailsController.post
 GET        /register/summary                controllers.SummaryController.get
