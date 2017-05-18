@@ -1,0 +1,19 @@
+@import helper.CSRF
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages)
+
+@contentHeader = {
+    <h1>Select your business structure</h1>
+}
+
+@views.html.main_template(title = "Select your business structure - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+
+<form method="post">
+    @CSRF.formField
+
+</form>
+
+<p><a href="javascript:history.go(-1)">&lt; Back</a></p>
+
+}
