@@ -36,6 +36,7 @@ trait SummaryController extends LisaBaseController {
 
   private val organisationDetailsCacheKey = "organisationDetails"
   private val tradingDetailsCacheKey = "tradingDetails"
+  private val businessStructureCacheKey = "businessStructure"
   private val yourDetailsCacheKey = "yourDetails"
 
   private val organisationForm = Form(
@@ -51,6 +52,12 @@ trait SummaryController extends LisaBaseController {
       "fsrRefNumber" -> nonEmptyText,
       "isaProviderRefNumber" -> nonEmptyText
     )(TradingDetails.apply)(TradingDetails.unapply)
+  )
+
+  private val businessStructureForm = Form(
+    mapping(
+      "businessStructure" -> nonEmptyText
+    )(BusinessStructure.apply)(BusinessStructure.unapply)
   )
 
   private val yourForm = Form(
@@ -76,11 +83,18 @@ trait SummaryController extends LisaBaseController {
             case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
             case Some(tradData) => {
 
-              // get user details
-              cache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
-                case None => Redirect(routes.YourDetailsController.get())
-                case Some(yourData) => {
-                  Ok(views.html.registration.summary(new LisaRegistration(orgData, tradData, yourData)))
+              // get business structure
+              cache.fetchAndGetEntry[BusinessStructure](cacheId, businessStructureCacheKey).flatMap {
+                case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+                case Some(busData) => {
+
+                  // get user details
+                  cache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
+                    case None => Redirect(routes.YourDetailsController.get())
+                    case Some(yourData) => {
+                      Ok(views.html.registration.summary(new LisaRegistration(orgData, tradData, busData, yourData)))
+                    }
+                  }
                 }
               }
             }

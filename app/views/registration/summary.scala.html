@@ -4,10 +4,10 @@
 @(data: LisaRegistration)(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
-    <h1>Check your answers before sending your application</h1>
+    <h1>Check your answers before submitting your application</h1>
 }
 
-@views.html.main_template(title = "Register as a Lifetime ISA manager", bodyClasses = None, contentHeader = Some(contentHeader)) {
+@views.html.main_template(title = "Check your answers - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
     <table>
         <thead>
@@ -35,11 +35,12 @@
                     </a>
                 </td>
             </tr>
-            <tr><td>
-                Corporation Tax reference number<br>
-                Financial Services Register reference number<br>
-                ISA provider reference number
-            </td>
+            <tr>
+                <td>
+                    Corporation Tax reference number<br>
+                    Financial Services Register reference number<br>
+                    ISA provider reference number
+                </td>
                 <td>
                     @data.tradingDetails.ctrNumber<br>
                     @data.tradingDetails.fsrRefNumber<br>
@@ -48,6 +49,19 @@
                 <td>
                     <a href="@routes.TradingDetailsController.get">
                         Change <span class="visuallyhidden">Trading Details</span>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Business structure
+                </td>
+                <td>
+                    @data.businessStructure.businessStructure
+                </td>
+                <td>
+                    <a href="@routes.BusinessStructureController.get">
+                        Change <span class="visuallyhidden">Business Structure</span>
                     </a>
                 </td>
             </tr>
@@ -75,10 +89,18 @@
         </tbody>
     </table>
 
-    <h2>Now send your application</h2>
+    <h2>Submit your application</h2>
 
-    <p>By submitting this notification you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
+    <p>You're applying to become a Lifetime ISA manager.</p>
 
-    <p><a href="@routes.RosmController.get" class="button">Accept and send application</a></p>
+    <div class="section">
+        <p class="important-notice">
+            <i class="visuallyhidden">Warning</i>
+            By registering to become a Lifetime ISA manager, you confirm that all the
+            information you’ve provided is correct.
+        </p>
+    </div>
+
+    <p><a href="@routes.RosmController.get" class="button">Accept and register</a></p>
 
 }
