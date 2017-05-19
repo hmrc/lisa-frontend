@@ -9,7 +9,10 @@
 
 @views.html.main_template(title = "Your details - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
-    <p>We need your details so we can contact you about your application if we need to.</p>
+    <div class="subsection">
+        <p class="indent">HMRC might contact you, or someone else from your organisation,
+            to confirm the information in this application.</p>
+    </div>
 
     <form method="post">
         @CSRF.formField
@@ -29,12 +32,13 @@
             <div class="form-group">
                 @input(form("email"), '_label -> "Email address", '_inputClass -> "form-control form-control--block")
             </div>
-            <div class="form-group">
+            <div class="form-field form-field--submit">
                 <input type="submit" class="button" value="Continue">
+            </div>
+            <div class="form-field form-field--submit">
+                <p><a href="javascript:history.go(-1)">&lt; Back</a></p>
             </div>
         </fieldset>
     </form>
-
-    <p><a href="javascript:history.go(-1)">&lt; Back</a></p>
 
 }
