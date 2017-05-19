@@ -16,6 +16,8 @@
 
 package controllers
 
+import config.{FrontendAuthConnector, LisaShortLivedCache}
+import play.api.{Configuration, Environment, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
@@ -23,10 +25,16 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait ApplicationSubmittedController extends FrontendController {
+trait ApplicationSubmittedController extends LisaBaseController {
   def get(email: String): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_submitted(email)))
+    authorisedForLisa { (_) =>
+      Future.successful(Ok(views.html.registration.application_submitted(email)))
+    }
   }
 }
 
-object ApplicationSubmittedController extends ApplicationSubmittedController
+object ApplicationSubmittedController extends ApplicationSubmittedController {
+  val authConnector = FrontendAuthConnector
+  val config: Configuration = Play.current.configuration
+  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+}
