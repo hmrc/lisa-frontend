@@ -16,12 +16,11 @@
 
 package controllers
 
-import config.{FrontendAuthConnector, LisaShortLivedCache}
-import play.api.{Configuration, Environment, Play}
+import config.FrontendAuthConnector
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.{Configuration, Environment, Play}
 
 import scala.concurrent.Future
 
