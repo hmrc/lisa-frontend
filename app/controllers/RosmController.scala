@@ -38,6 +38,7 @@ trait RosmController extends LisaBaseController
 
   private val organisationDetailsCacheKey = "organisationDetails"
   private val tradingDetailsCacheKey = "tradingDetails"
+  private val businessStructureCacheKey = "businessStructure"
   private val yourDetailsCacheKey = "yourDetails"
 
   private val organisationForm = Form(
@@ -53,6 +54,12 @@ trait RosmController extends LisaBaseController
       "fsrRefNumber" -> nonEmptyText,
       "isaProviderRefNumber" -> nonEmptyText
     )(TradingDetails.apply)(TradingDetails.unapply)
+  )
+
+  private val businessStructureForm = Form(
+    mapping(
+      "businessStructure" -> nonEmptyText
+    )(BusinessStructure.apply)(BusinessStructure.unapply)
   )
 
   private val yourForm = Form(
@@ -78,22 +85,29 @@ trait RosmController extends LisaBaseController
             case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
             case Some(tradData) => {
 
-              // get user details
-              cache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).flatMap {
-                case None => Future.successful(Redirect(routes.YourDetailsController.get()))
-                case Some(yourData) => {
-                  val registrationDetails = LisaRegistration(orgData, tradData, yourData)
+              // get trading details
+              cache.fetchAndGetEntry[BusinessStructure](cacheId, businessStructureCacheKey).flatMap {
+                case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+                case Some(busData) => {
 
-                  cache.remove(cacheId)
+                  // get user details
+                  cache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).flatMap {
+                    case None => Future.successful(Redirect(routes.YourDetailsController.get()))
+                    case Some(yourData) => {
+                      val registrationDetails = LisaRegistration(orgData, tradData, busData, yourData)
 
-                  val rosmReg = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false)
-                  val regResult = rosmConnector.registerOnce(tradData.ctrNumber, rosmReg)
+                      cache.remove(cacheId)
 
-                  regResult map {
-                    case s: RosmRegistrationSuccessResponse => NotImplemented(Json.toJson[RosmRegistrationSuccessResponse](s))
-                    case e: RosmRegistrationFailureResponse => InternalServerError(Json.toJson[RosmRegistrationFailureResponse](e))
-                  } recover {
-                    case _ => InternalServerError(views.html.error.internal_server_error())
+                      val rosmReg = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false)
+                      val regResult = rosmConnector.registerOnce(registrationDetails.tradingDetails.ctrNumber, rosmReg)
+
+                      regResult map {
+                        case s: RosmRegistrationSuccessResponse => NotImplemented(Json.toJson[RosmRegistrationSuccessResponse](s))
+                        case e: RosmRegistrationFailureResponse => InternalServerError(Json.toJson[RosmRegistrationFailureResponse](e))
+                      } recover {
+                        case _ => InternalServerError(views.html.error.internal_server_error())
+                      }
+                    }
                   }
                 }
               }
