@@ -19,7 +19,7 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{OrganisationDetails, TradingDetails, YourDetails}
+import models.{BusinessStructure, OrganisationDetails, TradingDetails, YourDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -51,6 +51,7 @@ class SummaryControllerSpec extends PlaySpec
 
     val organisationDetailsCacheKey = "organisationDetails"
     val tradingDetailsCacheKey = "tradingDetails"
+    val businessStructureCacheKey = "businessStructure"
     val yourDetailsCacheKey = "yourDetails"
 
     "redirect the user to organisation details" when {
@@ -87,8 +88,8 @@ class SummaryControllerSpec extends PlaySpec
       }
     }
 
-    "redirect the user to your details" when {
-      "no your details are found in the cache" in {
+    "redirect the user to business structure" when {
+      "no business structure details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
         val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
@@ -98,6 +99,33 @@ class SummaryControllerSpec extends PlaySpec
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(None))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+      }
+    }
+
+    "redirect the user to your details" when {
+      "no your details are found in the cache" in {
+        val uri = controllers.routes.SummaryController.get().url
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val businessStructureForm = new BusinessStructure("LLP")
+
+        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(organisationForm)))
+
+        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(tradingForm)))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(businessStructureForm)))
 
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(None))
@@ -115,6 +143,7 @@ class SummaryControllerSpec extends PlaySpec
         val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
         val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
           firstName = "Test",
           lastName = "User",
@@ -128,6 +157,9 @@ class SummaryControllerSpec extends PlaySpec
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(businessStructureForm)))
+
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
@@ -137,7 +169,7 @@ class SummaryControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Check your answers before sending your application</h1>")
+        content must include ("<h1>Check your answers before submitting your application</h1>")
         content must include ("test@test.com")
       }
     }
