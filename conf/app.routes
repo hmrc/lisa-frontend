@@ -11,5 +11,5 @@ GET        /business-structure              controllers.BusinessStructureControl
 POST       /business-structure              controllers.BusinessStructureController.post
 GET        /your-details                    controllers.YourDetailsController.get
 POST       /your-details                    controllers.YourDetailsController.post
-GET        /register/summary                controllers.SummaryController.get
-GET        /register/submit                 controllers.RosmController.get
+GET        /check-your-answers              controllers.SummaryController.get
+GET        /submit-registration             controllers.RosmController.get
