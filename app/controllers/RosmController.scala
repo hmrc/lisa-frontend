@@ -98,14 +98,9 @@ trait RosmController extends LisaBaseController
 
                       cache.remove(cacheId)
 
-                      val rosmReg = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false)
-                      val regResult = rosmConnector.registerOnce(registrationDetails.tradingDetails.ctrNumber, rosmReg)
-
-                      regResult map {
-                        case s: RosmRegistrationSuccessResponse => NotImplemented(Json.toJson[RosmRegistrationSuccessResponse](s))
-                        case e: RosmRegistrationFailureResponse => InternalServerError(Json.toJson[RosmRegistrationFailureResponse](e))
-                      } recover {
-                        case _ => InternalServerError(views.html.error.internal_server_error())
+                      registrationDetails.tradingDetails.ctrNumber match {
+                        case "0000000000" => Future.successful(Redirect(routes.ErrorController.error()))
+                        case _ => Future.successful(Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email)))
                       }
                     }
                   }

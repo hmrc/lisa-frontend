@@ -1,0 +1,24 @@
+@import helper.CSRF
+@import uk.gov.hmrc.play.views.html.helpers._
+@import config.FrontendAppConfig
+
+@(email: String)(implicit request: Request[_], messages: Messages)
+
+@contentHeader = {
+    <div class="transaction-banner--complete">
+        <h1 class="transaction-banner__heading">Application submitted</h1>
+    </div>
+}
+
+@views.html.main_template(title = "Application submitted - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+    <h2>What happens next</h2>
+
+    <p>Your application to become a Lifetime ISA manager will be reviewed by HM Revenue and Customs.</p>
+
+    <p>The review process can take up to 14 days. We will send an email to @email when the decision
+        has been made. You'll need to sign in to this website to see the decision.</p>
+
+    <div class="form-field form-field--submit">
+        <p><a href="@FrontendAppConfig.signOutUrl" class="button">Sign out</a></p>
+    </div>
+}
