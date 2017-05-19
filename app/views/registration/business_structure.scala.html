@@ -12,6 +12,18 @@
 <form method="post">
     @CSRF.formField
 
+    @inputRadioGroup(form("businessStructure"), Seq(
+        ("P", "Partnership"),
+        ("LLP", "Limited Liability Partnership"),
+        ("LTD", "Corporate Body"),
+        ("X", "Unincorporated Body")
+    ), '_labelClass -> "block-label")
+
+    <div class="heading-small">
+        <div class="form-group">
+            <input type="submit" class="button" value="Continue">
+        </div>
+    </div>
 </form>
 
 <p><a href="javascript:history.go(-1)">&lt; Back</a></p>
