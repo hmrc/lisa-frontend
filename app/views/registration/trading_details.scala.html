@@ -13,13 +13,13 @@
         @CSRF.formField
         <fieldset>
             <div class="form-group">
-                @input(form("ctrNumber"), '_label -> "Corporation Tax reference number", '_inputClass -> "input--cleared")
+                @input(form("ctrNumber"), '_label -> "Corporation Tax reference number", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
-                @input(form("fsrRefNumber"), '_label -> "Financial Conduct Authority (FCA) reference number", '_inputClass -> "input--cleared")
+                @input(form("fsrRefNumber"), '_label -> "Financial Conduct Authority (FCA) reference number", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
-                @input(form("isaProviderRefNumber"), '_label -> "ISA manager reference number", '_inputClass -> "input--cleared")
+                @input(form("isaProviderRefNumber"), '_label -> "ISA manager reference number", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
                 <input type="submit" class="button" value="Continue">

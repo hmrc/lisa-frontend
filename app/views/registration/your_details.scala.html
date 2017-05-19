@@ -7,30 +7,34 @@
     <h1>Your details</h1>
 }
 
-@views.html.main_template(title = "Register as a Lifetime ISA manager", bodyClasses = None, contentHeader = Some(contentHeader)) {
+@views.html.main_template(title = "Your details - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+
+    <p>We need your details so we can contact you about your application if we need to.</p>
 
     <form method="post">
         @CSRF.formField
         <fieldset>
             <div class="form-group">
-                @input(form("firstName"), '_label -> "First name", '_inputClass -> "input--cleared")
+                @input(form("firstName"), '_label -> "First name", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
-                @input(form("lastName"), '_label -> "Last name", '_inputClass -> "input--cleared")
+                @input(form("lastName"), '_label -> "Last name", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
-                @input(form("role"), '_label -> "Role in the organisation", '_inputClass -> "input--cleared")
+                @input(form("role"), '_label -> "Role in the organisation", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
-                @input(form("phone"), '_label -> "Phone number", '_inputClass -> "input--cleared")
+                @input(form("phone"), '_label -> "Phone number", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
-                @input(form("email"), '_label -> "Email address", '_inputClass -> "input--cleared")
+                @input(form("email"), '_label -> "Email address", '_inputClass -> "form-control form-control--block")
             </div>
             <div class="form-group">
                 <input type="submit" class="button" value="Continue">
             </div>
         </fieldset>
     </form>
+
+    <p><a href="javascript:history.go(-1)">&lt; Back</a></p>
 
 }
