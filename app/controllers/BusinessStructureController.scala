@@ -34,15 +34,35 @@ trait BusinessStructureController extends LisaBaseController {
 
   val cache:ShortLivedCache
 
+  private val cacheKey = "businessStructure"
+
+  private val form = Form(
+    mapping(
+      "businessStructure" -> nonEmptyText
+    )(BusinessStructure.apply)(BusinessStructure.unapply)
+  )
+
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      Future.successful(Ok("business structure"))
+      cache.fetchAndGetEntry[BusinessStructure](cacheId, cacheKey).map {
+        case Some(data) => Ok(views.html.registration.business_structure(form.fill(data)))
+        case None => Ok(views.html.registration.business_structure(form))
+      }
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      Future.successful(Ok("business structure"))
+      form.bindFromRequest.fold(
+        formWithErrors => {
+          Future.successful(BadRequest(views.html.registration.business_structure(formWithErrors)))
+        },
+        data => {
+          cache.cache[BusinessStructure](cacheId, cacheKey, data)
+
+          Future.successful(Redirect(routes.YourDetailsController.get()))
+        }
+      )
     }
   }
 

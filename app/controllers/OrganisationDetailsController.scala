@@ -45,12 +45,10 @@ trait OrganisationDetailsController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
       cache.fetchAndGetEntry[OrganisationDetails](cacheId, cacheKey).map {
         case Some(data) => Ok(views.html.registration.organisation_details(form.fill(data)))
         case None => Ok(views.html.registration.organisation_details(form))
       }
-
     }
   }
 
