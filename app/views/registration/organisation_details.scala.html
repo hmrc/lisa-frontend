@@ -11,14 +11,12 @@
 
     <form method="post">
         @CSRF.formField
-        <fieldset>
-            <div class="form-group">
-                @input(form("companyName"), '_label -> "Company name", '_inputClass -> "form-control form-control--block")
-            </div>
-            <div class="form-group">
-                @input(form("tradingName"), '_label -> "Trading name", '_inputClass -> "form-control form-control--block")
-            </div>
-        </fieldset>
+        <div class="form-group">
+            @input(form("companyName"), '_label -> "Company name", '_inputClass -> "form-control form-control--block")
+        </div>
+        <div class="form-group">
+            @input(form("tradingName"), '_label -> "Trading name", '_inputClass -> "form-control form-control--block")
+        </div>
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue">
         </div>
