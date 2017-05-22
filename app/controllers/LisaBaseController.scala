@@ -84,4 +84,13 @@ trait LisaBaseController extends FrontendController
     }
   }
 
+  def handleRedirect(redirectUrl: String)(implicit request: Request[AnyContent]): Future[Result] = {
+    val returnUrl: Option[String] = request.getQueryString("returnUrl")
+
+    returnUrl match {
+      case Some(url) if url.matches("^\\/lifetime\\-isa\\/.*$") => Future.successful(Redirect(url))
+      case _ => Future.successful(Redirect(redirectUrl))
+    }
+  }
+
 }

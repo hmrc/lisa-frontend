@@ -30,7 +30,7 @@
                     @data.organisationDetails.tradingName<br>
                 </td>
                 <td>
-                    <a href="@routes.OrganisationDetailsController.get">
+                    <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get">
                         Change <span class="visuallyhidden">Organisation Details</span>
                     </a>
                 </td>
@@ -47,7 +47,7 @@
                     @data.tradingDetails.isaProviderRefNumber<br>
                 </td>
                 <td>
-                    <a href="@routes.TradingDetailsController.get">
+                    <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get">
                         Change <span class="visuallyhidden">Trading Details</span>
                     </a>
                 </td>
@@ -60,7 +60,7 @@
                     @data.businessStructure.businessStructure
                 </td>
                 <td>
-                    <a href="@routes.BusinessStructureController.get">
+                    <a href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get">
                         Change <span class="visuallyhidden">Business Structure</span>
                     </a>
                 </td>
@@ -81,7 +81,7 @@
                     @data.yourDetails.email
                 </td>
                 <td>
-                    <a href="@routes.YourDetailsController.get">
+                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get">
                         Change <span class="visuallyhidden">Your Details</span>
                     </a>
                 </td>

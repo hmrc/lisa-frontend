@@ -194,6 +194,44 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
+    "handle redirections" when {
+
+      "there is no return url" in {
+        val result = SUT.handleRedirect(routes.TradingDetailsController.get().url)(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.TradingDetailsController.get().url)
+      }
+
+      "there return url is a valid lisa url" in {
+        val req = FakeRequest("GET", s"/?returnUrl=${routes.SummaryController.get().url}")
+        val result = SUT.handleRedirect(routes.TradingDetailsController.get().url)(req)
+
+        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      }
+
+      "the return url is an external url" in {
+        val req = FakeRequest("GET", "/?returnUrl=http://news.ycombinator.com")
+        val result = SUT.handleRedirect(routes.TradingDetailsController.get().url)(req)
+
+        redirectLocation(result) mustBe Some(routes.TradingDetailsController.get().url)
+      }
+
+      "the return url is a protocol-relative external url" in {
+        val req = FakeRequest("GET", "/?returnUrl=//news.ycombinator.com")
+        val result = SUT.handleRedirect(routes.TradingDetailsController.get().url)(req)
+
+        redirectLocation(result) mustBe Some(routes.TradingDetailsController.get().url)
+      }
+
+      "the return url is a relative url for a non-lisa service" in {
+        val req = FakeRequest("GET", "/?returnUrl=/test")
+        val result = SUT.handleRedirect(routes.TradingDetailsController.get().url)(req)
+
+        redirectLocation(result) mustBe Some(routes.TradingDetailsController.get().url)
+      }
+
+    }
+
   }
 
   val fakeRequest = FakeRequest("GET", "/")
