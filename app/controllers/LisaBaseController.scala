@@ -46,7 +46,7 @@ trait LisaBaseController extends FrontendController
   }
 
   def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
-    case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
+    case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa"))
     case _ : AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
     case _ => Future.successful(Redirect(routes.ErrorController.error()))
   }
