@@ -16,6 +16,8 @@
 
 package models
 
+import play.api.data._
+import play.api.data.Forms._
 import play.api.libs.json.{Json, OFormat}
 
 case class TradingDetails(ctrNumber: String,
@@ -24,4 +26,12 @@ case class TradingDetails(ctrNumber: String,
 
 object TradingDetails {
   implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
+  val cacheKey = "tradingDetails"
+  val form = Form(
+    mapping(
+      "ctrNumber" -> nonEmptyText,
+      "fsrRefNumber" -> nonEmptyText,
+      "isaProviderRefNumber" -> nonEmptyText
+    )(TradingDetails.apply)(TradingDetails.unapply)
+  )
 }

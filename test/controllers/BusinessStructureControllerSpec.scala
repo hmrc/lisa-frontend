@@ -44,35 +44,95 @@ class BusinessStructureControllerSpec extends PlaySpec
   with CSRFTest
   with BeforeAndAfter {
 
-  "GET Business Structure" should {
-    "return 200 ok" in {
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
-        thenReturn(Future.successful(None))
+  "GET Business Structure" must {
 
-      val result = SUT.get(fakeRequest)
+    "return a populated form" when {
 
-      status(result) mustBe Status.OK
-      contentType(result) mustBe Some("text/html")
-      charset(result) mustBe Some("utf-8")
+      "the cache returns a value" in {
+        val form = new BusinessStructure("Limited Liability Partnership")
 
-      contentAsString(result) must include("Select your business structure")
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(form)))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.OK
+
+        val content = contentAsString(result)
+
+        content must include (pageTitle)
+        content must include ("checked")
+      }
+
     }
+
+    "return a blank form" when {
+
+      "the cache does not return a value" in {
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(None))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.OK
+
+        val content = contentAsString(result)
+
+        content must include (pageTitle)
+        content must not include ("checked")
+      }
+
+    }
+
   }
 
-  "POST Business Structure" should {
-    "return 400 for an empty POST" in {
-      val uri = controllers.routes.BusinessStructureController.post().url
-      val req = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
-      val result = SUT.post()(req)
+  "POST Business Structure" must {
 
-      status(result) mustBe Status.BAD_REQUEST
-      contentType(result) mustBe Some("text/html")
-      charset(result) mustBe Some("utf-8")
-
-      contentAsString(result) must include("Select your business structure")
+    before {
+      reset(mockCache)
     }
+
+    "return validation errors" when {
+      "the submitted data is incomplete" in {
+        val uri = controllers.routes.BusinessStructureController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        val result = SUT.post()(request)
+
+        status(result) mustBe Status.BAD_REQUEST
+
+        val content = contentAsString(result)
+
+        content must include (pageTitle)
+        content must include ("This field is required")
+      }
+    }
+
+    "redirect the user to your details" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.BusinessStructureController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("businessStructure" -> "LLP")))
+        val result = SUT.post(request)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+      }
+    }
+
+    "store business structure details in cache" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.BusinessStructureController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("businessStructure" -> "LLP")))
+
+        await(SUT.post(request))
+
+        verify(mockCache).cache[BusinessStructure](any(), any(), any())(any(), any())
+      }
+    }
+
   }
 
+  val pageTitle = ">Select your business structure</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {

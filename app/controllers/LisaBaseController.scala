@@ -16,13 +16,13 @@
 
 package controllers
 
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import models._
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals.internalId
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.frontend.Redirects
+import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
@@ -30,6 +30,8 @@ import scala.concurrent.Future
 trait LisaBaseController extends FrontendController
   with AuthorisedFunctions
   with Redirects {
+
+  val cache:ShortLivedCache
 
   def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     authorised(
@@ -47,6 +49,39 @@ trait LisaBaseController extends FrontendController
     case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa/register/organisation-details"))
     case _ : AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
     case _ => Future.successful(Redirect(routes.ErrorController.error()))
+  }
+
+  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Result)(implicit request: Request[AnyContent]): Future[Result] = {
+    // get organisation details
+    cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
+      case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
+      case Some(orgData) => {
+
+        // get trading details
+        cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
+          case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
+          case Some(tradData) => {
+
+            // get business structure
+            cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+              case Some(busData) => {
+
+                // get user details
+                cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
+                  case None => Redirect(routes.YourDetailsController.get())
+                  case Some(yourData) => {
+                    val data = new LisaRegistration(orgData, tradData, busData, yourData)
+
+                    callback(data)
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
 }

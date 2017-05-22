@@ -17,41 +17,22 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.{RosmConnector, RosmJsonFormats}
 import models._
 import play.api.Play.current
-import play.api.data.Forms._
-import play.api.data._
 import play.api.i18n.Messages.Implicits._
-import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
 trait YourDetailsController extends LisaBaseController {
 
-  val cache:ShortLivedCache
-
-  private val cacheKey = "yourDetails"
-
-  private val form = Form(
-    mapping(
-      "firstName" -> nonEmptyText,
-      "lastName" -> nonEmptyText,
-      "role" -> nonEmptyText,
-      "phone" -> nonEmptyText,
-      "email" -> nonEmptyText
-    )(YourDetails.apply)(YourDetails.unapply)
-  )
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      cache.fetchAndGetEntry[YourDetails](cacheId, cacheKey).map {
-        case Some(data) => Ok(views.html.registration.your_details(form.fill(data)))
-        case None => Ok(views.html.registration.your_details(form))
+      cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
+        case Some(data) => Ok(views.html.registration.your_details(YourDetails.form.fill(data)))
+        case None => Ok(views.html.registration.your_details(YourDetails.form))
       }
 
     }
@@ -60,12 +41,12 @@ trait YourDetailsController extends LisaBaseController {
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      form.bindFromRequest.fold(
+      YourDetails.form.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
         },
         data => {
-          cache.cache[YourDetails](cacheId, cacheKey, data)
+          cache.cache[YourDetails](cacheId, YourDetails.cacheKey, data)
 
           Future.successful(Redirect(routes.SummaryController.get()))
         }

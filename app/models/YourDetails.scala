@@ -16,6 +16,8 @@
 
 package models
 
+import play.api.data._
+import play.api.data.Forms._
 import play.api.libs.json.{Json, OFormat}
 
 case class YourDetails(firstName: String,
@@ -26,4 +28,14 @@ case class YourDetails(firstName: String,
 
 object YourDetails {
   implicit val formats: OFormat[YourDetails] = Json.format[YourDetails]
+  val cacheKey = "yourDetails"
+  val form = Form(
+    mapping(
+      "firstName" -> nonEmptyText,
+      "lastName" -> nonEmptyText,
+      "role" -> nonEmptyText,
+      "phone" -> nonEmptyText,
+      "email" -> nonEmptyText
+    )(YourDetails.apply)(YourDetails.unapply)
+  )
 }

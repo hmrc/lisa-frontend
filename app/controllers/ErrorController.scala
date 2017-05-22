@@ -16,11 +16,10 @@
 
 package controllers
 
-import play.api.{Configuration, Environment, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import play.api.{Configuration, Environment, Play}
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 

@@ -73,6 +73,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
     override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
+    override val cache: ShortLivedCache = mockCache
   }
 
   when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
