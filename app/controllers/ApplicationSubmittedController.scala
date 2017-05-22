@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.FrontendAuthConnector
+import config.{FrontendAuthConnector, LisaShortLivedCache}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
@@ -36,4 +36,5 @@ object ApplicationSubmittedController extends ApplicationSubmittedController {
   val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+  override val cache = LisaShortLivedCache
 }

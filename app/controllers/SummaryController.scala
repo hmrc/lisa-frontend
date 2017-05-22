@@ -17,89 +17,17 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.{RosmConnector, RosmJsonFormats}
-import models._
 import play.api.Play.current
-import play.api.data.Forms._
-import play.api.data._
 import play.api.i18n.Messages.Implicits._
-import play.api.libs.json.Json
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
-
-import scala.concurrent.Future
 
 trait SummaryController extends LisaBaseController {
 
-  val cache:ShortLivedCache
-
-  private val organisationDetailsCacheKey = "organisationDetails"
-  private val tradingDetailsCacheKey = "tradingDetails"
-  private val businessStructureCacheKey = "businessStructure"
-  private val yourDetailsCacheKey = "yourDetails"
-
-  private val organisationForm = Form(
-    mapping(
-      "companyName" -> nonEmptyText,
-      "ctrNumber" -> nonEmptyText
-    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
-  )
-
-  private val tradingForm = Form(
-    mapping(
-      "tradingName" -> nonEmptyText,
-      "fsrRefNumber" -> nonEmptyText,
-      "isaProviderRefNumber" -> nonEmptyText
-    )(TradingDetails.apply)(TradingDetails.unapply)
-  )
-
-  private val businessStructureForm = Form(
-    mapping(
-      "businessStructure" -> nonEmptyText
-    )(BusinessStructure.apply)(BusinessStructure.unapply)
-  )
-
-  private val yourForm = Form(
-    mapping(
-      "firstName" -> nonEmptyText,
-      "lastName" -> nonEmptyText,
-      "role" -> nonEmptyText,
-      "phone" -> nonEmptyText,
-      "email" -> nonEmptyText
-    )(YourDetails.apply)(YourDetails.unapply)
-  )
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
-      // get organisation details
-      cache.fetchAndGetEntry[OrganisationDetails](cacheId, organisationDetailsCacheKey).flatMap {
-        case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
-        case Some(orgData) => {
-
-          // get trading details
-          cache.fetchAndGetEntry[TradingDetails](cacheId, tradingDetailsCacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
-            case Some(tradData) => {
-
-              // get business structure
-              cache.fetchAndGetEntry[BusinessStructure](cacheId, businessStructureCacheKey).flatMap {
-                case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-                case Some(busData) => {
-
-                  // get user details
-                  cache.fetchAndGetEntry[YourDetails](cacheId, yourDetailsCacheKey).map {
-                    case None => Redirect(routes.YourDetailsController.get())
-                    case Some(yourData) => {
-                      Ok(views.html.registration.summary(new LisaRegistration(orgData, tradData, busData, yourData)))
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+      hasAllSubmissionData(cacheId) { (data) =>
+        Ok(views.html.registration.summary(data))
       }
     }
   }

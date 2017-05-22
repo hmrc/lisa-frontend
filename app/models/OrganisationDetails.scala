@@ -16,10 +16,20 @@
 
 package models
 
+import play.api.data._
+import play.api.data.Forms._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(companyName: String, tradingName: String)
 
 object OrganisationDetails {
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+  val cacheKey: String = "organisationDetails"
+  val form: Form[OrganisationDetails] = Form(
+    mapping(
+      "companyName" -> text.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{1,105}$""".r, error="Invalid company name")),
+      "tradingName" -> nonEmptyText
+    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
+  )
 }

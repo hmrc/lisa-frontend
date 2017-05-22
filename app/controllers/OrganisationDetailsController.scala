@@ -17,37 +17,21 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.{RosmConnector, RosmJsonFormats}
 import models._
 import play.api.Play.current
-import play.api.data.Forms._
-import play.api.data._
-import play.api.data.validation.Constraints._
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
 trait OrganisationDetailsController extends LisaBaseController {
 
-  val cache:ShortLivedCache
-
-  private val cacheKey = "organisationDetails"
-
-  private val form = Form(
-    mapping(
-      "companyName" -> text.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{1,105}$""".r, error="Invalid company name")),
-      "tradingName" -> nonEmptyText
-    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
-  )
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[OrganisationDetails](cacheId, cacheKey).map {
-        case Some(data) => Ok(views.html.registration.organisation_details(form.fill(data)))
-        case None => Ok(views.html.registration.organisation_details(form))
+      cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
+        case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data)))
+        case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form))
       }
     }
   }
@@ -55,12 +39,12 @@ trait OrganisationDetailsController extends LisaBaseController {
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      form.bindFromRequest.fold(
+      OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
         },
         data => {
-          cache.cache[OrganisationDetails](cacheId, cacheKey, data)
+          cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
 
           Future.successful(Redirect(routes.TradingDetailsController.get()))
         }

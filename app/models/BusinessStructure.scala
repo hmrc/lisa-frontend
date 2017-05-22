@@ -16,10 +16,18 @@
 
 package models
 
+import play.api.data._
+import play.api.data.Forms._
 import play.api.libs.json.{Json, OFormat}
 
 case class BusinessStructure(businessStructure: String)
 
 object BusinessStructure {
   implicit val formats: OFormat[BusinessStructure] = Json.format[BusinessStructure]
+  val cacheKey = "businessStructure"
+  val form = Form(
+    mapping(
+      "businessStructure" -> nonEmptyText
+    )(BusinessStructure.apply)(BusinessStructure.unapply)
+  )
 }

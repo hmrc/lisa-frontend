@@ -29,6 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
 
@@ -200,6 +201,7 @@ class LisaBaseControllerSpec extends PlaySpec
   val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
+  val mockCache: ShortLivedCache = mock[ShortLivedCache]
 
   trait SUT extends LisaBaseController {
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
@@ -214,6 +216,7 @@ class LisaBaseControllerSpec extends PlaySpec
     override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
+    override val cache: ShortLivedCache = mockCache
   }
 
   when(mockConfig.getString(matches("^appName$"), any())).
