@@ -140,37 +140,6 @@ class RosmControllerSpec extends PlaySpec
       }
     }
 
-    "submit the registration" when {
-      "all required details are found in the cache" in {
-        val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
-        val yourForm = new YourDetails(
-          firstName = "Test",
-          lastName = "User",
-          role = "Role",
-          phone = "0191 123 4567",
-          email = "test@test.com")
-
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(yourForm)))
-
-        await(SUT.get(fakeRequest))
-
-        verify(mockRosmConnector).registerOnce(any(), any())(any())
-      }
-    }
-
     "handle a successful rosm registration" in {
       val uri = controllers.routes.RosmController.get().url
       val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
@@ -210,14 +179,14 @@ class RosmControllerSpec extends PlaySpec
 
       when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(Future.successful(rosmSuccessResponse))
 
-      status(SUT.get(fakeRequest)) mustBe NOT_IMPLEMENTED
+      redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get("test@test.com").url))
     }
 
     "handle a failed rosm registration" when {
-      "the proper failure response is returned" in {
+      "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val tradingForm = new TradingDetails(ctrNumber = "0000000000", fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
           firstName = "Test",
@@ -238,47 +207,9 @@ class RosmControllerSpec extends PlaySpec
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
-        val rosmFailedResponse = RosmRegistrationFailureResponse(code = "failed", reason = "failed to register")
-
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(Future.successful(rosmFailedResponse))
-
         val result = SUT.get(fakeRequest)
 
-        status(result) mustBe INTERNAL_SERVER_ERROR
-
-        (contentAsJson(result) \ "reason").as[String] mustBe "failed to register"
-      }
-      "the future fails" in {
-        val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
-        val yourForm = new YourDetails(
-          firstName = "Test",
-          lastName = "User",
-          role = "Role",
-          phone = "0191 123 4567",
-          email = "test@test.com")
-
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(yourForm)))
-
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("test")))
-
-        val result = SUT.get(fakeRequest)
-
-        status(result) mustBe INTERNAL_SERVER_ERROR
-
-        contentAsString(result) must include ("<h1>An error occurred</h1>")
+        redirectLocation(result) must be(Some(routes.ErrorController.error().url))
       }
     }
 

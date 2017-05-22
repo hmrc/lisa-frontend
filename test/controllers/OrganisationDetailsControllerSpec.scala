@@ -18,7 +18,6 @@ package controllers
 
 import java.io.File
 
-import connectors.RosmConnector
 import helpers.CSRFTest
 import models.OrganisationDetails
 import org.mockito.Matchers._
@@ -28,10 +27,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Headers}
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.libs.json.Json
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
+import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
