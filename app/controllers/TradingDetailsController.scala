@@ -48,7 +48,7 @@ trait TradingDetailsController extends LisaBaseController {
         data => {
           cache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, data)
 
-          Future.successful(Redirect(routes.BusinessStructureController.get()))
+          handleRedirect(routes.BusinessStructureController.get().url)
         }
       )
 
