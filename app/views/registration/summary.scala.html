@@ -9,91 +9,79 @@
 
 @views.html.main_template(title = "Check your answers - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
-    <table>
-        <thead>
-            <tr>
-                <th colspan="3">
-                    <h2>
-                        Organisation details
-                    </h2>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    Company name<br>
-                    Trading name<br>
-                </td>
-                <td>
-                    @data.organisationDetails.companyName<br>
-                    @data.organisationDetails.tradingName<br>
-                </td>
-                <td>
-                    <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get">
-                        Change <span class="visuallyhidden">Organisation Details</span>
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Corporation Tax reference number<br>
-                    Financial Services Register reference number<br>
-                    ISA provider reference number
-                </td>
-                <td>
-                    @data.tradingDetails.ctrNumber<br>
-                    @data.tradingDetails.fsrRefNumber<br>
-                    @data.tradingDetails.isaProviderRefNumber<br>
-                </td>
-                <td>
-                    <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get">
-                        Change <span class="visuallyhidden">Trading Details</span>
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Business structure
-                </td>
-                <td>
-                    @data.businessStructure.businessStructure
-                </td>
-                <td>
-                    <a href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get">
-                        Change <span class="visuallyhidden">Business Structure</span>
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    First name<br>
-                    Last name<br>
-                    Role in organisation<br>
-                    Phone number<br>
-                    Email address
-                </td>
-                <td>
-                    @data.yourDetails.firstName<br>
-                    @data.yourDetails.lastName<br>
-                    @data.yourDetails.role<br>
-                    @data.yourDetails.phone<br>
-                    @data.yourDetails.email
-                </td>
-                <td>
-                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get">
-                        Change <span class="visuallyhidden">Your Details</span>
-                    </a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <h2>Organisation details</h2>
 
-    <h2>Submit your application</h2>
+    <!-- Org name -->
+    <section class="divider--top">
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Company name</span>
+            <span class="tabular-data__data-1">@data.organisationDetails.companyName</span>
+            <a class="tabular-data__data-2" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your organisation's name</span></a>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Trading name</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.organisationDetails.tradingName</span>
+        </div>
+    </section>
 
-    <p>You're applying to become a Lifetime ISA manager.</p>
+    <!-- Org ref numbers -->
+    <section class="divider--top">
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Corporation Tax reference number</span>
+            <span class="tabular-data__data-1">@data.tradingDetails.ctrNumber</span>
+            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your organisation's reference numbers</span></a>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Financial Services Register reference number</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.tradingDetails.fsrRefNumber</span>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">ISA provider reference number</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.tradingDetails.isaProviderRefNumber</span>
+        </div>
+    </section>
 
-    <div class="section">
+    <!-- Business structure -->
+    <section class="divider--top">
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Business structure</span>
+            <span class="tabular-data__data-1">@data.businessStructure.businessStructure</span>
+            <a class="tabular-data__data-2" href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your business structure</span></a>
+        </div>
+    </section>
+
+    <!-- Your details -->
+    <section class="divider--top divider--bottom">
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">First name</span>
+            <span class="tabular-data__data-1">@data.yourDetails.firstName</span>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your details</span></a>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Last name</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.lastName</span>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Role in organisation</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.role</span>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Phone number</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.phone</span>
+        </div>
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label">Email address</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.email</span>
+        </div>
+    </section>
+
+    <div class="subsection">
+        <h2>Submit your application</h2>
+
+        <p>You're applying to become a Lifetime ISA manager.</p>
+    </div>
+
+    <div class="subsection">
         <p class="important-notice">
             <i class="visuallyhidden">Warning</i>
             By registering to become a Lifetime ISA manager, you confirm that all the
@@ -101,6 +89,6 @@
         </p>
     </div>
 
-    <p><a href="@routes.RosmController.get" class="button">Accept and register</a></p>
+    <p><a href="@routes.RosmController.get" class="button" role="button">Accept and register</a></p>
 
 }
