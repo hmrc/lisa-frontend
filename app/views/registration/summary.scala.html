@@ -14,64 +14,64 @@
     <!-- Org name -->
     <section class="divider--top">
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Company name</span>
-            <span class="tabular-data__data-1">@data.organisationDetails.companyName</span>
-            <a class="tabular-data__data-2" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your organisation's name</span></a>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-companyName">Company name</span>
+            <span class="tabular-data__data-1" id="value-companyName">@data.organisationDetails.companyName</span>
+            <a class="tabular-data__data-2" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationName">Change <span class="visuallyhidden">Change your organisation's name</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Trading name</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.organisationDetails.tradingName</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-tradingName">Trading name</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-tradingName">@data.organisationDetails.tradingName</span>
         </div>
     </section>
 
     <!-- Org ref numbers -->
     <section class="divider--top">
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Corporation Tax reference number</span>
-            <span class="tabular-data__data-1">@data.tradingDetails.ctrNumber</span>
-            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your organisation's reference numbers</span></a>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-ctrNumber">Corporation Tax reference number</span>
+            <span class="tabular-data__data-1" id="value-ctrNumber">@data.tradingDetails.ctrNumber</span>
+            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers">Change <span class="visuallyhidden">Change your organisation's reference numbers</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Financial Services Register reference number</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.tradingDetails.fsrRefNumber</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-fsrRefNumber">Financial Services Register reference number</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</span>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">ISA provider reference number</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.tradingDetails.isaProviderRefNumber</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-isaProviderRefNumber">ISA provider reference number</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</span>
         </div>
     </section>
 
     <!-- Business structure -->
     <section class="divider--top">
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Business structure</span>
-            <span class="tabular-data__data-1">@data.businessStructure.businessStructure</span>
-            <a class="tabular-data__data-2" href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your business structure</span></a>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-businessStructure">Business structure</span>
+            <span class="tabular-data__data-1" id="value-businessStructure">@data.businessStructure.businessStructure</span>
+            <a class="tabular-data__data-2" href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get" id="change-businessStructure">Change <span class="visuallyhidden">Change your business structure</span></a>
         </div>
     </section>
 
     <!-- Your details -->
     <section class="divider--top divider--bottom">
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">First name</span>
-            <span class="tabular-data__data-1">@data.yourDetails.firstName</span>
-            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get">Change <span class="visuallyhidden">Change your details</span></a>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-firstName">First name</span>
+            <span class="tabular-data__data-1" id="value-firstName">@data.yourDetails.firstName</span>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails">Change <span class="visuallyhidden">Change your details</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Last name</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.lastName</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-lastName">Last name</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-lastName">@data.yourDetails.lastName</span>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Role in organisation</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.role</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-role">Role in organisation</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-role">@data.yourDetails.role</span>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Phone number</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.phone</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-phone">Phone number</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-phone">@data.yourDetails.phone</span>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label">Email address</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col">@data.yourDetails.email</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-email">Email address</span>
+            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-email">@data.yourDetails.email</span>
         </div>
     </section>
 
