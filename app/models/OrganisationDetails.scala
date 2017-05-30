@@ -28,7 +28,7 @@ object OrganisationDetails {
   val cacheKey: String = "organisationDetails"
   val form: Form[OrganisationDetails] = Form(
     mapping(
-      "companyName" -> text.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{1,105}$""".r, error="Invalid company name")),
+      "companyName" -> nonEmptyText.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{0,105}$""".r, error="Invalid company name")),
       "tradingName" -> nonEmptyText
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
