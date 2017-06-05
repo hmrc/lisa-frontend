@@ -21,7 +21,7 @@ import java.io.File
 import connectors.RosmConnector
 import helpers.CSRFTest
 import models._
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq=>MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
@@ -32,6 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
+import services.AuditService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -49,6 +50,7 @@ class RosmControllerSpec extends PlaySpec
     before {
       reset(mockCache)
       reset(mockRosmConnector)
+      reset(mockAuditService)
     }
 
     val organisationDetailsCacheKey = "organisationDetails"
@@ -183,6 +185,7 @@ class RosmControllerSpec extends PlaySpec
     }
 
     "handle a failed rosm registration" when {
+
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
@@ -211,6 +214,114 @@ class RosmControllerSpec extends PlaySpec
 
         redirectLocation(result) must be(Some(routes.ErrorController.error().url))
       }
+
+    }
+
+    "audit a successful rosm registration" in {
+      val uri = controllers.routes.RosmController.get().url
+      val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+      val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val businessStructureForm = new BusinessStructure("LLP")
+      val yourForm = new YourDetails(
+        firstName = "Test",
+        lastName = "User",
+        role = "Role",
+        phone = "0191 123 4567",
+        email = "test@test.com")
+      val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm)
+
+      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(organisationForm)))
+
+      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(tradingForm)))
+
+      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(businessStructureForm)))
+
+      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(yourForm)))
+
+      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
+      val rosmContact = RosmContactDetails()
+      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
+        safeId = "",
+        agentReferenceNumber = "",
+        isEditable = true,
+        isAnAgent = true,
+        isAnASAgent = true,
+        isAnIndividual = true,
+        address = rosmAddress,
+        contactDetails = rosmContact
+      )
+
+      when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(Future.successful(rosmSuccessResponse))
+
+      await(SUT.get(fakeRequest))
+
+      verify(mockAuditService).audit(
+        auditType = MatcherEquals("applicationReceived"),
+        path = MatcherEquals("/lifetime-isa/submit-registration"),
+        auditData = MatcherEquals(Map(
+          "subscriptionId" -> "123456789012",
+          "companyName" -> registrationDetails.organisationDetails.companyName,
+          "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+          "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
+          "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
+          "firstName" -> registrationDetails.yourDetails.firstName,
+          "lastName" -> registrationDetails.yourDetails.lastName,
+          "roleInOrganisation" -> registrationDetails.yourDetails.role,
+          "phoneNumber" -> registrationDetails.yourDetails.phone,
+          "emailAddress" -> registrationDetails.yourDetails.email))
+      )(any())
+    }
+
+    "audit a failed rosm registration" when {
+
+      "the ct utr is 0000000000" in {
+        val uri = controllers.routes.RosmController.get().url
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val tradingForm = new TradingDetails(ctrNumber = "0000000000", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val businessStructureForm = new BusinessStructure("LLP")
+        val yourForm = new YourDetails(
+          firstName = "Test",
+          lastName = "User",
+          role = "Role",
+          phone = "0191 123 4567",
+          email = "test@test.com")
+        val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm)
+
+        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(organisationForm)))
+
+        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(tradingForm)))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(businessStructureForm)))
+
+        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(yourForm)))
+
+        await(SUT.get(fakeRequest))
+
+        verify(mockAuditService).audit(
+          auditType = MatcherEquals("applicationNotReceived"),
+          path = MatcherEquals("/lifetime-isa/submit-registration"),
+          auditData = MatcherEquals(Map(
+            "reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
+            "companyName" -> registrationDetails.organisationDetails.companyName,
+            "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+            "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
+            "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
+            "firstName" -> registrationDetails.yourDetails.firstName,
+            "lastName" -> registrationDetails.yourDetails.lastName,
+            "roleInOrganisation" -> registrationDetails.yourDetails.role,
+            "phoneNumber" -> registrationDetails.yourDetails.phone,
+            "emailAddress" -> registrationDetails.yourDetails.email))
+        )(any())
+      }
+
     }
 
   }
@@ -224,6 +335,7 @@ class RosmControllerSpec extends PlaySpec
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockAuditService: AuditService = mock[AuditService]
 
   object SUT extends RosmController {
     override val authConnector: PlayAuthConnector = mockAuthConnector
@@ -231,6 +343,7 @@ class RosmControllerSpec extends PlaySpec
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
+    override val auditService: AuditService = mockAuditService
   }
 
   when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
