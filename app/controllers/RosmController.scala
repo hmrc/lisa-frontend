@@ -22,7 +22,6 @@ import models.LisaRegistration
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
 import services.AuditService
-import utils.LisaExtensions._
 
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
