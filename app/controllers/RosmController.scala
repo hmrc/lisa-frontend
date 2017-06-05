@@ -18,13 +18,17 @@ package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
 import connectors.{RosmConnector, RosmJsonFormats}
+import models.LisaRegistration
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
+import services.AuditService
+import utils.LisaExtensions._
 
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
 
   val rosmConnector:RosmConnector
+  val auditService:AuditService
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -32,11 +36,41 @@ trait RosmController extends LisaBaseController
         cache.remove(cacheId)
 
         registrationDetails.tradingDetails.ctrNumber match {
-          case "0000000000" => Redirect(routes.ErrorController.error())
-          case _ => Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+          case "0000000000" => {
+            auditService.audit(
+              auditType = "applicationNotReceived",
+              path = routes.RosmController.get().url,
+              auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER")
+            )
+
+            Redirect(routes.ErrorController.error())
+          }
+          case _ => {
+            auditService.audit(
+              auditType = "applicationReceived",
+              path = routes.RosmController.get().url,
+              auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> "123456789012")
+            )
+
+            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+          }
         }
       }
     }
+  }
+
+  private def createAuditDetails(registrationDetails: LisaRegistration) = {
+    Map(
+      "companyName" -> registrationDetails.organisationDetails.companyName,
+      "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+      "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
+      "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
+      "firstName" -> registrationDetails.yourDetails.firstName,
+      "lastName" -> registrationDetails.yourDetails.lastName,
+      "roleInOrganisation" -> registrationDetails.yourDetails.role,
+      "phoneNumber" -> registrationDetails.yourDetails.phone,
+      "emailAddress" -> registrationDetails.yourDetails.email
+    )
   }
 
 }
@@ -47,4 +81,5 @@ object RosmController extends RosmController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val rosmConnector = RosmConnector
   override val cache = LisaShortLivedCache
+  override val auditService = AuditService
 }
