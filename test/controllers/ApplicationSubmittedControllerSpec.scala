@@ -52,8 +52,24 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
       val content = contentAsString(result)
 
-      content must include (pageTitle)
+      content must include (submittedPageTitle)
       content must include ("test@user.com")
+
+    }
+
+  }
+
+  "GET Application Pending" must {
+
+    "return the pending page" in {
+
+      val result = SUT.pending()(fakeRequest)
+
+      status(result) mustBe Status.OK
+
+      val content = contentAsString(result)
+
+      content must include (pendingPageTitle)
 
     }
 
@@ -61,7 +77,8 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
-  val pageTitle = ">Application submitted</h1>"
+  val submittedPageTitle = ">Application submitted</h1>"
+  val pendingPageTitle = ">Application pending</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]

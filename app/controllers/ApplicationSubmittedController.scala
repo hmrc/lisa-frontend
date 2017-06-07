@@ -30,6 +30,12 @@ trait ApplicationSubmittedController extends LisaBaseController {
       Future.successful(Ok(views.html.registration.application_submitted(email)))
     }
   }
+
+  def pending(): Action[AnyContent] = Action.async { implicit request =>
+    authorisedForLisa { (_) =>
+      Future.successful(Ok(views.html.registration.application_pending()))
+    }
+  }
 }
 
 object ApplicationSubmittedController extends ApplicationSubmittedController {
