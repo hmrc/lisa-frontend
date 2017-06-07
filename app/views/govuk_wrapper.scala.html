@@ -1,4 +1,6 @@
 @import config.AppConfig
+@import config.FrontendAppConfig
+
 @(appConfig: config.AppConfig,
   title: String,
   mainClass: Option[String] = None,
@@ -8,7 +10,8 @@
   contentHeader: Option[Html] = None,
   mainContent: Html = HtmlFormat.empty,
   serviceInfoContent: Html = HtmlFormat.empty,
-  scriptElem: Option[Html] = None)(implicit request: Request[_], messages: Messages)
+  scriptElem: Option[Html] = None,
+  showSignOutLink: Boolean)(implicit request: Request[_], messages: Messages)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
@@ -22,7 +25,9 @@
 }
 
 @headerNavLinks = {
-
+    @if(showSignOutLink) {
+        <li><a id="navSignout" href="@FrontendAppConfig.signOutUrl">Sign out</a></li>
+    }
 }
 
 @insideHeader = {
@@ -30,7 +35,8 @@
       navTitle = Some("Register as a Lifetime ISA manager"),
       navTitleLink = Some(routes.HomePageController.home),
       showBetaLink = false,
-      navLinks = None)
+      navLinks = Some(headerNavLinks)
+    )
 }
 
 @afterHeader = {}
