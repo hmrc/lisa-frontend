@@ -14,3 +14,4 @@ POST       /your-details                    controllers.YourDetailsController.po
 GET        /check-your-answers              controllers.SummaryController.get
 GET        /submit-registration             controllers.RosmController.get
 GET        /application-submitted           controllers.ApplicationSubmittedController.get(email)
+GET        /application-pending             controllers.ApplicationSubmittedController.pending
