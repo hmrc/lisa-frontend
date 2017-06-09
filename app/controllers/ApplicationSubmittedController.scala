@@ -32,9 +32,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (_) =>
-      Future.successful(Ok(views.html.registration.application_pending()))
-    }
+    Future.successful(Ok(views.html.registration.application_pending()))
   }
 }
 
