@@ -15,3 +15,4 @@ GET        /check-your-answers              controllers.SummaryController.get
 GET        /submit-registration             controllers.RosmController.get
 GET        /application-submitted           controllers.ApplicationSubmittedController.get(email)
 GET        /application-pending             controllers.ApplicationSubmittedController.pending
+GET        /application-unsuccessful        controllers.ApplicationSubmittedController.rejected
