@@ -75,10 +75,27 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   }
 
+  "GET Application Successful" must {
+
+    "return the successful page" in {
+
+      val result = SUT.successful()(fakeRequest)
+
+      status(result) mustBe Status.OK
+
+      val content = contentAsString(result)
+
+      content must include (successPageTitle)
+
+    }
+
+  }
+
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val submittedPageTitle = ">Application submitted</h1>"
   val pendingPageTitle = ">Application pending</h1>"
+  val successPageTitle = ">Registration successful</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]

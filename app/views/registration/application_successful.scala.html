@@ -1,0 +1,26 @@
+@import helper.CSRF
+@import uk.gov.hmrc.play.views.html.helpers._
+@import config.FrontendAppConfig
+
+@(zref: String)(implicit request: Request[_], messages: Messages)
+
+@contentHeader = {
+<div class="transaction-banner--complete">
+    <h1 class="transaction-banner__heading">Registration successful</h1>
+    <p>LISA manager reference number: @zref</p>
+</div>
+}
+
+@views.html.main_template(title = "Registration successful - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+    <h2>What happens next</h2>
+
+    <p>You can now use your Government Gateway credentials to connect to the Lifetime ISA API.</p>
+
+    <p>Keep a note of this reference number as you'll need it when reporting information to HM Revenue and Customs (HMRC).</p>
+
+    <p>You can sign back into this service at any time to see it.</p>
+
+    <div class="form-field form-field--submit">
+        <p><a href="@FrontendAppConfig.signOutUrl" class="button">Sign out</a></p>
+    </div>
+}
