@@ -16,3 +16,4 @@ GET        /submit-registration             controllers.RosmController.get
 GET        /application-submitted           controllers.ApplicationSubmittedController.get(email)
 GET        /application-pending             controllers.ApplicationSubmittedController.pending
 GET        /application-successful          controllers.ApplicationSubmittedController.successful
+GET        /application-unsuccessful        controllers.ApplicationSubmittedController.rejected
