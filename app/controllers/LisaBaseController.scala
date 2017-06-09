@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import models._
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -46,7 +47,7 @@ trait LisaBaseController extends FrontendController
   }
 
   def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
-    case _ : NoActiveSession => Future.successful(toGGLogin("/lifetime-isa"))
+    case _ : NoActiveSession => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
     case _ : AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
     case _ => Future.successful(Redirect(routes.ErrorController.error()))
   }
