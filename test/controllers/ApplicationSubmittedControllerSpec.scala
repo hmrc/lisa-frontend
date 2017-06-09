@@ -75,6 +75,22 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   }
 
+  "GET Application Successful" must {
+
+    "return the successful page" in {
+
+      val result = SUT.successful()(fakeRequest)
+
+      status(result) mustBe Status.OK
+
+      val content = contentAsString(result)
+
+      content must include (successPageTitle)
+      
+    }
+    
+  }
+
   "GET Application Rejected" must {
 
     "return the unsuccessful page" in {
@@ -86,7 +102,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
       val content = contentAsString(result)
 
       content must include (rejectedPageTitle)
-
+      
     }
 
   }
@@ -95,6 +111,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   val submittedPageTitle = ">Application submitted</h1>"
   val pendingPageTitle = ">Application pending</h1>"
+  val successPageTitle = ">Registration successful</h1>"
   val rejectedPageTitle = ">Registration not successful</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
