@@ -20,7 +20,7 @@ import config.{FrontendAuthConnector, LisaShortLivedCache}
 import connectors.{RosmConnector, RosmJsonFormats}
 import models.LisaRegistration
 import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Play}
+import play.api.{Logger, Configuration, Environment, Play}
 import services.AuditService
 
 trait RosmController extends LisaBaseController
@@ -36,6 +36,7 @@ trait RosmController extends LisaBaseController
 
         registrationDetails.tradingDetails.ctrNumber match {
           case "0000000000" => {
+            Logger.info("Audit of Submission -> auditType = applicationNotReceived")
             auditService.audit(
               auditType = "applicationNotReceived",
               path = routes.RosmController.get().url,
@@ -45,6 +46,7 @@ trait RosmController extends LisaBaseController
             Redirect(routes.ErrorController.error())
           }
           case _ => {
+            Logger.info("Audit of Submission -> auditType = applicationReceived")
             auditService.audit(
               auditType = "applicationReceived",
               path = routes.RosmController.get().url,

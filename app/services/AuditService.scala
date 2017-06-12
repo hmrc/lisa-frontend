@@ -17,6 +17,7 @@
 package services
 
 import config.FrontendAuditConnector
+import play.api.Logger
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
@@ -36,7 +37,7 @@ trait AuditService extends AppName {
       tags = hc.toAuditTags(auditType, path),
       detail = hc.toAuditDetails() ++ auditData
     )
-
+    Logger.info(s"audit Config ${connector.auditingConfig}")
     connector.sendEvent(event)
   }
 
