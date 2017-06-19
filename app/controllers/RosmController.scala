@@ -17,45 +17,37 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.{RosmConnector, RosmJsonFormats}
+import connectors.RosmJsonFormats
 import models.LisaRegistration
 import play.api.mvc.{Action, _}
-import play.api.{Logger, Configuration, Environment, Play}
-import services.AuditService
+import play.api.{Configuration, Environment, Logger, Play}
+import services.{AuditService, RosmService}
 
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
 
-  val rosmConnector:RosmConnector
   val auditService:AuditService
+  val rosmService:RosmService
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      hasAllSubmissionData(cacheId) { (registrationDetails) =>
-        cache.remove(cacheId)
+      hasAllSubmissionData(cacheId) { registrationDetails =>
+        rosmService.registerAndSubscribe(registrationDetails).map(
+          (res) => res.isLeft match {
+            case true =>  Logger.info("Audit of Submission -> auditType = applicationReceived" + res.left.get)
+                        auditService.audit(auditType = "applicationReceived",
+                          path = routes.RosmController.get().url,
+                          auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> res.left.get))
+              Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
 
-        registrationDetails.tradingDetails.ctrNumber match {
-          case "0000000000" => {
-            Logger.info("Audit of Submission -> auditType = applicationNotReceived")
-            auditService.audit(
-              auditType = "applicationNotReceived",
-              path = routes.RosmController.get().url,
-              auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER")
-            )
+            case _ => Logger.info("Audit of Submission -> auditType = applicationNotReceived")
+                      auditService.audit(auditType = "applicationNotReceived",
+                        path = routes.RosmController.get().url,
+                        auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> res.right.get))
 
-            Redirect(routes.ErrorController.error())
+              Redirect(routes.ErrorController.error())
           }
-          case _ => {
-            Logger.info("Audit of Submission -> auditType = applicationReceived")
-            auditService.audit(
-              auditType = "applicationReceived",
-              path = routes.RosmController.get().url,
-              auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> "123456789012")
-            )
-
-            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
-          }
-        }
+        )
       }
     }
   }
@@ -80,7 +72,7 @@ object RosmController extends RosmController {
   val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val rosmConnector = RosmConnector
   override val cache = LisaShortLivedCache
   override val auditService = AuditService
+  override val rosmService =  RosmService
 }

@@ -18,9 +18,16 @@ package models
 
 import play.api.libs.json.Json
 
+case class Organisation(organisationName:String,organisationType:String)
+
+object Organisation {
+  implicit val formats = Json.format[Organisation]
+}
+
 case class RosmRegistration(regime: String,
                             requiresNameMatch: Boolean,
-                            isAnAgent: Boolean)
+                            isAnAgent: Boolean,
+                            organisation: Organisation)
 
 object RosmRegistration {
   implicit val formats = Json.format[RosmRegistration]

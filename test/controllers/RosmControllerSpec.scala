@@ -32,7 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.AuditService
+import services.{RosmService, AuditService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -165,6 +165,7 @@ class RosmControllerSpec extends PlaySpec
 
       when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
+      when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Left("123456789")))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -178,8 +179,6 @@ class RosmControllerSpec extends PlaySpec
         address = rosmAddress,
         contactDetails = rosmContact
       )
-
-      when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(Future.successful(rosmSuccessResponse))
 
       redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get("test@test.com").url))
     }
@@ -209,6 +208,8 @@ class RosmControllerSpec extends PlaySpec
 
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
+
+        when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("INTERNAL_SERVER_ERROR")))
 
         val result = SUT.get(fakeRequest)
 
@@ -254,8 +255,7 @@ class RosmControllerSpec extends PlaySpec
         address = rosmAddress,
         contactDetails = rosmContact
       )
-
-      when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(Future.successful(rosmSuccessResponse))
+      when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Left("123456789012")))
 
       await(SUT.get(fakeRequest))
 
@@ -302,6 +302,7 @@ class RosmControllerSpec extends PlaySpec
 
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
+        when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.get(fakeRequest))
 
@@ -336,14 +337,15 @@ class RosmControllerSpec extends PlaySpec
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuditService: AuditService = mock[AuditService]
+  val mockRosmService :RosmService = mock[RosmService]
 
   object SUT extends RosmController {
     override val authConnector: PlayAuthConnector = mockAuthConnector
-    override val rosmConnector: RosmConnector = mockRosmConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
     override val auditService: AuditService = mockAuditService
+    override val rosmService:RosmService = mockRosmService
   }
 
   when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).

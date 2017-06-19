@@ -22,12 +22,14 @@ import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
 
+import scala.concurrent.Future
+
 trait SummaryController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { (data) =>
-        Ok(views.html.registration.summary(data))
+        Future(Ok(views.html.registration.summary(data)))
       }
     }
   }
