@@ -165,7 +165,7 @@ class RosmControllerSpec extends PlaySpec
 
       when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
-      when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Left("123456789")))
+      when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("123456789")))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -209,7 +209,7 @@ class RosmControllerSpec extends PlaySpec
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
-        when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("INTERNAL_SERVER_ERROR")))
+        when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
         val result = SUT.get(fakeRequest)
 
@@ -255,7 +255,7 @@ class RosmControllerSpec extends PlaySpec
         address = rosmAddress,
         contactDetails = rosmContact
       )
-      when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Left("123456789012")))
+      when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.get(fakeRequest))
 
@@ -302,7 +302,7 @@ class RosmControllerSpec extends PlaySpec
 
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
-        when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
+        when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.get(fakeRequest))
 

@@ -33,7 +33,7 @@ trait RosmController extends LisaBaseController
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
         rosmService.registerAndSubscribe(registrationDetails).map {
-          case Left(subscriptionId) => {
+          case Right(subscriptionId) => {
             Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
             auditService.audit(auditType = "applicationReceived",
@@ -42,7 +42,7 @@ trait RosmController extends LisaBaseController
 
             Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
           }
-          case Right(error) => {
+          case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
 
             auditService.audit(auditType = "applicationNotReceived",
