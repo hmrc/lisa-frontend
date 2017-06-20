@@ -31,8 +31,7 @@ case class RosmRegistrationSuccessResponse(safeId: String,
                                            address: RosmAddress,
                                            contactDetails: RosmContactDetails) extends RosmRegistrationResponse
 
-case class RosmRegistrationFailureResponse(code: String,
-                                           reason: String) extends RosmRegistrationResponse
+case class DesFailureResponse(code: String, reason: String)
 
 case class RosmIndividual(firstName: String,
                           middleName: Option[String] = None,
@@ -55,3 +54,5 @@ case class RosmContactDetails(primaryPhoneNumber: Option[String] = None,
                               faxNumber: Option[String] = None,
                               emailAddress: Option[String] = None)
 
+
+case class DesSubscriptionSuccessResponse(subscriptionId:String)

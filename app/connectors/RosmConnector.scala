@@ -17,42 +17,30 @@
 package connectors
 
 import config.WSHttp
-import models.{RosmRegistration, RosmRegistrationFailureResponse, RosmRegistrationResponse, RosmRegistrationSuccessResponse}
-import play.api.libs.json.{JsError, JsSuccess, JsValue}
+import models._
+import play.api.Logger
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait RosmConnector extends ServicesConfig with RosmJsonFormats {
 
   val httpPost:HttpPost = WSHttp
-  lazy val rosmUrl = baseUrl("rosm")
+  lazy val rosmUrl = baseUrl("lisa")
 
   val httpReads:HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
     override def read(method: String, url: String, response: HttpResponse) = response
   }
 
-  def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[RosmRegistrationResponse] = {
-    val uri = s"$rosmUrl/registration/organisation/utr/$utr"
-    val result = httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
-
-    result map (r =>
-      r.json.validate[RosmRegistrationSuccessResponse] match {
-        case success: JsSuccess[RosmRegistrationSuccessResponse] => success.get
-        case error: JsError => parseError(r.json)
-      }
-    )
+  def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+    val uri = s"$rosmUrl/lisa/$utr/register"
+    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
   }
 
-  private def parseError(json:JsValue):RosmRegistrationFailureResponse = {
-    json.validate[RosmRegistrationFailureResponse] match {
-      case success: JsSuccess[RosmRegistrationFailureResponse] => success.get
-      case failure: JsError => RosmRegistrationFailureResponse(
-        code = "INTERNAL_SERVER_ERROR",
-        reason = "Internal Server Error")
-    }
+  def subscribe(lisaManagerRef: String, lisaSubscribe:LisaSubscription)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+    val uri = s"$rosmUrl/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
+      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly)
   }
 
 }

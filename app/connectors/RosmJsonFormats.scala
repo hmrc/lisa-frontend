@@ -47,6 +47,8 @@ trait RosmJsonFormats {
   implicit val addrFormats = Json.format[RosmAddress]
   implicit val contFormats = Json.format[RosmContactDetails]
   implicit val succFormats = Json.format[RosmRegistrationSuccessResponse]
-  implicit val failFormats = Json.format[RosmRegistrationFailureResponse]
+  implicit val failFormats = Json.format[DesFailureResponse]
+  implicit val desSubscribeFormats = Json.format[DesSubscriptionSuccessResponse]
+
 
 }

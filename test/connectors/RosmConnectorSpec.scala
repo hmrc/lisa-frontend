@@ -23,7 +23,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
@@ -46,23 +46,7 @@ class RosmConnectorSpec extends PlaySpec
           )))
 
         doRegistrationRequest { response =>
-          response mustBe rosmSuccessResponse
-        }
-      }
-      "rosm returns a success message without a dob" in {
-        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any())).
-          thenReturn(Future.successful(HttpResponse(
-            responseStatus = CREATED,
-            responseJson = Some(
-              Json.toJson(rosmSuccessResponseNoDob)
-            )
-          )))
-
-        doRegistrationRequest {
-          case s: RosmRegistrationSuccessResponse => {
-            s.individual.getOrElse(fail()).dateOfBirth mustBe None
-          }
-          case _ => fail()
+          response.json.validate[RosmRegistrationSuccessResponse].get mustBe rosmSuccessResponse
         }
       }
     }
@@ -75,7 +59,7 @@ class RosmConnectorSpec extends PlaySpec
             responseJson = Some(Json.toJson(rosmFailureResponse)))))
 
         doRegistrationRequest { response =>
-          response mustBe rosmFailureResponse
+          response.json.validate[DesFailureResponse].get mustBe rosmFailureResponse
         }
       }
       "rosm returns a success status and an unexpected json response" in {
@@ -85,19 +69,40 @@ class RosmConnectorSpec extends PlaySpec
             responseJson = Some(Json.parse("{}")))))
 
         doRegistrationRequest { response =>
-          response mustBe RosmRegistrationFailureResponse(
-            code = "INTERNAL_SERVER_ERROR",
-            reason = "Internal Server Error"
-          )
+          response.body mustBe "{ }"
         }
       }
     }
 
   }
 
-  private def doRegistrationRequest(callback: (RosmRegistrationResponse) => Unit) = {
-    val request = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false)
+  "subscribe" must {
+    "return success" when {
+      "valid payload with utr" in {
+        when(mockHttpPost.POST[LisaSubscription, HttpResponse](any(), any(), any())(any(), any(), any())).
+          thenReturn(Future.successful(HttpResponse(
+            responseStatus = CREATED,
+            responseJson = Some(Json.toJson(desSubscribeSuccessResponse))
+          )))
+
+        doRegistrationRequest { response =>
+          response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
+        }
+      }
+    }
+  }
+  private def doRegistrationRequest(callback: (HttpResponse) => Unit) = {
+    val request = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false,
+      Organisation(organisationName ="CompName",organisationType="LLP"))
     val response = Await.result(SUT.registerOnce("1234567890", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doSubscribe(callback: (HttpResponse) => Unit) = {
+    val payload =  LisaSubscription("4567890123","SAFEID0124",
+      "FCA1234", "compName", ApplicantDetails("name","lastname","role",ContactDetails("7234545","email@email.com")))
+    val response = Await.result(SUT.subscribe("Z1234", payload), Duration.Inf)
 
     callback(response)
   }
@@ -155,9 +160,11 @@ class RosmConnectorSpec extends PlaySpec
     contactDetails = rosmContactDetails
   )
 
-  val rosmFailureResponse = RosmRegistrationFailureResponse(
+  val rosmFailureResponse = DesFailureResponse(
     code = "SERVICE_UNAVAILABLE",
     reason = "Dependent systems are currently not responding."
   )
+
+  val desSubscribeSuccessResponse = DesSubscriptionSuccessResponse("123456")
 
 }

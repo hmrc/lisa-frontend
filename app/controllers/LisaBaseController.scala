@@ -52,7 +52,7 @@ trait LisaBaseController extends FrontendController
     case _ => Future.successful(Redirect(routes.ErrorController.error()))
   }
 
-  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Result)(implicit request: Request[AnyContent]): Future[Result] = {
+  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     // get organisation details
     cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
       case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
@@ -69,11 +69,10 @@ trait LisaBaseController extends FrontendController
               case Some(busData) => {
 
                 // get user details
-                cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
-                  case None => Redirect(routes.YourDetailsController.get())
+                cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).flatMap {
+                  case None => Future.successful(Redirect(routes.YourDetailsController.get()))
                   case Some(yourData) => {
                     val data = new LisaRegistration(orgData, tradData, busData, yourData)
-
                     callback(data)
                   }
                 }
