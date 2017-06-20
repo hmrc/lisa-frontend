@@ -17,6 +17,7 @@
 package services
 
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
+import models.{TaxEnrolmentAddSubscriberFailed, TaxEnrolmentAddSubscriberSucceeded}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -46,7 +47,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
         val res = Await.result(SUT.addSubscriber("1234567890", "1234567890"), Duration.Inf)
 
-        res mustBe true
+        res mustBe TaxEnrolmentAddSubscriberSucceeded
       }
     }
 
@@ -57,7 +58,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
         val res = Await.result(SUT.addSubscriber("1234567890", "1234567890"), Duration.Inf)
 
-        res mustBe false
+        res mustBe TaxEnrolmentAddSubscriberFailed
       }
     }
 

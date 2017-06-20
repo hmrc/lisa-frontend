@@ -17,7 +17,6 @@
 package services
 
 import connectors.TaxEnrolmentConnector
-import models.TaxEnrolment.SubscribeSucceeded
 import models._
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -30,17 +29,17 @@ trait TaxEnrolmentService {
 
   val connector: TaxEnrolmentConnector
 
-  def addSubscriber(subscriptionId: String, safeId: String)(implicit hc:HeaderCarrier): Future[SubscribeSucceeded] = {
+  def addSubscriber(subscriptionId: String, safeId: String)(implicit hc:HeaderCarrier): Future[TaxEnrolmentAddSubscriberResponse] = {
     val request = TaxEnrolmentAddSubscriberRequest("HMRC-ORG-LISA", "", safeId)
     val response = connector.addSubscriber(subscriptionId, request)(hc)
 
     response.map { _ =>
       Logger.info(s"Tax Enrolment Subscribe accepted for $subscriptionId.")
-      true
+      TaxEnrolmentAddSubscriberSucceeded
     } recover {
       case NonFatal(ex:Exception) =>
         Logger.error(s"Tax Enrolment Subscribe failed for $subscriptionId. Exception : ${ex.getMessage}")
-        false
+        TaxEnrolmentAddSubscriberFailed
     }
   }
 
