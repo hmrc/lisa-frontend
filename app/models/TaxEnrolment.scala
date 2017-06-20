@@ -18,13 +18,11 @@ package models
 
 import org.joda.time.DateTime
 
-case class TaxEnrolmentAddSubscriberRequest(serviceName: String, callback: String, etmpId: String)
+object TaxEnrolment {
+  type SubscribeSucceeded = Boolean
+}
 
-trait TaxEnrolmentAddSubscriberResponse
-case object TaxEnrolmentAddSubscriberSuccess extends TaxEnrolmentAddSubscriberResponse
-case object TaxEnrolmentAddSubscriberBadRequest extends TaxEnrolmentAddSubscriberResponse
-case object TaxEnrolmentAddSubscriberUnauthorised extends TaxEnrolmentAddSubscriberResponse
-case object TaxEnrolmentAddSubscriberError extends TaxEnrolmentAddSubscriberResponse
+case class TaxEnrolmentAddSubscriberRequest(serviceName: String, callback: String, etmpId: String)
 
 case class TaxEnrolmentSubscription(
                                      created: DateTime,

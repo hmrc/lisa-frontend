@@ -17,9 +17,10 @@
 package services
 
 import connectors.TaxEnrolmentConnector
+import models.TaxEnrolment.SubscribeSucceeded
 import models._
 import play.api.Logger
-import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -29,39 +30,24 @@ trait TaxEnrolmentService {
 
   val connector: TaxEnrolmentConnector
 
-  def addSubscriber(subscriptionId: String, safeId: String)(implicit hc:HeaderCarrier): Future[TaxEnrolmentAddSubscriberResponse] = {
+  def addSubscriber(subscriptionId: String, safeId: String)(implicit hc:HeaderCarrier): Future[SubscribeSucceeded] = {
     val request = TaxEnrolmentAddSubscriberRequest("HMRC-ORG-LISA", "", safeId)
     val response = connector.addSubscriber(subscriptionId, request)(hc)
 
     response.map { res =>
       res.status match {
         case 204 =>
-          TaxEnrolmentAddSubscriberSuccess
+          Logger.info(s"Tax Enrolment Subscribe accepted for $subscriptionId.")
+          true
         case _ =>
-          logError(s"Unexpected Http Status : ${res.status}")
-          TaxEnrolmentAddSubscriberError
+          Logger.error(s"Tax Enrolment Subscribe failed for $subscriptionId. Status : ${res.status}, Body: ${res.body}")
+          false
       }
     } recover {
-      case ex:Upstream4xxResponse =>
-        ex.upstreamResponseCode match {
-          case 400 =>
-            logError("Bad Request")
-            TaxEnrolmentAddSubscriberBadRequest
-          case 401 =>
-            logError("Unauthorised")
-            TaxEnrolmentAddSubscriberUnauthorised
-          case _ =>
-            logError(s"Unexpected Upstream4xxResponse -> upstreamResponseCode: ${ex.upstreamResponseCode}, reportAs: ${ex.reportAs}, message: ${ex.getMessage}")
-            TaxEnrolmentAddSubscriberError
-        }
       case NonFatal(ex:Exception) =>
-        logError(s"Exception : ${ex.getMessage}")
-        TaxEnrolmentAddSubscriberError
+        Logger.error(s"Tax Enrolment Subscribe failed for $subscriptionId. Exception : ${ex.getMessage}")
+        false
     }
-  }
-
-  private def logError(message: String) = {
-    Logger.error(s"Tax Enrolment Subscribe Failure - $message")
   }
 
 }
