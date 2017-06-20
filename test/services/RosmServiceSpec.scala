@@ -48,8 +48,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
           Future.successful(HttpResponse(OK,Some(Json.toJson(desSubscribeSuccessResponse)))))
 
         val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
-        res.isLeft mustBe(true)
-        res.isRight mustBe(false)
+
+        res mustBe Right("123456")
       }
       "return a Des Error" when {
         "an in-valid request for registration is recieved" in {
@@ -57,10 +57,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
             Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
           val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
-          res.isLeft mustBe (false)
-          res.isRight mustBe(true)
 
-          res.right.get mustBe rosmFailureResponse.code
+          res mustBe Left(rosmFailureResponse.code)
         }
       }
       "return a Des Error" when {
@@ -71,10 +69,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
                       Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
           val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
-          res.isLeft mustBe (false)
-          res.isRight mustBe (true)
 
-          res.right.get mustBe rosmFailureResponse.code
+          res mustBe Left(rosmFailureResponse.code)
         }
       }
       "return a Internal Server Error" when {
@@ -85,10 +81,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
             Future.successful(HttpResponse(OK, Some(Json.toJson(desSubscribeSuccessResponse)))))
 
           val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
-          res.isLeft mustBe (false)
-          res.isRight mustBe (true)
 
-          res.right.get mustBe "INTERNAL_SERVER_ERROR"
+          res mustBe Left("INTERNAL_SERVER_ERROR")
         }
         "response Json validation has failed in Registration" in {
           when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
@@ -97,10 +91,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
             Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
 
           val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
-          res.isLeft mustBe (false)
-          res.isRight mustBe (true)
 
-          res.right.get mustBe "INTERNAL_SERVER_ERROR"
+          res mustBe Left("INTERNAL_SERVER_ERROR")
         }
       }
     }
