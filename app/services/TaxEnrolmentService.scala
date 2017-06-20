@@ -34,15 +34,9 @@ trait TaxEnrolmentService {
     val request = TaxEnrolmentAddSubscriberRequest("HMRC-ORG-LISA", "", safeId)
     val response = connector.addSubscriber(subscriptionId, request)(hc)
 
-    response.map { res =>
-      res.status match {
-        case 204 =>
-          Logger.info(s"Tax Enrolment Subscribe accepted for $subscriptionId.")
-          true
-        case _ =>
-          Logger.error(s"Tax Enrolment Subscribe failed for $subscriptionId. Status : ${res.status}, Body: ${res.body}")
-          false
-      }
+    response.map { _ =>
+      Logger.info(s"Tax Enrolment Subscribe accepted for $subscriptionId.")
+      true
     } recover {
       case NonFatal(ex:Exception) =>
         Logger.error(s"Tax Enrolment Subscribe failed for $subscriptionId. Exception : ${ex.getMessage}")

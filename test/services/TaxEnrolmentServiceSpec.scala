@@ -40,7 +40,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
   "Tax Enrolment Service" must {
 
     "return true" when {
-      "the connector returns a HttpResponse with a status of 204" in {
+      "the connector returns a HttpResponse" in {
         when(mockConnector.addSubscriber(any(),any())(any())).thenReturn(
             Future.successful(HttpResponse(NO_CONTENT)))
 
@@ -51,16 +51,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return false" when {
-      "the connector returns a HttpResponse with any status other than 204" in {
-        when(mockConnector.addSubscriber(any(), any())(any())).thenReturn(
-          Future.successful(HttpResponse(OK)))
-
-        val res = Await.result(SUT.addSubscriber("1234567890", "1234567890"), Duration.Inf)
-
-        res mustBe false
-      }
-
-      "the connector returns an exception" in {
+      "the connector returns an Exception" in {
         when(mockConnector.addSubscriber(any(),any())(any())).thenReturn(
           Future.failed(Upstream5xxResponse("", 500, 500)))
 
@@ -69,5 +60,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         res mustBe false
       }
     }
+
   }
+
 }
