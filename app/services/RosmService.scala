@@ -41,7 +41,7 @@ trait RosmService extends RosmJsonFormats{
     def performSubscription(safeId:String) : Future[Either[String,String]] =
       rosmConnector.subscribe(registration.tradingDetails.isaProviderRefNumber, LisaSubscription(utr,safeId,registration.tradingDetails.fsrRefNumber, cName, applicantDetails)).map(
         subscribed => subscribed.json.validate[DesSubscriptionSuccessResponse] match {
-          case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Left(successResponse.get.subscriptionId)
+          case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
           case _ : JsError => handleErrorResponse(subscribed)
         })
 
@@ -56,9 +56,9 @@ trait RosmService extends RosmJsonFormats{
   private def handleErrorResponse(response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
       case failureResponse: JsSuccess[DesFailureResponse] =>
         Logger.error(s"Des FailureResponse : ${failureResponse.get.code}")
-        Right(failureResponse.get.code)
+        Left(failureResponse.get.code)
       case _: JsError => Logger.error("JsError in Response")
-        Right("INTERNAL_SERVER_ERROR")
+        Left("INTERNAL_SERVER_ERROR")
     }
 
 }
