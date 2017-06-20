@@ -18,7 +18,6 @@ package connectors
 
 import config.WSHttp
 import models._
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
 
@@ -29,31 +28,20 @@ trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats 
   val httpGet: HttpGet = WSHttp
   val httpPut: HttpPut = WSHttp
 
-  lazy val taxEnrolmentUrl: String = baseUrl("tax-enrolment")
+  lazy val serviceUrl: String = baseUrl("tax-enrolments")
 
-  def addSubscriber(subscriptionId: String, safeId: String)(implicit hc: HeaderCarrier): Future[TaxEnrolmentAddSubscriber] = {
-    val uri = s"$taxEnrolmentUrl/tax-enrolments/subscriptions/$subscriptionId/subscriber"
+  def addSubscriber(subscriptionId: String, request: TaxEnrolmentAddSubscriberRequest)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+    val uri = s"$serviceUrl/tax-enrolments/subscriptions/$subscriptionId/subscriber"
 
-    val req = Json.obj(
-      "serviceName" -> "HMRC-ORG-LISA",
-      "callback" -> "",
-      "etmpId" -> safeId
-    )
-
-    httpPut.PUT[JsValue, HttpResponse](uri, req)(implicitly, implicitly, hc).map(r =>
-      r.status match {
-        case 204 => TaxEnrolmentAddSubscriberSuccess
-        case 400 => TaxEnrolmentAddSubscriberInvalid
-        case 401 => TaxEnrolmentAddSubscriberUnauthorised
-      }
-    )
+    httpPut.PUT[TaxEnrolmentAddSubscriberRequest, HttpResponse](uri, request)(implicitly, implicitly, hc)
   }
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
-    val uri = s"$taxEnrolmentUrl/tax-enrolments/groups/$groupId/subscriptions"
+    val uri = s"$serviceUrl/tax-enrolments/groups/$groupId/subscriptions"
 
     httpGet.GET[List[TaxEnrolmentSubscription]](uri)(implicitly, hc)
   }
 
 }
 
+object TaxEnrolmentConnector extends TaxEnrolmentConnector
