@@ -32,22 +32,26 @@ trait RosmController extends LisaBaseController
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
-        rosmService.registerAndSubscribe(registrationDetails).map(
-          (res) => res.isLeft match {
-            case true =>  Logger.info("Audit of Submission -> auditType = applicationReceived" + res.left.get)
-                        auditService.audit(auditType = "applicationReceived",
-                          path = routes.RosmController.get().url,
-                          auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> res.left.get))
-              Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+        rosmService.registerAndSubscribe(registrationDetails).map {
+          case Left(subscriptionId) => {
+            Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
-            case _ => Logger.info("Audit of Submission -> auditType = applicationNotReceived")
-                      auditService.audit(auditType = "applicationNotReceived",
-                        path = routes.RosmController.get().url,
-                        auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> res.right.get))
+            auditService.audit(auditType = "applicationReceived",
+              path = routes.RosmController.get().url,
+              auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-              Redirect(routes.ErrorController.error())
+            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
           }
-        )
+          case Right(error) => {
+            Logger.info("Audit of Submission -> auditType = applicationNotReceived")
+
+            auditService.audit(auditType = "applicationNotReceived",
+              path = routes.RosmController.get().url,
+              auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
+
+            Redirect(routes.ErrorController.error())
+          }
+        }
       }
     }
   }
