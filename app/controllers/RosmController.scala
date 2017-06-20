@@ -45,6 +45,8 @@ trait RosmController extends LisaBaseController
               case TaxEnrolmentAddSubscriberSucceeded => Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
               case TaxEnrolmentAddSubscriberFailed => Redirect(routes.ErrorController.error())
             }
+
+            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
           }
           case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
