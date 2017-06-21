@@ -21,7 +21,7 @@ import java.io.File
 import connectors.RosmConnector
 import helpers.CSRFTest
 import models._
-import org.mockito.Matchers.{eq=>MatcherEquals, _}
+import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
@@ -32,7 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.{RosmService, AuditService}
+import services.{AuditService, RosmService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -51,6 +51,7 @@ class RosmControllerSpec extends PlaySpec
       reset(mockCache)
       reset(mockRosmConnector)
       reset(mockAuditService)
+      reset(mockTaxEnrolmentService)
     }
 
     val organisationDetailsCacheKey = "organisationDetails"
@@ -165,7 +166,10 @@ class RosmControllerSpec extends PlaySpec
 
       when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
+
       when (mockRosmService.registerAndSubscribe(any())(any())).thenReturn(Future.successful(Right("123456789")))
+
+      when (mockTaxEnrolmentService.addSubscriber(any(), any())(any())).thenReturn(Future.successful(TaxEnrolmentAddSubscriberSucceeded))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -337,7 +341,8 @@ class RosmControllerSpec extends PlaySpec
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuditService: AuditService = mock[AuditService]
-  val mockRosmService :RosmService = mock[RosmService]
+  val mockRosmService: RosmService = mock[RosmService]
+  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
 
   object SUT extends RosmController {
     override val authConnector: PlayAuthConnector = mockAuthConnector
@@ -345,7 +350,8 @@ class RosmControllerSpec extends PlaySpec
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
     override val auditService: AuditService = mockAuditService
-    override val rosmService:RosmService = mockRosmService
+    override val rosmService: RosmService = mockRosmService
+    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
   }
 
   when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).

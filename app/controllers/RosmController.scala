@@ -18,21 +18,24 @@ package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
 import connectors.RosmJsonFormats
-import models.LisaRegistration
+import models.{LisaRegistration, TaxEnrolmentAddSubscriberFailed, TaxEnrolmentAddSubscriberSucceeded}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
-import services.{AuditService, RosmService}
+import services.{AuditService, RosmService, TaxEnrolmentService}
+
+import scala.concurrent.Future
 
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
 
   val auditService:AuditService
   val rosmService:RosmService
+  val taxEnrolmentService:TaxEnrolmentService
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
-        rosmService.registerAndSubscribe(registrationDetails).map {
+        rosmService.registerAndSubscribe(registrationDetails).flatMap {
           case Right(subscriptionId) => {
             Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
@@ -40,7 +43,10 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+            taxEnrolmentService.addSubscriber(subscriptionId, "SAFEID").map {
+              case TaxEnrolmentAddSubscriberSucceeded => Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+              case TaxEnrolmentAddSubscriberFailed => Redirect(routes.ErrorController.error())
+            }
           }
           case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
@@ -49,7 +55,7 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
-            Redirect(routes.ErrorController.error())
+            Future.successful(Redirect(routes.ErrorController.error()))
           }
         }
       }
@@ -78,5 +84,6 @@ object RosmController extends RosmController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val cache = LisaShortLivedCache
   override val auditService = AuditService
-  override val rosmService =  RosmService
+  override val rosmService = RosmService
+  override val taxEnrolmentService = TaxEnrolmentService
 }
