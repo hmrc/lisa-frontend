@@ -17,7 +17,8 @@
 package services
 
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
-import models.{TaxEnrolmentAddSubscriberFailed, TaxEnrolmentAddSubscriberSucceeded}
+import models._
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -38,9 +39,9 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     override val connector:TaxEnrolmentConnector = mockConnector
   }
 
-  "Tax Enrolment Service" must {
+  "Add Subscriber" must {
 
-    "return true" when {
+    "return succeeded" when {
       "the connector returns a HttpResponse" in {
         when(mockConnector.addSubscriber(any(),any())(any())).thenReturn(
             Future.successful(HttpResponse(NO_CONTENT)))
@@ -51,7 +52,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
     }
 
-    "return false" when {
+    "return failed" when {
       "the connector returns an Exception" in {
         when(mockConnector.addSubscriber(any(),any())(any())).thenReturn(
           Future.failed(Upstream5xxResponse("", 500, 500)))
@@ -63,5 +64,85 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
   }
+
+  "Get LISA subscription" must {
+
+    "return the appropriate state" when {
+
+      "given a single lisa subscription in the connector response" in {
+        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+          Future.successful(List(lisaSuccessSubscription)))
+
+        val res = Await.result(SUT.getLisaSubscriptionStatus("1234567890"), Duration.Inf)
+
+        res mustBe TaxEnrolmentSuccess
+      }
+
+      "given two lisa subscriptions in the connector response - newest first" in {
+        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+          Future.successful(List(lisaErrorSubscription, lisaSuccessSubscription)))
+
+        val res = Await.result(SUT.getLisaSubscriptionStatus("1234567890"), Duration.Inf)
+
+        res mustBe TaxEnrolmentError
+      }
+
+      "given two lisa subscriptions in the connector response - oldest first" in {
+        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+          Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription)))
+
+        val res = Await.result(SUT.getLisaSubscriptionStatus("1234567890"), Duration.Inf)
+
+        res mustBe TaxEnrolmentError
+      }
+
+      "given multiple different subscriptions in the connector response" in {
+        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+          Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription, randomPendingSubscription)))
+
+        val res = Await.result(SUT.getLisaSubscriptionStatus("1234567890"), Duration.Inf)
+
+        res mustBe TaxEnrolmentError
+      }
+
+    }
+
+  }
+
+  private val lisaSuccessSubscription = TaxEnrolmentSubscription(
+    created = new DateTime(),
+    lastModified = new DateTime(),
+    credId = "",
+    serviceName = "HMRC-LISA-ORG",
+    identifiers = Nil,
+    callback = "",
+    state = TaxEnrolmentSuccess,
+    etmpId = "",
+    groupIdentifier = ""
+  )
+
+  private val lisaErrorSubscription = TaxEnrolmentSubscription(
+    created = new DateTime().plusDays(1),
+    lastModified = new DateTime(),
+    credId = "",
+    serviceName = "HMRC-LISA-ORG",
+    identifiers = Nil,
+    callback = "",
+    state = TaxEnrolmentError,
+    etmpId = "",
+    groupIdentifier = ""
+  )
+
+  private val randomPendingSubscription = TaxEnrolmentSubscription(
+    created = new DateTime().plusDays(2),
+    lastModified = new DateTime(),
+    credId = "",
+    serviceName = "TEST",
+    identifiers = Nil,
+    callback = "",
+    state = TaxEnrolmentPending,
+    etmpId = "",
+    groupIdentifier = ""
+  )
 
 }
