@@ -32,7 +32,6 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
 
 trait LisaBaseController extends FrontendController
   with AuthorisedFunctions
