@@ -17,7 +17,7 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.RosmJsonFormats
+import connectors.{RosmJsonFormats, UserDetailsConnector}
 import models.{LisaRegistration, TaxEnrolmentAddSubscriberFailed, TaxEnrolmentAddSubscriberSucceeded}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
@@ -30,7 +30,6 @@ trait RosmController extends LisaBaseController
 
   val auditService:AuditService
   val rosmService:RosmService
-  val taxEnrolmentService:TaxEnrolmentService
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -85,5 +84,6 @@ object RosmController extends RosmController {
   override val cache = LisaShortLivedCache
   override val auditService = AuditService
   override val rosmService = RosmService
+  override val userDetailsConnector = UserDetailsConnector
   override val taxEnrolmentService = TaxEnrolmentService
 }

@@ -17,8 +17,10 @@
 package controllers
 
 import config.FrontendAppConfig
+import connectors.UserDetailsConnector
 import models._
 import play.api.mvc.{AnyContent, Request, Result}
+import services.TaxEnrolmentService
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._
@@ -33,6 +35,8 @@ trait LisaBaseController extends FrontendController
   with Redirects {
 
   val cache:ShortLivedCache
+  val userDetailsConnector:UserDetailsConnector
+  val taxEnrolmentService:TaxEnrolmentService
 
   def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     authorised(
@@ -40,7 +44,28 @@ trait LisaBaseController extends FrontendController
     ).retrieve(internalId and userDetailsUri) { case (id ~ userUri) =>
       val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
 
-      callback(s"$userId-lisa-registration")
+      userUri match {
+        case Some(url) => {
+          userDetailsConnector.getUserDetails(url) flatMap { user =>
+            user.groupIdentifier match {
+              case Some(groupId) => {
+                taxEnrolmentService.getLisaSubscriptionState(groupId) flatMap {
+                  case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+                  case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+                  case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+                  case _ => callback(s"$userId-lisa-registration")
+                }
+              }
+              case None => {
+                Future.successful(Redirect(routes.ErrorController.error()))
+              }
+            }
+          }
+        }
+        case None => {
+          Future.successful(Redirect(routes.ErrorController.error()))
+        }
+      }
     } recoverWith {
       handleFailure
     }

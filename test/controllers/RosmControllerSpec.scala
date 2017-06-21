@@ -18,7 +18,7 @@ package controllers
 
 import java.io.File
 
-import connectors.RosmConnector
+import connectors.{RosmConnector, UserDetailsConnector}
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -51,7 +51,6 @@ class RosmControllerSpec extends PlaySpec
       reset(mockCache)
       reset(mockRosmConnector)
       reset(mockAuditService)
-      reset(mockTaxEnrolmentService)
     }
 
     val organisationDetailsCacheKey = "organisationDetails"
@@ -342,6 +341,7 @@ class RosmControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuditService: AuditService = mock[AuditService]
   val mockRosmService: RosmService = mock[RosmService]
+  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
   val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
 
   object SUT extends RosmController {
@@ -351,6 +351,8 @@ class RosmControllerSpec extends PlaySpec
     override val cache: ShortLivedCache = mockCache
     override val auditService: AuditService = mockAuditService
     override val rosmService: RosmService = mockRosmService
+
+    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
     override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
   }
 
@@ -367,5 +369,10 @@ class RosmControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
+
+  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
+    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
+
+  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }

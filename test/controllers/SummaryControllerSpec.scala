@@ -18,8 +18,9 @@ package controllers
 
 import java.io.File
 
+import connectors.UserDetailsConnector
 import helpers.CSRFTest
-import models.{BusinessStructure, OrganisationDetails, TradingDetails, YourDetails}
+import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -31,6 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
+import services.TaxEnrolmentService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -184,12 +186,17 @@ class SummaryControllerSpec extends PlaySpec
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
+  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
 
   object SUT extends SummaryController {
     override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
+
+    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
+    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
   }
 
   val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
@@ -205,5 +212,10 @@ class SummaryControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
+
+  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
+    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
+
+  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }

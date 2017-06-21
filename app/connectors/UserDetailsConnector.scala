@@ -33,3 +33,4 @@ trait UserDetailsConnector extends ServicesConfig with UserDetailsJsonFormats {
 
 }
 
+object UserDetailsConnector extends UserDetailsConnector
