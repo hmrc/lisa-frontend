@@ -23,6 +23,8 @@ import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
 import services.{AuditService, RosmService, TaxEnrolmentService}
 
+import scala.concurrent.Future
+
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
 
@@ -33,7 +35,7 @@ trait RosmController extends LisaBaseController
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
-        rosmService.registerAndSubscribe(registrationDetails).map {
+        rosmService.registerAndSubscribe(registrationDetails).flatMap {
           case Right(subscriptionId) => {
             Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
@@ -45,8 +47,6 @@ trait RosmController extends LisaBaseController
               case TaxEnrolmentAddSubscriberSucceeded => Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
               case TaxEnrolmentAddSubscriberFailed => Redirect(routes.ErrorController.error())
             }
-
-            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
           }
           case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
@@ -55,7 +55,7 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
-            Redirect(routes.ErrorController.error())
+            Future.successful(Redirect(routes.ErrorController.error()))
           }
         }
       }
