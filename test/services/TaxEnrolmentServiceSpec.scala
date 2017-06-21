@@ -107,6 +107,19 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
     }
 
+    "return a does not exist state" when {
+
+      "there are no lisa subscriptions" in {
+        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+          Future.successful(List()))
+
+        val res = Await.result(SUT.getLisaSubscriptionState("1234567890"), Duration.Inf)
+
+        res mustBe TaxEnrolmentDoesNotExist
+      }
+
+    }
+
   }
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(
