@@ -18,6 +18,7 @@ package services
 
 import connectors.TaxEnrolmentConnector
 import models._
+import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -26,6 +27,8 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 trait TaxEnrolmentService {
+
+  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
 
   val connector: TaxEnrolmentConnector
 
@@ -40,6 +43,15 @@ trait TaxEnrolmentService {
       case NonFatal(ex:Exception) =>
         Logger.error(s"Tax Enrolment Subscribe failed for $subscriptionId. Exception : ${ex.getMessage}")
         TaxEnrolmentAddSubscriberFailed
+    }
+  }
+
+  def getLisaSubscriptionState(groupId: String)(implicit hc:HeaderCarrier): Future[TaxEnrolmentState] = {
+    val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)(hc)
+
+    response.map { l =>
+      val subs = l.filter(sub => sub.serviceName == "HMRC-LISA-ORG")
+      if (subs.isEmpty) TaxEnrolmentDoesNotExist else subs.maxBy(sub => sub.created).state
     }
   }
 

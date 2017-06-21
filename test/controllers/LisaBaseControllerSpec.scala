@@ -18,6 +18,8 @@ package controllers
 
 import java.io.File
 
+import connectors.UserDetailsConnector
+import models.{TaxEnrolmentDoesNotExist, UserDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -28,6 +30,7 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
+import services.TaxEnrolmentService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
@@ -182,8 +185,10 @@ class LisaBaseControllerSpec extends PlaySpec
     "allow access" when {
 
       "authorisation passes" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.successful(Some("12345")))
+        val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("12345"), Some("/")))
+
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(retrievalResult)
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -240,6 +245,8 @@ class LisaBaseControllerSpec extends PlaySpec
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
+  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
 
   trait SUT extends LisaBaseController {
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
@@ -255,6 +262,9 @@ class LisaBaseControllerSpec extends PlaySpec
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
+
+    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
+    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
   }
 
   when(mockConfig.getString(matches("^appName$"), any())).
@@ -265,5 +275,10 @@ class LisaBaseControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
+
+  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
+    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
+
+  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }
