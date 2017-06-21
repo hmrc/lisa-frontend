@@ -20,7 +20,7 @@ import java.io.File
 
 import connectors.UserDetailsConnector
 import helpers.CSRFTest
-import models.{TaxEnrolmentDoesNotExist, UserDetails}
+import models.{TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
 import org.mockito.Matchers.{any, matches}
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
@@ -32,7 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.TaxEnrolmentService
+import services.{AuthorisationService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core.{PlayAuthConnector, ~}
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -118,27 +118,23 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   val rejectedPageTitle = ">Registration not successful</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
-  val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
-  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
+  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object SUT extends ApplicationSubmittedController {
-    override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
-
-    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
-    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
+    override val authorisationService: AuthorisationService = mockAuthorisationService
   }
 
-  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+  when(mockAuthorisationService.userStatus(any())).
+    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""))))
 
-  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
-    thenReturn(retrievalResult)
+  when(mockAuthorisationService.getEnrolmentState(any())(any())).
+    thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))
@@ -148,10 +144,5 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
-
-  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
-    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
-
-  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }
