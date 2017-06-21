@@ -182,8 +182,10 @@ class LisaBaseControllerSpec extends PlaySpec
     "allow access" when {
 
       "authorisation passes" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.successful(Some("12345")))
+        val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("12345"), Some("/")))
+
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(retrievalResult)
 
         val result = SUT.testAuthorisation(fakeRequest)
 

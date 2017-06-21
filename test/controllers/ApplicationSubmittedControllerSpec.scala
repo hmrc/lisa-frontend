@@ -30,7 +30,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import uk.gov.hmrc.auth.core.PlayAuthConnector
+import uk.gov.hmrc.auth.core.{PlayAuthConnector, ~}
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -127,8 +127,10 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
     override val cache: ShortLivedCache = mockCache
   }
 
-  when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-    thenReturn(Future.successful(Some("1234")))
+  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+
+  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+    thenReturn(retrievalResult)
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))

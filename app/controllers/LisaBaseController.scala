@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import models._
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.Retrievals.internalId
+import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
@@ -37,7 +37,7 @@ trait LisaBaseController extends FrontendController
   def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     authorised(
       AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
-    ).retrieve(internalId) { id =>
+    ).retrieve(internalId and userDetailsUri) { case (id ~ userUri) =>
       val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
 
       callback(s"$userId-lisa-registration")

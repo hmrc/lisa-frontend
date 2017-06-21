@@ -171,8 +171,10 @@ class YourDetailsControllerSpec extends PlaySpec
     override val cache: ShortLivedCache = mockCache
   }
 
-  when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-    thenReturn(Future.successful(Some("1234")))
+  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+
+  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+    thenReturn(retrievalResult)
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))
