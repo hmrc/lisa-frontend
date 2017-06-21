@@ -46,7 +46,7 @@ trait TaxEnrolmentService {
     }
   }
 
-  def getLisaSubscriptionStatus(groupId: String)(implicit hc:HeaderCarrier): Future[TaxEnrolmentState] = {
+  def getLisaSubscriptionState(groupId: String)(implicit hc:HeaderCarrier): Future[TaxEnrolmentState] = {
     val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)(hc)
 
     response.map { l =>
