@@ -18,20 +18,18 @@ package controllers
 
 import java.io.File
 
-import connectors.UserDetailsConnector
-import models.{TaxEnrolmentDoesNotExist, UserDetails}
+import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.TaxEnrolmentService
-import uk.gov.hmrc.auth.core._
+import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 
 import scala.concurrent.Future
@@ -44,51 +42,9 @@ class LisaBaseControllerSpec extends PlaySpec
 
     "redirect to login" when {
 
-      "a missing bearer token response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new MissingBearerToken()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        status(result) mustBe Status.SEE_OTHER
-
-        val redirectUrl = redirectLocation(result).getOrElse("")
-
-        redirectUrl must startWith("/gg/sign-in?continue=%2Flifetime-isa")
-        redirectUrl must endWith("&origin=lisa-frontend")
-      }
-
-      "a invalid bearer token response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new InvalidBearerToken()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        status(result) mustBe Status.SEE_OTHER
-
-        val redirectUrl = redirectLocation(result).getOrElse("")
-
-        redirectUrl must startWith("/gg/sign-in?continue=%2Flifetime-isa")
-        redirectUrl must endWith("&origin=lisa-frontend")
-      }
-
-      "a bearer token expired response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new BearerTokenExpired()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        status(result) mustBe Status.SEE_OTHER
-
-        val redirectUrl = redirectLocation(result).getOrElse("")
-
-        redirectUrl must startWith("/gg/sign-in?continue=%2Flifetime-isa")
-        redirectUrl must endWith("&origin=lisa-frontend")
-      }
-
-      "a session record not found response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new SessionRecordNotFound()))
+      "a not logged in response is returned from auth" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserNotLoggedIn))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -102,56 +58,11 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
-    "return access denied" when {
+    "redirect to access denied" when {
 
-      "a insufficient confidence level response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new InsufficientConfidenceLevel()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
-      }
-
-      "a insufficient enrolments response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new InsufficientEnrolments()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
-      }
-
-      "a internal error response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new InternalError("auth unavailable")))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
-      }
-
-      "a unsupported affinity group response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new UnsupportedAffinityGroup()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
-      }
-
-      "a unsupported auth provider response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new UnsupportedAuthProvider()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
-      }
-
-      "a unsupported credential role response is returned from auth" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.failed(new UnsupportedCredentialRole()))
+      "a unauthorised response is returned from auth" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserUnauthorised))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -160,35 +71,66 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
-    "return the error page" when {
+    "redirect to error page" when {
 
-      "the internal id retrieval fails" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.successful(None))
+      "getting the user status fails" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.failed(new RuntimeException("No internalId for user")))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ErrorController.error().url)
       }
 
-      "an error occurs within the controller body" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any())).
-          thenReturn(Future.successful(Some("error")))
+    }
+
+    "redirect to pending subscription" when {
+
+      "an authorised user has a pending subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        redirectLocation(result) mustBe Some(routes.ErrorController.error().url)
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.pending().url)
+
+      }
+
+    }
+
+    "redirect to rejected subscription" when {
+
+      "an authorised user has a errored subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentError)))
+
+        val result = SUT.testAuthorisation(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.rejected().url)
+
+      }
+
+    }
+
+    "redirect to successful subscription" when {
+
+      "an authorised user has a successful subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess)))
+
+        val result = SUT.testAuthorisation(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
+
       }
 
     }
 
     "allow access" when {
 
-      "authorisation passes" in {
-        val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("12345"), Some("/")))
-
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
-          thenReturn(retrievalResult)
+      "an authorised user has no subscriptions in progress" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -241,12 +183,10 @@ class LisaBaseControllerSpec extends PlaySpec
 
   val fakeRequest = FakeRequest("GET", "/")
 
-  val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
-  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
+  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   trait SUT extends LisaBaseController {
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
@@ -258,14 +198,14 @@ class LisaBaseControllerSpec extends PlaySpec
   }
 
   object SUT extends SUT {
-    override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
-
-    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
-    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
+    override val authorisationService: AuthorisationService = mockAuthorisationService
   }
+
+  when(mockAuthorisationService.userStatus(any())).
+    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))
@@ -275,10 +215,5 @@ class LisaBaseControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
-
-  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
-    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
-
-  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }

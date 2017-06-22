@@ -21,7 +21,7 @@ import connectors.{RosmJsonFormats, UserDetailsConnector}
 import models.{LisaRegistration, TaxEnrolmentAddSubscriberFailed, TaxEnrolmentAddSubscriberSucceeded}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
-import services.{AuditService, RosmService, TaxEnrolmentService}
+import services.{AuditService, AuthorisationService, RosmService, TaxEnrolmentService}
 
 import scala.concurrent.Future
 
@@ -30,6 +30,7 @@ trait RosmController extends LisaBaseController
 
   val auditService:AuditService
   val rosmService:RosmService
+  val taxEnrolmentService:TaxEnrolmentService
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -64,7 +65,7 @@ trait RosmController extends LisaBaseController
   private def createAuditDetails(registrationDetails: LisaRegistration) = {
     Map(
       "companyName" -> registrationDetails.organisationDetails.companyName,
-      "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+      "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
       "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
       "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
       "firstName" -> registrationDetails.yourDetails.firstName,
@@ -78,12 +79,11 @@ trait RosmController extends LisaBaseController
 }
 
 object RosmController extends RosmController {
-  val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val cache = LisaShortLivedCache
   override val auditService = AuditService
   override val rosmService = RosmService
-  override val userDetailsConnector = UserDetailsConnector
   override val taxEnrolmentService = TaxEnrolmentService
+  override val authorisationService = AuthorisationService
 }

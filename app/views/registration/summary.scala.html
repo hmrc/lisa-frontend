@@ -19,21 +19,18 @@
             <a class="tabular-data__data-2" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationName">Change <span class="visuallyhidden">Change your organisation's name</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-tradingName">Trading name</span>
-            <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-tradingName">@data.organisationDetails.tradingName</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-ctrNumber">Corporation Tax reference number</span>
+            <span class="tabular-data__data-1" id="value-ctrNumber">@data.organisationDetails.ctrNumber</span>
         </div>
     </section>
 
     <!-- Org ref numbers -->
     <section class="divider--top">
-        <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-ctrNumber">Corporation Tax reference number</span>
-            <span class="tabular-data__data-1" id="value-ctrNumber">@data.tradingDetails.ctrNumber</span>
-            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers">Change <span class="visuallyhidden">Change your organisation's reference numbers</span></a>
-        </div>
+
         <div class="tabular-data__entry tabular-data__entry--grouped">
             <span class="tabular-data__heading tabular-data__heading--label" id="title-fsrRefNumber">Financial Services Register reference number</span>
             <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</span>
+            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers">Change <span class="visuallyhidden">Change your organisation's reference numbers</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
             <span class="tabular-data__heading tabular-data__heading--label" id="title-isaProviderRefNumber">ISA provider reference number</span>

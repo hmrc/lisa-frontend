@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{TaxEnrolmentPending, TaxEnrolmentSubscription}
+import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, Json}
@@ -26,25 +26,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
   "Tax Enrolments" must {
 
     "serialize from json" when {
-      "given valid json" in {
-        val testJson = """[{
-                         |    "created": "2016-01-25T15:44:17.496Z",
-                         |    "lastModified": "2016-01-25T16:44:17.496Z",
-                         |    "serviceName": "HMRC-ORG-LISA",
-                         |    "identifiers": [
-                         |        {
-                         |            "key": "eori",
-                         |            "value": "gb123456ghj"
-                         |        }
-                         |    ],
-                         |    "callback": "callback url",
-                         |    "etmpId": "bp safe id",
-                         |
-                         |    "credId": "X",
-                         |    "state": "PENDING",
-                         |    "groupIdentifier": "Z"
-                         |}]""".stripMargin
-
+      "given valid json with a pending status" in {
         val parsed = Json.parse(testJson).as[List[TaxEnrolmentSubscription]]
 
         parsed.size mustBe 1
@@ -54,27 +36,29 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
         sub.created.toString mustBe "2016-01-25T15:44:17.496Z"
         sub.state mustBe TaxEnrolmentPending
       }
+      "given valid json with a error status" in {
+        val parsed = Json.parse(testJson.replace("PENDING", "ERROR")).as[List[TaxEnrolmentSubscription]]
+
+        parsed.size mustBe 1
+
+        val sub = parsed.head
+
+        sub.state mustBe TaxEnrolmentError
+      }
+      "given valid json with a success status" in {
+        val parsed = Json.parse(testJson.replace("PENDING", "SUCCESS")).as[List[TaxEnrolmentSubscription]]
+
+        parsed.size mustBe 1
+
+        val sub = parsed.head
+
+        sub.state mustBe TaxEnrolmentSuccess
+      }
     }
 
     "not serialize from json" when {
       "given an invalid state" in {
-        val invalidStateJson = """[{
-                         |    "created": "2016-01-25T15:44:17.496Z",
-                         |    "lastModified": "2016-01-25T16:44:17.496Z",
-                         |    "serviceName": "HMRC-ORG-LISA",
-                         |    "identifiers": [
-                         |        {
-                         |            "key": "eori",
-                         |            "value": "gb123456ghj"
-                         |        }
-                         |    ],
-                         |    "callback": "callback url",
-                         |    "etmpId": "bp safe id",
-                         |
-                         |    "credId": "X",
-                         |    "state": "Y",
-                         |    "groupIdentifier": "Z"
-                         |}]""".stripMargin
+        val invalidStateJson = testJson.replace("PENDING", "TEST")
 
         val parsed = Json.parse(invalidStateJson).validate[List[TaxEnrolmentSubscription]]
 
@@ -92,5 +76,23 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
     }
 
   }
+
+  private val testJson: String = """[{
+                           |    "created": "2016-01-25T15:44:17.496Z",
+                           |    "lastModified": "2016-01-25T16:44:17.496Z",
+                           |    "serviceName": "HMRC-ORG-LISA",
+                           |    "identifiers": [
+                           |        {
+                           |            "key": "eori",
+                           |            "value": "gb123456ghj"
+                           |        }
+                           |    ],
+                           |    "callback": "callback url",
+                           |    "etmpId": "bp safe id",
+                           |
+                           |    "credId": "X",
+                           |    "state": "PENDING",
+                           |    "groupIdentifier": "Z"
+                           |}]""".stripMargin
 
 }

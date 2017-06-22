@@ -18,7 +18,7 @@ package controllers
 
 import java.io.File
 
-import connectors.{RosmConnector, UserDetailsConnector}
+import connectors.RosmConnector
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -32,8 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.{AuditService, RosmService, TaxEnrolmentService}
-import uk.gov.hmrc.auth.core._
+import services.{AuditService, AuthorisationService, RosmService, TaxEnrolmentService}
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -59,7 +58,7 @@ class RosmControllerSpec extends PlaySpec
     val yourDetailsCacheKey = "yourDetails"
 
     "redirect the user to business structure" when {
-      "no organisation details are found in the cache" in {
+      "no business structure details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
@@ -77,14 +76,13 @@ class RosmControllerSpec extends PlaySpec
       "no organisation details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
         val businessStructureForm = new BusinessStructure("LLP")
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(None))
+
 
         val result = SUT.get(fakeRequest)
 
@@ -96,12 +94,13 @@ class RosmControllerSpec extends PlaySpec
 
     "redirect the user to trading details" when {
       "no trading details are found in the cache" in {
-        val businessStructureForm = new BusinessStructure("LLP")
         val uri = controllers.routes.RosmController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
+
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
@@ -121,8 +120,8 @@ class RosmControllerSpec extends PlaySpec
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
@@ -147,8 +146,8 @@ class RosmControllerSpec extends PlaySpec
 
     "handle a successful rosm registration" in {
       val uri = controllers.routes.RosmController.get().url
-      val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-      val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
       val yourForm = new YourDetails(
         firstName = "Test",
@@ -193,8 +192,8 @@ class RosmControllerSpec extends PlaySpec
 
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "0000000000", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
           firstName = "Test",
@@ -226,8 +225,8 @@ class RosmControllerSpec extends PlaySpec
 
     "audit a successful rosm registration" in {
       val uri = controllers.routes.RosmController.get().url
-      val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-      val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
       val yourForm = new YourDetails(
         firstName = "Test",
@@ -271,7 +270,7 @@ class RosmControllerSpec extends PlaySpec
         auditData = MatcherEquals(Map(
           "subscriptionId" -> "123456789012",
           "companyName" -> registrationDetails.organisationDetails.companyName,
-          "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+          "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
           "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
           "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
           "firstName" -> registrationDetails.yourDetails.firstName,
@@ -286,8 +285,8 @@ class RosmControllerSpec extends PlaySpec
 
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "0000000000", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
           firstName = "Test",
@@ -297,15 +296,14 @@ class RosmControllerSpec extends PlaySpec
           email = "test@test.com")
         val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm)
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
+          thenReturn(Future.successful(Some(organisationForm)))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
-        thenReturn(Future.successful(Some(tradingForm)))
+          thenReturn(Future.successful(Some(tradingForm)))
 
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(businessStructureForm)))
 
         when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
@@ -319,7 +317,7 @@ class RosmControllerSpec extends PlaySpec
           auditData = MatcherEquals(Map(
             "reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
             "companyName" -> registrationDetails.organisationDetails.companyName,
-            "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+            "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
             "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
             "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
             "firstName" -> registrationDetails.yourDetails.firstName,
@@ -338,32 +336,27 @@ class RosmControllerSpec extends PlaySpec
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
-  val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockRosmConnector: RosmConnector = mock[RosmConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuditService: AuditService = mock[AuditService]
   val mockRosmService: RosmService = mock[RosmService]
-  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
   val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
+  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object SUT extends RosmController {
-    override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
     override val auditService: AuditService = mockAuditService
     override val rosmService: RosmService = mockRosmService
-
-    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
     override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
+    override val authorisationService: AuthorisationService = mockAuthorisationService
   }
 
-  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
-
-  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
-    thenReturn(retrievalResult)
+  when(mockAuthorisationService.userStatus(any())).
+    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))
@@ -373,10 +366,5 @@ class RosmControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
-
-  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
-    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
-
-  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }
