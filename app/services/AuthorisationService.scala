@@ -36,35 +36,20 @@ trait AuthorisationService extends AuthorisedFunctions {
   def userStatus(implicit hc:HeaderCarrier): Future[LisaUserStatus] = {
     authorised(
       AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
-    ).retrieve(internalId and userDetailsUri) { case (id ~ userUri) =>
+    ).retrieve(internalId and userDetailsUri) {case (id ~ uri) =>
       val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
+      val userUri = uri.getOrElse(throw new RuntimeException("No userDetailsUri"))
 
-      getUserDetails(userUri)(hc) flatMap { user =>
-        getEnrolmentState(user.groupIdentifier)(hc) map { state =>
+      userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
+        val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("Could not get groupIdentifier"))
+
+        taxEnrolmentService.getLisaSubscriptionState(groupId)(hc) map { state =>
           UserAuthorised(userId, user, state)
         }
       }
     } recover {
       case _ : NoActiveSession => UserNotLoggedIn
       case _ : AuthorisationException => UserUnauthorised
-    }
-  }
-
-  def getUserDetails(userDetailsUri: Option[String])(implicit hc:HeaderCarrier): Future[UserDetails] = {
-    userDetailsUri match {
-      case Some(url) => {
-        userDetailsConnector.getUserDetails(url)(hc)
-      }
-      case None => {
-        Future.failed(new RuntimeException("No userDetailsUri"))
-      }
-    }
-  }
-
-  def getEnrolmentState(groupIdentifier: Option[String])(implicit hc:HeaderCarrier): Future[TaxEnrolmentState] = {
-    groupIdentifier match {
-      case Some(groupId) => taxEnrolmentService.getLisaSubscriptionState(groupId)
-      case None => Future.failed(new RuntimeException("Could not get groupIdentifier"))
     }
   }
 
