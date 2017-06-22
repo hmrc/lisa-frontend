@@ -34,9 +34,9 @@ trait LisaBaseController extends FrontendController
   with AuthorisedFunctions
   with Redirects {
 
-  val cache:ShortLivedCache
-  val userDetailsConnector:UserDetailsConnector
-  val taxEnrolmentService:TaxEnrolmentService
+  val cache: ShortLivedCache
+  val userDetailsConnector: UserDetailsConnector
+  val taxEnrolmentService: TaxEnrolmentService
 
   def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     authorised(
@@ -72,26 +72,27 @@ trait LisaBaseController extends FrontendController
   }
 
   def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
-    case _ : NoActiveSession => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
-    case _ : AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
+    case _: NoActiveSession => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
+    case _: AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
     case _ => Future.successful(Redirect(routes.ErrorController.error()))
   }
 
   def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     // get organisation details
-    cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
-      case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
-      case Some(orgData) => {
+    cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+      case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+      case Some(busData) => {
 
-        // get trading details
-        cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
-          case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
-          case Some(tradData) => {
+        cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
+          case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
+          case Some(orgData) => {
 
-            // get business structure
-            cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-              case Some(busData) => {
+            // get trading details
+            cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
+              case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
+              case Some(tradData) => {
+
+                // get business structure
 
                 // get user details
                 cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).flatMap {
