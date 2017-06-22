@@ -37,11 +37,11 @@ trait AuthorisationService extends AuthorisedFunctions {
     authorised(
       AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
     ).retrieve(internalId and userDetailsUri) {case (id ~ uri) =>
-      val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
-      val userUri = uri.getOrElse(throw new RuntimeException("No userDetailsUri"))
+      val userId = id.getOrElse(throw new RuntimeException("No internalId for user"))
+      val userUri = uri.getOrElse(throw new RuntimeException("No userDetailsUri for user"))
 
       userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
-        val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("Could not get groupIdentifier"))
+        val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("No groupIdentifier for user"))
 
         taxEnrolmentService.getLisaSubscriptionState(groupId)(hc) map { state =>
           UserAuthorised(userId, user, state)

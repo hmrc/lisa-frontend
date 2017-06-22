@@ -20,6 +20,7 @@ import connectors.UserDetailsConnector
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.auth.core._
@@ -92,11 +93,9 @@ class AuthorisationServiceSpec extends PlaySpec
 
         val result = SUT.userStatus
 
-        result map { _ =>
-          fail("Future succeeded")
-        } recover {
-          case ex: RuntimeException => ex.getMessage() mustBe "No internalId for logged in user"
-          case _ => fail("unexpected error")
+        ScalaFutures.whenReady(result.failed) { e =>
+          e mustBe a[RuntimeException]
+          e.getMessage mustBe "No internalId for user"
         }
       }
 
@@ -111,11 +110,9 @@ class AuthorisationServiceSpec extends PlaySpec
 
         val result = SUT.userStatus
 
-        result map { _ =>
-          fail("Future succeeded")
-        } recover {
-          case ex: RuntimeException => ex.getMessage() mustBe "No userDetailsUri"
-          case _ => fail("unexpected error")
+        ScalaFutures.whenReady(result.failed) { e =>
+          e mustBe a[RuntimeException]
+          e.getMessage mustBe "No userDetailsUri for user"
         }
       }
 
@@ -128,11 +125,9 @@ class AuthorisationServiceSpec extends PlaySpec
 
         val result = SUT.userStatus
 
-        result map { _ =>
-          fail("Future succeeded")
-        } recover {
-          case ex: RuntimeException => ex.getMessage() mustBe "Could not get groupIdentifier"
-          case _ => fail("unexpected error")
+        ScalaFutures.whenReady(result.failed) { e =>
+          e mustBe a[RuntimeException]
+          e.getMessage mustBe "No groupIdentifier for user"
         }
       }
 
