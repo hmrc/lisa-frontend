@@ -75,7 +75,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
       "getting the user status fails" in {
         when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.failed(new RuntimeException("error")))
+          thenReturn(Future.failed(new RuntimeException("No internalId for logged in user")))
 
         val result = SUT.testAuthorisation(fakeRequest)
 

@@ -22,7 +22,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.auth.core.{AuthConnector, ~}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,13 +35,45 @@ class AuthorisationServiceSpec extends PlaySpec
 
   "user status" must {
 
-    "return an authorised user with all appropriate details" when {
+    "return an authorised user" when {
 
       "all methods result in a happy path" in {
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(successfulRetrieval)
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
         val result = SUT.userStatus
 
         result map { status =>
           status mustBe UserAuthorised("1234", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)
+        }
+      }
+
+    }
+
+    "return user not logged in" when {
+
+      "a NoActiveSession exception is returned from auth" in {
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(Future.failed(new BearerTokenExpired()))
+
+        SUT.userStatus map { status =>
+          status mustBe UserNotLoggedIn
+        }
+      }
+
+    }
+
+    "return user unauthorised" when {
+
+      "a AuthorisationException exception is returned from auth" in {
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(Future.failed(new InsufficientEnrolments()))
+
+        SUT.userStatus map { status =>
+          status mustBe UserUnauthorised
         }
       }
 
@@ -55,12 +87,52 @@ class AuthorisationServiceSpec extends PlaySpec
         when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
           thenReturn(invalidRetrievalResult)
 
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
         val result = SUT.userStatus
 
         result map { _ =>
           fail("Future succeeded")
         } recover {
           case ex: RuntimeException => ex.getMessage() mustBe "No internalId for logged in user"
+          case _ => fail("unexpected error")
+        }
+      }
+
+      "a userDetailsUri isn't returned from auth" in {
+        val invalidRetrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), None))
+
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(invalidRetrievalResult)
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        val result = SUT.userStatus
+
+        result map { _ =>
+          fail("Future succeeded")
+        } recover {
+          case ex: RuntimeException => ex.getMessage() mustBe "No userDetailsUri"
+          case _ => fail("unexpected error")
+        }
+      }
+
+      "the user does not have a groupId" in {
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(successfulRetrieval)
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = None)))
+
+        val result = SUT.userStatus
+
+        result map { _ =>
+          fail("Future succeeded")
+        } recover {
+          case ex: RuntimeException => ex.getMessage() mustBe "Could not get groupIdentifier"
+          case _ => fail("unexpected error")
         }
       }
 
@@ -78,12 +150,7 @@ class AuthorisationServiceSpec extends PlaySpec
     override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
   }
 
-  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
-
-  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
-    thenReturn(retrievalResult)
-
-  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(None, None, "")))
+  val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
   when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
