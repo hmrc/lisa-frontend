@@ -50,7 +50,7 @@ trait TradingDetailsController extends LisaBaseController {
         data => {
           cache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, data)
 
-          handleRedirect(routes.BusinessStructureController.get().url)
+          handleRedirect(routes.YourDetailsController.get().url)
         }
       )
 

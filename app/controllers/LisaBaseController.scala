@@ -56,19 +56,20 @@ trait LisaBaseController extends FrontendController
 
   def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     // get organisation details
-    cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
-      case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
-      case Some(orgData) => {
+    cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+      case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+      case Some(busData) => {
 
-        // get trading details
-        cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
-          case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
-          case Some(tradData) => {
+        cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
+          case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
+            case Some(orgData) => {
 
-            // get business structure
-            cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-              case Some(busData) => {
+            // get trading details
+            cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
+              case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
+                case Some(tradData) => {
+
+                // get business structure
 
                 // get user details
                 cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).flatMap {

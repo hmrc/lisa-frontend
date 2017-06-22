@@ -107,7 +107,7 @@ class BusinessStructureControllerSpec extends PlaySpec
       }
     }
 
-    "redirect the user to your details" when {
+    "redirect the user to organisation details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.BusinessStructureController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("businessStructure" -> "LLP")))
@@ -115,7 +115,7 @@ class BusinessStructureControllerSpec extends PlaySpec
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
       }
     }
 
