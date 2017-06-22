@@ -58,7 +58,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
-    "return access denied" when {
+    "redirect to access denied" when {
 
       "a unauthorised response is returned from auth" in {
         when(mockAuthorisationService.userStatus(any())).
@@ -71,7 +71,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
-    "return the error page" when {
+    "redirect to error page" when {
 
       "getting the user status fails" in {
         when(mockAuthorisationService.userStatus(any())).
@@ -84,9 +84,51 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
+    "redirect to pending subscription" when {
+
+      "an authorised user has a pending subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentPending)))
+
+        val result = SUT.testAuthorisation(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.pending().url)
+
+      }
+
+    }
+
+    "redirect to rejected subscription" when {
+
+      "an authorised user has a errored subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentError)))
+
+        val result = SUT.testAuthorisation(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.rejected().url)
+
+      }
+
+    }
+
+    "redirect to successful subscription" when {
+
+      "an authorised user has a successful subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess)))
+
+        val result = SUT.testAuthorisation(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
+
+      }
+
+    }
+
     "allow access" when {
 
-      "authorisation passes" in {
+      "an authorised user has no subscriptions in progress" in {
         when(mockAuthorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
