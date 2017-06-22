@@ -108,7 +108,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
       "the company name is invalid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "tradingName" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "ctrNumber" -> "X")))
         val result = SUT.post(request)
 
         status(result) mustBe Status.BAD_REQUEST
@@ -123,7 +123,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "redirect the user to trading details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "tradingName" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -135,7 +135,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "store organisation details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "tradingName" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
 
         await(SUT.post(request))
 

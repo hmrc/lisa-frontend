@@ -29,7 +29,7 @@ class OrganisationDetailsSpec extends PlaySpec {
         val test = Map[String, String]()
         val res = SUT.bind(test)
 
-        res.errors mustBe Seq[FormError](FormError("companyName", "error.required"), FormError("tradingName", "error.required"))
+        res.errors mustBe Seq[FormError](FormError("companyName", "error.required"), FormError("ctrNumber", "error.required"))
       }
 
     }
@@ -37,7 +37,7 @@ class OrganisationDetailsSpec extends PlaySpec {
     "Show company name invalid error" when {
 
       "given a company name with invalid characters" in {
-        val test = Map[String, String]("companyName" -> "?", "tradingName" -> "?")
+        val test = Map[String, String]("companyName" -> "?", "ctrNumber" -> "?")
         val res = SUT.bind(test)
 
         res.errors.size mustBe 1
