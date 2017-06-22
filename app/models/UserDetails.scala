@@ -16,19 +16,22 @@
 
 package models
 
-case class  UserDetails(
-                         authProviderId: Option[String],
-                         authProviderType: Option[String],
-                         name: String,
-                         lastName: Option[String] = None,
-                         dateOfBirth: Option[String] = None,
-                         postCode: Option[String] = None,
-                         email: Option[String] = None,
-                         affinityGroup: Option[String] = None,
-                         agentCode: Option[String] = None,
-                         agentId: Option[String] = None,
-                         agentFriendlyName: Option[String] = None,
-                         credentialRole: Option[String] = None,
-                         description: Option[String] = None,
-                         groupIdentifier: Option[String] = None
-                       )
+trait LisaUserStatus
+case object UserNotLoggedIn extends LisaUserStatus
+case object UserUnauthorised extends LisaUserStatus
+case class UserAuthorised(internalId: String, userDetails: UserDetails, enrolmentState: TaxEnrolmentState) extends LisaUserStatus
+
+case class UserDetails(authProviderId: Option[String],
+                       authProviderType: Option[String],
+                       name: String,
+                       lastName: Option[String] = None,
+                       dateOfBirth: Option[String] = None,
+                       postCode: Option[String] = None,
+                       email: Option[String] = None,
+                       affinityGroup: Option[String] = None,
+                       agentCode: Option[String] = None,
+                       agentId: Option[String] = None,
+                       agentFriendlyName: Option[String] = None,
+                       credentialRole: Option[String] = None,
+                       description: Option[String] = None,
+                       groupIdentifier: Option[String] = None)

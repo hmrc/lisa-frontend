@@ -76,16 +76,16 @@ class RosmConnectorSpec extends PlaySpec
 
   }
 
-  "subscribe" must {
+  "Subscribe Many endpoint" must {
     "return success" when {
-      "valid payload with utr" in {
+      "rosm returns a valid payload with utr" in {
         when(mockHttpPost.POST[LisaSubscription, HttpResponse](any(), any(), any())(any(), any(), any())).
           thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(desSubscribeSuccessResponse))
           )))
 
-        doRegistrationRequest { response =>
+        doSubscribe { response =>
           response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
         }
       }

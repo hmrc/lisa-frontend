@@ -17,64 +17,41 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.UserDetailsConnector
 import models._
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
-import services.TaxEnrolmentService
-import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.Retrievals._
-import uk.gov.hmrc.auth.core._
+import services.AuthorisationService
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 trait LisaBaseController extends FrontendController
-  with AuthorisedFunctions
   with Redirects {
 
   val cache:ShortLivedCache
-  val userDetailsConnector:UserDetailsConnector
-  val taxEnrolmentService:TaxEnrolmentService
+  val authorisationService:AuthorisationService
 
   def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
-    authorised(
-      AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
-    ).retrieve(internalId and userDetailsUri) { case (id ~ userUri) =>
-      val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
-
-      userUri match {
-        case Some(url) => {
-          userDetailsConnector.getUserDetails(url) flatMap { user =>
-            user.groupIdentifier match {
-              case Some(groupId) => {
-                taxEnrolmentService.getLisaSubscriptionState(groupId) flatMap {
-                  case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
-                  case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-                  case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
-                  case _ => callback(s"$userId-lisa-registration")
-                }
-              }
-              case None => {
-                Future.successful(Redirect(routes.ErrorController.error()))
-              }
-            }
-          }
-        }
-        case None => {
-          Future.successful(Redirect(routes.ErrorController.error()))
+    authorisationService.userStatus flatMap {
+      case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
+      case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
+      case user: UserAuthorised => {
+        user.enrolmentState match {
+          case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+          case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+          case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+          case TaxEnrolmentDoesNotExist => callback(s"${user.internalId}-lisa-registration")
         }
       }
-    } recoverWith {
-      handleFailure
+    } recover {
+      case NonFatal(ex: Throwable) => {
+        Logger.warn(s"Auth error: ${ex.getMessage}")
+        Redirect(routes.ErrorController.error())
+      }
     }
-  }
-
-  def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
-    case _ : NoActiveSession => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
-    case _ : AuthorisationException => Future.successful(Redirect(routes.ErrorController.accessDenied()))
-    case _ => Future.successful(Redirect(routes.ErrorController.error()))
   }
 
   def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
