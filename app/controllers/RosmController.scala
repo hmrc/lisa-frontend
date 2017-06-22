@@ -64,7 +64,7 @@ trait RosmController extends LisaBaseController
   private def createAuditDetails(registrationDetails: LisaRegistration) = {
     Map(
       "companyName" -> registrationDetails.organisationDetails.companyName,
-      "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+      "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
       "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
       "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
       "firstName" -> registrationDetails.yourDetails.firstName,

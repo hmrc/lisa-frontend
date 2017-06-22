@@ -30,7 +30,7 @@ trait RosmService extends RosmJsonFormats{
 
   def registerAndSubscribe(registration: LisaRegistration)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
   {
-    val utr = registration.tradingDetails.ctrNumber
+    val utr = registration.organisationDetails.ctrNumber
     val cName = registration.organisationDetails.companyName
 
     val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(cName,registration.businessStructure.businessStructure))

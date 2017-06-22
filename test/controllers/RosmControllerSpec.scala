@@ -95,8 +95,8 @@ class RosmControllerSpec extends PlaySpec
     "redirect the user to business structure" when {
       "no business structure details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -118,8 +118,8 @@ class RosmControllerSpec extends PlaySpec
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
@@ -144,8 +144,8 @@ class RosmControllerSpec extends PlaySpec
 
     "handle a successful rosm registration" in {
       val uri = controllers.routes.RosmController.get().url
-      val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-      val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
       val yourForm = new YourDetails(
         firstName = "Test",
@@ -190,8 +190,8 @@ class RosmControllerSpec extends PlaySpec
 
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "0000000000", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
           firstName = "Test",
@@ -223,8 +223,8 @@ class RosmControllerSpec extends PlaySpec
 
     "audit a successful rosm registration" in {
       val uri = controllers.routes.RosmController.get().url
-      val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-      val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
       val yourForm = new YourDetails(
         firstName = "Test",
@@ -268,7 +268,7 @@ class RosmControllerSpec extends PlaySpec
         auditData = MatcherEquals(Map(
           "subscriptionId" -> "123456789012",
           "companyName" -> registrationDetails.organisationDetails.companyName,
-          "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+          "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
           "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
           "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
           "firstName" -> registrationDetails.yourDetails.firstName,
@@ -283,8 +283,8 @@ class RosmControllerSpec extends PlaySpec
 
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
-        val tradingForm = new TradingDetails(ctrNumber = "0000000000", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
           firstName = "Test",
@@ -315,7 +315,7 @@ class RosmControllerSpec extends PlaySpec
           auditData = MatcherEquals(Map(
             "reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
             "companyName" -> registrationDetails.organisationDetails.companyName,
-            "uniqueTaxReferenceNumber" -> registrationDetails.tradingDetails.ctrNumber,
+            "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
             "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
             "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
             "firstName" -> registrationDetails.yourDetails.firstName,

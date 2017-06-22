@@ -51,7 +51,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val tradingForm = new TradingDetails(ctrNumber = "1234567890", fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
@@ -63,7 +63,7 @@ class TradingDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("1234567890")
+        content must include ("123")
       }
 
     }
