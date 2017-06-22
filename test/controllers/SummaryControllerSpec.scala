@@ -18,7 +18,6 @@ package controllers
 
 import java.io.File
 
-import connectors.UserDetailsConnector
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
@@ -32,8 +31,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.{AuthorisationService, TaxEnrolmentService}
-import uk.gov.hmrc.auth.core._
+import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 

@@ -18,7 +18,7 @@ package controllers
 
 import java.io.File
 
-import connectors.{RosmConnector, UserDetailsConnector}
+import connectors.RosmConnector
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -33,7 +33,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.{AuditService, AuthorisationService, RosmService, TaxEnrolmentService}
-import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 
