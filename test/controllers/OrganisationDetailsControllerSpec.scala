@@ -169,10 +169,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
   }
 
   when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""))))
-
-  when(mockAuthorisationService.getEnrolmentState(any())(any())).
-    thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
+    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))

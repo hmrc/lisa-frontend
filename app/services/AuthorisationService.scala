@@ -39,8 +39,10 @@ trait AuthorisationService extends AuthorisedFunctions {
     ).retrieve(internalId and userDetailsUri) { case (id ~ userUri) =>
       val userId = id.getOrElse(throw new RuntimeException("No internalId for logged in user"))
 
-      getUserDetails(userUri)(hc) map { user =>
-        UserAuthorised(userId, user)
+      getUserDetails(userUri)(hc) flatMap { user =>
+        getEnrolmentState(user.groupIdentifier)(hc) map { state =>
+          UserAuthorised(userId, user, state)
+        }
       }
     } recover {
       case _ : NoActiveSession => UserNotLoggedIn

@@ -39,7 +39,7 @@ trait LisaBaseController extends FrontendController
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorised => {
-        authorisationService.getEnrolmentState(user.userDetails.groupIdentifier) flatMap {
+        user.enrolmentState match {
           case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
           case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
           case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
