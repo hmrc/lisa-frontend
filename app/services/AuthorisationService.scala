@@ -72,8 +72,6 @@ trait AuthorisationService extends AuthorisedFunctions {
 
 object AuthorisationService extends AuthorisationService {
   val authConnector: AuthConnector = FrontendAuthConnector
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   override val taxEnrolmentService: TaxEnrolmentService = TaxEnrolmentService
 }
