@@ -17,14 +17,56 @@
 package services
 
 import connectors.UserDetailsConnector
+import models._
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.{AuthConnector, ~}
+import uk.gov.hmrc.play.http.HeaderCarrier
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class AuthorisationServiceSpec extends PlaySpec
   with MockitoSugar {
 
+  implicit val hc:HeaderCarrier = HeaderCarrier()
 
+  "user status" must {
+
+    "return an authorised user with all appropriate details" when {
+
+      "all methods result in a happy path" in {
+        val result = SUT.userStatus
+
+        result map { status =>
+          status mustBe UserAuthorised("1234", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)
+        }
+      }
+
+    }
+
+    "throw an error" when {
+
+      "an internalId isn't returned from auth" in {
+        val invalidRetrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(None, Some("/")))
+
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(invalidRetrievalResult)
+
+        val result = SUT.userStatus
+
+        result map { _ =>
+          fail("Future succeeded")
+        } recover {
+          case ex: RuntimeException => ex.getMessage() mustBe "No internalId for logged in user"
+        }
+      }
+
+    }
+
+  }
 
   val mockAuthConnector = mock[AuthConnector]
   val mockUserDetailsConnector = mock[UserDetailsConnector]
@@ -35,5 +77,14 @@ class AuthorisationServiceSpec extends PlaySpec
     override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
     override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
   }
+
+  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+
+  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+    thenReturn(retrievalResult)
+
+  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(None, None, "")))
+
+  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }
