@@ -109,7 +109,7 @@ class TradingDetailsControllerSpec extends PlaySpec
       }
     }
 
-    "redirect the user to business structure" when {
+    "redirect the user to your details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
@@ -122,7 +122,7 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
       }
     }
 
