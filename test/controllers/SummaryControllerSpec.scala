@@ -18,7 +18,6 @@ package controllers
 
 import java.io.File
 
-import connectors.UserDetailsConnector
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
@@ -32,8 +31,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.TaxEnrolmentService
-import uk.gov.hmrc.auth.core._
+import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -56,9 +54,29 @@ class SummaryControllerSpec extends PlaySpec
     val businessStructureCacheKey = "businessStructure"
     val yourDetailsCacheKey = "yourDetails"
 
-    "redirect the user to organisation details" when {
+    "redirect the user to business structure" when {
+      "no business structure details are found in the cache" in {
+        val uri = controllers.routes.SummaryController.get().url
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(None))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+      }
+    }
+
+    "redirect the user to ogranisation details" when {
       "no organisation details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
+        val businessStructureForm = new BusinessStructure("LLP")
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(businessStructureForm)))
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(None))
@@ -75,12 +93,16 @@ class SummaryControllerSpec extends PlaySpec
       "no trading details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
+        val businessStructureForm = new BusinessStructure("LLP")
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(businessStructureForm)))
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
+        thenReturn(Future.successful(Some(organisationForm)))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(None))
+        thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
 
@@ -90,28 +112,6 @@ class SummaryControllerSpec extends PlaySpec
       }
     }
 
-    "redirect the user to business structure" when {
-      "no business structure details are found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
-        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
-          thenReturn(Future.successful(None))
-
-        val result = SUT.get(fakeRequest)
-
-        status(result) mustBe Status.SEE_OTHER
-
-        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
-      }
-    }
 
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
@@ -182,27 +182,20 @@ class SummaryControllerSpec extends PlaySpec
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
-  val mockAuthConnector: PlayAuthConnector = mock[PlayAuthConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
-  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
+  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object SUT extends SummaryController {
-    override val authConnector: PlayAuthConnector = mockAuthConnector
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
-
-    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
-    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
+    override val authorisationService: AuthorisationService = mockAuthorisationService
   }
 
-  val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
-
-  when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
-    thenReturn(retrievalResult)
+  when(mockAuthorisationService.userStatus(any())).
+    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))
@@ -212,10 +205,5 @@ class SummaryControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
-
-  when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(authProviderId = Some(""),
-    authProviderType = Some(""), name = "User", groupIdentifier = Some("groupId"))))
-
-  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
 
 }

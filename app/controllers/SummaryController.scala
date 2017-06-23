@@ -22,7 +22,7 @@ import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
-import services.TaxEnrolmentService
+import services.{AuthorisationService, TaxEnrolmentService}
 
 import scala.concurrent.Future
 
@@ -39,10 +39,8 @@ trait SummaryController extends LisaBaseController {
 }
 
 object SummaryController extends SummaryController {
-  val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val cache = LisaShortLivedCache
-  override val userDetailsConnector = UserDetailsConnector
-  override val taxEnrolmentService = TaxEnrolmentService
+  override val authorisationService = AuthorisationService
 }

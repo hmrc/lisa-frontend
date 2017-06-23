@@ -22,8 +22,8 @@ import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
-import play.api.{Logger, Configuration, Environment, Play}
-import services.{RosmService, TaxEnrolmentService}
+import play.api.{Logger,Configuration, Environment, Play}
+import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
 
@@ -72,8 +72,7 @@ object OrganisationDetailsController extends OrganisationDetailsController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val cache = LisaShortLivedCache
-  override val userDetailsConnector = UserDetailsConnector
-  override val taxEnrolmentService = TaxEnrolmentService
   override val rosmService = RosmService
 
+  override val authorisationService = AuthorisationService
 }
