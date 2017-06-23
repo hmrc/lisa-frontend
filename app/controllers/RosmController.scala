@@ -16,8 +16,8 @@
 
 package controllers
 
-import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.{RosmJsonFormats, UserDetailsConnector}
+import config.LisaShortLivedCache
+import connectors.RosmJsonFormats
 import models.{LisaRegistration, TaxEnrolmentAddSubscriberFailed, TaxEnrolmentAddSubscriberSucceeded}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
@@ -43,7 +43,7 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-            taxEnrolmentService.addSubscriber(subscriptionId, "SAFEID").map {
+            taxEnrolmentService.addSubscriber(subscriptionId, "subscriptionId").map {
               case TaxEnrolmentAddSubscriberSucceeded => Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
               case TaxEnrolmentAddSubscriberFailed => Redirect(routes.ErrorController.error())
             }

@@ -110,9 +110,6 @@ class RosmControllerSpec extends PlaySpec
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(None))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
-          thenReturn(Future.successful(None))
-
         val result = SUT.get(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
