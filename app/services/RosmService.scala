@@ -28,7 +28,7 @@ trait RosmService extends RosmJsonFormats{
 
   val rosmConnector:RosmConnector
 
-  def registerAndSubscribe(registration: LisaRegistration)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
+/*  def registerAndSubscribe(registration: LisaRegistration)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
   {
     val utr = registration.organisationDetails.ctrNumber
     val cName = registration.organisationDetails.companyName
@@ -51,7 +51,7 @@ trait RosmService extends RosmJsonFormats{
         case _ : JsError => Future(handleErrorResponse(res))
       }
     }
-  }
+  }*/
 
   private def handleErrorResponse(response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
       case failureResponse: JsSuccess[DesFailureResponse] =>
@@ -60,6 +60,37 @@ trait RosmService extends RosmJsonFormats{
       case _: JsError => Logger.error("JsError in Response")
         Left("INTERNAL_SERVER_ERROR")
     }
+
+  def rosmRegister(businessStructure:String, orgDetails: OrganisationDetails)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
+  {
+    val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName,businessStructure))
+
+    rosmConnector.registerOnce(orgDetails.ctrNumber , rosmRegistration).map { res =>
+      res.json.validate[RosmRegistrationSuccessResponse] match {
+        case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
+        case _ : JsError => handleErrorResponse(res)
+      }
+    }
+  }
+
+
+  def performSubscription(registration: LisaRegistration)(implicit hc:HeaderCarrier) : Future[Either[String,String]] = {
+
+    val utr = registration.organisationDetails.ctrNumber
+    val cName = registration.organisationDetails.companyName
+    val safeId = registration.organisationDetails.safeId.get
+    val applicantDetails = ApplicantDetails(registration.yourDetails.firstName, registration.yourDetails.lastName,
+      registration.yourDetails.role, ContactDetails(registration.yourDetails.email, registration.yourDetails.phone))
+
+
+    rosmConnector.subscribe(registration.tradingDetails.isaProviderRefNumber,
+      LisaSubscription(utr, safeId, registration.tradingDetails.fsrRefNumber, cName, applicantDetails)).map(
+      subscribed => subscribed.json.validate[DesSubscriptionSuccessResponse] match {
+        case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
+        case _: JsError => handleErrorResponse(subscribed)
+      })
+  }
+
 
 }
 object RosmService extends RosmService{

@@ -40,57 +40,66 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
   }
 
   "RosmService" must {
-    "Register&Subscribe" when {
+    "Register" when {
       " a Valid request for submission" in {
         when(mockRosmConnector.registerOnce(any(),any())(any())).thenReturn(
             Future.successful(HttpResponse(OK,Some(Json.toJson(rosmSuccessResponse)))))
-        when(mockRosmConnector.subscribe(any(),any())(any())).thenReturn(
-          Future.successful(HttpResponse(OK,Some(Json.toJson(desSubscribeSuccessResponse)))))
 
-        val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
+        val res = Await.result(SUT.rosmRegister("LLP",org), Duration.Inf)
 
-        res mustBe Right("123456")
+        res mustBe Right("XE0001234567890")
       }
       "return a Des Error" when {
         "an in-valid request for registration is recieved" in {
           when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
             Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
-          val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
+          val res = Await.result(SUT.rosmRegister("LLP",org), Duration.Inf)
 
           res mustBe Left(rosmFailureResponse.code)
         }
       }
+
+      "return a Internal Server Error" when {
+
+        "response Json validation has failed in Registration" in {
+          when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+            Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
+
+          val res = Await.result(SUT.rosmRegister("LLP",org), Duration.Inf)
+
+          res mustBe Left("INTERNAL_SERVER_ERROR")
+        }
+      }
+    }
+
+    "perform Subscription" when {
+      " a Valid request for submission" in {
+        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+          Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
+        when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
+          Future.successful(HttpResponse(OK, Some(Json.toJson(desSubscribeSuccessResponse)))))
+
+        val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
+
+        res mustBe Right("123456")
+      }
       "return a Des Error" when {
         "an in-valid request for submission is recieved" in {
-          when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
-            Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
-                    when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
-                      Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
+          when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
+            Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
-          val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
+          val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
 
           res mustBe Left(rosmFailureResponse.code)
         }
       }
       "return a Internal Server Error" when {
         "response Json validation has failed in submission" in {
-          when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
-            Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
-          when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
-            Future.successful(HttpResponse(OK, Some(Json.toJson(desSubscribeSuccessResponse)))))
-
-          val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
-
-          res mustBe Left("INTERNAL_SERVER_ERROR")
-        }
-        "response Json validation has failed in Registration" in {
-          when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
-            Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
           when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
             Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
 
-          val res = Await.result(SUT.registerAndSubscribe(registration), Duration.Inf)
+          val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
 
           res mustBe Left("INTERNAL_SERVER_ERROR")
         }
@@ -128,7 +137,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
 
   val desSubscribeSuccessResponse = DesSubscriptionSuccessResponse("123456")
 
-  val registration = LisaRegistration(OrganisationDetails("Test Company Name", "1234567890"),
+  val org = OrganisationDetails("Test Company Name", "1234567890", Some("56789"))
+  val registration = LisaRegistration(OrganisationDetails("Test Company Name", "1234567890", Some("56789")),
         TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123"),
         BusinessStructure("LLP"),YourDetails(firstName = "Test",lastName = "User",role = "Role",
         phone = "0191 123 4567",email = "test@test.com"))

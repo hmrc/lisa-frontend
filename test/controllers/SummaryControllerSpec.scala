@@ -74,7 +74,7 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to trading details" when {
       "no trading details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -93,7 +93,7 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to business structure" when {
       "no business structure details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
@@ -116,7 +116,7 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
@@ -143,7 +143,7 @@ class SummaryControllerSpec extends PlaySpec
     "show the summary" when {
       "all required details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(

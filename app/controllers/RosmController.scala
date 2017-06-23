@@ -34,7 +34,7 @@ trait RosmController extends LisaBaseController
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
-        rosmService.registerAndSubscribe(registrationDetails).flatMap {
+        rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) => {
             Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 

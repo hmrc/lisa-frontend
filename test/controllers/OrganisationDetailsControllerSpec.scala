@@ -20,7 +20,7 @@ import java.io.File
 
 import connectors.UserDetailsConnector
 import helpers.CSRFTest
-import models.{OrganisationDetails, TaxEnrolmentDoesNotExist, UserDetails}
+import models.{BusinessStructure, OrganisationDetails, TaxEnrolmentDoesNotExist, UserDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -33,7 +33,7 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
-import services.TaxEnrolmentService
+import services.{RosmService, TaxEnrolmentService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -51,7 +51,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name",Some("34567889"))
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -126,6 +126,10 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
+
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -134,10 +138,31 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       }
     }
 
+    "return Registration Error" when {
+      "the ROSM Registration is failed" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when(mockRosmService.rosmRegister(any(), any())(any())).thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
+
+        val result = SUT.post(request)
+
+        status(result) mustBe Status.BAD_REQUEST
+        val content = contentAsString(result)
+        content must include (pageTitle)
+
+        //redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
+      }
+    }
+
     "store organisation details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
@@ -162,6 +187,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockUserDetailsConnector: UserDetailsConnector = mock[UserDetailsConnector]
   val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
+  val mockRosmService:RosmService = mock[RosmService]
 
   object SUT extends OrganisationDetailsController {
     override val authConnector: PlayAuthConnector = mockAuthConnector
@@ -171,6 +197,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
     override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
     override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
+    override val rosmService:RosmService = mockRosmService
   }
 
   val retrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))

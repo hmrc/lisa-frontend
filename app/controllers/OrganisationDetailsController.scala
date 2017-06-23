@@ -22,12 +22,13 @@ import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Play}
-import services.TaxEnrolmentService
+import play.api.{Logger, Configuration, Environment, Play}
+import services.{RosmService, TaxEnrolmentService}
 
 import scala.concurrent.Future
 
 trait OrganisationDetailsController extends LisaBaseController {
+  val rosmService:RosmService
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -46,12 +47,21 @@ trait OrganisationDetailsController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
         },
         data => {
-          cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
+            Logger.debug("BusinessStructure retrieved")
+            rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap(res =>
+              res.isRight match {
+                case true => Logger.debug("rosmRegister Successful")
+                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(res.right.get)))
+                  handleRedirect(routes.TradingDetailsController.get().url)
 
-          handleRedirect(routes.TradingDetailsController.get().url)
+                case false => Logger.error(s"rosmRegister Failure due to ${res.left.getOrElse("UNKNOWN FAILURE")}")
+                  Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
+              }
+            )
+          }
         }
       )
-
     }
   }
 
@@ -64,4 +74,6 @@ object OrganisationDetailsController extends OrganisationDetailsController {
   override val cache = LisaShortLivedCache
   override val userDetailsConnector = UserDetailsConnector
   override val taxEnrolmentService = TaxEnrolmentService
+  override val rosmService = RosmService
+
 }
