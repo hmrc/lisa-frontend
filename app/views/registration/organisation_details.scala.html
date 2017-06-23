@@ -1,7 +1,7 @@
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@(form: Form[OrganisationDetails])(implicit request: Request[_], messages: Messages)
+@(form: Form[OrganisationDetails], utrLabel: String)(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
     <h1>Your organisation's name</h1>

@@ -29,11 +29,31 @@ import scala.concurrent.Future
 
 trait OrganisationDetailsController extends LisaBaseController {
 
+  def businessLables(businessStructure:  Option[BusinessStructure]): String = {
+    val acceptableValues = Map("Coporate" -> "Company UTR",
+    "Limited Liability Partnership" -> "Partnership UTR"
+    )
+
+    businessStructure match {
+      case None => throw new Exception("No business type selected")
+      case Some(_) => {
+        try {
+          acceptableValues(businessStructure.get.businessStructure)
+        }
+        catch {
+          case e: Exception => throw new Exception("Invalid business structure")
+        }
+      }
+    }
+  }
+
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
-        case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data)))
-        case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form))
+      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bus =>
+        cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
+          case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLables(bus)))
+          case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLables(bus)))
+        }
       }
     }
   }
@@ -43,7 +63,7 @@ trait OrganisationDetailsController extends LisaBaseController {
 
       OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
+          Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors,"")))
         },
         data => {
           cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
