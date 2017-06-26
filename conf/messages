@@ -1,0 +1,11 @@
+validation.summary.heading=Check your answers below
+validation.summary.info=Check your information is correct, in the right place and in the right format.
+validation.registration.summary.llp.info=Your Company name and Corporation Tax reference number do not match.\nYour business name should match the name written on any letters you have from HMRC.\nYour UTR number is made up of 10 or 13 digits, If it is 13 digits only enter the last 10.\nYour UTR should match the UTR on any letters you have from HMRC.
+org.compName.mandatory=Enter your Company name
+org.ctUtr.mandatory=Enter your Corporation Tax reference number
+org.compName=companyName
+validation.registration.summary.ltd.info=Your company name and Corporation Tax reference number must both be correct.\n\
+Your company name must match the name written on any letters you have from HMRC.\n\
+Your Corporation Tax reference number must match the number on any letters you have from HMRC. It is made up of 10 or 13 digits. If it is 13 digits only enter the last 10.
+org.details.llp=Limited Liability Partnership
+org.details.corpbody=Limited Company

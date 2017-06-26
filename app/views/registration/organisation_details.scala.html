@@ -1,5 +1,7 @@
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.error.errorSummaryOrgTemplate
+
 
 @(form: Form[OrganisationDetails])(implicit request: Request[_], messages: Messages)
 
@@ -9,6 +11,7 @@
 
 @views.html.main_template(title = "Your organisation's name - Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
+    @errorSummaryOrgTemplate(form,None)
     <form method="post">
         @CSRF.formField
         <div class="form-group">
