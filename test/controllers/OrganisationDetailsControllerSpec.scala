@@ -200,10 +200,6 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     addToken(FakeRequest("POST", uri, FakeHeaders(), body))
   }
 
-  def createFakeGetRequest[T](uri: String, body:T):FakeRequest[T] = {
-    addToken(FakeRequest("GET", uri, FakeHeaders(), body))
-  }
-
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
