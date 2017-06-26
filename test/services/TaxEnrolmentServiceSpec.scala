@@ -39,32 +39,6 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     override val connector:TaxEnrolmentConnector = mockConnector
   }
 
-  "Add Subscriber" must {
-
-    "return succeeded" when {
-      "the connector returns a HttpResponse" in {
-        when(mockConnector.addSubscriber(any(),any())(any())).thenReturn(
-            Future.successful(HttpResponse(NO_CONTENT)))
-
-        val res = Await.result(SUT.addSubscriber("1234567890", "1234567890"), Duration.Inf)
-
-        res mustBe TaxEnrolmentAddSubscriberSucceeded
-      }
-    }
-
-    "return failed" when {
-      "the connector returns an Exception" in {
-        when(mockConnector.addSubscriber(any(),any())(any())).thenReturn(
-          Future.failed(Upstream5xxResponse("", 500, 500)))
-
-        val res = Await.result(SUT.addSubscriber("1234567890", "1234567890"), Duration.Inf)
-
-        res mustBe TaxEnrolmentAddSubscriberFailed
-      }
-    }
-
-  }
-
   "Get LISA subscription" must {
 
     "return the appropriate state" when {

@@ -23,8 +23,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json.Json
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPut, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -46,27 +45,11 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   }
 
-  "Add Subscription endpoint" must {
-
-    "return whatever it receives" in {
-      when(mockHttpPut.PUT[TaxEnrolmentAddSubscriberRequest, HttpResponse](any(), any())(any(), any(), any())).
-        thenReturn(Future.successful(HttpResponse(200, Some(Json.parse("{}")))))
-
-      val response = Await.result(SUT.addSubscriber("1234567890", TaxEnrolmentAddSubscriberRequest("", "", "")), Duration.Inf)
-
-      response.status mustBe 200
-      response.json mustBe Json.parse("{}")
-    }
-
-  }
-
   val mockHttpGet = mock[HttpGet]
-  val mockHttpPut = mock[HttpPut]
   implicit val hc = HeaderCarrier()
 
   object SUT extends TaxEnrolmentConnector {
     override val httpGet = mockHttpGet
-    override val httpPut = mockHttpPut
   }
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(

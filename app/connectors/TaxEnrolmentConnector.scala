@@ -26,15 +26,8 @@ import scala.concurrent.Future
 trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats {
 
   val httpGet: HttpGet = WSHttp
-  val httpPut: HttpPut = WSHttp
 
   lazy val serviceUrl: String = baseUrl("tax-enrolments")
-
-  def addSubscriber(subscriptionId: String, request: TaxEnrolmentAddSubscriberRequest)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    val uri = s"$serviceUrl/tax-enrolments/subscriptions/$subscriptionId/subscriber"
-
-    httpPut.PUT[TaxEnrolmentAddSubscriberRequest, HttpResponse](uri, request)(implicitly, implicitly, hc)
-  }
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"$serviceUrl/tax-enrolments/groups/$groupId/subscriptions"
