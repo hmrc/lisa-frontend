@@ -78,7 +78,6 @@ trait OrganisationDetailsController extends LisaBaseController {
         },
         data => {
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
-            Logger.debug("BusinessStructure retrieved")
             rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap {
               case Right(safeId) => {Logger.debug("rosmRegister Successful")
                 cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
