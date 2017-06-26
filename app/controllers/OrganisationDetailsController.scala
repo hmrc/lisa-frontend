@@ -17,17 +17,17 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.UserDetailsConnector
 import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Play}
-import services.{AuthorisationService, TaxEnrolmentService}
+import play.api.{Logger,Configuration, Environment, Play}
+import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
 
 trait OrganisationDetailsController extends LisaBaseController {
+  val rosmService:RosmService
 
   def businessLables(businessStructure:  Option[BusinessStructure]): String = {
     val acceptableValues = Map("Corporate" -> "Company UTR",
@@ -66,20 +66,29 @@ trait OrganisationDetailsController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors,"")))
         },
         data => {
-          cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
-
-          handleRedirect(routes.TradingDetailsController.get().url)
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
+            Logger.debug("BusinessStructure retrieved")
+            rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap {
+              case Right(safeId) => {Logger.debug("rosmRegister Successful")
+                cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
+                handleRedirect(routes.TradingDetailsController.get().url)}
+              case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
+                Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
+            }
+            }
+          }
         }
       )
-
     }
   }
-
 }
 
 object OrganisationDetailsController extends OrganisationDetailsController {
+  val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val cache = LisaShortLivedCache
+  override val rosmService = RosmService
+
   override val authorisationService = AuthorisationService
 }

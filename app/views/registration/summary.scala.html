@@ -11,12 +11,19 @@
 
     <h2>Organisation details</h2>
 
+    <!-- Business structure -->
+    <section class="divider--top">
+        <div class="tabular-data__entry tabular-data__entry--grouped">
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-businessStructure">Business structure</span>
+            <span class="tabular-data__data-1" id="value-businessStructure">@data.businessStructure.businessStructure</span>
+        </div>
+    </section>
+
     <!-- Org name -->
     <section class="divider--top">
         <div class="tabular-data__entry tabular-data__entry--grouped">
             <span class="tabular-data__heading tabular-data__heading--label" id="title-companyName">Company name</span>
             <span class="tabular-data__data-1" id="value-companyName">@data.organisationDetails.companyName</span>
-            <a class="tabular-data__data-2" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationName">Change <span class="visuallyhidden">Change your organisation's name</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped">
             <span class="tabular-data__heading tabular-data__heading--label" id="title-ctrNumber">Corporation Tax reference number</span>
@@ -35,15 +42,6 @@
         <div class="tabular-data__entry tabular-data__entry--grouped">
             <span class="tabular-data__heading tabular-data__heading--label" id="title-isaProviderRefNumber">ISA provider reference number</span>
             <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</span>
-        </div>
-    </section>
-
-    <!-- Business structure -->
-    <section class="divider--top">
-        <div class="tabular-data__entry tabular-data__entry--grouped">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-businessStructure">Business structure</span>
-            <span class="tabular-data__data-1" id="value-businessStructure">@data.businessStructure.businessStructure</span>
-            <a class="tabular-data__data-2" href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get" id="change-businessStructure">Change <span class="visuallyhidden">Change your business structure</span></a>
         </div>
     </section>
 

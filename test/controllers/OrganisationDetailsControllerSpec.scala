@@ -19,7 +19,7 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models.{BusinessStructure,OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -32,7 +32,7 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
-import services.AuthorisationService
+import services.{RosmService,AuthorisationService}
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -49,7 +49,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name",Some("34567889"))
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
@@ -124,6 +124,10 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
+
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -132,10 +136,30 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       }
     }
 
+    "return Registration Error" when {
+      "the ROSM Registration is failed" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when(mockRosmService.rosmRegister(any(), any())(any())).thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
+
+        val result = SUT.post(request)
+
+        status(result) mustBe Status.BAD_REQUEST
+        val content = contentAsString(result)
+        content must include (pageTitle)
+
+     }
+    }
+
     "store organisation details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
@@ -158,12 +182,15 @@ class OrganisationDetailsControllerSpec extends PlaySpec
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
+  val mockRosmService:RosmService = mock[RosmService]
 
   object SUT extends OrganisationDetailsController {
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
     override val cache: ShortLivedCache = mockCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
+    override val rosmService:RosmService = mockRosmService
+
   }
 
   when(mockAuthorisationService.userStatus(any())).
