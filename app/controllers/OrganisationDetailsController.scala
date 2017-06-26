@@ -30,7 +30,7 @@ import scala.concurrent.Future
 trait OrganisationDetailsController extends LisaBaseController {
 
   def businessLables(businessStructure:  Option[BusinessStructure]): String = {
-    val acceptableValues = Map("Coporate" -> "Company UTR",
+    val acceptableValues = Map("Corporate" -> "Company UTR",
     "Limited Liability Partnership" -> "Partnership UTR"
     )
 
