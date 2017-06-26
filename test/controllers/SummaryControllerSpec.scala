@@ -72,6 +72,7 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to ogranisation details" when {
       "no organisation details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
@@ -91,7 +92,7 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to trading details" when {
       "no trading details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
@@ -115,7 +116,7 @@ class SummaryControllerSpec extends PlaySpec
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
@@ -142,7 +143,7 @@ class SummaryControllerSpec extends PlaySpec
     "show the summary" when {
       "all required details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
         val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
