@@ -49,7 +49,8 @@ trait OrganisationDetailsController extends LisaBaseController {
         data => {
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
             Logger.debug("BusinessStructure retrieved")
-            rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap(res =>
+            rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap {
+              /*res =>
               res.isRight match {
                 case true => Logger.debug("rosmRegister Successful")
                   cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(res.right.get)))
@@ -57,8 +58,14 @@ trait OrganisationDetailsController extends LisaBaseController {
 
                 case false => Logger.error(s"rosmRegister Failure due to ${res.left.getOrElse("UNKNOWN FAILURE")}")
                   Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
-              }
-            )
+              }*/
+                          case Right(safeId) => {Logger.debug("rosmRegister Successful")
+              cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
+              handleRedirect(routes.TradingDetailsController.get().url)}
+                          case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
+              Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
+            }
+            }
           }
         }
       )

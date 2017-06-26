@@ -43,7 +43,7 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-            taxEnrolmentService.addSubscriber(subscriptionId, "subscriptionId").map {
+            taxEnrolmentService.addSubscriber(subscriptionId, registrationDetails.organisationDetails.safeId.get).map {
               case TaxEnrolmentAddSubscriberSucceeded => Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
               case TaxEnrolmentAddSubscriberFailed => Redirect(routes.ErrorController.error())
             }
