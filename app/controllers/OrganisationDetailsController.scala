@@ -17,7 +17,6 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.UserDetailsConnector
 import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
@@ -50,20 +49,11 @@ trait OrganisationDetailsController extends LisaBaseController {
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
             Logger.debug("BusinessStructure retrieved")
             rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap {
-              /*res =>
-              res.isRight match {
-                case true => Logger.debug("rosmRegister Successful")
-                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(res.right.get)))
-                  handleRedirect(routes.TradingDetailsController.get().url)
-
-                case false => Logger.error(s"rosmRegister Failure due to ${res.left.getOrElse("UNKNOWN FAILURE")}")
-                  Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
-              }*/
-                          case Right(safeId) => {Logger.debug("rosmRegister Successful")
-              cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
-              handleRedirect(routes.TradingDetailsController.get().url)}
-                          case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
-              Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
+              case Right(safeId) => {Logger.debug("rosmRegister Successful")
+                cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
+                handleRedirect(routes.TradingDetailsController.get().url)}
+              case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
+                Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
             }
             }
           }
@@ -71,7 +61,6 @@ trait OrganisationDetailsController extends LisaBaseController {
       )
     }
   }
-
 }
 
 object OrganisationDetailsController extends OrganisationDetailsController {
