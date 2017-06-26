@@ -30,12 +30,14 @@ trait OrganisationDetailsController extends LisaBaseController {
   val rosmService:RosmService
 
   def businessLables(businessStructure:  Option[BusinessStructure]): String = {
-    val acceptableValues = Map("Corporate" -> "Company UTR",
-    "Limited Liability Partnership" -> "Partnership UTR"
+    val acceptableValues = Map("Corporate Body" -> "Corporation Tax reference number",
+    "Limited Liability Partnership" -> "Partnership Unique Tax reference number"
     )
 
     businessStructure match {
-      case None => throw new Exception("No business type selected")
+      case None => {
+        throw new NoBusinessStructureException
+      }
       case Some(_) => {
         try {
           acceptableValues(businessStructure.get.businessStructure)
@@ -49,12 +51,19 @@ trait OrganisationDetailsController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bus =>
-        cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
-          case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLables(bus)))
-          case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLables(bus)))
+      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
+        cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map { org =>
+          try {
+            org match {
+              case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLables(bStructure)))
+              case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLables(bStructure)))
+            }
+          } catch {
+            case e: NoBusinessStructureException => Redirect(routes.BusinessStructureController.get())
+          }
         }
       }
+
     }
   }
 
@@ -63,7 +72,9 @@ trait OrganisationDetailsController extends LisaBaseController {
 
       OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors,"")))
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
+            Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLables(bStructure))))
+          }
         },
         data => {
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
@@ -73,7 +84,7 @@ trait OrganisationDetailsController extends LisaBaseController {
                 cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
                 handleRedirect(routes.TradingDetailsController.get().url)}
               case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
-                Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
+                Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"),businessLables(bStructure))))
             }
             }
           }
@@ -92,3 +103,5 @@ object OrganisationDetailsController extends OrganisationDetailsController {
 
   override val authorisationService = AuthorisationService
 }
+
+class NoBusinessStructureException extends Exception

@@ -49,9 +49,12 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
+
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name",Some("34567889"))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), any())(any(), any())).
+
+        when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
           thenReturn(Future.successful(Some(organisationForm)))
 
         val result = SUT.get(fakeRequest)
@@ -69,7 +72,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -84,6 +88,19 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
     }
 
+    "redirect the user to business structure" when {
+      "The business structure details are missing from the cache" in {
+        when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
+          thenReturn(Future.successful(None)).
+          thenReturn(Future.successful(None))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+      }
+    }
   }
 
   "POST Organisation Details" must {
@@ -96,6 +113,9 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       "the submitted data is incomplete" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
+          thenReturn(Future.successful(None))
         val result = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
@@ -110,7 +130,9 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "ctrNumber" -> "X")))
         val result = SUT.post(request)
-
+        when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
+          thenReturn(Future.successful(None))
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)
@@ -176,6 +198,10 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
     addToken(FakeRequest("POST", uri, FakeHeaders(), body))
+  }
+
+  def createFakeGetRequest[T](uri: String, body:T):FakeRequest[T] = {
+    addToken(FakeRequest("GET", uri, FakeHeaders(), body))
   }
 
   val mockConfig: Configuration = mock[Configuration]
