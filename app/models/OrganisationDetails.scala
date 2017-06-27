@@ -24,6 +24,8 @@ case class OrganisationDetails(companyName: String, ctrNumber: String, safeId:Op
 
 object OrganisationDetails {
 
+  val cacheKey: String = "organisationDetails"
+
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
   val form: Form[OrganisationDetails] = Form(
