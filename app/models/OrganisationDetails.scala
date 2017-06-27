@@ -18,18 +18,21 @@ package models
 
 import play.api.data._
 import play.api.data.Forms._
-import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(companyName: String, ctrNumber: String, safeId:Option[String])
 
 object OrganisationDetails {
-  implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+
   val cacheKey: String = "organisationDetails"
+
+  implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+
   val form: Form[OrganisationDetails] = Form(
     mapping(
-      "companyName" -> nonEmptyText.verifying(pattern("""^[a-zA-Z0-9 '&\\/]{0,105}$""".r, error="Invalid company name")),
-      "ctrNumber" -> nonEmptyText)((companyName,ctrNumber) => OrganisationDetails(companyName,ctrNumber,Some("")))
+      compLabel-> text.verifying(nonEmptyTextLisa(company_error_key),companyPattern),
+      utrLabel -> text.verifying(nonEmptyTextLisa(ctutr_error_key)))((companyName,ctrNumber) =>
+      OrganisationDetails(companyName,ctrNumber,Some("")))
     (organisationDetails => Some((organisationDetails.companyName,organisationDetails.ctrNumber)))
   )
 }

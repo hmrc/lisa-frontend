@@ -17,12 +17,14 @@
 package services
 
 import connectors.{RosmJsonFormats, RosmConnector}
+import controllers.routes
 import models._
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess}
 import uk.gov.hmrc.play.http.{HttpResponse, HeaderCarrier}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 trait RosmService extends RosmJsonFormats{
 
@@ -45,6 +47,13 @@ trait RosmService extends RosmJsonFormats{
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
         case _ : JsError => handleErrorResponse(res)
       }
+    }.recover {
+      case NonFatal(ex: Throwable) =>
+      {
+        Logger.error(s"rosm registration error: ${ex.getMessage}")
+        Left("INTERNAL_SERVER_ERROR")
+      }
+
     }
   }
 

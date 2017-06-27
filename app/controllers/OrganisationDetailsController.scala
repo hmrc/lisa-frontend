@@ -17,8 +17,11 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
+import models.OrganisationDetails._
 import models._
 import play.api.Play.current
+import play.api.data.FormError
+import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Logger,Configuration, Environment, Play}
@@ -67,15 +70,22 @@ trait OrganisationDetailsController extends LisaBaseController {
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
             case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
             case Some(businessStructure) => {
+              Logger.debug("BusinessStructure retrieved")
               rosmService.rosmRegister(businessStructure, data).flatMap {
                 case Right(safeId) => {
                   Logger.debug("rosmRegister Successful")
-                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data.copy(safeId = Some(safeId)))
+                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
                   handleRedirect(routes.TradingDetailsController.get().url)
                 }
                 case Left(error) => {
-                  Logger.error(s"rosmRegister Failure due to ${error}")
-                  Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"), businessLabels(businessStructure))))
+                  Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to ${error}")
+
+                  val regErrors = Seq(FormError(businessStructure.businessStructure, Messages("")),
+                    FormError(utrLabel, Messages("org.ctUtr.mandatory")),
+                    FormError(compLabel, Messages("org.compName.mandatory")))
+
+                  Future.successful(BadRequest(views.html.registration.organisation_details(
+                    OrganisationDetails.form.copy(errors = regErrors) fill (data), businessLabels(businessStructure))))
                 }
               }
             }
