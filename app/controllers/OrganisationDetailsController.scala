@@ -29,11 +29,24 @@ import scala.concurrent.Future
 trait OrganisationDetailsController extends LisaBaseController {
   val rosmService:RosmService
 
+  private def businessLabels(businessStructure:  BusinessStructure): String = {
+    val acceptableValues = Map("Corporate Body" -> "Corporation Tax reference number",
+    "Limited Liability Partnership" -> "Partnership Unique Tax reference number"
+    )
+
+    acceptableValues(businessStructure.businessStructure)
+  }
+
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
-        case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data)))
-        case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form))
+      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case Some(businessStructure) => {
+          cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
+            case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabels(businessStructure)))
+            case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabels(businessStructure)))
+          }
+        }
       }
     }
   }
@@ -43,18 +56,28 @@ trait OrganisationDetailsController extends LisaBaseController {
 
       OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors)))
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+            case Some(businessStructure) => {
+              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
+            }
+          }
         },
         data => {
-          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
-            Logger.debug("BusinessStructure retrieved")
-            rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap {
-              case Right(safeId) => {Logger.debug("rosmRegister Successful")
-                cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
-                handleRedirect(routes.TradingDetailsController.get().url)}
-              case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
-                Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"))))
-            }
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+            case Some(businessStructure) => {
+              rosmService.rosmRegister(businessStructure, data).flatMap {
+                case Right(safeId) => {
+                  Logger.debug("rosmRegister Successful")
+                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data.copy(safeId = Some(safeId)))
+                  handleRedirect(routes.TradingDetailsController.get().url)
+                }
+                case Left(error) => {
+                  Logger.error(s"rosmRegister Failure due to ${error}")
+                  Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"), businessLabels(businessStructure))))
+                }
+              }
             }
           }
         }
@@ -72,3 +95,5 @@ object OrganisationDetailsController extends OrganisationDetailsController {
 
   override val authorisationService = AuthorisationService
 }
+
+class NoBusinessStructureException extends Exception

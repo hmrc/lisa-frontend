@@ -1,7 +1,7 @@
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@(form: Form[OrganisationDetails])(implicit request: Request[_], messages: Messages)
+@(form: Form[OrganisationDetails], utrLabel: String)(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
     <h1>Your organisation's name</h1>
@@ -15,7 +15,7 @@
             @input(form("companyName"), '_label -> "Company name", '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-group">
-        @input(form("ctrNumber"), '_label -> "Corporation Tax reference number", '_inputClass -> "form-control form-control--block")
+        @input(form("ctrNumber"), '_label -> utrLabel, '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue">

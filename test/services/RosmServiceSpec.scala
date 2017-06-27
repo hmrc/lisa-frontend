@@ -45,7 +45,7 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
         when(mockRosmConnector.registerOnce(any(),any())(any())).thenReturn(
             Future.successful(HttpResponse(OK,Some(Json.toJson(rosmSuccessResponse)))))
 
-        val res = Await.result(SUT.rosmRegister("LLP",org), Duration.Inf)
+        val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
 
         res mustBe Right("XE0001234567890")
       }
@@ -54,7 +54,7 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
           when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
             Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
-          val res = Await.result(SUT.rosmRegister("LLP",org), Duration.Inf)
+          val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
 
           res mustBe Left(rosmFailureResponse.code)
         }
@@ -66,7 +66,7 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
           when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
             Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
 
-          val res = Await.result(SUT.rosmRegister("LLP",org), Duration.Inf)
+          val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
 
           res mustBe Left("INTERNAL_SERVER_ERROR")
         }
