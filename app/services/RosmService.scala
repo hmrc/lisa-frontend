@@ -38,9 +38,9 @@ trait RosmService extends RosmJsonFormats{
         Left("INTERNAL_SERVER_ERROR")
     }
 
-  def rosmRegister(businessStructure:String, orgDetails: OrganisationDetails)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
+  def rosmRegister(businessStructure:BusinessStructure, orgDetails: OrganisationDetails)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
   {
-    val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName,businessStructure))
+    val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName,businessStructure.businessStructure))
 
     rosmConnector.registerOnce(orgDetails.ctrNumber , rosmRegistration).map { res =>
       res.json.validate[RosmRegistrationSuccessResponse] match {

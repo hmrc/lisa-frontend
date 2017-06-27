@@ -24,7 +24,6 @@ import play.api.libs.json._
 trait TaxEnrolmentJsonFormats {
 
   implicit val taxIdentifierFormats: OFormat[TaxEnrolmentIdentifier] = Json.format[TaxEnrolmentIdentifier]
-  implicit val taxAddSubscriberFormats: OFormat[TaxEnrolmentAddSubscriberRequest] = Json.format[TaxEnrolmentAddSubscriberRequest]
 
   implicit val subscriptionReads: Reads[TaxEnrolmentSubscription] = (
     (JsPath \ "created").read[String].map[DateTime](d => new DateTime(d)) and

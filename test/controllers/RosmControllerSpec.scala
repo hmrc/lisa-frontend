@@ -32,7 +32,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
-import services.{AuditService, AuthorisationService, RosmService, TaxEnrolmentService}
+import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.cache.client.ShortLivedCache
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -171,8 +171,6 @@ class RosmControllerSpec extends PlaySpec
         thenReturn(Future.successful(Some(yourForm)))
 
       when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789")))
-
-      when (mockTaxEnrolmentService.addSubscriber(any(), any())(any())).thenReturn(Future.successful(TaxEnrolmentAddSubscriberSucceeded))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -344,7 +342,6 @@ class RosmControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuditService: AuditService = mock[AuditService]
   val mockRosmService: RosmService = mock[RosmService]
-  val mockTaxEnrolmentService: TaxEnrolmentService = mock[TaxEnrolmentService]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object SUT extends RosmController {
@@ -353,7 +350,6 @@ class RosmControllerSpec extends PlaySpec
     override val cache: ShortLivedCache = mockCache
     override val auditService: AuditService = mockAuditService
     override val rosmService: RosmService = mockRosmService
-    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
     override val authorisationService: AuthorisationService = mockAuthorisationService
   }
 
