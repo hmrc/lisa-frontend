@@ -49,7 +49,7 @@ class BusinessStructureControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val form = new BusinessStructure("Limited Liability Partnership")
+        val form = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(form)))

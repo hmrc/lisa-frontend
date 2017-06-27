@@ -176,10 +176,8 @@ class RosmControllerSpec extends PlaySpec
       val rosmContact = RosmContactDetails()
       val rosmSuccessResponse = RosmRegistrationSuccessResponse(
         safeId = "",
-        agentReferenceNumber = "",
         isEditable = true,
         isAnAgent = true,
-        isAnASAgent = true,
         isAnIndividual = true,
         address = rosmAddress,
         contactDetails = rosmContact
@@ -252,10 +250,8 @@ class RosmControllerSpec extends PlaySpec
       val rosmContact = RosmContactDetails()
       val rosmSuccessResponse = RosmRegistrationSuccessResponse(
         safeId = "",
-        agentReferenceNumber = "",
         isEditable = true,
         isAnAgent = true,
-        isAnASAgent = true,
         isAnIndividual = true,
         address = rosmAddress,
         contactDetails = rosmContact
