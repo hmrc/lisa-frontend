@@ -33,8 +33,8 @@ trait OrganisationDetailsController extends LisaBaseController {
   val rosmService:RosmService
 
   private def businessLabels(businessStructure:  BusinessStructure): String = {
-    val acceptableValues = Map("Corporate Body" -> "Corporation Tax reference number",
-    "Limited Liability Partnership" -> "Partnership Unique Tax reference number"
+    val acceptableValues = Map(Messages("org.details.corpbody") -> "Corporation Tax reference number",
+    Messages("org.details.llp") -> "Partnership Unique Tax reference number"
     )
 
     acceptableValues(businessStructure.businessStructure)

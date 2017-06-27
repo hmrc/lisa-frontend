@@ -54,7 +54,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
 
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
+          thenReturn(Future.successful(Some(new BusinessStructure("LLP")))).
           thenReturn(Future.successful(Some(organisationForm)))
 
         val result = SUT.get(fakeRequest)
@@ -73,7 +73,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
       "the cache does not return a value" in {
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
+          thenReturn(Future.successful(Some(new BusinessStructure("LLP")))).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -114,7 +114,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
+          thenReturn(Future.successful(Some(new BusinessStructure("LLP")))).
           thenReturn(Future.successful(None))
         val result = SUT.post()(request)
 
@@ -131,7 +131,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "ctrNumber" -> "X")))
         val result = SUT.post(request)
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership")))).
+          thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body")))).
           thenReturn(Future.successful(None))
         status(result) mustBe Status.BAD_REQUEST
 
@@ -163,7 +163,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+          thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
         when(mockRosmService.rosmRegister(any(), any())(any())).thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
 
         val result = SUT.post(request)

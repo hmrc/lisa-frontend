@@ -21,10 +21,10 @@ import org.joda.time.DateTime
 trait RosmRegistrationResponse
 
 case class RosmRegistrationSuccessResponse(safeId: String,
-                                           agentReferenceNumber: String,
+                                           agentReferenceNumber: Option[String] = None,
                                            isEditable: Boolean,
                                            isAnAgent: Boolean,
-                                           isAnASAgent: Boolean,
+                                           isAnASAgent: Option[Boolean] = None,
                                            isAnIndividual: Boolean,
                                            individual: Option[RosmIndividual] = None,
                                            organisation: Option[RosmOrganisation] = None,

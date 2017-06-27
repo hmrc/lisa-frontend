@@ -120,10 +120,8 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
 
   val rosmSuccessResponse = RosmRegistrationSuccessResponse(
     safeId = "XE0001234567890",
-    agentReferenceNumber = "AARN1234567",
     isEditable = true,
     isAnAgent = false,
-    isAnASAgent = false,
     isAnIndividual = true,
     individual = None,
     address = rosmAddress,

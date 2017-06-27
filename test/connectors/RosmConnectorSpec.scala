@@ -138,10 +138,10 @@ class RosmConnectorSpec extends PlaySpec
 
   val rosmSuccessResponse = RosmRegistrationSuccessResponse(
     safeId = "XE0001234567890",
-    agentReferenceNumber = "AARN1234567",
+    agentReferenceNumber = Some("AARN1234567"),
     isEditable = true,
     isAnAgent = false,
-    isAnASAgent = false,
+    isAnASAgent = Some(false),
     isAnIndividual = true,
     individual = Some(rosmIndividual),
     address = rosmAddress,
@@ -150,10 +150,10 @@ class RosmConnectorSpec extends PlaySpec
 
   val rosmSuccessResponseNoDob = RosmRegistrationSuccessResponse(
     safeId = "XE0001234567890",
-    agentReferenceNumber = "AARN1234567",
+    agentReferenceNumber = Some("AARN1234567"),
     isEditable = true,
     isAnAgent = false,
-    isAnASAgent = false,
+    isAnASAgent = Some(false),
     isAnIndividual = true,
     individual = Some(rosmIndividualNoDob),
     address = rosmAddress,
