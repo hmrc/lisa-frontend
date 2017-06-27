@@ -18,26 +18,19 @@ package models
 
 import play.api.data._
 import play.api.data.Forms._
-import play.api.data.validation.Constraints.pattern
-import play.api.data.validation.{Constraint, Valid, Invalid, ValidationError}
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(companyName: String, ctrNumber: String, safeId:Option[String])
 
 object OrganisationDetails {
 
-  def nonEmptyTextLisa[T](messageKey:String): Constraint[String] = Constraint[String]("constraint.required") { text =>
-    if (text == null) Invalid(messageKey) else if (text.trim.isEmpty) Invalid(ValidationError(messageKey)) else Valid
-  }
-
-  val pat = pattern("""^[a-zA-Z0-9 '&\\/]{0,105}$""".r, error="Invalid company name")
-
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
-  val cacheKey: String = "organisationDetails"
+
   val form: Form[OrganisationDetails] = Form(
     mapping(
-      "companyName" -> text.verifying(nonEmptyTextLisa("org.compName.mandatory"),pattern("""^[a-zA-Z0-9 '&\\/]{0,105}$""".r, error="Invalid company name")),
-      "ctrNumber" -> text.verifying(nonEmptyTextLisa("org.ctUtr.mandatory")))((companyName,ctrNumber) => OrganisationDetails(companyName,ctrNumber,Some("")))
+      compLabel-> text.verifying(nonEmptyTextLisa(company_error_key),companyPattern),
+      utrLabel -> text.verifying(nonEmptyTextLisa(ctutr_error_key)))((companyName,ctrNumber) =>
+      OrganisationDetails(companyName,ctrNumber,Some("")))
     (organisationDetails => Some((organisationDetails.companyName,organisationDetails.ctrNumber)))
   )
 }

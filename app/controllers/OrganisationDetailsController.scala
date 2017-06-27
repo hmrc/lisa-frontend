@@ -17,6 +17,7 @@
 package controllers
 
 import config.{FrontendAuthConnector, LisaShortLivedCache}
+import models.OrganisationDetails._
 import models._
 import play.api.Play.current
 import play.api.data.FormError
@@ -55,10 +56,14 @@ trait OrganisationDetailsController extends LisaBaseController {
                 cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
                 handleRedirect(routes.TradingDetailsController.get().url)}
               case Left(error) => {Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to ${error}")
+
+                val regErrors = Seq(FormError(bStructure.get.businessStructure, Messages("")),
+                                                FormError(utrLabel, Messages("org.ctUtr.mandatory")),
+                                    FormError(compLabel, Messages("org.compName.mandatory")))
+
                 Future.successful(BadRequest(views.html.registration.organisation_details(
-                  OrganisationDetails.form.fill(data).withError(FormError(bStructure.get.businessStructure, Messages(""))))))
+                  OrganisationDetails.form.copy(errors = regErrors)fill(data))))
             }
-                //copy(errors = Seq(FormError(bStructure.get.businessStructure, Messages("")),FormError("ctrNumber", Messages(""))))
             }
           }
         }
