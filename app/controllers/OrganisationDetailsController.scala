@@ -29,41 +29,25 @@ import scala.concurrent.Future
 trait OrganisationDetailsController extends LisaBaseController {
   val rosmService:RosmService
 
-  def businessLables(businessStructure:  Option[BusinessStructure]): String = {
+  private def businessLabels(businessStructure:  BusinessStructure): String = {
     val acceptableValues = Map("Corporate Body" -> "Corporation Tax reference number",
     "Limited Liability Partnership" -> "Partnership Unique Tax reference number"
     )
 
-    businessStructure match {
-      case None => {
-        throw new NoBusinessStructureException
-      }
-      case Some(_) => {
-        try {
-          acceptableValues(businessStructure.get.businessStructure)
-        }
-        catch {
-          case e: Exception => throw new Exception("Invalid business structure")
-        }
-      }
-    }
+    acceptableValues(businessStructure.businessStructure)
   }
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
-        cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map { org =>
-          try {
-            org match {
-              case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLables(bStructure)))
-              case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLables(bStructure)))
-            }
-          } catch {
-            case e: NoBusinessStructureException => Redirect(routes.BusinessStructureController.get())
+      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case Some(businessStructure) => {
+          cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
+            case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabels(businessStructure)))
+            case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabels(businessStructure)))
           }
         }
       }
-
     }
   }
 
@@ -72,19 +56,28 @@ trait OrganisationDetailsController extends LisaBaseController {
 
       OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
-            Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLables(bStructure))))
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+            case Some(businessStructure) => {
+              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
+            }
           }
         },
         data => {
-          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap { bStructure =>
-            rosmService.rosmRegister(bStructure.get.businessStructure, data).flatMap {
-              case Right(safeId) => {Logger.debug("rosmRegister Successful")
-                cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
-                handleRedirect(routes.TradingDetailsController.get().url)}
-              case Left(error) => {Logger.error(s"rosmRegister Failure due to ${error}")
-                Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"),businessLables(bStructure))))
-            }
+          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+            case Some(businessStructure) => {
+              rosmService.rosmRegister(businessStructure, data).flatMap {
+                case Right(safeId) => {
+                  Logger.debug("rosmRegister Successful")
+                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data.copy(safeId = Some(safeId)))
+                  handleRedirect(routes.TradingDetailsController.get().url)
+                }
+                case Left(error) => {
+                  Logger.error(s"rosmRegister Failure due to ${error}")
+                  Future.successful(BadRequest(views.html.registration.organisation_details(OrganisationDetails.form.withError("registerError", "Registration Failed"), businessLabels(businessStructure))))
+                }
+              }
             }
           }
         }
