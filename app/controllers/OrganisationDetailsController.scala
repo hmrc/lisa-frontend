@@ -78,11 +78,12 @@ trait OrganisationDetailsController extends LisaBaseController {
                   handleRedirect(routes.TradingDetailsController.get().url)
                 }
                 case Left(error) => {
-                  Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to ${error}")
+                  Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
 
                   val regErrors = Seq(FormError(businessStructure.businessStructure, Messages("")),
-                    FormError(utrLabel, Messages("org.ctUtr.mandatory")),
-                    FormError(compLabel, Messages("org.compName.mandatory")))
+                    FormError(compLabel, Messages("org.compName.mandatory")),
+                    FormError(utrLabel, Messages("org.ctUtr.mandatory"))
+                  )
 
                   Future.successful(BadRequest(views.html.registration.organisation_details(
                     OrganisationDetails.form.copy(errors = regErrors) fill (data), businessLabels(businessStructure))))
@@ -105,5 +106,3 @@ object OrganisationDetailsController extends OrganisationDetailsController {
 
   override val authorisationService = AuthorisationService
 }
-
-class NoBusinessStructureException extends Exception

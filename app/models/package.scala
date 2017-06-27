@@ -20,7 +20,8 @@ import play.api.data.validation.{Valid, ValidationError, Invalid, Constraint}
 
 package object models extends Constants{
 
-  val companyPattern = pattern("""^[a-zA-Z0-9 '&\\/]{0,105}$""".r, error="Invalid company name")
+  val companyPattern = pattern("""^[a-zA-Z0-9 '&\\/]{0,105}$""".r, error="Invalid Company name")
+  val utrPattern = pattern("""^[0-9]{10}$""".r, error="Invalid UTR")
 
   def nonEmptyTextLisa[T](messageKey:String): Constraint[String] = Constraint[String](required) { text =>
     if (text == null) Invalid(messageKey) else if (text.trim.isEmpty) Invalid(ValidationError(messageKey)) else Valid
