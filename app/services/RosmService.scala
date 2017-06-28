@@ -62,14 +62,25 @@ trait RosmService extends RosmJsonFormats{
   def performSubscription(registration: LisaRegistration)(implicit hc:HeaderCarrier) : Future[Either[String,String]] = {
 
     val utr = registration.organisationDetails.ctrNumber
-    val cName = registration.organisationDetails.companyName
+    val companyName = registration.organisationDetails.companyName
     val safeId = registration.organisationDetails.safeId.get
-    val applicantDetails = ApplicantDetails(registration.yourDetails.firstName, registration.yourDetails.lastName,
-      registration.yourDetails.role, ContactDetails(registration.yourDetails.email, registration.yourDetails.phone))
+    val applicantDetails = ApplicantDetails(
+      name = registration.yourDetails.firstName,
+      surname = registration.yourDetails.lastName,
+      position = registration.yourDetails.role,
+      contactDetails = ContactDetails(
+        phoneNumber = registration.yourDetails.phone,
+        emailAddress = registration.yourDetails.email))
 
-
-    rosmConnector.subscribe(registration.tradingDetails.isaProviderRefNumber,
-      LisaSubscription(utr, safeId, registration.tradingDetails.fsrRefNumber, cName, applicantDetails)).map(
+    rosmConnector.subscribe(
+      lisaManagerRef = registration.tradingDetails.isaProviderRefNumber,
+      lisaSubscribe = LisaSubscription(
+        utr = utr,
+        safeId = safeId,
+        approvalNumber = registration.tradingDetails.fsrRefNumber,
+        companyName = companyName,
+        applicantDetails = applicantDetails)
+    ).map(
       subscribed => subscribed.json.validate[DesSubscriptionSuccessResponse] match {
         case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
         case _: JsError => handleErrorResponse(subscribed)
