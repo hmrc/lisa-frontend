@@ -15,7 +15,13 @@
     <section class="divider--top">
         <div class="tabular-data__entry tabular-data__entry--grouped">
             <span class="tabular-data__heading tabular-data__heading--label" id="title-businessStructure">Business structure</span>
-            <span class="tabular-data__data-1" id="value-businessStructure">@data.businessStructure.businessStructure</span>
+            <span class="tabular-data__data-1" id="value-businessStructure">
+                @if(data.businessStructure.businessStructure == Messages("org.details.llp")) {
+                    @Messages("org.details.llp.view")
+                } else {
+                    @Messages("org.details.corpbody.view")
+                }
+            </span>
         </div>
     </section>
 

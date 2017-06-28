@@ -13,8 +13,8 @@
     @CSRF.formField
 
     @inputRadioGroup(form("businessStructure"), Seq(
-        ( Messages("org.details.llp"), Messages("org.details.llp.view")),
-        (Messages("org.details.corpbody"), "Corporate Body")
+        (Messages("org.details.llp"), Messages("org.details.llp.view")),
+        (Messages("org.details.corpbody"), Messages("org.details.corpbody.view"))
     ), '_labelClass -> "block-label", '_legend -> "Select your business structure", '_legendClass -> Some("visuallyhidden"))
 
     <div class="form-field form-field--submit">
