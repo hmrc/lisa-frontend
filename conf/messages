@@ -11,4 +11,5 @@ Your company name must match the name written on any letters you have from HMRC.
 Your Corporation Tax reference number must match the number on any letters you have from HMRC. It is made up of 10 or 13 digits. If it is 13 digits only enter the last 10.
 org.details.llp.view=Limited Liability Partnership
 org.details.llp=LLP
+org.details.corpbody.view=Limited Company
 org.details.corpbody=Corporate Body
