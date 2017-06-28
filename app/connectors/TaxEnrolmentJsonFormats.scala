@@ -41,4 +41,20 @@ trait TaxEnrolmentJsonFormats {
     (JsPath \ "groupIdentifier").read[String]
   )(TaxEnrolmentSubscription.apply _)
 
+  implicit val subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
+    (JsPath \ "created").write[String].contramap[DateTime]{_.toString} and
+    (JsPath \ "lastModified").write[String].contramap[DateTime]{_.toString} and
+    (JsPath \ "credId").write[String] and
+    (JsPath \ "serviceName").write[String] and
+    (JsPath \ "identifiers").write[List[TaxEnrolmentIdentifier]] and
+    (JsPath \ "callback").write[String] and
+    (JsPath \ "state").write[String].contramap[TaxEnrolmentState] {
+      case TaxEnrolmentError => "ERROR"
+      case TaxEnrolmentSuccess => "SUCCESS"
+      case TaxEnrolmentPending => "PENDING"
+    } and
+    (JsPath \ "etmpId").write[String] and
+    (JsPath \ "groupIdentifier").write[String]
+  ) (unlift(TaxEnrolmentSubscription.unapply))
+
 }

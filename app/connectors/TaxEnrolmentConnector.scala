@@ -18,9 +18,11 @@ package connectors
 
 import config.WSHttp
 import models._
+import play.api.Logger
+import play.api.libs.json.Json
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats {
@@ -32,9 +34,11 @@ trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"$serviceUrl/tax-enrolments/groups/$groupId/subscriptions"
 
-    httpGet.GET[List[TaxEnrolmentSubscription]](uri)(implicitly, hc)
+    httpGet.GET[HttpResponse](uri)(implicitly, hc) map { res =>
+      Logger.debug(s"Getsubscriptions returned status: ${res.status} with body ${res.body.toString}")
+      Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
+    }
   }
-
 }
 
 object TaxEnrolmentConnector extends TaxEnrolmentConnector
