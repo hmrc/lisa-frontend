@@ -23,20 +23,23 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import play.api.libs.json._
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpResponse}
+import play.api.http.HeaderNames
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class TaxEnrolmentConnectorSpec extends PlaySpec
   with MockitoSugar
-  with GuiceOneAppPerSuite {
+  with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
+
 
   "Get Subscriptions by Group ID endpoint" must {
 
     "return whatever it receives" in {
-      when(mockHttpGet.GET[List[TaxEnrolmentSubscription]](any())(any(), any())).
-        thenReturn(Future.successful(subs))
+      when(mockHttpGet.GET[HttpResponse](any())(any(), any())).
+      thenReturn(Future.successful(HttpResponse(200, Some(Json.toJson(subs)), Map[String,Seq[String]]("test"->Seq("test1","test2")), None)))
 
       val response = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
 
