@@ -1,10 +1,10 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
-    <h1>Register as a Lifetime ISA manager</h1>
+    <h1>Apply to be an approved Lifetime ISA Manager</h1>
 }
 
-@views.html.main_template(title = "Register as a Lifetime ISA manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader), showSignOutLink = false) {
+@views.html.main_template(title = "Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader), showSignOutLink = false) {
 
     <section class="subsection">
 
@@ -27,12 +27,13 @@
 
         <p>You must be registered with HMRC as an ISA manager.</p>
 
-        <p>You'll need your:</p>
+        <p>You’ll need your organisation's:</p>
 
         <div class="gutter-left">
             <ul class="list list-bullet">
+                <li>Government Gateway ID</li>
                 <li>ISA manager reference number</li>
-                <li>Corporation Tax reference number</li>
+                <li>Corporation Tax reference number/Partnership Unique Tax reference number</li>
                 <li>Financial Conduct Authority reference number</li>
             </ul>
         </div>
