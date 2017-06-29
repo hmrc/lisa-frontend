@@ -17,6 +17,7 @@
 package connectors
 
 import models._
+import org.joda.time.DateTimeZone
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, Json}
@@ -33,7 +34,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val sub = parsed.head
 
-        sub.created.toString mustBe "2016-01-25T15:44:17.496Z"
+        sub.created.withZone(DateTimeZone.UTC).toString() mustBe "2017-06-29T09:01:54.908Z"
         sub.state mustBe TaxEnrolmentPending
       }
       "given valid json with a error status" in {
@@ -53,6 +54,16 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
         val sub = parsed.head
 
         sub.state mustBe TaxEnrolmentSuccess
+      }
+      "given valid json with identifiers set to null" in {
+        val parsed = Json.parse(testJsonNullIdentifiers).as[List[TaxEnrolmentSubscription]]
+
+        parsed.size mustBe 1
+
+        val sub = parsed.head
+
+        sub.state mustBe TaxEnrolmentPending
+        sub.identifiers mustBe Nil
       }
     }
 
@@ -78,8 +89,8 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
   }
 
   private val testJson: String = """[{
-                           |    "created": "2016-01-25T15:44:17.496Z",
-                           |    "lastModified": "2016-01-25T16:44:17.496Z",
+                           |    "created": 1498726914908,
+                           |    "lastModified": 1498726914908,
                            |    "serviceName": "HMRC-ORG-LISA",
                            |    "identifiers": [
                            |        {
@@ -89,10 +100,21 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
                            |    ],
                            |    "callback": "callback url",
                            |    "etmpId": "bp safe id",
-                           |
                            |    "credId": "X",
                            |    "state": "PENDING",
                            |    "groupIdentifier": "Z"
                            |}]""".stripMargin
+
+  private val testJsonNullIdentifiers: String = """[{
+                                                |    "created": 1498726914908,
+                                                |    "lastModified": 1498726914908,
+                                                |    "serviceName": "HMRC-ORG-LISA",
+                                                |    "identifiers": null,
+                                                |    "callback": "callback url",
+                                                |    "etmpId": "bp safe id",
+                                                |    "credId": "X",
+                                                |    "state": "PENDING",
+                                                |    "groupIdentifier": "Z"
+                                                |}]""".stripMargin
 
 }

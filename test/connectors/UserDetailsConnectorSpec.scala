@@ -31,6 +31,8 @@ class UserDetailsConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite {
 
+  implicit val hc = HeaderCarrier()
+
   "Get User Details endpoint" must {
 
     "return whatever it receives" in {
@@ -45,7 +47,6 @@ class UserDetailsConnectorSpec extends PlaySpec
   }
 
   val mockHttpGet = mock[HttpGet]
-  implicit val hc = HeaderCarrier()
 
   object SUT extends UserDetailsConnector {
     override val httpGet = mockHttpGet
