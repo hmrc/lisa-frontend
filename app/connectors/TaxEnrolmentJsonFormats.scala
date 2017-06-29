@@ -26,11 +26,11 @@ trait TaxEnrolmentJsonFormats {
   implicit val taxIdentifierFormats: OFormat[TaxEnrolmentIdentifier] = Json.format[TaxEnrolmentIdentifier]
 
   implicit val subscriptionReads: Reads[TaxEnrolmentSubscription] = (
-    (JsPath \ "created").read[String].map[DateTime](d => new DateTime(d)) and
-    (JsPath \ "lastModified").read[String].map[DateTime](d => new DateTime(d)) and
+    (JsPath \ "created").read[Long].map[DateTime](d => new DateTime(d)) and
+    (JsPath \ "lastModified").read[Long].map[DateTime](d => new DateTime(d)) and
     (JsPath \ "credId").read[String] and
     (JsPath \ "serviceName").read[String] and
-    (JsPath \ "identifiers").read[List[TaxEnrolmentIdentifier]] and
+    (JsPath \ "identifiers").read[List[TaxEnrolmentIdentifier]].orElse(Reads.pure(Nil)) and
     (JsPath \ "callback").read[String] and
     (JsPath \ "state").read[String](Reads.pattern("^(ERROR|SUCCESS|PENDING)$".r, "error.formatting.state")).map[TaxEnrolmentState] {
       case "ERROR" => TaxEnrolmentError
@@ -42,8 +42,8 @@ trait TaxEnrolmentJsonFormats {
   )(TaxEnrolmentSubscription.apply _)
 
   implicit val subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
-    (JsPath \ "created").write[String].contramap[DateTime]{_.toString} and
-    (JsPath \ "lastModified").write[String].contramap[DateTime]{_.toString} and
+    (JsPath \ "created").write[Long].contramap[DateTime]{_.getMillis} and
+    (JsPath \ "lastModified").write[Long].contramap[DateTime]{_.getMillis} and
     (JsPath \ "credId").write[String] and
     (JsPath \ "serviceName").write[String] and
     (JsPath \ "identifiers").write[List[TaxEnrolmentIdentifier]] and
