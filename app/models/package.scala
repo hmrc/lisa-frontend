@@ -26,7 +26,7 @@ package object models extends Constants{
   val isaPattern: Constraint[String] = pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="Enter a valid ISA ref number. This" +
     " starts with Z, and includes either 4 or 6 numbers.")
   val rolePattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="Enter a valid role in " +
-    "the organisation. You can enter up to 30 characters")
+    "the organisation. You can enter up to 30 characters.")
   val phoneNumberPattern: Constraint[String] = pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="Enter a valid contact phone number.")
   def namePattern(error: String): Constraint[String] = {
     pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error=error)
