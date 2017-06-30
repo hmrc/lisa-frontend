@@ -31,11 +31,11 @@ object YourDetails {
   val cacheKey = "yourDetails"
   val form = Form(
     mapping(
-      "firstName" -> nonEmptyText,
-      "lastName" -> nonEmptyText,
-      "role" -> nonEmptyText,
-      "phone" -> nonEmptyText,
-      "email" -> nonEmptyText
+      "firstName" -> text.verifying(namePattern("Enter a valid first name.")),
+      "lastName" -> text.verifying(namePattern("Enter a valid last name.")),
+      "role" -> text.verifying(rolePattern),
+      "phone" -> text.verifying(phoneNumberPattern),
+      "email" -> email
     )(YourDetails.apply)(YourDetails.unapply)
   )
 }
