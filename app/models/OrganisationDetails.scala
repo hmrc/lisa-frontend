@@ -31,7 +31,7 @@ object OrganisationDetails {
   val form: Form[OrganisationDetails] = Form(
     mapping(
       compLabel-> text.verifying(nonEmptyTextLisa(company_error_key),companyPattern),
-      utrLabel -> text.verifying(nonEmptyTextLisa(ctutr_error_key)))((companyName,ctrNumber) =>
+      utrLabel -> text.verifying(nonEmptyTextLisa(ctutr_error_key), utrPattern))((companyName,ctrNumber) =>
       OrganisationDetails(companyName,ctrNumber,Some("")))
     (organisationDetails => Some((organisationDetails.companyName,organisationDetails.ctrNumber)))
   )
