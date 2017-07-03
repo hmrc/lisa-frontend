@@ -45,5 +45,7 @@ trait Constants {
   val isaprovider_error_key: String = "org.isa.mandatory"
   val compLabel:String = "companyName"
   val utrLabel:String = "ctrNumber"
+  val fsrRefNumberLabel: String = "fsrRefNumber"
+  val isaProviderRefNumberLabel: String = "isaProviderRefNumber"
   val required :String= "constraint.required"
 }

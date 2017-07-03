@@ -24,11 +24,16 @@ case class TradingDetails(fsrRefNumber: String,
                           isaProviderRefNumber: String)
 
 object TradingDetails {
+
   implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
+
   val cacheKey = "tradingDetails"
-  val form = Form(
-    mapping("fsrRefNumber" -> text.verifying(nonEmptyTextLisa(fca_error_key),fcaPattern),
-      "isaProviderRefNumber" -> text.verifying(nonEmptyTextLisa(isaprovider_error_key),isaPattern)
-    )(TradingDetails.apply)(TradingDetails.unapply)
+
+  val form: Form[TradingDetails] = Form(
+    mapping(fsrRefNumberLabel -> text.verifying(nonEmptyTextLisa(fca_error_key),fcaPattern),
+      isaProviderRefNumberLabel -> text.verifying(nonEmptyTextLisa(isaprovider_error_key),isaPattern))
+    ((fsrRefNumber,isaProviderRefNumber) =>
+      TradingDetails(fsrRefNumber, isaProviderRefNumber))
+    (tradingDetails => Some((tradingDetails.fsrRefNumber,tradingDetails.isaProviderRefNumber)))
   )
 }
