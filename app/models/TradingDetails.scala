@@ -27,8 +27,8 @@ object TradingDetails {
   implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
   val cacheKey = "tradingDetails"
   val form = Form(
-    mapping("fsrRefNumber" -> text.verifying(fcaPattern),
-      "isaProviderRefNumber" -> text.verifying(isaPattern)
+    mapping("fsrRefNumber" -> text.verifying(nonEmptyTextLisa(fca_error_key),fcaPattern),
+      "isaProviderRefNumber" -> text.verifying(nonEmptyTextLisa(isaprovider_error_key),isaPattern)
     )(TradingDetails.apply)(TradingDetails.unapply)
   )
 }

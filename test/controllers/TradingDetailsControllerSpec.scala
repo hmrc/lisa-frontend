@@ -113,7 +113,7 @@ class TradingDetailsControllerSpec extends PlaySpec
         val validJson = Json.obj(
           "ctrNumber" -> "1234567890",
           "fsrRefNumber" -> "123",
-          "isaProviderRefNumber" -> "123"
+          "isaProviderRefNumber" -> "Z123456"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
         val result = SUT.post(request)

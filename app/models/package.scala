@@ -20,9 +20,9 @@ import play.api.data.validation.{Valid, ValidationError, Invalid, Constraint}
 
 package object models extends Constants{
 
-  val companyPattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="")
-  val utrPattern: Constraint[String] = pattern("""^[0-9]{10}$""".r, error="")
-  val fcaPattern: Constraint[String] = pattern("""^[0-9]{6}$""".r, error="Enter a valid company name.")
+  val companyPattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="Enter a valid company name.")
+  val utrPattern: Constraint[String] = pattern("""^[0-9]{10}$""".r, error="Enter a valid Tax Reference Number.")
+  val fcaPattern: Constraint[String] = pattern("""^[0-9]{6}$""".r, error="Enter a valid Financial Number.")
   val isaPattern: Constraint[String] = pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="Enter a valid ISA ref number. This" +
     " starts with Z, and includes either 4 or 6 numbers.")
   val rolePattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="Enter a valid role in " +
@@ -41,6 +41,8 @@ trait Constants {
 
   val company_error_key:String = "org.compName.mandatory"
   val ctutr_error_key:String =  "org.ctUtr.mandatory"
+  val fca_error_key:String = "org.fca.manadtory"
+  val isaprovider_error_key: String = "org.isa.mandatory"
   val compLabel:String = "companyName"
   val utrLabel:String = "ctrNumber"
   val required :String= "constraint.required"
