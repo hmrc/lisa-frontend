@@ -37,12 +37,23 @@ class OrganisationDetailsSpec extends PlaySpec {
     "Show company name invalid error" when {
 
       "given a company name with invalid characters" in {
-        val test = Map[String, String]("companyName" -> "?", "ctrNumber" -> "?")
+        val test = Map[String, String]("companyName" -> "?", "ctrNumber" -> "0123456789")
         val res = SUT.bind(test)
-
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
-        res.errors.head.message mustBe "Invalid company name"
+        res.errors.head.messages.head mustBe "Enter a valid company name."
+      }
+
+    }
+
+    "Show utr invalid error" when {
+
+      "given a utr with invalid characters" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "?")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.messages.head mustBe "Enter a valid Tax Reference Number."
       }
 
     }
