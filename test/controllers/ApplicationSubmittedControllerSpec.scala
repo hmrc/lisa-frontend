@@ -19,7 +19,7 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models.{TaxEnrolmentDoesNotExist, TaxEnrolmentPending, UserAuthorised, UserDetails}
 import org.mockito.Matchers.{any, matches}
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
@@ -47,6 +47,9 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the submitted page with correct email address" in {
 
+      when(mockAuthorisationService.userStatus(any())).
+        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentPending)))
+
       val result = SUT.get("test@user.com")(fakeRequest)
 
       status(result) mustBe Status.OK
@@ -64,6 +67,9 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the pending page" in {
 
+      when(mockAuthorisationService.userStatus(any())).
+        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+
       val result = SUT.pending()(fakeRequest)
 
       status(result) mustBe Status.OK
@@ -80,6 +86,9 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the successful page" in {
 
+      when(mockAuthorisationService.userStatus(any())).
+        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+
       val result = SUT.successful()(fakeRequest)
 
       status(result) mustBe Status.OK
@@ -95,6 +104,9 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   "GET Application Rejected" must {
 
     "return the unsuccessful page" in {
+
+      when(mockAuthorisationService.userStatus(any())).
+        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest)
 
@@ -127,9 +139,6 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
     override val cache: ShortLivedCache = mockCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
   }
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))
