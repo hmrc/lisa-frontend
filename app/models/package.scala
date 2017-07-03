@@ -20,11 +20,10 @@ import play.api.data.validation.{Valid, ValidationError, Invalid, Constraint}
 
 package object models extends Constants{
 
-  val companyPattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="Enter a valid company name.")
-  val utrPattern: Constraint[String] = pattern("""^[0-9]{10}$""".r, error="Enter a valid Tax Reference Number.")
-  val fcaPattern: Constraint[String] = pattern("""^[0-9]{6}$""".r, error="Enter a valid Financial Number.")
-  val isaPattern: Constraint[String] = pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="Enter a valid ISA ref number. This" +
-    " starts with Z, and includes either 4 or 6 numbers.")
+  val companyPattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="")
+  val utrPattern: Constraint[String] = pattern("""^[0-9]{10}$""".r, error="")
+  val fcaPattern: Constraint[String] = pattern("""^[0-9]{6}$""".r, error="")
+  val isaPattern: Constraint[String] = pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="")
   val rolePattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="Enter a valid role in " +
     "the organisation. You can enter up to 30 characters.")
   val phoneNumberPattern: Constraint[String] = pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="Enter a valid contact phone number.")
@@ -41,11 +40,20 @@ trait Constants {
 
   val company_error_key:String = "org.compName.mandatory"
   val ctutr_error_key:String =  "org.ctUtr.mandatory"
-  val fca_error_key:String = "org.fca.manadtory"
+  val fca_error_key:String = "org.fca.mandatory"
   val isaprovider_error_key: String = "org.isa.mandatory"
+  val role_error_key: String = "org.role.mandatory"
+  val email_error_key: String = "org.email.mandatory"
+  val phone_error_key: String = "org.phone.mandatory"
+  val firstname_error_key: String = "org.firstname.mandatory"
+  val lastname_error_key: String = "org.lastname.mandatory"
   val compLabel:String = "companyName"
   val utrLabel:String = "ctrNumber"
   val fsrRefNumberLabel: String = "fsrRefNumber"
+  val firstNameLabel: String = "firstName"
+  val lastNameLabel: String = "lastName"
+  val roleLabel: String = "role"
+  val phoneLabel: String = "phone"
   val isaProviderRefNumberLabel: String = "isaProviderRefNumber"
   val required :String= "constraint.required"
 }

@@ -28,13 +28,15 @@ case class YourDetails(firstName: String,
 
 object YourDetails {
   implicit val formats: OFormat[YourDetails] = Json.format[YourDetails]
+
   val cacheKey = "yourDetails"
+
   val form = Form(
     mapping(
-      "firstName" -> text.verifying(namePattern("Enter a valid first name.")),
-      "lastName" -> text.verifying(namePattern("Enter a valid last name.")),
-      "role" -> text.verifying(rolePattern),
-      "phone" -> text.verifying(phoneNumberPattern),
+      firstNameLabel -> text.verifying(namePattern("Enter a valid first name.")),
+      lastNameLabel -> text.verifying(namePattern("Enter a valid last name.")),
+      roleLabel -> text.verifying(rolePattern),
+      phoneLabel -> text.verifying(phoneNumberPattern),
       "email" -> email
     )(YourDetails.apply)(YourDetails.unapply)
   )
