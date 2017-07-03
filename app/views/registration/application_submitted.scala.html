@@ -11,7 +11,8 @@
 }
 
 @analyticsAdditionalJs = {
-    ga('set', 'page', '/lifetime-isa/application-submitted')
+    ga('set', 'location', document.URL.split("?")[0]);
+    ga('set', 'page', '/lifetime-isa/application-submitted');
 }
 
 @views.html.main_template(title = "Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader), analyticsAdditionalJs = Some(analyticsAdditionalJs)) {
