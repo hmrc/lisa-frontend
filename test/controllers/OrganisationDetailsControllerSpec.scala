@@ -138,14 +138,14 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("Invalid company name")
+        content must include ("Enter a valid company name.")
       }
     }
 
     "redirect the user to trading details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
         when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
