@@ -11,7 +11,8 @@
   mainContent: Html = HtmlFormat.empty,
   serviceInfoContent: Html = HtmlFormat.empty,
   scriptElem: Option[Html] = None,
-  showSignOutLink: Boolean)(implicit request: Request[_], messages: Messages)
+  showSignOutLink: Boolean,
+  analyticsAdditionalJs: Option[Html] = None)(implicit request: Request[_], messages: Messages)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
@@ -47,7 +48,8 @@
       analyticsHost = appConfig.analyticsHost,
       ssoUrl = None,
       scriptElem = scriptElem,
-      gaCalls = None)
+      gaCalls = None,
+      analyticsAdditionalJs = analyticsAdditionalJs)
 }
 
 @footerTop = {}
