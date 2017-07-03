@@ -34,7 +34,7 @@ trait LisaBaseController extends FrontendController
   val cache:ShortLivedCache
   val authorisationService:AuthorisationService
 
-  def authorisedForLisa(callback: (String) => Future[Result])(checkEnrolmentStates: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
+  def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentStates: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
