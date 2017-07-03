@@ -4,7 +4,8 @@
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = None,
   scriptElem: Option[Html] = None,
-  showSignOutLink: Boolean = true)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+  showSignOutLink: Boolean = true,
+  analyticsAdditionalJs: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
 @import uk.gov.hmrc.play.views.html.layouts
 
@@ -27,5 +28,6 @@
                mainContent = layouts.article(mainContent),
                serviceInfoContent = serviceInfoContent,
                scriptElem = scriptElem,
-               showSignOutLink = showSignOutLink
+               showSignOutLink = showSignOutLink,
+               analyticsAdditionalJs = analyticsAdditionalJs
 )
