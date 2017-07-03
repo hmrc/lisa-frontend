@@ -34,16 +34,21 @@ trait LisaBaseController extends FrontendController
   val cache:ShortLivedCache
   val authorisationService:AuthorisationService
 
-  def authorisedForLisa(callback: (String) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+  def authorisedForLisa(callback: (String) => Future[Result])(checkEnrolmentStates: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorised => {
-        user.enrolmentState match {
-          case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
-          case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-          case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
-          case TaxEnrolmentDoesNotExist => callback(s"${user.internalId}-lisa-registration")
+        if (checkEnrolmentStates) {
+          user.enrolmentState match {
+            case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+            case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+            case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+            case TaxEnrolmentDoesNotExist => callback(s"${user.internalId}-lisa-registration")
+          }
+        }
+        else {
+          callback(s"${user.internalId}-lisa-registration")
         }
       }
     } recover {

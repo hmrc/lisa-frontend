@@ -30,7 +30,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
   def get(email: String): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (_) =>
       Future.successful(Ok(views.html.registration.application_submitted(email)))
-    }
+    }(checkEnrolmentStates = false)
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
