@@ -32,9 +32,9 @@ trait TaxEnrolmentJsonFormats {
     (JsPath \ "serviceName").read[String] and
     (JsPath \ "identifiers").read[List[TaxEnrolmentIdentifier]].orElse(Reads.pure(Nil)) and
     (JsPath \ "callback").read[String] and
-    (JsPath \ "state").read[String](Reads.pattern("^(ERROR|SUCCESS|PENDING)$".r, "error.formatting.state")).map[TaxEnrolmentState] {
+    (JsPath \ "state").read[String](Reads.pattern("^(ERROR|SUCCEEDED|PENDING)$".r, "error.formatting.state")).map[TaxEnrolmentState] {
       case "ERROR" => TaxEnrolmentError
-      case "SUCCESS" => TaxEnrolmentSuccess
+      case "SUCCEEDED" => TaxEnrolmentSuccess
       case "PENDING" => TaxEnrolmentPending
     } and
     (JsPath \ "etmpId").read[String] and
@@ -50,7 +50,7 @@ trait TaxEnrolmentJsonFormats {
     (JsPath \ "callback").write[String] and
     (JsPath \ "state").write[String].contramap[TaxEnrolmentState] {
       case TaxEnrolmentError => "ERROR"
-      case TaxEnrolmentSuccess => "SUCCESS"
+      case TaxEnrolmentSuccess => "SUCCEEDED"
       case TaxEnrolmentPending => "PENDING"
     } and
     (JsPath \ "etmpId").write[String] and
