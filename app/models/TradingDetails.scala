@@ -16,8 +16,9 @@
 
 package models
 
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class TradingDetails(fsrRefNumber: String,
@@ -29,11 +30,10 @@ object TradingDetails {
 
   val cacheKey = "tradingDetails"
 
-  val form: Form[TradingDetails] = Form(
-    mapping(fsrRefNumberLabel -> text.verifying(nonEmptyTextLisa(fca_error_key),fcaPattern),
-      isaProviderRefNumberLabel -> text.verifying(nonEmptyTextLisa(isaprovider_error_key),isaPattern))
-    ((fsrRefNumber,isaProviderRefNumber) =>
-      TradingDetails(fsrRefNumber, isaProviderRefNumber))
-    (tradingDetails => Some((tradingDetails.fsrRefNumber,tradingDetails.isaProviderRefNumber)))
+  val form = Form(
+    mapping(
+      "fsrRefNumber" -> text.verifying(pattern("""^[0-9]{6}$""".r, error="Enter a valid Financial Number.")),
+      "isaProviderRefNumber" -> text.verifying(pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="Enter a valid ISA ref number. This starts with Z, and includes either 4 or 6 numbers."))
+    )(TradingDetails.apply)(TradingDetails.unapply)
   )
 }

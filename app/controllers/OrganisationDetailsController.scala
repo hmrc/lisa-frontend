@@ -24,7 +24,7 @@ import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
-import play.api.{Logger,Configuration, Environment, Play}
+import play.api.{Configuration, Environment, Logger, Play}
 import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
@@ -82,8 +82,8 @@ trait OrganisationDetailsController extends LisaBaseController {
                   Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
 
                   val regErrors = Seq(FormError(businessStructure.businessStructure, Messages("")),
-                    FormError(compLabel, Messages("org.compName.mandatory")),
-                    FormError(utrLabel, Messages("org.ctUtr.mandatory"))
+                    FormError("companyName", Messages("org.compName.mandatory")),
+                    FormError("ctrNumber", Messages("org.ctUtr.mandatory"))
                   )
 
                   Future.successful(BadRequest(views.html.registration.organisation_details(

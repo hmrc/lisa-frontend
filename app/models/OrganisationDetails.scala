@@ -16,8 +16,9 @@
 
 package models
 
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(companyName: String, ctrNumber: String)
@@ -30,8 +31,8 @@ object OrganisationDetails {
 
   val form = Form(
     mapping(
-      "companyName" -> text.verifying(companyPattern),
-      "ctrNumber" -> text.verifying(utrPattern)
+      "companyName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="Enter a valid company name.")),
+      "ctrNumber" -> text.verifying(pattern("""^[0-9]{10}$""".r, error="Enter a unique tax reference number that is 10 characters long."))
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 }

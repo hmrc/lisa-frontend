@@ -16,8 +16,9 @@
 
 package models
 
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class YourDetails(firstName: String,
@@ -31,17 +32,13 @@ object YourDetails {
 
   val cacheKey = "yourDetails"
 
-  val form: Form[YourDetails] = Form(
-
+  val form = Form(
     mapping(
-      firstNameLabel -> text.verifying(nonEmptyTextLisa(firstname_error_key),namePattern),
-      lastNameLabel -> text.verifying(nonEmptyTextLisa(lastname_error_key),namePattern),
-      roleLabel -> text.verifying(nonEmptyTextLisa(role_error_key),rolePattern),
-      phoneLabel -> text.verifying(nonEmptyTextLisa(phone_error_key),phoneNumberPattern),
-      "email" -> email)
-   ((firstName,lastName, role, phone, email) =>
-    YourDetails(firstName, lastName, role, phone, email))
-  (yourdetails => Some((yourdetails.firstName, yourdetails.lastName, yourdetails.role,yourdetails.phone, yourdetails.email)))
-
+      "firstName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="Enter a valid first name.")),
+      "lastName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="Enter a valid last name.")),
+      "role" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="Enter a valid role in the organisation. You can enter up to 30 characters.")),
+      "phone" -> text.verifying(pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="Enter a valid contact phone number.")),
+      "email" -> email
+    )(YourDetails.apply)(YourDetails.unapply)
   )
 }

@@ -16,13 +16,12 @@
 
 package controllers
 
-import config.{FrontendAuthConnector, LisaShortLivedCache}
-import connectors.UserDetailsConnector
+import config.LisaShortLivedCache
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Play}
-import services.{AuthorisationService, TaxEnrolmentService}
+import services.AuthorisationService
 
 import scala.concurrent.Future
 

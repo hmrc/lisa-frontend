@@ -18,14 +18,14 @@ package services
 
 import config.FrontendAuditConnector
 import play.api.Logger
+import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait AuditService extends AppName {
   val connector: AuditConnector
