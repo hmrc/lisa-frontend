@@ -47,7 +47,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
         sub.state mustBe TaxEnrolmentError
       }
       "given valid json with a success status" in {
-        val parsed = Json.parse(testJson.replace("PENDING", "SUCCESS")).as[List[TaxEnrolmentSubscription]]
+        val parsed = Json.parse(testJson.replace("PENDING", "SUCCEEDED")).as[List[TaxEnrolmentSubscription]]
 
         parsed.size mustBe 1
 
