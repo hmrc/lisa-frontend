@@ -138,7 +138,6 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("Enter a valid company name.")
       }
     }
 

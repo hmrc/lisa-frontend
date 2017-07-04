@@ -31,13 +31,17 @@ object YourDetails {
 
   val cacheKey = "yourDetails"
 
-  val form = Form(
+  val form: Form[YourDetails] = Form(
+
     mapping(
-      firstNameLabel -> text.verifying(namePattern("Enter a valid first name.")),
-      lastNameLabel -> text.verifying(namePattern("Enter a valid last name.")),
-      roleLabel -> text.verifying(rolePattern),
-      phoneLabel -> text.verifying(phoneNumberPattern),
-      "email" -> email
-    )(YourDetails.apply)(YourDetails.unapply)
+      firstNameLabel -> text.verifying(nonEmptyTextLisa(firstname_error_key),namePattern),
+      lastNameLabel -> text.verifying(nonEmptyTextLisa(lastname_error_key),namePattern),
+      roleLabel -> text.verifying(nonEmptyTextLisa(role_error_key),rolePattern),
+      phoneLabel -> text.verifying(nonEmptyTextLisa(phone_error_key),phoneNumberPattern),
+      "email" -> email)
+   ((firstName,lastName, role, phone, email) =>
+    YourDetails(firstName, lastName, role, phone, email))
+  (yourdetails => Some((yourdetails.firstName, yourdetails.lastName, yourdetails.role,yourdetails.phone, yourdetails.email)))
+
   )
 }
