@@ -16,12 +16,12 @@
 
 package services
 
-import connectors.{RosmJsonFormats, RosmConnector}
-import controllers.routes
+import connectors.{RosmConnector, RosmJsonFormats}
 import models._
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess}
-import uk.gov.hmrc.play.http.{HttpResponse, HeaderCarrier}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
@@ -63,7 +63,7 @@ trait RosmService extends RosmJsonFormats{
 
     val utr = registration.organisationDetails.ctrNumber
     val companyName = registration.organisationDetails.companyName
-    val safeId = registration.organisationDetails.safeId.get
+    val safeId = registration.safeId
     val applicantDetails = ApplicantDetails(
       name = registration.yourDetails.firstName,
       surname = registration.yourDetails.lastName,

@@ -19,9 +19,9 @@ package models
 import org.scalatestplus.play.PlaySpec
 import play.api.data.FormError
 
-class OrganisationDetailsSpec extends PlaySpec {
+class TradingDetailsSpec extends PlaySpec {
 
-  "Organisation Details form" must {
+  "Trading Details form" must {
 
     "show field required errors" when {
 
@@ -29,37 +29,39 @@ class OrganisationDetailsSpec extends PlaySpec {
         val test = Map[String, String]()
         val res = SUT.bind(test)
 
-        res.errors mustBe Seq[FormError](FormError("companyName", "error.required"), FormError("ctrNumber", "error.required"))
+        res.errors mustBe Seq[FormError](FormError("fsrRefNumber", "error.required"), FormError("isaProviderRefNumber", "error.required"))
       }
 
     }
 
-    "show company name invalid error" when {
+    "show fsrRefNumber invalid error" when {
 
-      "given a company name with invalid characters" in {
-        val test = Map[String, String]("companyName" -> "?", "ctrNumber" -> "0123456789")
+      "given a fsrRefNumber with invalid characters" in {
+        val test = Map[String, String]("fsrRefNumber" -> "?", "isaProviderRefNumber" -> "Z123456")
         val res = SUT.bind(test)
+        println(res.errors.toString)
         res.errors.size mustBe 1
-        res.errors.head.key mustBe "companyName"
-        res.errors.head.message mustBe "error.companyName"
+        res.errors.head.key mustBe "fsrRefNumber"
+        res.errors.head.message mustBe "error.fsrRefNumber"
       }
 
     }
 
-    "show utr invalid error" when {
+    "show isa provider invalid error" when {
 
-      "given a utr with invalid characters" in {
-        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "?")
+      "given a isa provider number with invalid characters" in {
+        val test = Map[String, String]("fsrRefNumber" -> "123456", "isaProviderRefNumber" -> "?")
         val res = SUT.bind(test)
+        println(res.errors.toString)
         res.errors.size mustBe 1
-        res.errors.head.key mustBe "ctrNumber"
-        res.errors.head.message mustBe "error.ctrNumber"
+        res.errors.head.key mustBe "isaProviderRefNumber"
+        res.errors.head.message mustBe "error.isaProviderRefNumber"
       }
 
     }
 
   }
 
-  val SUT = OrganisationDetails.form
+  val SUT = TradingDetails.form
 
 }

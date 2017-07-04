@@ -20,7 +20,7 @@ import java.io.File
 
 import helpers.CSRFTest
 import models.{BusinessStructure,OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
@@ -49,9 +49,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name",Some("34567889"))
-
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP")))).
@@ -128,7 +126,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
       "the company name is invalid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "ctrNumber" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X")))
         val result = SUT.post(request)
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body")))).
@@ -138,14 +136,13 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("Invalid company name")
       }
     }
 
     "redirect the user to trading details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
         when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
@@ -178,14 +175,36 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "store organisation details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+
+        val request = createFakePostRequest[AnyContentAsJson](uri,
+          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+
         when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
-        verify(mockCache).cache[OrganisationDetails](any(), any(), any())(any(), any())
+        verify(mockCache).cache[OrganisationDetails](any(), matcherEq(OrganisationDetails.cacheKey), any())(any(), any())
+      }
+    }
+
+    "store safeId in cache" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+
+        val request = createFakePostRequest[AnyContentAsJson](uri,
+          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+
+        when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
+
+        await(SUT.post(request))
+
+        verify(mockCache).cache[OrganisationDetails](any(), matcherEq("safeId"), any())(any(), any())
       }
     }
 

@@ -19,12 +19,10 @@ package services
 import connectors.TaxEnrolmentConnector
 import models._
 import org.joda.time.DateTime
-import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 trait TaxEnrolmentService {
 

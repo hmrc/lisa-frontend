@@ -135,9 +135,12 @@ class RosmServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite wit
 
   val desSubscribeSuccessResponse = DesSubscriptionSuccessResponse("123456")
 
-  val org = OrganisationDetails("Test Company Name", "1234567890", Some("56789"))
-  val registration = LisaRegistration(OrganisationDetails("Test Company Name", "1234567890", Some("56789")),
-        TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123"),
-        BusinessStructure("LLP"),YourDetails(firstName = "Test",lastName = "User",role = "Role",
-        phone = "0191 123 4567",email = "test@test.com"))
+  val org = OrganisationDetails("Test Company Name", "1234567890")
+
+  val registration = LisaRegistration(
+    organisationDetails = org,
+    tradingDetails = TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123"),
+    businessStructure = BusinessStructure("LLP"),
+    yourDetails = YourDetails(firstName = "Test",lastName = "User",role = "Role", phone = "0191 123 4567",email = "test@test.com"),
+    safeId = "56789")
 }

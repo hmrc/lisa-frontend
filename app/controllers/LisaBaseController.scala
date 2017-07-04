@@ -31,8 +31,8 @@ import scala.util.control.NonFatal
 trait LisaBaseController extends FrontendController
   with Redirects {
 
-  val cache:ShortLivedCache
-  val authorisationService:AuthorisationService
+  val cache: ShortLivedCache
+  val authorisationService: AuthorisationService
 
   def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentStates: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
@@ -60,28 +60,35 @@ trait LisaBaseController extends FrontendController
   }
 
   def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
-    // get organisation details
+
+    // get business structure
     cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
       case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
       case Some(busData) => {
 
+        // get organisation details
         cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
           case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
-            case Some(orgData) => {
+          case Some(orgData) => {
 
-            // get trading details
-            cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
-              case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
-                case Some(tradData) => {
+            // get safe Id
+            cache.fetchAndGetEntry[String](cacheId, "safeId").flatMap {
+              case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
+              case Some(safeId) => {
 
-                // get business structure
+                // get trading details
+                cache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
+                  case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
+                  case Some(tradData) => {
 
-                // get user details
-                cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).flatMap {
-                  case None => Future.successful(Redirect(routes.YourDetailsController.get()))
-                  case Some(yourData) => {
-                    val data = new LisaRegistration(orgData, tradData, busData, yourData)
-                    callback(data)
+                    // get user details
+                    cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).flatMap {
+                      case None => Future.successful(Redirect(routes.YourDetailsController.get()))
+                      case Some(yourData) => {
+                        val data = new LisaRegistration(orgData, tradData, busData, yourData, safeId)
+                        callback(data)
+                      }
+                    }
                   }
                 }
               }

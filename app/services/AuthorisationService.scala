@@ -19,7 +19,6 @@ package services
 import config.FrontendAuthConnector
 import connectors.UserDetailsConnector
 import models._
-import play.api.{Configuration, Environment, Play}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._

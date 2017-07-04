@@ -16,11 +16,12 @@
 
 package models
 
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
-case class OrganisationDetails(companyName: String, ctrNumber: String, safeId:Option[String])
+case class OrganisationDetails(companyName: String, ctrNumber: String)
 
 object OrganisationDetails {
 
@@ -28,11 +29,10 @@ object OrganisationDetails {
 
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
-  val form: Form[OrganisationDetails] = Form(
+  val form = Form(
     mapping(
-      compLabel-> text.verifying(nonEmptyTextLisa(company_error_key),companyPattern),
-      utrLabel -> text.verifying(nonEmptyTextLisa(ctutr_error_key)))((companyName,ctrNumber) =>
-      OrganisationDetails(companyName,ctrNumber,Some("")))
-    (organisationDetails => Some((organisationDetails.companyName,organisationDetails.ctrNumber)))
+      "companyName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="error.companyName")),
+      "ctrNumber" -> text.verifying(pattern("""^[0-9]{10}$""".r, error="error.ctrNumber"))
+    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 }

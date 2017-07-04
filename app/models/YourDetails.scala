@@ -16,8 +16,9 @@
 
 package models
 
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class YourDetails(firstName: String,
@@ -28,14 +29,16 @@ case class YourDetails(firstName: String,
 
 object YourDetails {
   implicit val formats: OFormat[YourDetails] = Json.format[YourDetails]
+
   val cacheKey = "yourDetails"
+
   val form = Form(
     mapping(
-      "firstName" -> nonEmptyText,
-      "lastName" -> nonEmptyText,
-      "role" -> nonEmptyText,
-      "phone" -> nonEmptyText,
-      "email" -> nonEmptyText
+      "firstName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="error.firstName")),
+      "lastName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="error.lastName")),
+      "role" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="error.role")),
+      "phone" -> text.verifying(pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="error.phone")),
+      "email" -> email
     )(YourDetails.apply)(YourDetails.unapply)
   )
 }

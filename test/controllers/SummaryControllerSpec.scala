@@ -69,10 +69,10 @@ class SummaryControllerSpec extends PlaySpec
       }
     }
 
-    "redirect the user to ogranisation details" when {
+    "redirect the user to organisation details" when {
       "no organisation details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
@@ -87,12 +87,32 @@ class SummaryControllerSpec extends PlaySpec
 
         redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
       }
+      "no safeId is found in the cache" in {
+        val uri = controllers.routes.SummaryController.get().url
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+        val businessStructureForm = new BusinessStructure("LLP")
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(businessStructureForm)))
+
+        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
+          thenReturn(Future.successful(Some(organisationForm)))
+
+        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any())).
+          thenReturn(Future.successful(None))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
+      }
     }
 
     "redirect the user to trading details" when {
       "no trading details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
@@ -100,6 +120,9 @@ class SummaryControllerSpec extends PlaySpec
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
+
+        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any())).
+          thenReturn(Future.successful(Some("123456")))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
         thenReturn(Future.successful(None))
@@ -112,16 +135,18 @@ class SummaryControllerSpec extends PlaySpec
       }
     }
 
-
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
+
+        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any())).
+          thenReturn(Future.successful(Some("123456")))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
@@ -143,7 +168,7 @@ class SummaryControllerSpec extends PlaySpec
     "show the summary" when {
       "all required details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890", Some("5678910"))
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
         val yourForm = new YourDetails(
@@ -155,6 +180,9 @@ class SummaryControllerSpec extends PlaySpec
 
         when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
+
+        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any())).
+          thenReturn(Future.successful(Some("123456")))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))

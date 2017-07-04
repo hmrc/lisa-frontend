@@ -23,8 +23,6 @@ import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
 import services.{AuditService, AuthorisationService, RosmService}
 
-import scala.concurrent.Future
-
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
 

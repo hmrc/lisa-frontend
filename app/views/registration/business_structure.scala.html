@@ -1,5 +1,6 @@
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.error.errorSummaryOrgTemplate
 
 @(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages)
 
@@ -9,20 +10,22 @@
 
 @views.html.main_template(title = "Select your business structure - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
 
-<form method="post">
-    @CSRF.formField
+    @errorSummaryOrgTemplate(form)
 
-    @inputRadioGroup(form("businessStructure"), Seq(
-        (Messages("org.details.llp"), Messages("org.details.llp.view")),
-        (Messages("org.details.corpbody"), Messages("org.details.corpbody.view"))
-    ), '_labelClass -> "block-label", '_legend -> "Select your business structure", '_legendClass -> Some("visuallyhidden"))
+    <form method="post">
+        @CSRF.formField
 
-    <div class="form-field form-field--submit">
-        <input type="submit" class="button" value="Continue" id="continue">
-    </div>
-    <div class="form-field form-field--submit">
-        <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
-    </div>
-</form>
+        @inputRadioGroup(form("businessStructure"), Seq(
+            (Messages("org.details.llp"), Messages("org.details.llp.view")),
+            (Messages("org.details.corpbody"), Messages("org.details.corpbody.view"))
+        ), '_labelClass -> "block-label", '_legend -> "Select your business structure", '_legendClass -> Some("visuallyhidden"))
+
+        <div class="form-field form-field--submit">
+            <input type="submit" class="button" value="Continue" id="continue">
+        </div>
+        <div class="form-field form-field--submit">
+            <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
+        </div>
+    </form>
 
 }

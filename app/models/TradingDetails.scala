@@ -16,19 +16,24 @@
 
 package models
 
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
+import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class TradingDetails(fsrRefNumber: String,
                           isaProviderRefNumber: String)
 
 object TradingDetails {
+
   implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
+
   val cacheKey = "tradingDetails"
+
   val form = Form(
-    mapping("fsrRefNumber" -> nonEmptyText,
-      "isaProviderRefNumber" -> nonEmptyText
+    mapping(
+      "fsrRefNumber" -> text.verifying(pattern("""^[0-9]{6}$""".r, error="error.fsrRefNumber")),
+      "isaProviderRefNumber" -> text.verifying(pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="error.isaProviderRefNumber"))
     )(TradingDetails.apply)(TradingDetails.unapply)
   )
 }

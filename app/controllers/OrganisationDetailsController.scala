@@ -24,7 +24,7 @@ import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
-import play.api.{Logger,Configuration, Environment, Play}
+import play.api.{Configuration, Environment, Logger, Play}
 import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
@@ -68,6 +68,8 @@ trait OrganisationDetailsController extends LisaBaseController {
           }
         },
         data => {
+          cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
+
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
             case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
             case Some(businessStructure) => {
@@ -75,15 +77,15 @@ trait OrganisationDetailsController extends LisaBaseController {
               rosmService.rosmRegister(businessStructure, data).flatMap {
                 case Right(safeId) => {
                   Logger.debug("rosmRegister Successful")
-                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
+                  cache.cache[String](cacheId, "safeId", safeId)
                   handleRedirect(routes.TradingDetailsController.get().url)
                 }
                 case Left(error) => {
                   Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
 
                   val regErrors = Seq(FormError(businessStructure.businessStructure, Messages("")),
-                    FormError(compLabel, Messages("org.compName.mandatory")),
-                    FormError(utrLabel, Messages("org.ctUtr.mandatory"))
+                    FormError("companyName", Messages("org.compName.mandatory")),
+                    FormError("ctrNumber", Messages("org.ctUtr.mandatory"))
                   )
 
                   Future.successful(BadRequest(views.html.registration.organisation_details(

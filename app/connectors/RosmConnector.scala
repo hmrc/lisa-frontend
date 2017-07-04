@@ -18,7 +18,6 @@ package connectors
 
 import config.WSHttp
 import models._
-import play.api.Logger
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
 
