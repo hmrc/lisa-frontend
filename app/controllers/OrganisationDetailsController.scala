@@ -68,6 +68,8 @@ trait OrganisationDetailsController extends LisaBaseController {
           }
         },
         data => {
+          cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
+
           cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
             case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
             case Some(businessStructure) => {

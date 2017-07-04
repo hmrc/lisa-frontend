@@ -20,7 +20,7 @@ import java.io.File
 
 import helpers.CSRFTest
 import models.{BusinessStructure,OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
@@ -186,7 +186,25 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
         await(SUT.post(request))
 
-        verify(mockCache).cache[OrganisationDetails](any(), any(), any())(any(), any())
+        verify(mockCache).cache[OrganisationDetails](any(), matcherEq(OrganisationDetails.cacheKey), any())(any(), any())
+      }
+    }
+
+    "store safeId in cache" when {
+      "the submitted data is valid" in {
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+
+        val request = createFakePostRequest[AnyContentAsJson](uri,
+          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+
+        when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
+
+        await(SUT.post(request))
+
+        verify(mockCache).cache[OrganisationDetails](any(), matcherEq("safeId"), any())(any(), any())
       }
     }
 

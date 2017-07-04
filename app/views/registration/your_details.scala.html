@@ -1,5 +1,6 @@
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.error.errorSummaryOrgTemplate
 
 @(form: Form[YourDetails])(implicit request: Request[_], messages: Messages)
 
@@ -8,6 +9,8 @@
 }
 
 @views.html.main_template(title = "Your details - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+
+    @errorSummaryOrgTemplate(form)
 
     <div class="subsection">
         <p class="indent">HMRC might contact you, or someone else from your organisation,
