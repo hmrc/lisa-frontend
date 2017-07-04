@@ -24,13 +24,12 @@ package object models extends Constants{
   val utrPattern: Constraint[String] = pattern("""^[0-9]{10}$""".r, error="")
   val fcaPattern: Constraint[String] = pattern("""^[0-9]{6}$""".r, error="")
   val isaPattern: Constraint[String] = pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="")
-  val rolePattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="Enter a valid role in " +
-    "the organisation. You can enter up to 30 characters.")
-  val phoneNumberPattern: Constraint[String] = pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="Enter a valid contact phone number.")
-  def namePattern(error: String): Constraint[String] = {
-    pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error=error)
-
-  }
+  val rolePattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="")
+  val phoneNumberPattern: Constraint[String] = pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="")
+  val namePattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="")
+//  def namePattern(error: String): Constraint[String] = {
+//    pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error=error)
+//  }
   def nonEmptyTextLisa[T](messageKey:String): Constraint[String] = Constraint[String](required) { text =>
     if (text == null) Invalid(messageKey) else if (text.trim.isEmpty) Invalid(ValidationError(messageKey)) else Valid
   }

@@ -41,7 +41,6 @@ class OrganisationDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
-        res.errors.head.messages.head mustBe "Enter a valid company name."
       }
 
     }
@@ -53,7 +52,6 @@ class OrganisationDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "ctrNumber"
-        res.errors.head.messages.head mustBe "Enter a valid Tax Reference Number."
       }
 
     }
