@@ -43,7 +43,7 @@ class YourDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "firstName"
-        res.errors.head.message mustBe "Enter a valid first name."
+        res.errors.head.message mustBe "error.firstName"
       }
 
     }
@@ -55,7 +55,7 @@ class YourDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "lastName"
-        res.errors.head.message mustBe "Enter a valid last name."
+        res.errors.head.message mustBe "error.lastName"
       }
 
     }
@@ -67,7 +67,7 @@ class YourDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "role"
-        res.errors.head.message mustBe "Enter a valid role in the organisation. You can enter up to 30 characters."
+        res.errors.head.message mustBe "error.role"
       }
 
     }
@@ -79,7 +79,7 @@ class YourDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "phone"
-        res.errors.head.message mustBe "Enter a valid contact phone number."
+        res.errors.head.message mustBe "error.phone"
       }
 
     }

@@ -34,10 +34,10 @@ object YourDetails {
 
   val form = Form(
     mapping(
-      "firstName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="Enter a valid first name.")),
-      "lastName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="Enter a valid last name.")),
-      "role" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="Enter a valid role in the organisation. You can enter up to 30 characters.")),
-      "phone" -> text.verifying(pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="Enter a valid contact phone number.")),
+      "firstName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="error.firstName")),
+      "lastName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="error.lastName")),
+      "role" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="error.role")),
+      "phone" -> text.verifying(pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="error.phone")),
       "email" -> email
     )(YourDetails.apply)(YourDetails.unapply)
   )

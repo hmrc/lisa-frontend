@@ -31,8 +31,8 @@ object OrganisationDetails {
 
   val form = Form(
     mapping(
-      "companyName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="Enter a valid company name.")),
-      "ctrNumber" -> text.verifying(pattern("""^[0-9]{10}$""".r, error="Enter a unique tax reference number that is 10 characters long."))
+      "companyName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="error.companyName")),
+      "ctrNumber" -> text.verifying(pattern("""^[0-9]{10}$""".r, error="error.ctrNumber"))
     )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 }

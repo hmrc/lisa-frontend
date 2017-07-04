@@ -32,8 +32,8 @@ object TradingDetails {
 
   val form = Form(
     mapping(
-      "fsrRefNumber" -> text.verifying(pattern("""^[0-9]{6}$""".r, error="Enter a FCA number that is 6 characters long.")),
-      "isaProviderRefNumber" -> text.verifying(pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="Enter a valid ISA ref number. This starts with Z, and includes either 4 or 6 numbers."))
+      "fsrRefNumber" -> text.verifying(pattern("""^[0-9]{6}$""".r, error="error.fsrRefNumber")),
+      "isaProviderRefNumber" -> text.verifying(pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="error.isaProviderRefNumber"))
     )(TradingDetails.apply)(TradingDetails.unapply)
   )
 }

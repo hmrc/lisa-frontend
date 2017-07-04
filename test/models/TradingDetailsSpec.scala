@@ -23,7 +23,7 @@ class TradingDetailsSpec extends PlaySpec {
 
   "Trading Details form" must {
 
-    "Show field required errors" when {
+    "show field required errors" when {
 
       "given no data" in {
         val test = Map[String, String]()
@@ -34,7 +34,7 @@ class TradingDetailsSpec extends PlaySpec {
 
     }
 
-    "Show fsrRefNumber invalid error" when {
+    "show fsrRefNumber invalid error" when {
 
       "given a fsrRefNumber with invalid characters" in {
         val test = Map[String, String]("fsrRefNumber" -> "?", "isaProviderRefNumber" -> "Z123456")
@@ -42,12 +42,12 @@ class TradingDetailsSpec extends PlaySpec {
         println(res.errors.toString)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "fsrRefNumber"
-        res.errors.head.message mustBe "Enter a FCA number that is 6 characters long."
+        res.errors.head.message mustBe "error.fsrRefNumber"
       }
 
     }
 
-    "Show isa provider invalid error" when {
+    "show isa provider invalid error" when {
 
       "given a isa provider number with invalid characters" in {
         val test = Map[String, String]("fsrRefNumber" -> "123456", "isaProviderRefNumber" -> "?")
@@ -55,7 +55,7 @@ class TradingDetailsSpec extends PlaySpec {
         println(res.errors.toString)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "isaProviderRefNumber"
-        res.errors.head.message mustBe "Enter a valid ISA ref number. This starts with Z, and includes either 4 or 6 numbers."
+        res.errors.head.message mustBe "error.isaProviderRefNumber"
       }
 
     }

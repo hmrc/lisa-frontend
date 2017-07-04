@@ -23,7 +23,7 @@ class OrganisationDetailsSpec extends PlaySpec {
 
   "Organisation Details form" must {
 
-    "Show field required errors" when {
+    "show field required errors" when {
 
       "given no data" in {
         val test = Map[String, String]()
@@ -34,26 +34,26 @@ class OrganisationDetailsSpec extends PlaySpec {
 
     }
 
-    "Show company name invalid error" when {
+    "show company name invalid error" when {
 
       "given a company name with invalid characters" in {
         val test = Map[String, String]("companyName" -> "?", "ctrNumber" -> "0123456789")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
-        res.errors.head.message mustBe "Enter a valid company name."
+        res.errors.head.message mustBe "error.companyName"
       }
 
     }
 
-    "Show utr invalid error" when {
+    "show utr invalid error" when {
 
       "given a utr with invalid characters" in {
         val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "?")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "ctrNumber"
-        res.errors.head.message mustBe "Enter a unique tax reference number that is 10 characters long."
+        res.errors.head.message mustBe "error.ctrNumber"
       }
 
     }
