@@ -49,9 +49,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-
-        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name",Some("34567889"))
-
+        val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP")))).
@@ -177,9 +175,13 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "store organisation details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
+
+        val request = createFakePostRequest[AnyContentAsJson](uri,
+          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+
         when (mockRosmService.rosmRegister(any(),any())(any())).thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))

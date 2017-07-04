@@ -21,7 +21,8 @@ import play.api.libs.json.{Json, OFormat}
 case class LisaRegistration(organisationDetails: OrganisationDetails,
                             tradingDetails: TradingDetails,
                             businessStructure: BusinessStructure,
-                            yourDetails: YourDetails)
+                            yourDetails: YourDetails,
+                            safeId: String)
 
 object LisaRegistration {
   implicit val formats: OFormat[LisaRegistration] = Json.format[LisaRegistration]

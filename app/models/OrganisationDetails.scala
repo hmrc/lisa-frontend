@@ -20,7 +20,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.{Json, OFormat}
 
-case class OrganisationDetails(companyName: String, ctrNumber: String, safeId:Option[String])
+case class OrganisationDetails(companyName: String, ctrNumber: String)
 
 object OrganisationDetails {
 
@@ -28,12 +28,10 @@ object OrganisationDetails {
 
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
-  val form: Form[OrganisationDetails] = Form(
+  val form = Form(
     mapping(
-      compLabel-> text.verifying(nonEmptyTextLisa(company_error_key),companyPattern),
-      utrLabel -> text.verifying(nonEmptyTextLisa(ctutr_error_key), utrPattern))
-    ((companyName,ctrNumber) =>
-      OrganisationDetails(companyName,ctrNumber,Some("")))
-    (organisationDetails => Some((organisationDetails.companyName,organisationDetails.ctrNumber)))
+      "companyName" -> text.verifying(companyPattern),
+      "ctrNumber" -> text.verifying(utrPattern)
+    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
   )
 }

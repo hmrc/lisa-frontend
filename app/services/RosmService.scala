@@ -63,7 +63,7 @@ trait RosmService extends RosmJsonFormats{
 
     val utr = registration.organisationDetails.ctrNumber
     val companyName = registration.organisationDetails.companyName
-    val safeId = registration.organisationDetails.safeId.get
+    val safeId = registration.safeId
     val applicantDetails = ApplicantDetails(
       name = registration.yourDetails.firstName,
       surname = registration.yourDetails.lastName,

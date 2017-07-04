@@ -75,7 +75,7 @@ trait OrganisationDetailsController extends LisaBaseController {
               rosmService.rosmRegister(businessStructure, data).flatMap {
                 case Right(safeId) => {
                   Logger.debug("rosmRegister Successful")
-                  cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey,data.copy(safeId = Some(safeId)))
+                  cache.cache[String](cacheId, "safeId", safeId)
                   handleRedirect(routes.TradingDetailsController.get().url)
                 }
                 case Left(error) => {

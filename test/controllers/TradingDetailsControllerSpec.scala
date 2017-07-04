@@ -49,7 +49,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
+        val tradingForm = new TradingDetails(fsrRefNumber = "123456", isaProviderRefNumber = "Z1234")
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
@@ -111,9 +111,8 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
-          "ctrNumber" -> "1234567890",
           "fsrRefNumber" -> "123456",
-          "isaProviderRefNumber" -> "Z123456"
+          "isaProviderRefNumber" -> "Z1234"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
         val result = SUT.post(request)
@@ -128,9 +127,8 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
-          "ctrNumber" -> "1234567890",
-          "fsrRefNumber" -> "123",
-          "isaProviderRefNumber" -> "123"
+          "fsrRefNumber" -> "123456",
+          "isaProviderRefNumber" -> "Z1234"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
 
