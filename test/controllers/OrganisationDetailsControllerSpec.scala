@@ -126,7 +126,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
       "the company name is invalid" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X @ X", "ctrNumber" -> "X")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X")))
         val result = SUT.post(request)
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body")))).

@@ -41,6 +41,7 @@ class OrganisationDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
+        res.errors.head.message mustBe "Enter a valid company name."
       }
 
     }

@@ -15,12 +15,13 @@
  */
 
 import play.api.data.validation.Constraints._
-import play.api.data.validation.{Valid, ValidationError, Invalid, Constraint}
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import play.api.i18n.Messages
 
 
 package object models extends Constants{
 
-  val companyPattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="")
+  val companyPattern: Constraint[String] = pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="Enter a valid company name.")
   val utrPattern: Constraint[String] = pattern("""^[0-9]{10}$""".r, error="")
   val fcaPattern: Constraint[String] = pattern("""^[0-9]{6}$""".r, error="")
   val isaPattern: Constraint[String] = pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="")
