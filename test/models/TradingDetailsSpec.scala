@@ -42,6 +42,7 @@ class TradingDetailsSpec extends PlaySpec {
         println(res.errors.toString)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "fsrRefNumber"
+        res.errors.head.message mustBe "Enter a FCA number that is 6 characters long."
       }
 
     }
@@ -54,6 +55,7 @@ class TradingDetailsSpec extends PlaySpec {
         println(res.errors.toString)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "isaProviderRefNumber"
+        res.errors.head.message mustBe "Enter a valid ISA ref number. This starts with Z, and includes either 4 or 6 numbers."
       }
 
     }
