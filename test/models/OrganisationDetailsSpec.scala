@@ -53,6 +53,7 @@ class OrganisationDetailsSpec extends PlaySpec {
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.message mustBe "Enter a unique tax reference number that is 10 characters long."
       }
 
     }

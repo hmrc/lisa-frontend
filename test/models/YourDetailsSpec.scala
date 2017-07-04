@@ -24,7 +24,7 @@ class YourDetailsSpec extends PlaySpec {
 
   "Organisation Details form" must {
 
-    "Show field required errors" when {
+    "show field required errors" when {
 
       "given no data" in {
         val test = Map[String, String]()
@@ -36,13 +36,62 @@ class YourDetailsSpec extends PlaySpec {
 
     }
 
-    "Show company name invalid error" when {
+    "show first name invalid error" when {
 
-      "given a company name with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "?","lastName"->"H","role"->"Manager","phone"->"01234","email"->"me@test.com")
+      "given a first name with invalid characters" in {
+        val test = Map[String, String]("firstName" -> "?","lastName"->"B","role"->"Manager","phone"->"01234","email"->"me@test.com")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "firstName"
+        res.errors.head.message mustBe "Enter a valid first name."
+      }
+
+    }
+
+    "show last name invalid error" when {
+
+      "given a last name with invalid characters" in {
+        val test = Map[String, String]("firstName" -> "A","lastName"->"?","role"->"Manager","phone"->"01234","email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "lastName"
+        res.errors.head.message mustBe "Enter a valid last name."
+      }
+
+    }
+
+    "show role invalid error" when {
+
+      "given a role with invalid characters" in {
+        val test = Map[String, String]("firstName" -> "A","lastName"->"B","role"->"?","phone"->"01234","email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "role"
+        res.errors.head.message mustBe "Enter a valid role in the organisation. You can enter up to 30 characters."
+      }
+
+    }
+
+    "show phone invalid error" when {
+
+      "given a phone with invalid characters" in {
+        val test = Map[String, String]("firstName" -> "A","lastName"->"B","role"->"Manager","phone"->"?","email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "phone"
+        res.errors.head.message mustBe "Enter a valid contact phone number."
+      }
+
+    }
+
+    "show email invalid error" when {
+
+      "given a email with invalid characters" in {
+        val test = Map[String, String]("firstName" -> "A","lastName"->"B","role"->"Manager","phone"->"01234","email"->"?")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "email"
+        res.errors.head.message mustBe "error.email"
       }
 
     }
