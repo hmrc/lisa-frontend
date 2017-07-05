@@ -11,30 +11,29 @@
 
         <h2 id="error-summary-heading" class="h3-heading">@Messages("validation.summary.heading")</h2>
 
-        @form.errors.head.key match {
-            case "LLP" => {
-                <p>Your Company name and Partnership Unique Tax reference number do not match.</p>
-                <p>Your business name should match the name written on any letters you have from HMRC.</p>
-                <p>Your UTR number is made up of 10 or 13 digits, if it is 13 digits only enter the last 10.</p>
-                <p>Your UTR should match the UTR on any letters you have from HMRC.</p>
-            }
-            case "Corporate Body" => {
-                <p>Your company name and Corporation Tax reference number must both be correct.</p>
-                <p>Your company name must match the name written on any letters you have from HMRC.</p>
-                <p>Your Corporation Tax reference number must match the number on any letters you have from HMRC. It is made up of 10 or 13 digits. If it is 13 digits only enter the last 10.</p>
-            }
-            case _ => {
-                <ul>
-                    @form.errors.map { error =>
-                        <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error'>
-                            <a href='#@error.key.replaceAll("""[\.\[\]]""", "_")'>
-                                @Messages(error.message, error.args : _*)
-                            </a>
-                        </li>
-                    }
-                </ul>
-            }
+        @if(form.errors.exists(_.key == Messages("org.details.llp"))) {
+            <p>@Messages("error.matching.llp.line1")</p>
+            <p>@Messages("error.matching.llp.line2")</p>
+            <p>@Messages("error.matching.llp.line3")</p>
+            <p>@Messages("error.matching.llp.line4")</p>
         }
 
+        @if(form.errors.exists(_.key == Messages("org.details.corpbody"))) {
+            <p>@Messages("error.matching.corpbody.line1")</p>
+            <p>@Messages("error.matching.corpbody.line2")</p>
+            <p>@Messages("error.matching.corpbody.line3")</p>
+        }
+
+        <ul>
+            @form.errors.map { error =>
+                @if(error.key != Messages("org.details.llp") && error.key != Messages("org.details.corpbody")) {
+                    <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error'>
+                        <a href='#@error.key.replaceAll("""[\.\[\]]""", "_")'>
+                            @Messages(error.message, error.args : _*)
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
     </div>
 }

@@ -83,7 +83,11 @@ trait OrganisationDetailsController extends LisaBaseController {
                 case Left(error) => {
                   Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
 
-                  val regErrors = Seq(FormError(businessStructure.businessStructure, ""))
+                  val regErrors = Seq(
+                    FormError(businessStructure.businessStructure, ""),
+                    FormError("companyName", Messages("error.companyName")),
+                    FormError("ctrNumber", Messages("error.ctrNumber"))
+                  )
 
                   Future.successful(BadRequest(views.html.registration.organisation_details(
                     OrganisationDetails.form.copy(errors = regErrors) fill (data), businessLabels(businessStructure))))
