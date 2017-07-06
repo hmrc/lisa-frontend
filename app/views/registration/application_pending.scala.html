@@ -2,22 +2,31 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@()(implicit request: Request[_], messages: Messages)
+@(subscriptionId: String)(implicit request: Request[_], messages: Messages)
 
-@contentHeader = {
+
+
+@views.html.main_template(title = "Application pending - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+
     <h1>Application pending</h1>
-}
 
-@views.html.main_template(title = "Application pending - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
     <p>Your application will be reviewed by HM Revenue and Customs.</p>
 
     <p>The review process can take up to 14 days. You'll get an email when the decision has been made.</p>
 
     <p>You'll need to sign in to this website to see the decision.</p>
 
-    <p>If you need to make a change to your application, email <a href="mailto:savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a>.</p>
+    <p>Email  <a href="mailto:savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a> if you have any questions regarding your application.</p>
+
+    <p>You’ll need to quote your application reference: @subscriptionId</p>
 
     <div class="form-field form-field--submit">
         <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out">Sign out</a></p>
     </div>
+
+    <div class="form-field form-field--submit">
+        <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
+    </div>
+
+
 }

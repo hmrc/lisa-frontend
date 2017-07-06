@@ -4,19 +4,16 @@
 
 @(zref: String)(implicit request: Request[_], messages: Messages)
 
-@contentHeader = {
-<div class="transaction-banner--complete">
-    <h1 class="transaction-banner__heading">Registration successful</h1>
-    <p>LISA manager reference number: @zref</p>
-</div>
-}
+@views.html.main_template(title = "Application successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
-@views.html.main_template(title = "Registration successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+<div class="transaction-banner--complete">
+    <h1 class="transaction-banner__heading">Application successful</h1>
+    <p>Application reference: @zref</p>
+</div>
+
     <h2>What happens next</h2>
 
     <p>You can now use your Government Gateway credentials to connect to the Lifetime ISA API.</p>
-
-    <p>Keep a note of this reference number as you'll need it when reporting information to HM Revenue and Customs (HMRC).</p>
 
     <p>You can sign back into this service at any time to see it.</p>
 
@@ -24,3 +21,4 @@
         <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out">Sign out</a></p>
     </div>
 }
+
