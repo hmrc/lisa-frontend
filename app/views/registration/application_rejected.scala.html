@@ -2,21 +2,27 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@()(implicit request: Request[_], messages: Messages)
+@(subscriptionId: String)(implicit request: Request[_], messages: Messages)
 
-@contentHeader = {
-    <h1>Registration not successful</h1>
-}
 
-@views.html.main_template(title = "Registration not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
+@views.html.main_template(title = "Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+
+    <h1>Application not successful</h1>
+
     <h2>What happens next</h2>
 
     <p>Email <a href="mailto:savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a> to find out why
-        your application was unsuccessful. You'll need to quote your ISA manager reference number.</p>
+        your application was unsuccessful.</p>
+
+    <p>You’ll need to quote your application reference: @subscriptionId</p>
 
     <p>Alternatively you can submit a new application.</p>
 
     <div class="form-field form-field--submit">
         <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="submit">Submit new application</a></p>
+    </div>
+
+    <div class="form-field form-field--submit">
+        <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
     </div>
 }

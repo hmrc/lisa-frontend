@@ -2,20 +2,23 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@(email: String)(implicit request: Request[_], messages: Messages)
+@(email: String, subscriptionId: String)(implicit request: Request[_], messages: Messages)
 
-@contentHeader = {
-    <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">Application submitted</h1>
-    </div>
-}
+
 
 @analyticsAdditionalJs = {
     ga('set', 'location', document.URL.split("?")[0]);
     ga('set', 'page', '/lifetime-isa/application-submitted');
 }
 
-@views.html.main_template(title = "Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader), analyticsAdditionalJs = Some(analyticsAdditionalJs)) {
+@views.html.main_template(title = "Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, analyticsAdditionalJs = Some(analyticsAdditionalJs)) {
+
+    <div class="transaction-banner--complete">
+        <h1 class="transaction-banner__heading">Application submitted</h1>
+        <p>Application reference: @subscriptionId</p>
+    </div>
+
+
     <h2>What happens next</h2>
 
     <p>Your application to become a Lifetime ISA manager will be reviewed by HM Revenue and Customs.</p>

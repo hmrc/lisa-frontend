@@ -27,13 +27,13 @@ import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
   def get(email: String): Action[AnyContent] = Action.async { implicit request =>
-    val page = Future.successful(Ok(views.html.registration.application_submitted(email)))
+    val page = Future.successful(Ok(views.html.registration.application_submitted(email, "ABC1234")))
 
     authorisedForLisa((_) => page, checkEnrolmentStates = false)
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_pending()))
+    Future.successful(Ok(views.html.registration.application_pending("ABC1234")))
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
@@ -41,7 +41,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
   }
   
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_rejected()))
+    Future.successful(Ok(views.html.registration.application_rejected("ABC1234")))
   }
 }
 
