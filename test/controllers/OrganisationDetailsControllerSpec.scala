@@ -111,9 +111,11 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       "the submitted data is incomplete" in {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP")))).
           thenReturn(Future.successful(None))
+
         val result = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
@@ -128,9 +130,11 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X")))
         val result = SUT.post(request)
+
         when(mockCache.fetchAndGetEntry[Any](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body")))).
           thenReturn(Future.successful(None))
+
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)

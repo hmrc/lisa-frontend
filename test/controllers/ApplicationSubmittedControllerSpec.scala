@@ -124,8 +124,8 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   val submittedPageTitle = ">Application submitted</h1>"
   val pendingPageTitle = ">Application pending</h1>"
-  val successPageTitle = ">Registration successful</h1>"
-  val rejectedPageTitle = ">Registration not successful</h1>"
+  val successPageTitle = ">Application successful</h1>"
+  val rejectedPageTitle = ">Application not successful</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   val mockConfig: Configuration = mock[Configuration]
