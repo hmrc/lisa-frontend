@@ -44,7 +44,11 @@ trait LisaBaseController extends FrontendController
           user.enrolmentState match {
             case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
             case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-            case TaxEnrolmentSuccess => Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+            case TaxEnrolmentSuccess(lisaManagerReferenceNumber) => {
+              sessionCache.cache[String]("lisaManagerReferenceNumber", lisaManagerReferenceNumber)
+
+              Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+            }
             case TaxEnrolmentDoesNotExist => callback(s"${user.internalId}-lisa-registration")
           }
         }
