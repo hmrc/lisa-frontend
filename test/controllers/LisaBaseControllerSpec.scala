@@ -116,7 +116,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
       "an authorised user has a successful subscription" in {
         when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess)))
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess("Z1234"))))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
