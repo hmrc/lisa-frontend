@@ -53,7 +53,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val sub = parsed.head
 
-        sub.state mustBe TaxEnrolmentSuccess
+        sub.state mustBe TaxEnrolmentSuccess("Z1234")
       }
       "given valid json with identifiers set to null" in {
         val parsed = Json.parse(testJsonNullIdentifiers).as[List[TaxEnrolmentSubscription]]
@@ -94,8 +94,8 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
                            |    "serviceName": "HMRC-ORG-LISA",
                            |    "identifiers": [
                            |        {
-                           |            "key": "eori",
-                           |            "value": "gb123456ghj"
+                           |            "key": "ZREF",
+                           |            "value": "Z1234"
                            |        }
                            |    ],
                            |    "callback": "callback url",

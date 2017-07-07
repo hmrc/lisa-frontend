@@ -32,7 +32,8 @@ case class TaxEnrolmentSubscription(
 trait TaxEnrolmentState
 case object TaxEnrolmentPending extends TaxEnrolmentState
 case object TaxEnrolmentError extends TaxEnrolmentState
-case object TaxEnrolmentSuccess extends TaxEnrolmentState
 case object TaxEnrolmentDoesNotExist extends TaxEnrolmentState
+case object TaxEnrolmentSuccess extends TaxEnrolmentState
+case class TaxEnrolmentSuccess(lisaManagerReferenceNumber: String) extends TaxEnrolmentState
 
 case class TaxEnrolmentIdentifier(key: String, value: String)

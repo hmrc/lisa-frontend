@@ -30,12 +30,22 @@ trait TaxEnrolmentService {
 
   val connector: TaxEnrolmentConnector
 
-  def getLisaSubscriptionState(groupId: String)(implicit hc:HeaderCarrier): Future[TaxEnrolmentState] = {
+  def getNewestLisaSubscription(groupId: String)(implicit hc:HeaderCarrier): Future[Option[TaxEnrolmentSubscription]] = {
     val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)(hc)
 
     response.map { l =>
       val subs = l.filter(sub => sub.serviceName == "HMRC-LISA-ORG")
-      if (subs.isEmpty) TaxEnrolmentDoesNotExist else subs.maxBy(sub => sub.created).state
+      if (subs.isEmpty) {
+        None
+      }
+      else {
+        val sub = subs.maxBy(sub => sub.created)
+
+        sub.state match {
+          case TaxEnrolmentSuccess => throw new RuntimeException("Invalid LISA subscription - successful status with no zref")
+          case _ => Some(sub)
+        }
+      }
     }
   }
 

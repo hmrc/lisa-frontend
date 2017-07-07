@@ -19,8 +19,9 @@ package controllers
 import java.io.File
 
 import models._
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -30,15 +31,20 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
 class LisaBaseControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
-  with MockitoSugar {
+  with MockitoSugar
+  with BeforeAndAfter {
 
   "Lisa Base Controller" should {
+
+    before {
+      reset(mockSessionCache)
+    }
 
     "redirect to login" when {
 
@@ -116,11 +122,13 @@ class LisaBaseControllerSpec extends PlaySpec
 
       "an authorised user has a successful subscription" in {
         when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess)))
+          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess("Z1234"))))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
+
+        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z1234"))(any(), any())
 
       }
 
@@ -186,6 +194,7 @@ class LisaBaseControllerSpec extends PlaySpec
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   trait SUT extends LisaBaseController {
@@ -200,7 +209,8 @@ class LisaBaseControllerSpec extends PlaySpec
   object SUT extends SUT {
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    override val cache: ShortLivedCache = mockCache
+    override val shortLivedCache: ShortLivedCache = mockCache
+    override val sessionCache: SessionCache = mockSessionCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
   }
 

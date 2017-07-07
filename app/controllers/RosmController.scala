@@ -16,12 +16,13 @@
 
 package controllers
 
-import config.LisaShortLivedCache
+import config.{LisaSessionCache, LisaShortLivedCache}
 import connectors.RosmJsonFormats
-import models.LisaRegistration
+import models.{ApplicationSent, LisaRegistration}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
 import services.{AuditService, AuthorisationService, RosmService}
+import uk.gov.hmrc.http.cache.client.SessionCache
 
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
@@ -40,7 +41,13 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+            val applicationSentVM = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
+
+            sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM)
+
+            shortLivedCache.remove(cacheId)
+
+            Redirect(routes.ApplicationSubmittedController.get())
           }
           case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
@@ -75,7 +82,8 @@ trait RosmController extends LisaBaseController
 object RosmController extends RosmController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val auditService = AuditService
   override val rosmService = RosmService
   override val authorisationService = AuthorisationService

@@ -19,7 +19,7 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{BusinessStructure,OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models.{BusinessStructure, OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
 import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -32,8 +32,8 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
-import services.{RosmService,AuthorisationService}
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
+import services.{AuthorisationService, RosmService}
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -242,13 +242,15 @@ class OrganisationDetailsControllerSpec extends PlaySpec
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
   val mockRosmService:RosmService = mock[RosmService]
 
   object SUT extends OrganisationDetailsController {
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    override val cache: ShortLivedCache = mockCache
+    override val shortLivedCache: ShortLivedCache = mockCache
+    override val sessionCache: SessionCache = mockSessionCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
     override val rosmService:RosmService = mockRosmService
 

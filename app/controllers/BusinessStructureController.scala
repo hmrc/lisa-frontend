@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.LisaShortLivedCache
+import config.{LisaSessionCache, LisaShortLivedCache}
 import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
@@ -30,7 +30,7 @@ trait BusinessStructureController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).map {
+      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).map {
         case Some(data) => Ok(views.html.registration.business_structure(BusinessStructure.form.fill(data)))
         case None => Ok(views.html.registration.business_structure(BusinessStructure.form))
       }
@@ -44,7 +44,7 @@ trait BusinessStructureController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.business_structure(formWithErrors)))
         },
         data => {
-          cache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data)
+          shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data)
 
           handleRedirect(routes.OrganisationDetailsController.get().url)
         }
@@ -57,6 +57,7 @@ trait BusinessStructureController extends LisaBaseController {
 object BusinessStructureController extends BusinessStructureController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val authorisationService = AuthorisationService
 }

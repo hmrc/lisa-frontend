@@ -16,7 +16,8 @@
 
 package controllers
 
-import config.LisaShortLivedCache
+import config.{LisaSessionCache, LisaShortLivedCache}
+import models.ApplicationSent
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
@@ -26,28 +27,42 @@ import services.AuthorisationService
 import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
-  def get(email: String): Action[AnyContent] = Action.async { implicit request =>
-    val page = Future.successful(Ok(views.html.registration.application_submitted(email, "ABC1234")))
 
-    authorisedForLisa((_) => page, checkEnrolmentStates = false)
+  def get(): Action[AnyContent] = Action.async { implicit request =>
+    authorisedForLisa((_) => {
+      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).flatMap {
+        case Some(application) =>
+          Future.successful(Ok(views.html.registration.application_submitted(application.email, application.subscriptionId)))
+      }
+    }, checkEnrolmentState = false)
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_pending()))
+    authorisedForLisa((_) => {
+      Future.successful(Ok(views.html.registration.application_pending()))
+    }, checkEnrolmentState = false)
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_successful("Z1234")))
+    authorisedForLisa((_) => {
+      sessionCache.fetchAndGetEntry[String]("lisaManagerReferenceNumber").flatMap {
+        case Some(lisaManagerReferenceNumber) =>
+          Future.successful(Ok(views.html.registration.application_successful(lisaManagerReferenceNumber)))
+      }
+    }, checkEnrolmentState = false)
   }
   
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_rejected()))
+    authorisedForLisa((_) => {
+      Future.successful(Ok(views.html.registration.application_rejected()))
+    }, checkEnrolmentState = false)
   }
 }
 
 object ApplicationSubmittedController extends ApplicationSubmittedController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val authorisationService = AuthorisationService
 }

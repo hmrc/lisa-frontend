@@ -33,7 +33,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
@@ -142,12 +142,14 @@ class BusinessStructureControllerSpec extends PlaySpec
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
 
   object SUT extends BusinessStructureController {
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    override val cache: ShortLivedCache = mockCache
+    override val shortLivedCache: ShortLivedCache = mockCache
+    override val sessionCache: SessionCache = mockSessionCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
   }
 

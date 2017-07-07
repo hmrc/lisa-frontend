@@ -39,7 +39,21 @@ trait TaxEnrolmentJsonFormats {
     } and
     (JsPath \ "etmpId").read[String] and
     (JsPath \ "groupIdentifier").read[String]
-  )(TaxEnrolmentSubscription.apply _)
+  )( (created, lastModified, credId, serviceName, identifiers, callback, state, etmpId, groupIdentifier) => {
+    val zrefs = identifiers.filter(id => id.key == "ZREF").map(id => id.value)
+
+    TaxEnrolmentSubscription(
+      created = created,
+      lastModified = lastModified,
+      credId = credId,
+      serviceName = serviceName,
+      identifiers = identifiers,
+      callback = callback,
+      state = if (state == TaxEnrolmentSuccess && !zrefs.isEmpty) TaxEnrolmentSuccess(zrefs.head) else state,
+      etmpId = etmpId,
+      groupIdentifier = groupIdentifier
+    )
+  })
 
   implicit val subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
     (JsPath \ "created").write[Long].contramap[DateTime]{_.getMillis} and
@@ -51,6 +65,7 @@ trait TaxEnrolmentJsonFormats {
     (JsPath \ "state").write[String].contramap[TaxEnrolmentState] {
       case TaxEnrolmentError => "ERROR"
       case TaxEnrolmentSuccess => "SUCCEEDED"
+      case TaxEnrolmentSuccess(_) => "SUCCEEDED"
       case TaxEnrolmentPending => "PENDING"
     } and
     (JsPath \ "etmpId").write[String] and

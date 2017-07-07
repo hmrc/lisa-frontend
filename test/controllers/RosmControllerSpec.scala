@@ -33,7 +33,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.{AuditService, AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.ShortLivedCache
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -47,6 +47,7 @@ class RosmControllerSpec extends PlaySpec
   "GET Rosm Registration" must {
 
     before {
+      reset(mockSessionCache)
       reset(mockCache)
       reset(mockRosmConnector)
       reset(mockAuditService)
@@ -133,7 +134,6 @@ class RosmControllerSpec extends PlaySpec
       }
     }
 
-
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
@@ -202,7 +202,7 @@ class RosmControllerSpec extends PlaySpec
         contactDetails = rosmContact
       )
 
-      redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get("test@test.com").url))
+      redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
     }
 
     "handle a failed rosm registration" when {
@@ -354,6 +354,53 @@ class RosmControllerSpec extends PlaySpec
 
     }
 
+    "cache subscriptionId and email as part of a successful rosm registration" in {
+      val uri = controllers.routes.RosmController.get().url
+      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val businessStructureForm = new BusinessStructure("LLP")
+      val yourForm = new YourDetails(
+        firstName = "Test",
+        lastName = "User",
+        role = "Role",
+        phone = "0191 123 4567",
+        email = "test@test.com")
+      val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+
+      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(organisationForm)))
+
+      when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any())).
+        thenReturn(Future.successful(Some("123456")))
+
+      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(tradingForm)))
+
+      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(businessStructureForm)))
+
+      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any())).
+        thenReturn(Future.successful(Some(yourForm)))
+
+      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
+      val rosmContact = RosmContactDetails()
+      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
+        safeId = "",
+        isEditable = true,
+        isAnAgent = true,
+        isAnIndividual = true,
+        address = rosmAddress,
+        contactDetails = rosmContact
+      )
+      when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+
+      await(SUT.get(fakeRequest))
+
+      val applicationSentVM = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
+
+      verify(mockSessionCache).cache(MatcherEquals(ApplicationSent.cacheKey), MatcherEquals(applicationSentVM))(any(), any())
+    }
+
   }
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
@@ -363,6 +410,7 @@ class RosmControllerSpec extends PlaySpec
   val mockRosmConnector: RosmConnector = mock[RosmConnector]
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
+  val mockSessionCache: SessionCache = mock[SessionCache]
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockAuditService: AuditService = mock[AuditService]
   val mockRosmService: RosmService = mock[RosmService]
@@ -371,7 +419,8 @@ class RosmControllerSpec extends PlaySpec
   object SUT extends RosmController {
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    override val cache: ShortLivedCache = mockCache
+    override val sessionCache: SessionCache = mockSessionCache
+    override val shortLivedCache: ShortLivedCache = mockCache
     override val auditService: AuditService = mockAuditService
     override val rosmService: RosmService = mockRosmService
     override val authorisationService: AuthorisationService = mockAuthorisationService

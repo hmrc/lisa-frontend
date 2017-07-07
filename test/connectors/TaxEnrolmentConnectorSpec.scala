@@ -60,9 +60,9 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
     lastModified = new DateTime(),
     credId = "",
     serviceName = "HMRC-LISA-ORG",
-    identifiers = Nil,
+    identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
     callback = "",
-    state = TaxEnrolmentSuccess,
+    state = TaxEnrolmentSuccess("Z1234"),
     etmpId = "",
     groupIdentifier = ""
   )
