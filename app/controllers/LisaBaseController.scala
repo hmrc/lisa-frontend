@@ -35,12 +35,12 @@ trait LisaBaseController extends FrontendController
   val shortLivedCache: ShortLivedCache
   val authorisationService: AuthorisationService
 
-  def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentStates: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
+  def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentState: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorised => {
-        if (checkEnrolmentStates) {
+        if (checkEnrolmentState) {
           user.enrolmentState match {
             case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
             case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))

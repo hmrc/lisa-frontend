@@ -29,27 +29,33 @@ import scala.concurrent.Future
 trait ApplicationSubmittedController extends LisaBaseController {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
-    sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).flatMap {
-      case Some(application) =>
-        val page = Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
-
-        authorisedForLisa((_) => Future.successful(page), checkEnrolmentStates = false)
-    }
+    authorisedForLisa((_) => {
+      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).flatMap {
+        case Some(application) =>
+          Future.successful(Ok(views.html.registration.application_submitted(application.email, application.subscriptionId)))
+      }
+    }, checkEnrolmentState = false)
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_pending()))
+    authorisedForLisa((_) => {
+      Future.successful(Ok(views.html.registration.application_pending()))
+    }, checkEnrolmentState = false)
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
-    sessionCache.fetchAndGetEntry[String]("lisaManagerReferenceNumber").flatMap {
-      case Some(lisaManagerReferenceNumber) =>
-        Future.successful(Ok(views.html.registration.application_successful(lisaManagerReferenceNumber)))
-    }
+    authorisedForLisa((_) => {
+      sessionCache.fetchAndGetEntry[String]("lisaManagerReferenceNumber").flatMap {
+        case Some(lisaManagerReferenceNumber) =>
+          Future.successful(Ok(views.html.registration.application_successful(lisaManagerReferenceNumber)))
+      }
+    }, checkEnrolmentState = false)
   }
   
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_rejected()))
+    authorisedForLisa((_) => {
+      Future.successful(Ok(views.html.registration.application_rejected()))
+    }, checkEnrolmentState = false)
   }
 }
 
