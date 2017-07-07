@@ -36,7 +36,7 @@ trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats 
     val uri = s"$serviceUrl/tax-enrolments/groups/$groupId/subscriptions"
 
     httpGet.GET[HttpResponse](uri)(implicitly, hc) map { res =>
-      Logger.debug(s"Getsubscriptions returned status: ${res.status} with body ${res.body.toString}")
+      Logger.debug(s"Getsubscriptions returned status: ${res.status} ")
       Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
     }
   }
