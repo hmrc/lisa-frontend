@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/hmrc/lisa-frontend.svg?branch=master)](https://travis-ci.org/hmrc/lisa-frontend) [ ![Download](https://api.bintray.com/packages/hmrc/releases/lisa-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/lisa-frontend/_latestVersion)
 
-This is a placeholder README.md for a new repository
+This service provides the ability for ISA managers to apply for approval to become a Lifetime ISA provider.
 
 ### License
 
