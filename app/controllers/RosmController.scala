@@ -40,7 +40,7 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email))
+            Redirect(routes.ApplicationSubmittedController.get(registrationDetails.yourDetails.email, subscriptionId))
           }
           case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")

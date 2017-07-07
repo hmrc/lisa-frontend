@@ -50,7 +50,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
       when(mockAuthorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentPending)))
 
-      val result = SUT.get("test@user.com")(fakeRequest)
+      val result = SUT.get("test@user.com", "123456789")(fakeRequest)
 
       status(result) mustBe Status.OK
 
@@ -58,6 +58,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
       content must include (submittedPageTitle)
       content must include ("test@user.com")
+      content must include ("123456789")
 
     }
 

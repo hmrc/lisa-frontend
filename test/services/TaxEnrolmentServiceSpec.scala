@@ -47,36 +47,36 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription)))
 
-        val res = Await.result(SUT.getLisaSubscriptionState("1234567890"), Duration.Inf)
+        val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
-        res mustBe TaxEnrolmentSuccess
+        res mustBe Some(lisaSuccessSubscription)
       }
 
       "given two lisa subscriptions in the connector response - newest first" in {
         when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
           Future.successful(List(lisaErrorSubscription, lisaSuccessSubscription)))
 
-        val res = Await.result(SUT.getLisaSubscriptionState("1234567890"), Duration.Inf)
+        val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
-        res mustBe TaxEnrolmentError
+        res mustBe Some(lisaErrorSubscription)
       }
 
       "given two lisa subscriptions in the connector response - oldest first" in {
         when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription)))
 
-        val res = Await.result(SUT.getLisaSubscriptionState("1234567890"), Duration.Inf)
+        val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
-        res mustBe TaxEnrolmentError
+        res mustBe Some(lisaErrorSubscription)
       }
 
       "given multiple different subscriptions in the connector response" in {
         when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription, randomPendingSubscription)))
 
-        val res = Await.result(SUT.getLisaSubscriptionState("1234567890"), Duration.Inf)
+        val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
-        res mustBe TaxEnrolmentError
+        res mustBe Some(lisaErrorSubscription)
       }
 
     }
@@ -87,9 +87,9 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
           Future.successful(List()))
 
-        val res = Await.result(SUT.getLisaSubscriptionState("1234567890"), Duration.Inf)
+        val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
-        res mustBe TaxEnrolmentDoesNotExist
+        res mustBe None
       }
 
     }

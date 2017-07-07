@@ -147,6 +147,6 @@ class AuthorisationServiceSpec extends PlaySpec
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
-  when(mockTaxEnrolmentService.getLisaSubscriptionState(any())(any())).thenReturn(Future.successful(TaxEnrolmentDoesNotExist))
+  when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(None))
 
 }

@@ -26,8 +26,8 @@ import services.AuthorisationService
 import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
-  def get(email: String): Action[AnyContent] = Action.async { implicit request =>
-    val page = Future.successful(Ok(views.html.registration.application_submitted(email, "ABC1234")))
+  def get(email: String, subscriptionId: String): Action[AnyContent] = Action.async { implicit request =>
+    val page = Future.successful(Ok(views.html.registration.application_submitted(email, subscriptionId)))
 
     authorisedForLisa((_) => page, checkEnrolmentStates = false)
   }
