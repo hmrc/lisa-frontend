@@ -42,7 +42,10 @@ trait ApplicationSubmittedController extends LisaBaseController {
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_successful("Z1234")))
+    sessionCache.fetchAndGetEntry[String]("lisaManagerReferenceNumber").flatMap {
+      case Some(lisaManagerReferenceNumber) =>
+        Future.successful(Ok(views.html.registration.application_successful(lisaManagerReferenceNumber)))
+    }
   }
   
   def rejected(): Action[AnyContent] = Action.async { implicit request =>

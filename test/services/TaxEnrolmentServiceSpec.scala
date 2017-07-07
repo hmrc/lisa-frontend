@@ -94,6 +94,19 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
     }
 
+    "throw an error" when {
+
+      "a successful subscription does not contain a zref" in {
+        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+          Future.successful(List(lisaSuccessSubscription.copy(identifiers = Nil, state = TaxEnrolmentSuccess))))
+
+        assertThrows[RuntimeException] {
+          Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
+        }
+      }
+
+    }
+
   }
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(

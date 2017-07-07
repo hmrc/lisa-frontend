@@ -34,13 +34,13 @@ trait TaxEnrolmentJsonFormats {
     (JsPath \ "callback").read[String] and
     (JsPath \ "state").read[String](Reads.pattern("^(ERROR|SUCCEEDED|PENDING)$".r, "error.formatting.state")).map[TaxEnrolmentState] {
       case "ERROR" => TaxEnrolmentError
-      case "SUCCEEDED" => TaxEnrolmentSuccess("")
+      case "SUCCEEDED" => TaxEnrolmentSuccess
       case "PENDING" => TaxEnrolmentPending
     } and
     (JsPath \ "etmpId").read[String] and
     (JsPath \ "groupIdentifier").read[String]
   )( (created, lastModified, credId, serviceName, identifiers, callback, state, etmpId, groupIdentifier) => {
-    val zref = identifiers.filter(id => id.key == "ZREF").map(id => id.value).headOption.getOrElse("")
+    val zrefs = identifiers.filter(id => id.key == "ZREF").map(id => id.value)
 
     TaxEnrolmentSubscription(
       created = created,
@@ -49,7 +49,7 @@ trait TaxEnrolmentJsonFormats {
       serviceName = serviceName,
       identifiers = identifiers,
       callback = callback,
-      state = if (state == TaxEnrolmentSuccess("")) TaxEnrolmentSuccess(zref) else state,
+      state = if (state == TaxEnrolmentSuccess && !zrefs.isEmpty) TaxEnrolmentSuccess(zrefs.head) else state,
       etmpId = etmpId,
       groupIdentifier = groupIdentifier
     )
@@ -64,6 +64,7 @@ trait TaxEnrolmentJsonFormats {
     (JsPath \ "callback").write[String] and
     (JsPath \ "state").write[String].contramap[TaxEnrolmentState] {
       case TaxEnrolmentError => "ERROR"
+      case TaxEnrolmentSuccess => "SUCCEEDED"
       case TaxEnrolmentSuccess(_) => "SUCCEEDED"
       case TaxEnrolmentPending => "PENDING"
     } and

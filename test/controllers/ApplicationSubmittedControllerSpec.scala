@@ -93,6 +93,9 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
       when(mockAuthorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
+      when(mockSessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any())).
+        thenReturn(Future.successful(Some("Z9999")))
+
       val result = SUT.successful()(fakeRequest)
 
       status(result) mustBe Status.OK
@@ -100,6 +103,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
       val content = contentAsString(result)
 
       content must include (successPageTitle)
+      content must include ("Z9999")
       
     }
     

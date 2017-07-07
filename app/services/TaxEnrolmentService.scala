@@ -35,7 +35,17 @@ trait TaxEnrolmentService {
 
     response.map { l =>
       val subs = l.filter(sub => sub.serviceName == "HMRC-LISA-ORG")
-      if (subs.isEmpty) None else Some(subs.maxBy(sub => sub.created))
+      if (subs.isEmpty) {
+        None
+      }
+      else {
+        val sub = subs.maxBy(sub => sub.created)
+
+        sub.state match {
+          case TaxEnrolmentSuccess => throw new RuntimeException("Invalid LISA subscription - successful status with no zref")
+          case _ => Some(sub)
+        }
+      }
     }
   }
 

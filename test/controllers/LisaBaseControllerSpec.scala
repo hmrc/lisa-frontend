@@ -19,8 +19,9 @@ package controllers
 import java.io.File
 
 import models._
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -36,9 +37,14 @@ import scala.concurrent.Future
 
 class LisaBaseControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
-  with MockitoSugar {
+  with MockitoSugar
+  with BeforeAndAfter {
 
   "Lisa Base Controller" should {
+
+    before {
+      reset(mockSessionCache)
+    }
 
     "redirect to login" when {
 
@@ -121,6 +127,8 @@ class LisaBaseControllerSpec extends PlaySpec
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
+
+        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z1234"))(any(), any())
 
       }
 
