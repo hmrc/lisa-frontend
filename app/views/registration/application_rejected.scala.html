@@ -2,7 +2,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@(subscriptionId: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 
 @views.html.main_template(title = "Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
@@ -13,8 +13,6 @@
 
     <p>Email <a href="mailto:savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a> to find out why
         your application was unsuccessful.</p>
-
-    <p>You’ll need to quote your application reference: @subscriptionId</p>
 
     <p>Alternatively you can submit a new application.</p>
 

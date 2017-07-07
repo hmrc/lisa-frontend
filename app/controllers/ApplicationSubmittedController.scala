@@ -33,7 +33,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_pending("ABC1234")))
+    Future.successful(Ok(views.html.registration.application_pending()))
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
@@ -41,7 +41,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
   }
   
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.registration.application_rejected("ABC1234")))
+    Future.successful(Ok(views.html.registration.application_rejected()))
   }
 }
 

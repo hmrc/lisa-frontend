@@ -2,7 +2,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@(subscriptionId: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 
 
@@ -18,7 +18,7 @@
 
     <p>Email  <a href="mailto:savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a> if you have any questions regarding your application.</p>
 
-    <p>You’ll need to quote your application reference: @subscriptionId</p>
+
 
     <div class="form-field form-field--submit">
         <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out">Sign out</a></p>
