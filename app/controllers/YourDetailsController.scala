@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.LisaShortLivedCache
+import config.{LisaSessionCache, LisaShortLivedCache}
 import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
@@ -31,7 +31,7 @@ trait YourDetailsController extends LisaBaseController {
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      cache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
+      shortLivedCache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
         case Some(data) => Ok(views.html.registration.your_details(YourDetails.form.fill(data)))
         case None => Ok(views.html.registration.your_details(YourDetails.form))
       }
@@ -47,7 +47,7 @@ trait YourDetailsController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
         },
         data => {
-          cache.cache[YourDetails](cacheId, YourDetails.cacheKey, data)
+          shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data)
 
           handleRedirect(routes.SummaryController.get().url)
         }
@@ -61,6 +61,7 @@ trait YourDetailsController extends LisaBaseController {
 object YourDetailsController extends YourDetailsController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val authorisationService = AuthorisationService
 }

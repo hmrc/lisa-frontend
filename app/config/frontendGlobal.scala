@@ -24,7 +24,7 @@ import play.api.mvc.Request
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.http.cache.client.{ShortLivedCache, ShortLivedHttpCaching}
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
@@ -78,4 +78,11 @@ object LisaShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with
 object LisaShortLivedCache extends ShortLivedCache {
   override implicit lazy val crypto = ApplicationCrypto.JsonCrypto
   override lazy val shortLiveCache = LisaShortLivedHttpCaching
+}
+
+object LisaSessionCache extends SessionCache with AppName with ServicesConfig {
+  override lazy val http = WSHttp
+  override lazy val defaultSource = appName
+  override lazy val baseUri = baseUrl("cachable.session-cache")
+  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 }

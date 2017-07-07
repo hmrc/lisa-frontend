@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.LisaShortLivedCache
+import config.{LisaSessionCache, LisaShortLivedCache}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
@@ -40,6 +40,7 @@ trait SummaryController extends LisaBaseController {
 object SummaryController extends SummaryController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val authorisationService = AuthorisationService
 }
