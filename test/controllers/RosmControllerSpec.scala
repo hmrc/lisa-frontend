@@ -202,7 +202,7 @@ class RosmControllerSpec extends PlaySpec
         contactDetails = rosmContact
       )
 
-      redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get("test@test.com").url))
+      redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get("test@test.com", "123456789").url))
     }
 
     "handle a failed rosm registration" when {
