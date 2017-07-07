@@ -39,12 +39,12 @@ trait LisaBaseController extends FrontendController
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
-      case user: UserAuthorised => {
+      case user: UserAuthorised => { Logger.warn("User Authorised")
         if (checkEnrolmentState) {
           user.enrolmentState match {
-            case TaxEnrolmentPending => Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
-            case TaxEnrolmentError => Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-            case TaxEnrolmentSuccess(lisaManagerReferenceNumber) => {
+            case TaxEnrolmentPending => Logger.warn("Enrollment Pending"); Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+            case TaxEnrolmentError => Logger.warn("Enrollment Rejected"); Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+            case TaxEnrolmentSuccess(lisaManagerReferenceNumber) => { Logger.warn("Enrollment Success");
               sessionCache.cache[String]("lisaManagerReferenceNumber", lisaManagerReferenceNumber)
 
               Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))

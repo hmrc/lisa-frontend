@@ -43,7 +43,7 @@ trait RosmService extends RosmJsonFormats{
     val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName,businessStructure.businessStructure))
 
     rosmConnector.registerOnce(orgDetails.ctrNumber , rosmRegistration).map { res =>
-      Logger.debug("response is : " + res.json)
+      Logger.debug("response  recieved from :registerOnce ")
       res.json.validate[RosmRegistrationSuccessResponse] match {
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
         case _ : JsError => handleErrorResponse(res)
