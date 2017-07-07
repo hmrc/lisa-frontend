@@ -45,6 +45,8 @@ trait RosmController extends LisaBaseController
 
             sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM)
 
+            shortLivedCache.remove(cacheId)
+
             Redirect(routes.ApplicationSubmittedController.get())
           }
           case Left(error) => {
