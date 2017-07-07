@@ -13,7 +13,7 @@ GET        /your-details                    controllers.YourDetailsController.ge
 POST       /your-details                    controllers.YourDetailsController.post
 GET        /check-your-answers              controllers.SummaryController.get
 GET        /submit-registration             controllers.RosmController.get
-GET        /application-submitted           controllers.ApplicationSubmittedController.get(email, subscriptionId)
+GET        /application-submitted           controllers.ApplicationSubmittedController.get
 GET        /application-pending             controllers.ApplicationSubmittedController.pending
 GET        /application-successful          controllers.ApplicationSubmittedController.successful
 GET        /application-unsuccessful        controllers.ApplicationSubmittedController.rejected

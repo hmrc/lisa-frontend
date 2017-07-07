@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.{FrontendAuthConnector, LisaShortLivedCache}
+import config.{FrontendAuthConnector, LisaSessionCache, LisaShortLivedCache}
 import models.OrganisationDetails._
 import models._
 import play.api.Play.current
@@ -43,10 +43,10 @@ trait OrganisationDetailsController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-      cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          cache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
+          shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
             case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabels(businessStructure)))
             case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabels(businessStructure)))
           }
@@ -60,7 +60,7 @@ trait OrganisationDetailsController extends LisaBaseController {
 
       OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+          shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
             case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
             case Some(businessStructure) => {
               Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
@@ -68,16 +68,16 @@ trait OrganisationDetailsController extends LisaBaseController {
           }
         },
         data => {
-          cache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
+          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
 
-          cache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+          shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
             case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
             case Some(businessStructure) => {
               Logger.debug("BusinessStructure retrieved")
               rosmService.rosmRegister(businessStructure, data).flatMap {
                 case Right(safeId) => {
                   Logger.debug("rosmRegister Successful")
-                  cache.cache[String](cacheId, "safeId", safeId)
+                  shortLivedCache.cache[String](cacheId, "safeId", safeId)
                   handleRedirect(routes.TradingDetailsController.get().url)
                 }
                 case Left(error) => {
@@ -105,7 +105,8 @@ object OrganisationDetailsController extends OrganisationDetailsController {
   val authConnector = FrontendAuthConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val rosmService = RosmService
 
   override val authorisationService = AuthorisationService

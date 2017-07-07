@@ -16,7 +16,8 @@
 
 package controllers
 
-import config.LisaShortLivedCache
+import config.{LisaSessionCache, LisaShortLivedCache}
+import models.ApplicationSent
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
@@ -26,10 +27,14 @@ import services.AuthorisationService
 import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
-  def get(email: String, subscriptionId: String): Action[AnyContent] = Action.async { implicit request =>
-    val page = Future.successful(Ok(views.html.registration.application_submitted(email, subscriptionId)))
 
-    authorisedForLisa((_) => page, checkEnrolmentStates = false)
+  def get(): Action[AnyContent] = Action.async { implicit request =>
+    sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).flatMap {
+      case Some(application) =>
+        val page = Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
+
+        authorisedForLisa((_) => Future.successful(page), checkEnrolmentStates = false)
+    }
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
@@ -48,6 +53,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
 object ApplicationSubmittedController extends ApplicationSubmittedController {
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val cache = LisaShortLivedCache
+  override val sessionCache = LisaSessionCache
+  override val shortLivedCache = LisaShortLivedCache
   override val authorisationService = AuthorisationService
 }
