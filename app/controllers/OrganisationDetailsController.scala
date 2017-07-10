@@ -61,9 +61,9 @@ trait OrganisationDetailsController extends LisaBaseController {
       OrganisationDetails.form.bindFromRequest.fold(
         formWithErrors => {
           shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+            case None => Future.successful(Redirect(routes.BusinessStructureController.get())) map { res => res}
             case Some(businessStructure) => {
-              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
+              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure)))) map { res => res}
             }
           }
         },
@@ -71,14 +71,14 @@ trait OrganisationDetailsController extends LisaBaseController {
           shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
 
           shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+            case None => Future.successful(Redirect(routes.BusinessStructureController.get())) map { res => res}
             case Some(businessStructure) => {
               Logger.debug("BusinessStructure retrieved")
               rosmService.rosmRegister(businessStructure, data).flatMap {
                 case Right(safeId) => {
                   Logger.debug("rosmRegister Successful")
                   shortLivedCache.cache[String](cacheId, "safeId", safeId)
-                  handleRedirect(routes.TradingDetailsController.get().url)
+                  handleRedirect(routes.TradingDetailsController.get().url) map { res => res}
                 }
                 case Left(error) => {
                   Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
@@ -90,7 +90,7 @@ trait OrganisationDetailsController extends LisaBaseController {
                   )
 
                   Future.successful(BadRequest(views.html.registration.organisation_details(
-                    OrganisationDetails.form.copy(errors = regErrors) fill (data), businessLabels(businessStructure))))
+                    OrganisationDetails.form.copy(errors = regErrors) fill (data), businessLabels(businessStructure)))) map {res => res}
                 }
               }
             }
