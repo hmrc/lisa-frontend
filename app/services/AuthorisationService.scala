@@ -42,22 +42,20 @@ trait AuthorisationService extends AuthorisedFunctions {
       userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
         val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("No groupIdentifier for user"))
 
-        taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map { sub =>
-          sub match {
-            case Some(s) => {
-              s.state match {
-                case TaxEnrolmentSuccess => {
-                  val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
+        taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map {
+          case Some(s) => {
+            s.state match {
+              case TaxEnrolmentSuccess => {
+                val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
 
-                  UserAuthorisedAndEnrolled(userId, user, zref)
-                }
-                case _ => {
-                  UserAuthorised(userId, user, s.state)
-                }
+                UserAuthorisedAndEnrolled(userId, user, zref)
+              }
+              case _ => {
+                UserAuthorised(userId, user, s.state)
               }
             }
-            case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
           }
+          case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
         }
       }
     } recover {
