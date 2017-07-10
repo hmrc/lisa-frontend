@@ -44,8 +44,8 @@ trait LisaBaseController extends FrontendController
           user.enrolmentState match {
             case TaxEnrolmentPending => Logger.warn("Enrollment Pending"); Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
             case TaxEnrolmentError => Logger.warn("Enrollment Rejected"); Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-            case TaxEnrolmentSuccess(lisaManagerReferenceNumber) => { Logger.warn("Enrollment Success");
-              sessionCache.cache[String]("lisaManagerReferenceNumber", lisaManagerReferenceNumber)
+            case TaxEnrolmentSuccess => { Logger.warn("Enrollment Success");
+              sessionCache.cache[String]("lisaManagerReferenceNumber", "Z1234")
 
               Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
             }

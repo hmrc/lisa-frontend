@@ -49,12 +49,10 @@ trait RosmService extends RosmJsonFormats{
         case _ : JsError => handleErrorResponse(res)
       }
     }.recover {
-      case NonFatal(ex: Throwable) =>
-      {
+      case NonFatal(ex: Throwable) => {
         Logger.error(s"rosm registration error: ${ex.getMessage}")
         Left("INTERNAL_SERVER_ERROR")
       }
-
     }
   }
 
