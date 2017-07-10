@@ -43,7 +43,10 @@ trait AuthorisationService extends AuthorisedFunctions {
         val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("No groupIdentifier for user"))
 
         taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map { sub =>
-          UserAuthorised(userId, user, if (sub.isEmpty) TaxEnrolmentDoesNotExist else sub.get.state)
+          sub match {
+            case Some(s) => UserAuthorised(userId, user, s.state, s.zref)
+            case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
+          }
         }
       }
     } recover {

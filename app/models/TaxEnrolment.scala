@@ -27,7 +27,11 @@ case class TaxEnrolmentSubscription(
                                      callback: String,
                                      state: TaxEnrolmentState,
                                      etmpId: String,
-                                     groupIdentifier: String)
+                                     groupIdentifier: String) {
+  val zref: Option[String] = {
+    identifiers.filter(i => i.key == "ZREF").map(_.value).headOption
+  }
+}
 
 trait TaxEnrolmentState
 case object TaxEnrolmentPending extends TaxEnrolmentState
