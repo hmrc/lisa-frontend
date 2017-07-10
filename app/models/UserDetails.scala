@@ -19,11 +19,8 @@ package models
 trait LisaUserStatus
 case object UserNotLoggedIn extends LisaUserStatus
 case object UserUnauthorised extends LisaUserStatus
-case class UserAuthorised(
-                           internalId: String,
-                           userDetails: UserDetails,
-                           enrolmentState: TaxEnrolmentState,
-                           lisaManagerReferenceNumber: Option[String] = None) extends LisaUserStatus
+case class UserAuthorised(internalId: String, userDetails: UserDetails, enrolmentState: TaxEnrolmentState) extends LisaUserStatus
+case class UserAuthorisedAndEnrolled(internalId: String, userDetails: UserDetails, lisaManagerReferenceNumber: String) extends LisaUserStatus
 
 case class UserDetails(authProviderId: Option[String],
                        authProviderType: Option[String],

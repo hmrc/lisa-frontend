@@ -44,7 +44,18 @@ trait AuthorisationService extends AuthorisedFunctions {
 
         taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map { sub =>
           sub match {
-            case Some(s) => UserAuthorised(userId, user, s.state, s.zref)
+            case Some(s) => {
+              s.state match {
+                case TaxEnrolmentSuccess => {
+                  val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
+
+                  UserAuthorisedAndEnrolled(userId, user, zref)
+                }
+                case _ => {
+                  UserAuthorised(userId, user, s.state)
+                }
+              }
+            }
             case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
           }
         }
