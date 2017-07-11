@@ -27,13 +27,16 @@ case class TaxEnrolmentSubscription(
                                      callback: String,
                                      state: TaxEnrolmentState,
                                      etmpId: String,
-                                     groupIdentifier: String)
+                                     groupIdentifier: String) {
+  val zref: Option[String] = {
+    identifiers.filter(i => i.key == "ZREF").map(_.value).headOption
+  }
+}
 
 trait TaxEnrolmentState
 case object TaxEnrolmentPending extends TaxEnrolmentState
 case object TaxEnrolmentError extends TaxEnrolmentState
 case object TaxEnrolmentDoesNotExist extends TaxEnrolmentState
 case object TaxEnrolmentSuccess extends TaxEnrolmentState
-case class TaxEnrolmentSuccess(lisaManagerReferenceNumber: String) extends TaxEnrolmentState
 
 case class TaxEnrolmentIdentifier(key: String, value: String)

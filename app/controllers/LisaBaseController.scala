@@ -35,27 +35,13 @@ trait LisaBaseController extends FrontendController
   val shortLivedCache: ShortLivedCache
   val authorisationService: AuthorisationService
 
-  def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentState: Boolean = true)(implicit request: Request[AnyContent]): Future[Result] = {
+  def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentState: Boolean = true)
+                       (implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
-      case user: UserAuthorised => { Logger.warn("User Authorised")
-        if (checkEnrolmentState) {
-          user.enrolmentState match {
-            case TaxEnrolmentPending => Logger.warn("Enrollment Pending"); Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
-            case TaxEnrolmentError => Logger.warn("Enrollment Rejected"); Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-            case TaxEnrolmentSuccess(lisaManagerReferenceNumber) => { Logger.warn("Enrollment Success");
-              sessionCache.cache[String]("lisaManagerReferenceNumber", lisaManagerReferenceNumber)
-
-              Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
-            }
-            case TaxEnrolmentDoesNotExist => callback(s"${user.internalId}-lisa-registration")
-          }
-        }
-        else {
-          callback(s"${user.internalId}-lisa-registration")
-        }
-      }
+      case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
+      case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
     } recover {
       case NonFatal(ex: Throwable) => {
         Logger.warn(s"Auth error: ${ex.getMessage}")
@@ -64,7 +50,47 @@ trait LisaBaseController extends FrontendController
     }
   }
 
-  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+  private def handleUserAuthorised(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
+                                  (implicit request: Request[AnyContent]): Future[Result] = {
+    Logger.warn("User Authorised")
+
+    if (checkEnrolmentState) {
+      user.enrolmentState match {
+        case TaxEnrolmentPending => {
+          Logger.warn("Enrollment Pending")
+          Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+        }
+        case TaxEnrolmentError => {
+          Logger.warn("Enrollment Rejected")
+          Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+        }
+        case TaxEnrolmentDoesNotExist => {
+          Logger.warn("Enrollment Does Not Exist")
+          callback(s"${user.internalId}-lisa-registration")
+        }
+      }
+    }
+    else {
+      callback(s"${user.internalId}-lisa-registration")
+    }
+  }
+
+  private def handleUserAuthorisedAndEnrolled(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
+                                            (implicit request: Request[AnyContent]): Future[Result] = {
+    Logger.warn("User Authorised And Enrolled")
+
+    if (checkEnrolmentState) {
+      sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber)
+
+      Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+    }
+    else {
+      callback(s"${user.internalId}-lisa-registration")
+    }
+  }
+
+  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])
+                          (implicit request: Request[AnyContent]): Future[Result] = {
 
     // get business structure
     shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {

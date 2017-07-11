@@ -26,7 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
@@ -122,14 +122,40 @@ class LisaBaseControllerSpec extends PlaySpec
 
       "an authorised user has a successful subscription" in {
         when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentSuccess("Z1234"))))
+          thenReturn(Future.successful(UserAuthorisedAndEnrolled("", UserDetails(None, None, ""), "Z9876")))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
 
-        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z1234"))(any(), any())
+        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z9876"))(any(), any())
 
+      }
+
+    }
+
+    "avoid redirections" when {
+
+      "enrolment state check is disabled for a successful subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", UserDetails(None, None, ""), "Z9876")))
+
+        val result = SUT.testAuthorisationNoCheck(fakeRequest)
+
+        status(result) mustBe Status.OK
+
+        contentAsString(result) mustBe "Authorised. Cache ID: 12345-lisa-registration"
+      }
+
+      "enrolment state check is disabled for a pending subscription" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentPending)))
+
+        val result = SUT.testAuthorisationNoCheck(fakeRequest)
+
+        status(result) mustBe Status.OK
+
+        contentAsString(result) mustBe "Authorised. Cache ID: 12345-lisa-registration"
       }
 
     }
@@ -199,10 +225,16 @@ class LisaBaseControllerSpec extends PlaySpec
 
   trait SUT extends LisaBaseController {
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
-      authorisedForLisa {
-        case "error-lisa-registration" => throw new RuntimeException("An error occurred")
-        case cacheId => Future.successful(Ok(s"Authorised. Cache ID: $cacheId"))
-      }
+      authorisedForLisa(handleResult)
+    }
+
+    val testAuthorisationNoCheck: Action[AnyContent] = Action.async { implicit request =>
+      authorisedForLisa(handleResult, checkEnrolmentState = false)
+    }
+
+    private val handleResult: (String) => Future[Result] = {
+      case "error-lisa-registration" => throw new RuntimeException("An error occurred")
+      case cacheId => Future.successful(Ok(s"Authorised. Cache ID: $cacheId"))
     }
   }
 

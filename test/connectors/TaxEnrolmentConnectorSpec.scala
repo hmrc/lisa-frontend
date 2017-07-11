@@ -62,7 +62,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
     serviceName = "HMRC-LISA-ORG",
     identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
     callback = "",
-    state = TaxEnrolmentSuccess("Z1234"),
+    state = TaxEnrolmentSuccess,
     etmpId = "",
     groupIdentifier = ""
   )

@@ -39,12 +39,7 @@ trait TaxEnrolmentService {
         None
       }
       else {
-        val sub = subs.maxBy(sub => sub.created)
-
-        sub.state match {
-          case TaxEnrolmentSuccess => throw new RuntimeException("Invalid LISA subscription - successful status with no zref")
-          case _ => Some(sub)
-        }
+        Some(subs.maxBy(sub => sub.created))
       }
     }
   }

@@ -53,7 +53,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val sub = parsed.head
 
-        sub.state mustBe TaxEnrolmentSuccess("Z1234")
+        sub.state mustBe TaxEnrolmentSuccess
       }
       "given valid json with identifiers set to null" in {
         val parsed = Json.parse(testJsonNullIdentifiers).as[List[TaxEnrolmentSubscription]]
