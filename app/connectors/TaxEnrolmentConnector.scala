@@ -30,10 +30,10 @@ trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats 
 
   val httpGet: HttpGet = WSHttp
 
-  lazy val serviceUrl: String = baseUrl("tax-enrolments")
+  lazy val serviceUrl: String = baseUrl("lisa")
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
-    val uri = s"$serviceUrl/tax-enrolments/groups/$groupId/subscriptions"
+    val uri = s"$serviceUrl/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
     httpGet.GET[HttpResponse](uri)(implicitly, hc) map { res =>
       Logger.debug(s"Getsubscriptions returned status: ${res.status} ")
