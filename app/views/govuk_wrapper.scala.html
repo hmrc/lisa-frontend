@@ -36,7 +36,7 @@
       navTitle = Some("Apply to be an approved Lifetime ISA Manager"),
       navTitleLink = Some(routes.HomePageController.home),
       showBetaLink = false,
-      navLinks = Some(headerNavLinks)
+      navLinks = if (showSignOutLink) Some(headerNavLinks) else None
     )
 }
 
