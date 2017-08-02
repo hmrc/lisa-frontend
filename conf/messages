@@ -7,7 +7,8 @@ org.details.corpbody=Corporate Body
 
 error.companyName=Enter a valid company name.
 error.ctrNumber=Enter a unique tax reference number that is 10 characters long.
-error.fsrRefNumber=Enter a FCA number that is 6 characters long.
+error.fsrRefNumber=Enter your 6 digit Financial Conduct Authority (FCA) reference number.
+error.fsrRefNumber.notification=Enter your 6 digit Financial Conduct Authority reference number.
 error.isaProviderRefNumber=Enter a valid ISA ref number. This starts with Z, and includes either 4 or 6 numbers.
 error.firstName=Enter a valid first name.
 error.lastName=Enter a valid last name.
