@@ -291,7 +291,7 @@ class RosmControllerSpec extends PlaySpec
         auditData = MatcherEquals(Map(
           "subscriptionId" -> "123456789012",
           "companyName" -> registrationDetails.organisationDetails.companyName,
-          "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
+          "utr" -> registrationDetails.organisationDetails.ctrNumber,
           "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
           "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
           "firstName" -> registrationDetails.yourDetails.firstName,
@@ -341,7 +341,7 @@ class RosmControllerSpec extends PlaySpec
           auditData = MatcherEquals(Map(
             "reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
             "companyName" -> registrationDetails.organisationDetails.companyName,
-            "uniqueTaxReferenceNumber" -> registrationDetails.organisationDetails.ctrNumber,
+            "utr" -> registrationDetails.organisationDetails.ctrNumber,
             "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
             "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
             "firstName" -> registrationDetails.yourDetails.firstName,
