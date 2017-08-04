@@ -1,0 +1,33 @@
+@import helper.CSRF
+@import uk.gov.hmrc.play.views.html.helpers._
+@import config.FrontendAppConfig
+
+@()(implicit request: Request[_], messages: Messages)
+
+@views.html.main_template(title = "Your business details could not be found - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+
+    <header class="page-header">
+        <h1>Your business details could not be found</h1>
+    </header>
+
+    <p>This could be for a number of reasons.</p>
+
+    <h2>Business name is not an exact match</h2>
+
+    <p>
+        Your business name should match the name written on any letters you have from HMRC.
+        Check capital letters and spaces in your business name. You need to check that your
+        business name uses either 'limited' or 'LTD'.
+    </p>
+
+    <h2>Your Unique Taxpayer Reference (UTR) does not match</h2>
+
+    <p>
+        Your UTR should match the UTR on any letters you have from HMRC. If your UTR number
+        is made up of 13 digits, only enter the last 10.
+    </p>
+
+    <div class="form-field form-field--submit">
+        <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="continue">Try again</a></p>
+    </div>
+}

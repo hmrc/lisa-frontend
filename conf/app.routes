@@ -7,6 +7,7 @@ GET        /organisation-name               controllers.OrganisationDetailsContr
 POST       /organisation-name               controllers.OrganisationDetailsController.post
 GET        /reference-numbers               controllers.TradingDetailsController.get
 POST       /reference-numbers               controllers.TradingDetailsController.post
+GET        /business-match-error            controllers.MatchingFailedController.get
 GET        /business-structure              controllers.BusinessStructureController.get
 POST       /business-structure              controllers.BusinessStructureController.post
 GET        /your-details                    controllers.YourDetailsController.get
