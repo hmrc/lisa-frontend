@@ -14,12 +14,3 @@ error.lastName=Enter a valid last name.
 error.role=Enter a valid role in the organisation. You can enter up to 30 characters.
 error.phone=Enter a valid contact phone number.
 error.email=Enter a valid email address.
-
-error.matching.llp.line1=Your Company name and Partnership Unique Tax reference number do not match.
-error.matching.llp.line2=Your business name should match the name written on any letters you have from HMRC.
-error.matching.llp.line3=Your UTR number is made up of 10 or 13 digits, if it is 13 digits only enter the last 10.
-error.matching.llp.line4=Your UTR should match the UTR on any letters you have from HMRC.
-
-error.matching.corpbody.line1=Your company name and Corporation Tax reference number must both be correct.
-error.matching.corpbody.line2=Your company name must match the name written on any letters you have from HMRC.
-error.matching.corpbody.line3=Your Corporation Tax reference number must match the number on any letters you have from HMRC. It is made up of 10 or 13 digits. If it is 13 digits only enter the last 10.

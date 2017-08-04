@@ -12,28 +12,13 @@
 
         <h2 id="error-summary-heading" class="h3-heading">@Messages("validation.summary.heading")</h2>
 
-        @if(form.errors.exists(_.key == Messages("org.details.llp"))) {
-            <p>@Messages("error.matching.llp.line1")</p>
-            <p>@Messages("error.matching.llp.line2")</p>
-            <p>@Messages("error.matching.llp.line3")</p>
-            <p>@Messages("error.matching.llp.line4")</p>
-        }
-
-        @if(form.errors.exists(_.key == Messages("org.details.corpbody"))) {
-            <p>@Messages("error.matching.corpbody.line1")</p>
-            <p>@Messages("error.matching.corpbody.line2")</p>
-            <p>@Messages("error.matching.corpbody.line3")</p>
-        }
-
         <ul>
             @form.errors.map { error =>
-                @if(error.key != Messages("org.details.llp") && error.key != Messages("org.details.corpbody")) {
-                    <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error'>
-                        <a href='#@error.key.replaceAll("""[\.\[\]]""", "_")'>
-                            @Messages(error.message, error.args : _*)
-                        </a>
-                    </li>
-                }
+                <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error'>
+                    <a href='#@error.key.replaceAll("""[\.\[\]]""", "_")'>
+                        @Messages(error.message, error.args : _*)
+                    </a>
+                </li>
             }
         </ul>
     </div>
