@@ -3,7 +3,7 @@
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@atedNoAuthMain(title = Messages("label.signed_out"), userLoggedIn = false, supportLinkEnabled = false) {
+@views.html.main_template(title = "Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = None, showSignOutLink = false) {
 
 <div class="grid-row logged-out-page">
 
@@ -28,9 +28,9 @@
     @inputRadioGroup(questionnaireForm("satisfactionLevel"),
     Seq(
     "4" -> Messages("label.very_satisfied"),
-    "3" -> Messages("title.satisfied"),
+    "3" -> Messages("label.satisfied"),
     "2" -> Messages("label.neither_satisfied_or_dissatisfied"),
-    "1" -> Messages("title.dissatisfied"),
+    "1" -> Messages("label.dissatisfied"),
     "0" -> Messages("label.very_dissatisfied")
     ),
     '_legend -> Messages("label.how_satisfied_were_you_with_the_service"),

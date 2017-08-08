@@ -18,3 +18,5 @@ GET        /application-submitted           controllers.ApplicationSubmittedCont
 GET        /application-pending             controllers.ApplicationSubmittedController.pending
 GET        /application-successful          controllers.ApplicationSubmittedController.successful
 GET        /application-unsuccessful        controllers.ApplicationSubmittedController.rejected
+GET        /signed-out                      controllers.QuestionnaireController.showQuestionnaire
+POST       /signed-out                      controllers.QuestionnaireController.submitQuestionnaire
