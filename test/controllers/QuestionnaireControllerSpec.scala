@@ -16,16 +16,16 @@
 
 package controllers
 
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import org.mockito.Matchers.{eq => matcherEq, _}
-import org.mockito.Mockito._
-import play.api.test.FakeRequest
-import uk.gov.hmrc.play.http.HeaderCarrier
-import play.api.test.Helpers._
-import play.api.http.Status
+import org.mockito.Matchers.{eq => matcherEq}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.http.Status
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import services.AuditService
+import uk.gov.hmrc.play.http.HeaderCarrier
 
-class QuestionnaireControllerSpec extends PlaySpec with MockitoSugar  with OneAppPerSuite {
+class QuestionnaireControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   "Calling the QuestionnaireController.showQuestionnaire" should {
     "respond with OK" in {
@@ -34,12 +34,27 @@ class QuestionnaireControllerSpec extends PlaySpec with MockitoSugar  with OneAp
     }
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  "Calling the QuestionnaireController.submitQuestionnaire" should {
+    "respond with OK" in {
+      val result = SUT.submitQuestionnaire(fakePostRequest)
+      status(result) mustBe Status.SEE_OTHER
+    }
+  }
+  "Calling the QuestionnaireController.feedbackThankyou" should {
+    "respond with OK" in {
+      val result = SUT.feedbackThankyou(fakeRequest)
+      status(result) mustBe Status.OK
+    }
+  }
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val fakeRequest = FakeRequest("GET", "/")
+  val fakePostRequest = FakeRequest("POST", "/signed-out")
+
+  val mockAuditService: AuditService = mock[AuditService]
 
   object SUT extends QuestionnaireController {
-
+    override val auditService = mockAuditService
   }
 
 }

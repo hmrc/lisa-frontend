@@ -20,3 +20,4 @@ GET        /application-successful          controllers.ApplicationSubmittedCont
 GET        /application-unsuccessful        controllers.ApplicationSubmittedController.rejected
 GET        /signed-out                      controllers.QuestionnaireController.showQuestionnaire
 POST       /signed-out                      controllers.QuestionnaireController.submitQuestionnaire
+GET        /feedbackThankyou                controllers.QuestionnaireController.feedbackThankyou

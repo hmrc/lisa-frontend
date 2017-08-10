@@ -38,3 +38,8 @@ label.limit_is_1200_characters=(Limit is 1200 characters)
 label.please_dont_include_any_personal_or_financial_information=Do not include any personal or financial information like your National Insurance number or bank details.
 label.send_feedback=Send feedback
 label.signed_out=Lifetime Isa feedback questionnaire
+
+label.thanks_for_your_feedback=Thanks for your feedback
+label.feedback.redirect-startpage= TODO
+
+

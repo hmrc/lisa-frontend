@@ -21,10 +21,14 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 import models.Questionnaire
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
+import services.AuditService
+
 import scala.concurrent.Future
 
 
 trait QuestionnaireController extends FrontendController {
+
+  val auditService:AuditService
 
   def showQuestionnaire = Action.async { implicit request =>
     Future.successful(Ok(views.html.feedback.feedbackQuestionnaire(Questionnaire.form)))
@@ -37,12 +41,28 @@ trait QuestionnaireController extends FrontendController {
           Future.successful(BadRequest(views.html.feedback.feedbackQuestionnaire(formWithErrors))
           )
         },
-        value => {
-          Future.successful(Ok(views.html.home.home()))
+        data => {
+          auditService.audit(auditType="lisaFeedbackSurvey", path=routes.QuestionnaireController.submitQuestionnaire().url,CreateQuestionnaireAudit(data))
+          Future.successful(Redirect(routes.QuestionnaireController.feedbackThankyou()))
         }
       )
+  }
+
+  def feedbackThankyou = Action.async {
+    implicit request =>
+    Future.successful(Ok(views.html.feedback.thanks()))
+  }
+
+  private def CreateQuestionnaireAudit(survey: Questionnaire): Map[String, String] = {
+    Map(
+      "easyToUse" -> survey.easyToUse.mkString,
+      "satisfactionLevel" -> survey.satisfactionLevel.mkString,
+      "whyGiveThisRating" -> survey.whyGiveThisRating.mkString
+    )
   }
 }
 
 
-object QuestionnaireController extends QuestionnaireController
+object QuestionnaireController extends QuestionnaireController {
+  override val auditService = AuditService
+}
