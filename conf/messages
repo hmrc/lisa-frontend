@@ -14,3 +14,32 @@ error.lastName=Enter a valid last name.
 error.role=Enter a valid role in the organisation. You can enter up to 30 characters.
 error.phone=Enter a valid contact phone number.
 error.email=Enter a valid email address.
+
+##feedback
+
+label.youre_signed_out=You''re signed out
+label.youre_now_signed_out_of_your_lifetime_isa_account=You are now signed out of your Lifetime Isa account.
+label.explore_gov_uk=Explore GOV.UK
+label.satisfaction_survey=Satisfaction survey
+label.how_easy_was_the_service_to_use=How easy was the service to use?
+label.very_easy=Very easy
+label.easy=Easy
+label.neither_easy_or_difficult=Neither easy or difficult
+label.difficult=Difficult
+label.very_difficult=Very difficult
+label.how_satisfied_were_you_with_the_service=How satisfied were you with the service?
+label.very_satisfied=Very satisfied
+label.satisfied = Satisfied
+label.neither_satisfied_or_dissatisfied=Neither satisfied or dissatisfied
+label.dissatisfied = Dissatisfied
+label.very_dissatisfied=Very dissatisfied
+label.why_did_you_give_this_rating=Why did you give this rating?
+label.limit_is_1200_characters=(Limit is 1200 characters)
+label.please_dont_include_any_personal_or_financial_information=Do not include any personal or financial information like your National Insurance number or bank details.
+label.send_feedback=Send feedback
+label.signed_out=Lifetime Isa feedback questionnaire
+
+label.thanks_for_your_feedback=Thanks for your feedback
+label.feedback.redirect-startpage= TODO
+
+
