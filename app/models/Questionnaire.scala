@@ -27,13 +27,12 @@ case class Questionnaire(
                         )
 
 object Questionnaire {
-  val maxStringLength = 1200
   val maxOptionSize = 4
   val maxBooleanOptionSize = 2
   val form = Form(mapping(
     "easyToUse" -> optional(number(0, maxOptionSize)),
     "satisfactionLevel" -> optional(number(0, maxOptionSize)),
-    "whyGiveThisRating" -> optional(text(maxLength = maxStringLength)),
+    "whyGiveThisRating" -> optional(text),
     "referer" -> optional(text))(Questionnaire.apply)(Questionnaire.unapply)
   )
 }
