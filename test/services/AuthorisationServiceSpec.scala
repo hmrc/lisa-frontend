@@ -24,6 +24,8 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.Logger
+import uk.gov.hmrc.auth.core.ConfidenceLevel.L300
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -81,7 +83,7 @@ class AuthorisationServiceSpec extends PlaySpec
         val result = SUT.userStatus
 
         result map { status =>
-          status mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, ""), "Z0001")
+          status mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, ""), "Z000188")
         }
       }
 
@@ -181,6 +183,24 @@ class AuthorisationServiceSpec extends PlaySpec
         }
       }
 
+      "the user has an auth enrolment for HMRC-LISA-ORG" in {
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+          thenReturn(successfulRetrieval)
+
+        when(mockAuthConnector.authorise[Enrolments](any(),any())(any())).thenReturn(Future.successful(enrolments))
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        val result = SUT.userStatus
+
+        result map { status =>
+          Logger.debug("****** The status is " + status.toString)
+          status mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, ""), "Z0001")
+        }
+
+      }
+
     }
 
   }
@@ -198,6 +218,10 @@ class AuthorisationServiceSpec extends PlaySpec
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
   when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(None))
+
+  private val enrolmentIdentifier = EnrolmentIdentifier("ZREF","Z1234567")
+  private val enrolment = new Enrolment(key = "HMRC-LISA-ORG",identifiers = List(enrolmentIdentifier),state="Activated",confidenceLevel = L300,None)
+  private val enrolments = new Enrolments(Set(enrolment))
 
   private val subscription = TaxEnrolmentSubscription(
     created = new DateTime(),
