@@ -198,6 +198,32 @@ class AuthorisationServiceSpec extends PlaySpec
 
       }
 
+      "the user does not have an auth enrolment for HMRC-LISA-ORG" in {
+        when(mockAuthConnector.authorise[Any](any(), any())(any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(new Exception("Not authorised")))
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription)))
+
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z0001")
+
+      }
+
+      "get identifier returns error should result in TaxEnrolmentPending" in {
+        when(mockAuthConnector.authorise[Any](any(), any())(any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(brokenEnrolments))
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription.copy(state = TaxEnrolmentPending))))
+
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentPending)
+
+      }
     }
 
   }
@@ -219,6 +245,9 @@ class AuthorisationServiceSpec extends PlaySpec
   private val enrolmentIdentifier = EnrolmentIdentifier("ZREF", "Z123456")
   private val enrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated", confidenceLevel = L300, None)
   private val enrolments = new Enrolments(Set(enrolment))
+
+  val brokenEnrolment =  new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(EnrolmentIdentifier("test","test")), state = "Activated", confidenceLevel = L300, None)
+  private val brokenEnrolments = new Enrolments(Set(brokenEnrolment))
 
   private val subscription = TaxEnrolmentSubscription(
     created = new DateTime(),

@@ -33,11 +33,11 @@ trait AuthorisationService extends AuthorisedFunctions {
   val userDetailsConnector: UserDetailsConnector
   val taxEnrolmentService: TaxEnrolmentService
 
-  def enrolmentAuthorised(user: UserDetails, userId: String)(implicit hc: HeaderCarrier): Future[Either[Boolean, LisaUserStatus]] = {
+  def enrolmentAuthorised(implicit hc: HeaderCarrier): Future[Either[Boolean, String]] = {
     authorised(Enrolment("HMRC-LISA-ORG")).retrieve(authorisedEnrolments) { enr =>
       enr.getEnrolment("HMRC-LISA-ORG") match {
         case None => Future.successful(Left(false))
-        case Some(e) => Future.successful(Right(UserAuthorisedAndEnrolled(userId, user, e.getIdentifier("ZREF").get.value)))
+        case Some(e) => Future.successful(Right(e.getIdentifier("ZREF").get.value))
       }
     } recoverWith {
       case _ => Future.successful(Left(false))
@@ -54,9 +54,9 @@ trait AuthorisationService extends AuthorisedFunctions {
       userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
         val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("No groupIdentifier for user"))
 
-        enrolmentAuthorised(user, userId)(hc) flatMap { res =>
+        enrolmentAuthorised(hc) flatMap { res =>
           res match {
-            case Right(u) => Future.successful(u)
+            case Right(zref) => Future.successful(UserAuthorisedAndEnrolled(userId, user, zref))
             case Left(_) => {
               taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map {
                 case Some(s) => {
