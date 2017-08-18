@@ -19,6 +19,7 @@ package services
 import config.FrontendAuthConnector
 import connectors.UserDetailsConnector
 import models._
+import play.api.Logger
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._
@@ -29,8 +30,8 @@ import scala.concurrent.Future
 
 trait AuthorisationService extends AuthorisedFunctions {
 
-  val userDetailsConnector:UserDetailsConnector
-  val taxEnrolmentService:TaxEnrolmentService
+  val userDetailsConnector: UserDetailsConnector
+  val taxEnrolmentService: TaxEnrolmentService
 
   def enrolmentAuthorised(user: UserDetails, userId: String)(implicit hc: HeaderCarrier): Future[Either[Boolean, LisaUserStatus]] = {
     authorised(Enrolment("HMRC-LISA-ORG")).retrieve(authorisedEnrolments) { enr =>
@@ -43,42 +44,42 @@ trait AuthorisationService extends AuthorisedFunctions {
     }
   }
 
-  def userStatus(implicit hc:HeaderCarrier): Future[LisaUserStatus] = {
+  def userStatus(implicit hc: HeaderCarrier): Future[LisaUserStatus] = {
     authorised(
       AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
-    ).retrieve(internalId and userDetailsUri) {case (id ~ uri) =>
+    ).retrieve(internalId and userDetailsUri) { case (id ~ uri) =>
       val userId = id.getOrElse(throw new RuntimeException("No internalId for user"))
       val userUri = uri.getOrElse(throw new RuntimeException("No userDetailsUri for user"))
 
-       userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
+      userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
         val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("No groupIdentifier for user"))
 
-         enrolmentAuthorised(user,userId)(hc) flatMap { res => res match
-           {
-             case Right(u) => Future.successful(u)
-             case Left(_) => {
-               taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map {
-                 case Some(s) => {
-                   s.state match {
-                     case TaxEnrolmentSuccess => {
-                       val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
+        enrolmentAuthorised(user, userId)(hc) flatMap { res =>
+          res match {
+            case Right(u) => Future.successful(u)
+            case Left(_) => {
+              taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map {
+                case Some(s) => {
+                  s.state match {
+                    case TaxEnrolmentSuccess => {
+                      val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
 
-                       UserAuthorisedAndEnrolled(userId, user, zref)
-                     }
-                     case _ => {
-                       UserAuthorised(userId, user, s.state)
-                     }
-                   }
-                 }
-                 case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
-               }
-             }
-           }
-         }
+                      UserAuthorisedAndEnrolled(userId, user, zref)
+                    }
+                    case _ => {
+                      UserAuthorised(userId, user, s.state)
+                    }
+                  }
+                }
+                case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
+              }
+            }
+          }
+        }
       }
     } recover {
-      case _ : NoActiveSession => UserNotLoggedIn
-      case _ : AuthorisationException => UserUnauthorised
+      case _: NoActiveSession => UserNotLoggedIn
+      case _: AuthorisationException => UserUnauthorised
     }
   }
 
