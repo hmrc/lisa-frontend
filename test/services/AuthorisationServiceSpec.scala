@@ -21,9 +21,10 @@ import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Logger
 import uk.gov.hmrc.auth.core.ConfidenceLevel.L300
 import uk.gov.hmrc.auth.core._
@@ -33,7 +34,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AuthorisationServiceSpec extends PlaySpec
-  with MockitoSugar {
+  with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach {
+
+  override def beforeEach(): Unit = {
+    reset(mockAuthConnector)
+    reset(mockUserDetailsConnector)
+  }
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
