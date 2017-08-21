@@ -18,21 +18,26 @@ package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
 import models.ApplicationSent
+import org.apache.commons.io.FileUtils
+import services.{AuthorisationService, NotificationService}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
-import play.api.{Configuration, Environment, Play}
-import services.AuthorisationService
+import play.api.{Configuration, Environment, Logger, Play}
 
 import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
 
+  val notificationService: NotificationService
+
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
-      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).flatMap {
+      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
         case Some(application) =>
-          Future.successful(Ok(views.html.registration.application_submitted(application.email, application.subscriptionId)))
+          notificationService.sendMail(application.subscriptionId, application.email)
+          Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
+
       }
     }, checkEnrolmentState = false)
   }
@@ -51,7 +56,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
       }
     }, checkEnrolmentState = false)
   }
-  
+
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
       Future.successful(Ok(views.html.registration.application_rejected()))
@@ -60,6 +65,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
 }
 
 object ApplicationSubmittedController extends ApplicationSubmittedController {
+  override val notificationService = NotificationService
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val sessionCache = LisaSessionCache
