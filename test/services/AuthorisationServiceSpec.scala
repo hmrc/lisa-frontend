@@ -21,19 +21,28 @@ import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Logger
+import uk.gov.hmrc.auth.core.ConfidenceLevel.L300
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class AuthorisationServiceSpec extends PlaySpec
-  with MockitoSugar {
+  with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach {
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  override def beforeEach(): Unit = {
+    reset(mockAuthConnector)
+    reset(mockUserDetailsConnector)
+  }
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "user status" must {
 
@@ -46,11 +55,9 @@ class AuthorisationServiceSpec extends PlaySpec
         when(mockUserDetailsConnector.getUserDetails(any())(any())).
           thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
-        val result = SUT.userStatus
+        val result = Await.result(SUT.userStatus, Duration.Inf)
 
-        result map { status =>
-          status mustBe UserAuthorised("1234", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)
-        }
+        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentDoesNotExist)
       }
 
       "a user with a pending subscription is returned" in {
@@ -62,11 +69,9 @@ class AuthorisationServiceSpec extends PlaySpec
 
         when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription.copy(state = TaxEnrolmentPending))))
 
-        val result = SUT.userStatus
+        val result = Await.result(SUT.userStatus, Duration.Inf)
 
-        result map { status =>
-          status mustBe UserAuthorised("1234", UserDetails(None, None, ""), TaxEnrolmentPending)
-        }
+        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentPending)
       }
 
       "a user with a successful subscription is returned" in {
@@ -78,13 +83,51 @@ class AuthorisationServiceSpec extends PlaySpec
 
         when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription)))
 
-        val result = SUT.userStatus
+        val result = Await.result(SUT.userStatus, Duration.Inf)
 
-        result map { status =>
-          status mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, ""), "Z0001")
-        }
+        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z0001")
+
       }
 
+      "the user has an auth enrolment for HMRC-LISA-ORG" in {
+        when(mockAuthConnector.authorise[Any](any(), any())(any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(enrolments))
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+
+        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z123456")
+
+      }
+
+      "the user does not have an auth enrolment for HMRC-LISA-ORG" in {
+        when(mockAuthConnector.authorise[Any](any(), any())(any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(new Exception("Not authorised")))
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription)))
+
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z0001")
+
+      }
+
+      "get identifier returns error should result in TaxEnrolmentPending" in {
+        when(mockAuthConnector.authorise[Any](any(), any())(any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(brokenEnrolments))
+
+        when(mockUserDetailsConnector.getUserDetails(any())(any())).
+          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription.copy(state = TaxEnrolmentPending))))
+
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentPending)
+
+      }
     }
 
     "return user not logged in" when {
@@ -93,9 +136,9 @@ class AuthorisationServiceSpec extends PlaySpec
         when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
           thenReturn(Future.failed(new BearerTokenExpired()))
 
-        SUT.userStatus map { status =>
-          status mustBe UserNotLoggedIn
-        }
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+        result mustBe UserNotLoggedIn
       }
 
     }
@@ -106,9 +149,9 @@ class AuthorisationServiceSpec extends PlaySpec
         when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
           thenReturn(Future.failed(new InsufficientEnrolments()))
 
-        SUT.userStatus map { status =>
-          status mustBe UserUnauthorised
-        }
+        val result = Await.result(SUT.userStatus, Duration.Inf)
+
+        result mustBe UserUnauthorised
       }
 
     }
@@ -180,7 +223,6 @@ class AuthorisationServiceSpec extends PlaySpec
           e.getMessage mustBe "No zref for successful enrolment"
         }
       }
-
     }
 
   }
@@ -198,6 +240,13 @@ class AuthorisationServiceSpec extends PlaySpec
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
   when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(None))
+
+  private val enrolmentIdentifier = EnrolmentIdentifier("ZREF", "Z123456")
+  private val enrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated", confidenceLevel = L300, None)
+  private val enrolments = new Enrolments(Set(enrolment))
+
+  val brokenEnrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(EnrolmentIdentifier("test", "test")), state = "Activated", confidenceLevel = L300, None)
+  private val brokenEnrolments = new Enrolments(Set(brokenEnrolment))
 
   private val subscription = TaxEnrolmentSubscription(
     created = new DateTime(),
