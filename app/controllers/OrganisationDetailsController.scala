@@ -68,21 +68,22 @@ trait OrganisationDetailsController extends LisaBaseController {
           }
         },
         data => {
-          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
+          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { cacheres =>
 
-          shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-            case Some(businessStructure) => {
-              Logger.debug("BusinessStructure retrieved")
-              rosmService.rosmRegister(businessStructure, data).flatMap {
-                case Right(safeId) => {
-                  Logger.debug("rosmRegister Successful")
-                  shortLivedCache.cache[String](cacheId, "safeId", safeId)
-                  handleRedirect(routes.TradingDetailsController.get().url)
-                }
-                case Left(error) => {
-                  Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
-                  handleRedirect(routes.MatchingFailedController.get().url)
+            shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+              case Some(businessStructure) => {
+                Logger.debug("BusinessStructure retrieved")
+                rosmService.rosmRegister(businessStructure, data).flatMap {
+                  case Right(safeId) => {
+                    Logger.debug("rosmRegister Successful")
+                    shortLivedCache.cache[String](cacheId, "safeId", safeId)
+                    handleRedirect(routes.TradingDetailsController.get().url)
+                  }
+                  case Left(error) => {
+                    Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
+                    handleRedirect(routes.MatchingFailedController.get().url)
+                  }
                 }
               }
             }
