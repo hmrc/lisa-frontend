@@ -17,9 +17,10 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
+import connectors.EmailConnector
 import models.ApplicationSent
 import org.apache.commons.io.FileUtils
-import services.{AuthorisationService, NotificationService}
+import services.AuthorisationService
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
@@ -29,13 +30,14 @@ import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
 
-  val notificationService: NotificationService
+  val emailConnector: EmailConnector
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
       sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
         case Some(application) =>
-          notificationService.sendMail(application.subscriptionId, application.email)
+          emailConnector.sendTemplatedEmail(application.email, templateName =  "lisa_application_submit", params = Map("subscriptionId" -> application.subscriptionId, "email" -> application.email))
+
           Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
 
       }
@@ -65,7 +67,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
 }
 
 object ApplicationSubmittedController extends ApplicationSubmittedController {
-  override val notificationService = NotificationService
+  override val emailConnector: EmailConnector = EmailConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val sessionCache = LisaSessionCache
