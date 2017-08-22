@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import connectors.EmailConnector
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -141,6 +142,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
+  val mockEmailConnector: EmailConnector = mock[EmailConnector]
 
   object SUT extends ApplicationSubmittedController {
     override val config: Configuration = mockConfig
@@ -148,6 +150,8 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
     override val shortLivedCache: ShortLivedCache = mockCache
     override val sessionCache: SessionCache = mockSessionCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
+
+    override val emailConnector: EmailConnector = mockEmailConnector
   }
 
   when(mockConfig.getString(matches("^appName$"), any())).

@@ -17,22 +17,29 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
+import connectors.EmailConnector
 import models.ApplicationSent
+import org.apache.commons.io.FileUtils
+import services.AuthorisationService
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc._
-import play.api.{Configuration, Environment, Play}
-import services.AuthorisationService
+import play.api.{Configuration, Environment, Logger, Play}
 
 import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
 
+  val emailConnector: EmailConnector
+
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
-      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).flatMap {
+      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
         case Some(application) =>
-          Future.successful(Ok(views.html.registration.application_submitted(application.email, application.subscriptionId)))
+          emailConnector.sendTemplatedEmail(application.email, templateName =  "lisa_application_submit", params = Map("subscriptionId" -> application.subscriptionId, "email" -> application.email))
+
+          Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
+
       }
     }, checkEnrolmentState = false)
   }
@@ -51,7 +58,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
       }
     }, checkEnrolmentState = false)
   }
-  
+
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
       Future.successful(Ok(views.html.registration.application_rejected()))
@@ -60,6 +67,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
 }
 
 object ApplicationSubmittedController extends ApplicationSubmittedController {
+  override val emailConnector: EmailConnector = EmailConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val sessionCache = LisaSessionCache
