@@ -48,7 +48,6 @@ trait YourDetailsController extends LisaBaseController {
         },
         data => {
           shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data).flatMap { cacheres =>
-
             handleRedirect(routes.SummaryController.get().url)
           }
         }

@@ -45,7 +45,6 @@ trait BusinessStructureController extends LisaBaseController {
         },
         data => {
           shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data).flatMap { cachres =>
-
             handleRedirect(routes.OrganisationDetailsController.get().url)
           }
         }

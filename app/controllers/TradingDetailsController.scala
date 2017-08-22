@@ -41,14 +41,12 @@ trait TradingDetailsController extends LisaBaseController {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
       TradingDetails.form.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
         },
         data => {
           shortLivedCache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, data).flatMap { cacheres =>
-
             handleRedirect(routes.YourDetailsController.get().url)
           }
         }
