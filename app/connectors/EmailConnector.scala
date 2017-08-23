@@ -17,6 +17,7 @@
 package connectors
 
 import config.WSHttp
+import metrics.EmailMetrics
 import models.SendEmailRequest
 import play.api.Logger
 import play.api.http.Status._
@@ -51,10 +52,13 @@ trait EmailConnector extends ServicesConfig with RawResponseReads {
     http.POST(postUrl, jsonData).map { response =>
       response.status match {
         case ACCEPTED => {
+          Logger.info("Email sent successfully.")
+          EmailMetrics.emailSentCounter()
           EmailSent
         }
         case status => {
-          Logger.warn("email failed")
+          Logger.warn("Email not sent.")
+          EmailMetrics.emailNotSentCounter()
           EmailNotSent
         }
       }
