@@ -36,7 +36,7 @@ trait ApplicationSubmittedController extends LisaBaseController {
     authorisedForLisa((_) => {
       sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
         case Some(application) =>
-          emailConnector.sendTemplatedEmail(application.email, templateName =  "lisa_application_submit", params = Map("subscriptionId" -> application.subscriptionId, "email" -> application.email))
+          emailConnector.sendTemplatedEmail(application.email, templateName =  "lisa_application_submit", params = Map("application_reference" -> application.subscriptionId, "email" -> application.email))
 
           Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
 

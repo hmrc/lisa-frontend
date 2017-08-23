@@ -21,7 +21,6 @@ import models.SendEmailRequest
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpPut}
 
