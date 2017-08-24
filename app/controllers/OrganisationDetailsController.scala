@@ -20,7 +20,6 @@ import config.{FrontendAuthConnector, LisaSessionCache, LisaShortLivedCache}
 import models.OrganisationDetails._
 import models._
 import play.api.Play.current
-import play.api.data.FormError
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
@@ -30,9 +29,9 @@ import services.{AuthorisationService, RosmService}
 import scala.concurrent.Future
 
 trait OrganisationDetailsController extends LisaBaseController {
-  val rosmService:RosmService
+  val rosmService: RosmService
 
-  private def businessLabels(businessStructure:  BusinessStructure): String = {
+  private def businessLabels(businessStructure: BusinessStructure): String = {
     val acceptableValues = Map(
       Messages("org.details.corpbody") -> "Corporation Tax reference number",
       Messages("org.details.llp") -> "Partnership Unique Tax reference number"
@@ -68,21 +67,21 @@ trait OrganisationDetailsController extends LisaBaseController {
           }
         },
         data => {
-          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data)
-
-          shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-            case Some(businessStructure) => {
-              Logger.debug("BusinessStructure retrieved")
-              rosmService.rosmRegister(businessStructure, data).flatMap {
-                case Right(safeId) => {
-                  Logger.debug("rosmRegister Successful")
-                  shortLivedCache.cache[String](cacheId, "safeId", safeId)
-                  handleRedirect(routes.TradingDetailsController.get().url)
-                }
-                case Left(error) => {
-                  Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
-                  handleRedirect(routes.MatchingFailedController.get().url)
+          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { cacheres =>
+            shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+              case Some(businessStructure) => {
+                Logger.debug("BusinessStructure retrieved")
+                rosmService.rosmRegister(businessStructure, data).flatMap {
+                  case Right(safeId) => {
+                    Logger.debug("rosmRegister Successful")
+                    shortLivedCache.cache[String](cacheId, "safeId", safeId)
+                    handleRedirect(routes.TradingDetailsController.get().url)
+                  }
+                  case Left(error) => {
+                    Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
+                    handleRedirect(routes.MatchingFailedController.get().url)
+                  }
                 }
               }
             }

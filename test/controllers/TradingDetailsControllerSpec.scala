@@ -27,13 +27,13 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -115,6 +115,7 @@ class TradingDetailsControllerSpec extends PlaySpec
           "isaProviderRefNumber" -> "Z1234"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
+        when(mockCache.cache[TradingDetails](any(),any(),any())(any(),any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER

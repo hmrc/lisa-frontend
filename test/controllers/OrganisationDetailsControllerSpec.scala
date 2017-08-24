@@ -27,13 +27,13 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
 import services.{AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -168,6 +168,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
+        when(mockCache.cache[OrganisationDetails](any(),any(),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
@@ -235,6 +236,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
+        when(mockCache.cache[OrganisationDetails](any(),any(),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))

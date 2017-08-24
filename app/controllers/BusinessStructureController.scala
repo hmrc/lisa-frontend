@@ -44,9 +44,9 @@ trait BusinessStructureController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.business_structure(formWithErrors)))
         },
         data => {
-          shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data)
-
-          handleRedirect(routes.OrganisationDetailsController.get().url)
+          shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data).flatMap { cachres =>
+            handleRedirect(routes.OrganisationDetailsController.get().url)
+          }
         }
       )
     }
