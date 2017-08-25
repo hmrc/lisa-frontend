@@ -36,11 +36,20 @@ trait AuthorisationService extends AuthorisedFunctions {
   def enrolmentAuthorised(implicit hc: HeaderCarrier): Future[Either[Boolean, String]] = {
     authorised(Enrolment("HMRC-LISA-ORG")).retrieve(authorisedEnrolments) { enr =>
       enr.getEnrolment("HMRC-LISA-ORG") match {
-        case None => Future.successful(Left(false))
-        case Some(e) => Future.successful(Right(e.getIdentifier("ZREF").get.value))
+        case None => {
+          Logger.warn("Authorised but no enrolment object")
+          Future.successful(Left(false))
+        }
+        case Some(e) => {
+          Logger.info("Got enrolment object for HMRC-LISA-ORG")
+          Future.successful(Right(e.getIdentifier("ZREF").get.value))
+        }
       }
     } recoverWith {
-      case _ => Future.successful(Left(false))
+      case _ => {
+        Logger.warn("The enrolment is not authorised")
+        Future.successful(Left(false))
+      }
     }
   }
 
@@ -56,10 +65,17 @@ trait AuthorisationService extends AuthorisedFunctions {
 
         enrolmentAuthorised(hc) flatMap { res =>
           res match {
-            case Right(zref) => Future.successful(UserAuthorisedAndEnrolled(userId, user, zref))
+            case Right(zref) => {
+              Logger.info("HMRC-LISA-ORG Enrolment is Authorised")
+              Future.successful(UserAuthorisedAndEnrolled(userId, user, zref))
+            }
             case Left(_) => {
+
+              Logger.info("The enrolment has not been authorised yet so checking Enrolments service the group id is " + groupId)
               taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map {
+
                 case Some(s) => {
+                  Logger.info("The enrolments service came back with " + s.state.toString)
                   s.state match {
                     case TaxEnrolmentSuccess => {
                       val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
