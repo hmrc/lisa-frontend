@@ -55,7 +55,6 @@ trait QuestionnaireController extends FrontendController {
 
   private def CreateQuestionnaireAudit(survey: Questionnaire): Map[String, String] = {
     Map(
-      "easyToUse" -> survey.easyToUse.mkString,
       "satisfactionLevel" -> survey.satisfactionLevel.mkString,
       "whyGiveThisRating" -> survey.whyGiveThisRating.mkString
     )

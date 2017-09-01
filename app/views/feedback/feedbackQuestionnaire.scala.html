@@ -15,19 +15,6 @@
         <h2 class="heading-medium" id="satisfaction-survey-heading">@Messages("label.satisfaction_survey")</h2>
         @helpers.form(action = controllers.routes.QuestionnaireController.submitQuestionnaire, 'class -> "satisfactionSurveyForm") {
 
-        @inputRadioGroup(questionnaireForm("easyToUse"),
-        Seq(
-        "4" -> Messages("label.very_easy"),
-        "3" -> Messages("label.easy"),
-        "2" -> Messages("label.neither_easy_or_difficult"),
-        "1" -> Messages("label.difficult"),
-        "0" -> Messages("label.very_difficult")
-        ),
-        '_legend -> Messages("label.how_easy_was_the_service_to_use"),
-        '_labelAfter -> true,
-        '_fieldsetAttributes -> "id=easyToUseFieldset"
-        )
-        <div><br></div>
         @inputRadioGroup(questionnaireForm("satisfactionLevel"),
         Seq(
         "4" -> Messages("label.very_satisfied"),
