@@ -31,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
+import uk.gov.hmrc.auth.core.{AuthorisationException, InvalidBearerToken}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
@@ -77,15 +78,24 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
-    "redirect to error page" when {
+    "handle exceptions correctly" when {
 
-      "getting the user status fails" in {
+      "an exception related to auth occurs" in {
         when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.failed(new RuntimeException("No internalId for user")))
+          thenReturn(Future.failed(new InvalidBearerToken()))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ErrorController.error().url)
+      }
+
+      "any other exceptions occur" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.failed(new RuntimeException("Runtime issue")))
+
+        assertThrows[RuntimeException] {
+          await(SUT.testAuthorisation(fakeRequest))
+        }
       }
 
     }

@@ -95,6 +95,9 @@ class YourDetailsControllerSpec extends PlaySpec
 
     before {
       reset(mockCache)
+
+      when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+        thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
     }
 
     "return validation errors" when {
@@ -134,6 +137,9 @@ class YourDetailsControllerSpec extends PlaySpec
 
     "store your details in cache" when {
       "the submitted data is valid" in {
+        when(mockAuthorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+
         val uri = controllers.routes.YourDetailsController.post().url
         val validJson = Json.obj(
           "firstName" -> "Test",
@@ -142,7 +148,9 @@ class YourDetailsControllerSpec extends PlaySpec
           "phone" -> "0191 123 4567",
           "email" -> "test@test.com"
         )
+
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
+
         await(SUT.post(request))
 
         verify(mockCache).cache[YourDetails](any(), any(), any())(any(), any())

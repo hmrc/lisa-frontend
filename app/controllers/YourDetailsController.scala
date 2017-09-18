@@ -47,7 +47,7 @@ trait YourDetailsController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
         },
         data => {
-          shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data).flatMap { cacheres =>
+          shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data).flatMap { _ =>
             handleRedirect(routes.SummaryController.get().url)
           }
         }

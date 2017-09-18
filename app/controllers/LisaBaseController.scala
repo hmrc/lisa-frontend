@@ -21,6 +21,7 @@ import models._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
+import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
@@ -43,8 +44,9 @@ trait LisaBaseController extends FrontendController
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
     } recover {
-      case NonFatal(ex: Throwable) => {
+      case ex: AuthorisationException => {
         Logger.warn(s"Auth error: ${ex.getMessage}")
+
         Redirect(routes.ErrorController.error())
       }
     }

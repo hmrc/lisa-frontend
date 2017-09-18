@@ -117,6 +117,9 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
     before {
       reset(mockCache)
+
+      when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+        thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
     }
 
     "return validation errors" when {
