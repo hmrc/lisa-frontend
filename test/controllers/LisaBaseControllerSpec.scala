@@ -78,28 +78,6 @@ class LisaBaseControllerSpec extends PlaySpec
 
     }
 
-    "handle exceptions correctly" when {
-
-      "an exception related to auth occurs" in {
-        when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.failed(new InvalidBearerToken()))
-
-        val result = SUT.testAuthorisation(fakeRequest)
-
-        redirectLocation(result) mustBe Some(routes.ErrorController.error().url)
-      }
-
-      "any other exceptions occur" in {
-        when(mockAuthorisationService.userStatus(any())).
-          thenReturn(Future.failed(new RuntimeException("Runtime issue")))
-
-        assertThrows[RuntimeException] {
-          await(SUT.testAuthorisation(fakeRequest))
-        }
-      }
-
-    }
-
     "redirect to pending subscription" when {
 
       "an authorised user has a pending subscription" in {
