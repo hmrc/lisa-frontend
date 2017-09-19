@@ -34,12 +34,4 @@ class ErrorControllerSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
   }
 
-  "GET /error" should {
-    "return 500" in {
-      val result = ErrorController.error(fakeRequest)
-      status(result) mustBe Status.INTERNAL_SERVER_ERROR
-      contentAsString(result) must include("<h1>An error occurred</h1>")
-    }
-  }
-
 }

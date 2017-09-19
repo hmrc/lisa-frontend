@@ -26,7 +26,6 @@ import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 trait LisaBaseController extends FrontendController
   with Redirects {
@@ -42,11 +41,6 @@ trait LisaBaseController extends FrontendController
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
-    } recover {
-      case NonFatal(ex: Throwable) => {
-        Logger.warn(s"Auth error: ${ex.getMessage}")
-        Redirect(routes.ErrorController.error())
-      }
     }
   }
 

@@ -238,7 +238,7 @@ class RosmControllerSpec extends PlaySpec
 
         val result = SUT.get(fakeRequest)
 
-        redirectLocation(result) must be(Some(routes.ErrorController.error().url))
+        status(result) mustBe INTERNAL_SERVER_ERROR
       }
 
     }
