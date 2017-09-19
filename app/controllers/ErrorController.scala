@@ -32,10 +32,6 @@ trait ErrorController extends FrontendController
     Future.successful(Forbidden(views.html.error.access_denied(ggLoginUrl + "?origin=lisa-api&continue=/lifetime-isa/register/organisation-details")))
   }
 
-  val error: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(InternalServerError(views.html.error.internal_server_error()))
-  }
-
 }
 
 object ErrorController extends ErrorController {

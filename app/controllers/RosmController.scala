@@ -22,7 +22,11 @@ import models.{ApplicationSent, LisaRegistration}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
 import services.{AuditService, AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.SessionCache
+import play.api.Play.current
+import play.api.i18n.Messages
+import play.api.i18n.Messages.Implicits._
+
+import scala.concurrent.Future
 
 trait RosmController extends LisaBaseController
   with RosmJsonFormats {
@@ -56,7 +60,10 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
-            Redirect(routes.ErrorController.error())
+            InternalServerError(views.html.error_template(
+              Messages("global.error.InternalServerError500.title"),
+              Messages("global.error.InternalServerError500.heading"),
+              Messages("global.error.InternalServerError500.message")))
           }
         }
       }

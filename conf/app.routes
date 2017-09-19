@@ -3,7 +3,6 @@
 
 GET        /                                controllers.HomePageController.home
 GET        /access-denied                   controllers.ErrorController.accessDenied
-GET        /error                           controllers.ErrorController.error
 GET        /organisation-name               controllers.OrganisationDetailsController.get
 POST       /organisation-name               controllers.OrganisationDetailsController.post
 GET        /reference-numbers               controllers.TradingDetailsController.get
