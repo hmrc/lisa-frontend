@@ -20,6 +20,7 @@ import java.io.File
 
 import helpers.CSRFTest
 import models.{BusinessStructure, OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -120,6 +121,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
+
+      reset(mockRosmService)
     }
 
     "return validation errors" when {
@@ -251,6 +254,32 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         await(SUT.post(request))
 
         verify(mockCache).cache[OrganisationDetails](any(), matcherEq("safeId"), any())(any(), any())
+      }
+
+    }
+
+    "submit a registration for a corporate body" when {
+
+      "the user has identified their business as a friendly society" in {
+
+        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
+
+        when(mockCache.cache[OrganisationDetails](any(),any(),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+          thenReturn(Future.successful(Some(new BusinessStructure("Friendly Society"))))
+
+        when(mockRosmService.rosmRegister(any(),any())(any())).
+          thenReturn(Future.successful(Right("3456789")))
+
+        val captor = ArgumentCaptor.forClass(classOf[BusinessStructure])
+
+        await(SUT.post(request))
+
+        verify(mockRosmService).rosmRegister(captor.capture(), any())(any())
+
+        captor.getValue() mustBe BusinessStructure("Corporate Body")
+
       }
 
     }

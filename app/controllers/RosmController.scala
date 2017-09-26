@@ -47,7 +47,7 @@ trait RosmController extends LisaBaseController
 
             val applicationSentVM = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
 
-            sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM)
+            sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM).
 
             shortLivedCache.remove(cacheId)
 

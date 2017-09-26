@@ -4,6 +4,8 @@ org.details.llp.view=Limited Liability Partnership
 org.details.llp=LLP
 org.details.corpbody.view=Limited Company
 org.details.corpbody=Corporate Body
+org.details.friendlysoc.view=Friendly Society
+org.details.friendlysoc=Friendly Society
 
 error.companyName=Enter a valid company name.
 error.ctrNumber=Enter a unique tax reference number that is 10 characters long.
