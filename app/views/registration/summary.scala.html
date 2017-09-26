@@ -18,8 +18,12 @@
             <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-businessStructure">
                 @if(data.businessStructure.businessStructure == Messages("org.details.llp")) {
                     @Messages("org.details.llp.view")
-                } else {
-                    @Messages("org.details.corpbody.view")
+                }else {
+                    @if(data.businessStructure.businessStructure == Messages("org.details.friendlysoc")) {
+                        @Messages("org.details.friendlysoc.view")
+                    }else {
+                        @Messages("org.details.corpbody.view")
+                    }
                 }
             </span>
         </div>

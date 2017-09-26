@@ -34,6 +34,7 @@ trait OrganisationDetailsController extends LisaBaseController {
   private def businessLabels(businessStructure: BusinessStructure): String = {
     val acceptableValues = Map(
       Messages("org.details.corpbody") -> "Corporation Tax reference number",
+      Messages("org.details.friendlysoc") -> "Corporation Tax reference number",
       Messages("org.details.llp") -> "Partnership Unique Tax reference number"
     )
 
@@ -71,7 +72,7 @@ trait OrganisationDetailsController extends LisaBaseController {
             shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
               case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
               case Some(businessStructure) => {
-                Logger.debug("BusinessStructure retrieved")
+                Logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId) => {
                     Logger.debug("rosmRegister Successful")

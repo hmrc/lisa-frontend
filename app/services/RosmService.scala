@@ -31,19 +31,26 @@ trait RosmService extends RosmJsonFormats{
   val rosmConnector:RosmConnector
 
   private def handleErrorResponse(response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
-      case failureResponse: JsSuccess[DesFailureResponse] =>
-        Logger.error(s"Des FailureResponse : ${failureResponse.get.code}")
-        Left(failureResponse.get.code)
-      case _: JsError => Logger.error("JsError in Response")
-        Left("INTERNAL_SERVER_ERROR")
-    }
+    case failureResponse: JsSuccess[DesFailureResponse] =>
+      Logger.error(s"Des FailureResponse : ${failureResponse.get.code}")
+      Left(failureResponse.get.code)
+    case _: JsError => Logger.error("JsError in Response")
+      Left("INTERNAL_SERVER_ERROR")
+  }
+
+  private def getRosmBusinessStructure(input: BusinessStructure): String = {
+    if (input.businessStructure == "Friendly Society")
+      "Corporate Body"
+    else
+      input.businessStructure
+  }
 
   def rosmRegister(businessStructure:BusinessStructure, orgDetails: OrganisationDetails)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
   {
-    val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName,businessStructure.businessStructure))
+    val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName, getRosmBusinessStructure(businessStructure)))
 
-    rosmConnector.registerOnce(orgDetails.ctrNumber , rosmRegistration).map { res =>
-      Logger.debug("response  recieved from :registerOnce ")
+    rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
+      Logger.debug("response received from: registerOnce")
       res.json.validate[RosmRegistrationSuccessResponse] match {
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
         case _ : JsError => handleErrorResponse(res)
