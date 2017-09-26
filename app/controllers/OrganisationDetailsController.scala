@@ -41,13 +41,6 @@ trait OrganisationDetailsController extends LisaBaseController {
     acceptableValues(businessStructure.businessStructure)
   }
 
-  private def transformBusinessStructure(input: BusinessStructure): BusinessStructure = {
-    if (input == BusinessStructure("Friendly Society"))
-      BusinessStructure("Corporate Body")
-    else
-      input
-  }
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
@@ -80,11 +73,7 @@ trait OrganisationDetailsController extends LisaBaseController {
               case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
               case Some(businessStructure) => {
                 Logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
-
-                val modifiedBusinessStructure = transformBusinessStructure(businessStructure)
-
-                Logger.debug(s"Submitting BusinessStructure as: ${modifiedBusinessStructure.businessStructure}")
-                rosmService.rosmRegister(modifiedBusinessStructure, data).flatMap {
+                rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId) => {
                     Logger.debug("rosmRegister Successful")
                     shortLivedCache.cache[String](cacheId, "safeId", safeId)

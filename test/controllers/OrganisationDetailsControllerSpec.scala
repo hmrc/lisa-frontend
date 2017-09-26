@@ -258,32 +258,6 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
     }
 
-    "submit a registration for a corporate body" when {
-
-      "the user has identified their business as a friendly society" in {
-
-        val uri = controllers.routes.OrganisationDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
-
-        when(mockCache.cache[OrganisationDetails](any(),any(),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Friendly Society"))))
-
-        when(mockRosmService.rosmRegister(any(),any())(any())).
-          thenReturn(Future.successful(Right("3456789")))
-
-        val captor = ArgumentCaptor.forClass(classOf[BusinessStructure])
-
-        await(SUT.post(request))
-
-        verify(mockRosmService).rosmRegister(captor.capture(), any())(any())
-
-        captor.getValue() mustBe BusinessStructure("Corporate Body")
-
-      }
-
-    }
-
   }
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
