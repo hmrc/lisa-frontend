@@ -20,7 +20,6 @@ import java.io.File
 
 import helpers.CSRFTest
 import models.{BusinessStructure, OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -121,8 +120,6 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
-
-      reset(mockRosmService)
     }
 
     "return validation errors" when {
