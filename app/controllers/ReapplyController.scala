@@ -22,12 +22,14 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment, Play}
 import services.AuthorisationService
 
-import scala.concurrent.Future
-
 trait ReapplyController extends LisaBaseController {
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisationService.userStatus flatMap {
-      case user: UserAuthorised => Future.successful(Redirect(routes.BusinessStructureController.get()))
+      case user: UserAuthorised => {
+        shortLivedCache.cache[Boolean](s"${user.internalId}-lisa-registration","reapplication",true) map { res =>
+         Redirect(routes.BusinessStructureController.get())
+        }
+      }
     }
   }
 }

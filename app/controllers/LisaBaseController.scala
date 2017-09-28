@@ -18,6 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import models._
+import org.apache.commons.io.filefilter.FalseFileFilter
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
@@ -40,7 +41,19 @@ trait LisaBaseController extends FrontendController
       case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
-      case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
+      case user: UserAuthorised =>  getCheckEnrolmentState(user, checkEnrolmentState) flatMap { bool =>
+        handleUserAuthorised(callback, bool, user)
+      }
+    }
+  }
+
+  private def getCheckEnrolmentState(user: UserAuthorised, checkEnrolmentState: Boolean)(implicit request: Request[AnyContent]): Future[Boolean] = {
+    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", "reapplication") map { bool =>
+      bool
+      match {
+          case Some(true) => false
+          case _ => checkEnrolmentState
+      }
     }
   }
 

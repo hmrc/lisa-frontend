@@ -246,4 +246,6 @@ class LisaBaseControllerSpec extends PlaySpec
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
 
+  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+
 }

@@ -51,7 +51,9 @@ class BusinessStructureControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val form = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any())).
           thenReturn(Future.successful(Some(form)))
 
         val result = SUT.get(fakeRequest)
@@ -69,7 +71,9 @@ class BusinessStructureControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -93,6 +97,8 @@ class BusinessStructureControllerSpec extends PlaySpec
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
+
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
     }
 
     "return validation errors" when {
@@ -168,5 +174,6 @@ class BusinessStructureControllerSpec extends PlaySpec
 
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
+
 
 }

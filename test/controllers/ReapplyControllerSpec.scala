@@ -29,9 +29,10 @@ import models.{TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.libs.json.JsValue
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import play.api.test.Helpers._
 
 import scala.concurrent.Future
@@ -42,6 +43,9 @@ class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppP
 
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
+
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(true)))
+
       val result = SUT.get(fakeRequest)
 
       status(result) mustBe Status.SEE_OTHER
@@ -58,6 +62,9 @@ class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppP
 
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+
+  when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+    thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
 
   object SUT extends ReapplyController {
     override val config: Configuration = mockConfig

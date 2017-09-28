@@ -54,6 +54,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
@@ -75,6 +77,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
@@ -96,6 +100,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "redirect the user to business structure" when {
 
       "The business structure details are missing from the cache" in {
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(None))
 
@@ -117,6 +123,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
 
     before {
       reset(mockCache)
+
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
@@ -172,7 +180,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
         when(mockCache.cache[OrganisationDetails](any(),any(),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
         when(mockRosmService.rosmRegister(any(),any())(any())).
@@ -194,7 +203,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
         when(mockRosmService.rosmRegister(any(), any())(any())).
@@ -219,7 +228,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
         when(mockRosmService.rosmRegister(any(),any())(any())).
@@ -240,9 +249,9 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(mockCache.cache[OrganisationDetails](any(),any(),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
+        when(mockCache.cache[OrganisationDetails](any(),org.mockito.Matchers.eq(organisationDetailsCacheKey),any())(any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
         when(mockRosmService.rosmRegister(any(),any())(any())).
