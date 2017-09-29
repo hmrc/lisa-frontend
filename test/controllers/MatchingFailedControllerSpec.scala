@@ -77,6 +77,6 @@ class MatchingFailedControllerSpec extends PlaySpec
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
 }

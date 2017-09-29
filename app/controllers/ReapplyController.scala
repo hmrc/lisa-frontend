@@ -25,7 +25,7 @@ import services.AuthorisationService
 trait ReapplyController extends LisaBaseController {
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( (cacheId) =>{
-        shortLivedCache.cache[Boolean](cacheId,Reapplication.cachKey,true) map { res =>
+        shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { res =>
          Redirect(routes.BusinessStructureController.get())
         }
       }, checkEnrolmentState = false

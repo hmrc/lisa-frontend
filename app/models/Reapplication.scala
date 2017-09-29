@@ -17,5 +17,5 @@
 package models
 
 object Reapplication {
-  val cachKey: String = "reapplication"
+  val cacheKey: String = "reapplication"
 }
