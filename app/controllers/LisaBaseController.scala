@@ -44,33 +44,45 @@ trait LisaBaseController extends FrontendController
     }
   }
 
+  private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] = {
+    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", Reapplication.cacheKey) map { bool =>
+      bool
+      match {
+        case Some(true) => true
+        case _ => false
+      }
+    }
+  }
+
+
   private def handleUserAuthorised(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
                                   (implicit request: Request[AnyContent]): Future[Result] = {
     Logger.warn("User Authorised")
-
-    if (checkEnrolmentState) {
-      user.enrolmentState match {
-        case TaxEnrolmentPending => {
-          Logger.warn("Enrollment Pending")
-          Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
-        }
-        case TaxEnrolmentError => {
-          Logger.warn("Enrollment Rejected")
-          Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-        }
-        case TaxEnrolmentDoesNotExist => {
-          Logger.warn("Enrollment Does Not Exist")
-          callback(s"${user.internalId}-lisa-registration")
+    isReapplication(user) flatMap { isReapplication =>
+      if (checkEnrolmentState && !isReapplication) {
+        user.enrolmentState match {
+          case TaxEnrolmentPending => {
+            Logger.warn("Enrollment Pending")
+            Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+          }
+          case TaxEnrolmentError => {
+            Logger.warn("Enrollment Rejected")
+            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+          }
+          case TaxEnrolmentDoesNotExist => {
+            Logger.warn("Enrollment Does Not Exist")
+            callback(s"${user.internalId}-lisa-registration")
+          }
         }
       }
-    }
-    else {
-      callback(s"${user.internalId}-lisa-registration")
+      else {
+        callback(s"${user.internalId}-lisa-registration")
+      }
     }
   }
 
   private def handleUserAuthorisedAndEnrolled(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
-                                            (implicit request: Request[AnyContent]): Future[Result] = {
+                                             (implicit request: Request[AnyContent]): Future[Result] = {
     Logger.warn("User Authorised And Enrolled")
 
     if (checkEnrolmentState) {

@@ -56,7 +56,9 @@ class YourDetailsControllerSpec extends PlaySpec
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+
+        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
         val result = SUT.get(fakeRequest)
@@ -74,6 +76,8 @@ class YourDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+
         when(mockCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any())).
           thenReturn(Future.successful(None))
 
@@ -95,6 +99,8 @@ class YourDetailsControllerSpec extends PlaySpec
 
     before {
       reset(mockCache)
+
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))

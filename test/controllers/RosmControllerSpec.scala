@@ -51,6 +51,7 @@ class RosmControllerSpec extends PlaySpec
       reset(mockCache)
       reset(mockRosmConnector)
       reset(mockAuditService)
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
     }
 
     val organisationDetailsCacheKey = "organisationDetails"
@@ -60,6 +61,8 @@ class RosmControllerSpec extends PlaySpec
 
     "redirect the user to business structure" when {
       "no business structure details are found in the cache" in {
+
+
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(None))
 
@@ -438,4 +441,5 @@ class RosmControllerSpec extends PlaySpec
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
 
-}
+
+  }
