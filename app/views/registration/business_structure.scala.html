@@ -2,15 +2,12 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.error.errorSummaryOrgTemplate
 
-@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages)
+@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages,  title: String = "Select your business structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
-@contentHeader = {
-    <h1>Select your business structure</h1>
-}
+@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
-@views.html.main_template(title = "Select your business structure - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader)) {
-
-    @errorSummaryOrgTemplate(form)
+@errorSummaryOrgTemplate(form)
+<h1>Select your business structure</h1>
 
     <form method="post">
         @CSRF.formField
