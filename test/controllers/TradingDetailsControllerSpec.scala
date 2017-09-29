@@ -51,7 +51,7 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val tradingForm = new TradingDetails(fsrRefNumber = "123456", isaProviderRefNumber = "Z1234")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
@@ -71,7 +71,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any())).
           thenReturn(Future.successful(None))
@@ -95,7 +95,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     before {
       reset(mockCache)
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))

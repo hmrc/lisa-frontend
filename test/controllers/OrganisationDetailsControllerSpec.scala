@@ -19,7 +19,7 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{BusinessStructure, OrganisationDetails, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models._
 import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -54,7 +54,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
@@ -77,7 +77,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
@@ -100,7 +100,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     "redirect the user to business structure" when {
 
       "The business structure details are missing from the cache" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any())).
           thenReturn(Future.successful(None))
@@ -124,7 +124,7 @@ class OrganisationDetailsControllerSpec extends PlaySpec
     before {
       reset(mockCache)
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))

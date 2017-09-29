@@ -51,7 +51,7 @@ class RosmControllerSpec extends PlaySpec
       reset(mockCache)
       reset(mockRosmConnector)
       reset(mockAuditService)
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
     }
 
     val organisationDetailsCacheKey = "organisationDetails"

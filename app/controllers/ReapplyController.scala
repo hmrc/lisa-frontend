@@ -17,6 +17,7 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
+import models.Reapplication
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment, Play}
 import services.AuthorisationService
@@ -24,7 +25,7 @@ import services.AuthorisationService
 trait ReapplyController extends LisaBaseController {
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( (cacheId) =>{
-        shortLivedCache.cache[Boolean](cacheId,"reapplication",true) map { res =>
+        shortLivedCache.cache[Boolean](cacheId,Reapplication.cachKey,true) map { res =>
          Redirect(routes.BusinessStructureController.get())
         }
       }, checkEnrolmentState = false

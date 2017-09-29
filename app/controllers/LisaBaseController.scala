@@ -48,7 +48,7 @@ trait LisaBaseController extends FrontendController
   }
 
   private def getCheckEnrolmentState(user: UserAuthorised, checkEnrolmentState: Boolean)(implicit request: Request[AnyContent]): Future[Boolean] = {
-    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", "reapplication") map { bool =>
+    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", Reapplication.cachKey) map { bool =>
       bool
       match {
           case Some(true) => false

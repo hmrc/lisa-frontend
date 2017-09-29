@@ -25,7 +25,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, status}
 import helpers.CSRFTest
-import models.{TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -44,7 +44,7 @@ class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppP
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(true)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(true)))
 
       val result = SUT.get(fakeRequest)
 

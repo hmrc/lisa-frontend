@@ -19,7 +19,7 @@ package controllers
 import java.io.File
 
 import helpers.CSRFTest
-import models.{BusinessStructure, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
@@ -51,7 +51,7 @@ class BusinessStructureControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val form = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any())).
           thenReturn(Future.successful(Some(form)))
@@ -71,7 +71,7 @@ class BusinessStructureControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
 
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any())).
           thenReturn(Future.successful(None))
@@ -98,7 +98,7 @@ class BusinessStructureControllerSpec extends PlaySpec
       when(mockCache.cache[Any](any(), any(), any())(any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq("reapplication"))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cachKey))(any(), any())).thenReturn(Future.successful(Some(false)))
     }
 
     "return validation errors" when {
