@@ -18,7 +18,6 @@ package controllers
 
 import config.FrontendAppConfig
 import models._
-import org.apache.commons.io.filefilter.FalseFileFilter
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
