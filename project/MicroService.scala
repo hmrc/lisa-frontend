@@ -3,7 +3,11 @@ import sbt.Tests.{SubProcess, Group}
 import sbt._
 import play.routes.compiler.StaticRoutesGenerator
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
-
+import com.typesafe.sbt.web.Import._
+import com.typesafe.sbt.web.Import.WebKeys._
+import net.ground5hark.sbt.concat.Import._
+import com.typesafe.sbt.uglify.Import._
+import com.typesafe.sbt.digest.Import._
 
 trait MicroService {
 
@@ -75,6 +79,10 @@ trait MicroService {
       Resolver.bintrayRepo("hmrc", "releases"),
       Resolver.jcenterRepo
     ))
+    .settings(
+      pipelineStages := Seq(digest),
+      pipelineStages in Assets := Seq(concat,uglify)
+    )
 }
 
 private object TestPhases {
