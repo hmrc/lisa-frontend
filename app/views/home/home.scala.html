@@ -1,14 +1,11 @@
 @()(implicit request: Request[_], messages: Messages)
 
-@contentHeader = {
-    <div class="grid grid-2-3">
-        <h1>Apply to be an approved
-            Lifetime ISA Manager</h1>
-    </div>
-}
 
-@views.html.main_template(title = "Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, contentHeader = Some(contentHeader), showSignOutLink = false) {
 
+@views.html.main_template(title = "Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, showSignOutLink = false) {
+
+<h1>Apply to be an approved
+    Lifetime ISA Manager</h1>
     <section class="subsection">
 
         <p>Use this service to:</p>
