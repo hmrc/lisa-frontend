@@ -17,6 +17,7 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
+import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
@@ -28,11 +29,22 @@ import scala.concurrent.Future
 trait SummaryController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
-      hasAllSubmissionData(cacheId) { (data) =>
-        Future(Ok(views.html.registration.summary(data)))
-      }
-    }
+    //authorisedForLisa { (cacheId) =>
+      //hasAllSubmissionData(cacheId) { (data) =>
+    val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+    val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
+    val businessStructureForm = new BusinessStructure("LLP")
+    val yourForm = new YourDetails(
+      firstName = "Test",
+      lastName = "User",
+      role = "Role",
+      phone = "0191 123 4567",
+      email = "test@test.com")
+
+
+    Future(Ok(views.html.registration.summary(LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "X"))))
+      //}
+    //}
   }
 
 }
