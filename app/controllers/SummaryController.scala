@@ -17,6 +17,7 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
+import models._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
@@ -30,7 +31,7 @@ trait SummaryController extends LisaBaseController {
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { (data) =>
-        Future(Ok(views.html.registration.summary(data)))
+        Future.successful(Ok(views.html.registration.summary(data)))
       }
     }
   }

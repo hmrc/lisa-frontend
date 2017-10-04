@@ -1,0 +1,40 @@
+
+/*
+  Standard AF styles have extra padding on the bottom of the last row, we
+  want it to be the same as all other rows so the bottom border is consistent
+*/
+
+ .tabular-data__entry--grouped:last-child {
+   padding-bottom: .26316em;
+ }
+
+/* Amend alignment for columns 2 and 3 based on our titles & data */
+
+  .tabular-data__entry {
+    table-layout: fixed;
+  }
+
+  .tabular-data__data-1 {
+    overflow-wrap: break-word;
+    @media (min-width: $tablet-breakpoint){
+      box-sizing: border-box;
+      padding-left: 2%;
+      width: 42%;
+    }
+  }
+
+  .tabular-data__data-1--2-col {
+    @media (min-width: $tablet-breakpoint){
+      box-sizing: border-box;
+      padding-left: 2%;
+      width: 58%;
+    }
+  }
+
+  .tabular-data__data-2 {
+    white-space: nowrap;
+    @media (min-width: $tablet-breakpoint){
+      box-sizing: border-box;
+      width: 16%;
+    }
+  }
