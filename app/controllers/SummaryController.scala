@@ -31,7 +31,7 @@ trait SummaryController extends LisaBaseController {
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { (data) =>
-        Future(Ok(data))
+        Future.successful(Ok(views.html.registration.summary(data)))
       }
     }
   }
