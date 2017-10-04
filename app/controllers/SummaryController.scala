@@ -29,22 +29,11 @@ import scala.concurrent.Future
 trait SummaryController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    //authorisedForLisa { (cacheId) =>
-      //hasAllSubmissionData(cacheId) { (data) =>
-    val organisationForm = new OrganisationDetails("Super Hyper Global Technofunctional Meganet", "1234567890")
-    val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
-    val businessStructureForm = new BusinessStructure("LLP")
-    val yourForm = new YourDetails(
-      firstName = "Christopher",
-      lastName = "Waugh",
-      role = "Chief Executive Officer",
-      phone = "0191 123 4567",
-      email = "chris.waugh@digital.hmrc.gov.uk")
-
-
-    Future(Ok(views.html.registration.summary(LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "X"))))
-      //}
-    //}
+    authorisedForLisa { (cacheId) =>
+      hasAllSubmissionData(cacheId) { (data) =>
+        Future(Ok(data))
+      }
+    }
   }
 
 }
