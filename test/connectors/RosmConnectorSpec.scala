@@ -25,10 +25,10 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.{JsError, Json}
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 class RosmConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -39,7 +39,7 @@ class RosmConnectorSpec extends PlaySpec
 
     "return success" when {
       "rosm returns a success message" in {
-        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any())).
+        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
           thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(rosmSuccessResponse))
@@ -53,7 +53,7 @@ class RosmConnectorSpec extends PlaySpec
 
     "return failure" when {
       "rosm returns a success status but a failure response" in {
-        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any())).
+        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
           thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(rosmFailureResponse)))))
@@ -63,7 +63,7 @@ class RosmConnectorSpec extends PlaySpec
         }
       }
       "rosm returns a success status and an unexpected json response" in {
-        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any())).
+        when(mockHttpPost.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
           thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.parse("{}")))))
@@ -79,7 +79,7 @@ class RosmConnectorSpec extends PlaySpec
   "Subscribe Many endpoint" must {
     "return success" when {
       "rosm returns a valid payload with utr" in {
-        when(mockHttpPost.POST[LisaSubscription, HttpResponse](any(), any(), any())(any(), any(), any())).
+        when(mockHttpPost.POST[LisaSubscription, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
           thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(desSubscribeSuccessResponse))

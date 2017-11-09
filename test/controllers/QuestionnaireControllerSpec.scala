@@ -23,7 +23,7 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AuditService
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 
 class QuestionnaireControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 

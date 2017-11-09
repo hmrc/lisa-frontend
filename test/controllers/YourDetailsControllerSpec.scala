@@ -34,9 +34,9 @@ import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class YourDetailsControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
@@ -56,9 +56,9 @@ class YourDetailsControllerSpec extends PlaySpec
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any())).
+        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
         val result = SUT.get(fakeRequest)
@@ -76,9 +76,9 @@ class YourDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any())).
+        when(mockCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -100,9 +100,9 @@ class YourDetailsControllerSpec extends PlaySpec
     before {
       reset(mockCache)
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-      when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+      when(mockCache.cache[Any](any(), any(), any())(any(), any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
     }
 
@@ -132,7 +132,7 @@ class YourDetailsControllerSpec extends PlaySpec
           "email" -> "test@test.com"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-        when(mockCache.cache[YourDetails](any(),any(),any())(any(),any())).thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
+        when(mockCache.cache[YourDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -159,7 +159,7 @@ class YourDetailsControllerSpec extends PlaySpec
 
         await(SUT.post(request))
 
-        verify(mockCache).cache[YourDetails](any(), any(), any())(any(), any())
+        verify(mockCache).cache[YourDetails](any(), any(), any())(any(), any(), any())
       }
 
     }

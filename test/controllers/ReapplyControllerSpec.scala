@@ -44,7 +44,7 @@ class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppP
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(true)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(true)))
       val result = SUT.get(fakeRequest)
 
       status(result) mustBe Status.SEE_OTHER
@@ -62,7 +62,7 @@ class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppP
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
-  when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+  when(mockCache.cache[Any](any(), any(), any())(any(), any(), any())).
     thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
 
   object SUT extends ReapplyController {

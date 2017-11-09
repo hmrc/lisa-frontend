@@ -19,25 +19,25 @@ package connectors
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.ws.{WSGet, WSPost, WSPut}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut, HttpResponse }
 
 class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with BeforeAndAfterEach {
 
-  class MockHttp extends WSGet with WSPost with WSPut {
+  class MockHttp extends HttpGet with WSGet with HttpPost with WSPost with HttpPut with WSPut {
     override val hooks = NoneRequired
   }
 
   val mockWSHttp = mock[MockHttp]
 
   val testEmailConnector = new EmailConnector{
-    override val http: HttpGet with HttpPost with HttpPut = mockWSHttp
+    override val http:  HttpGet with HttpPost with HttpPut = mockWSHttp
   }
 
   override def beforeEach() {
@@ -59,7 +59,7 @@ class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         val params = Map("testParam" -> "testParam")
 
         when(mockWSHttp.POST[JsValue, HttpResponse](Matchers.any(), Matchers.any(),
-          Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any()))
+          Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any()))
           .thenReturn(Future.successful(HttpResponse(202, responseJson = None)))
 
         val response = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
@@ -78,7 +78,7 @@ class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         val params = Map("testParam" -> "testParam")
 
         when(mockWSHttp.POST[JsValue, HttpResponse](Matchers.any(), Matchers.any(),
-          Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any()))
+          Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any()))
           .thenReturn(Future.successful(HttpResponse(404, responseJson = None)))
 
         val response = testEmailConnector.sendTemplatedEmail(invalidEmailString, templateId, params)

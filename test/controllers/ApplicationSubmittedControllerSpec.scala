@@ -34,9 +34,9 @@ import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class ApplicationSubmittedControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
@@ -51,7 +51,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
       when(mockAuthorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentPending)))
 
-      when(mockSessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any())).
+      when(mockSessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
 
       val result = SUT.get()(fakeRequest)
@@ -94,7 +94,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
       when(mockAuthorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
-      when(mockSessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any())).
+      when(mockSessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any(), any())).
         thenReturn(Future.successful(Some("Z9999")))
 
       val result = SUT.successful()(fakeRequest)
@@ -163,6 +163,6 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
 
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
 }

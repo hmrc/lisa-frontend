@@ -20,13 +20,13 @@ import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
+import uk.gov.hmrc.play.frontend.config.AuthRedirects
 
 trait ErrorController extends FrontendController
-  with Redirects {
+  with AuthRedirects {
 
   val accessDenied: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Forbidden(views.html.error.access_denied(ggLoginUrl + "?origin=lisa-api&continue=/lifetime-isa/register/organisation-details")))

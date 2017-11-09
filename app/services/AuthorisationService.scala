@@ -21,12 +21,12 @@ import connectors.UserDetailsConnector
 import models._
 import play.api.Logger
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.play.http.HeaderCarrier
-
+import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait AuthorisationService extends AuthorisedFunctions {
 
