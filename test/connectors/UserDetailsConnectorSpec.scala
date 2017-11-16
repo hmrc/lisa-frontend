@@ -22,10 +22,10 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet }
 
 class UserDetailsConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -36,7 +36,7 @@ class UserDetailsConnectorSpec extends PlaySpec
   "Get User Details endpoint" must {
 
     "return whatever it receives" in {
-      when(mockHttpGet.GET[UserDetails](any())(any(), any())).
+      when(mockHttpGet.GET[UserDetails](any())(any(), any(), any())).
         thenReturn(Future.successful(UserDetails(None, None, "")))
 
       val response = Await.result(SUT.getUserDetails("1234567890"), Duration.Inf)

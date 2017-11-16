@@ -4,7 +4,6 @@ import sbt._
 import play.routes.compiler.StaticRoutesGenerator
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import com.typesafe.sbt.web.Import._
-import com.typesafe.sbt.web.Import.WebKeys._
 import net.ground5hark.sbt.concat.Import._
 import com.typesafe.sbt.uglify.Import._
 import com.typesafe.sbt.digest.Import._

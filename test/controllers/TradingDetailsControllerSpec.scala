@@ -34,9 +34,9 @@ import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class TradingDetailsControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
@@ -51,9 +51,9 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val tradingForm = new TradingDetails(fsrRefNumber = "123456", isaProviderRefNumber = "Z1234")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any())).
+        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
         val result = SUT.get(fakeRequest)
@@ -71,9 +71,9 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any())).
+        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -95,9 +95,9 @@ class TradingDetailsControllerSpec extends PlaySpec
     before {
       reset(mockCache)
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-      when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+      when(mockCache.cache[Any](any(), any(), any())(any(), any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
     }
 
@@ -124,7 +124,7 @@ class TradingDetailsControllerSpec extends PlaySpec
           "isaProviderRefNumber" -> "Z1234"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-        when(mockCache.cache[TradingDetails](any(),any(),any())(any(),any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(mockCache.cache[TradingDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -144,7 +144,7 @@ class TradingDetailsControllerSpec extends PlaySpec
 
         await(SUT.post(request))
 
-        verify(mockCache).cache[TradingDetails](any(), any(), any())(any(), any())
+        verify(mockCache).cache[TradingDetails](any(), any(), any())(any(), any(), any())
       }
     }
 

@@ -21,14 +21,14 @@ import models._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
-import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
+import uk.gov.hmrc.play.frontend.config.AuthRedirects
 
 trait LisaBaseController extends FrontendController
-  with Redirects {
+  with AuthRedirects {
 
   val sessionCache: SessionCache
   val shortLivedCache: ShortLivedCache

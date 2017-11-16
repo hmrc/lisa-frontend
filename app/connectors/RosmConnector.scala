@@ -19,9 +19,9 @@ package connectors
 import config.WSHttp
 import models._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http._
-
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 trait RosmConnector extends ServicesConfig with RosmJsonFormats {
 
@@ -34,12 +34,12 @@ trait RosmConnector extends ServicesConfig with RosmJsonFormats {
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"$rosmUrl/lisa/$utr/register"
-    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
   def subscribe(lisaManagerRef: String, lisaSubscribe:LisaSubscription)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"$rosmUrl/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
-      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly)
+      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
 }

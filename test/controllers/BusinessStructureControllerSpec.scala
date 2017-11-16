@@ -51,9 +51,9 @@ class BusinessStructureControllerSpec extends PlaySpec
       "the cache returns a value" in {
         val form = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any())).
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(form)))
 
         val result = SUT.get(fakeRequest)
@@ -71,9 +71,9 @@ class BusinessStructureControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any())).
+        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -95,10 +95,10 @@ class BusinessStructureControllerSpec extends PlaySpec
     before {
       reset(mockCache)
 
-      when(mockCache.cache[Any](any(), any(), any())(any(), any())).
+      when(mockCache.cache[Any](any(), any(), any())(any(), any(), any())).
         thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
 
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
     }
 
     "return validation errors" when {
@@ -120,7 +120,7 @@ class BusinessStructureControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.BusinessStructureController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("businessStructure" -> "LLP")))
-        when(mockCache.cache[BusinessStructure](any(),any(),any())(any(),any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(mockCache.cache[BusinessStructure](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -136,7 +136,7 @@ class BusinessStructureControllerSpec extends PlaySpec
 
         await(SUT.post(request))
 
-        verify(mockCache).cache[BusinessStructure](any(), any(), any())(any(), any())
+        verify(mockCache).cache[BusinessStructure](any(), any(), any())(any(), any(), any())
       }
     }
 

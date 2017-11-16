@@ -116,7 +116,7 @@ class LisaBaseControllerSpec extends PlaySpec
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
 
-        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z9876"))(any(), any())
+        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z9876"))(any(), any(), any())
 
       }
 
@@ -246,6 +246,6 @@ class LisaBaseControllerSpec extends PlaySpec
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
 
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any())).thenReturn(Future.successful(Some(false)))
+  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
 }

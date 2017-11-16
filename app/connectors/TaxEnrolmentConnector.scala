@@ -21,10 +21,10 @@ import models._
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http._
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpResponse }
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats {
 
@@ -35,7 +35,7 @@ trait TaxEnrolmentConnector extends ServicesConfig with TaxEnrolmentJsonFormats 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"$serviceUrl/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
-    httpGet.GET[HttpResponse](uri)(implicitly, hc) map { res =>
+    httpGet.GET[HttpResponse](uri)(implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc)) map { res =>
       Logger.debug(s"Getsubscriptions returned status: ${res.status} ")
       Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
     }
