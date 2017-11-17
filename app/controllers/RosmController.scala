@@ -37,7 +37,7 @@ trait RosmController extends LisaBaseController
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
-        rosmService.performSubscription(registrationDetails).map {
+        rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) => {
             Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
@@ -47,11 +47,11 @@ trait RosmController extends LisaBaseController
 
             val applicationSentVM = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
 
-            sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM)
+            sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM).map { _ =>
+              shortLivedCache.remove(cacheId)
 
-            shortLivedCache.remove(cacheId)
-
-            Redirect(routes.ApplicationSubmittedController.get())
+              Redirect(routes.ApplicationSubmittedController.get())
+            }
           }
           case Left(error) => {
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
@@ -60,10 +60,10 @@ trait RosmController extends LisaBaseController
               path = routes.RosmController.get().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
-            InternalServerError(views.html.error_template(
+            Future.successful(InternalServerError(views.html.error_template(
               Messages("global.error.InternalServerError500.title"),
               Messages("global.error.InternalServerError500.heading"),
-              Messages("global.error.InternalServerError500.message")))
+              Messages("global.error.InternalServerError500.message"))))
           }
         }
       }

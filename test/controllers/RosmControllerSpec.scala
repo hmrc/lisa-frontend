@@ -28,12 +28,13 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
+import play.api.libs.json.JsValue
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.{AuditService, AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -51,7 +52,12 @@ class RosmControllerSpec extends PlaySpec
       reset(mockCache)
       reset(mockRosmConnector)
       reset(mockAuditService)
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+
+      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
+        thenReturn(Future.successful(Some(false)))
+
+      when(mockSessionCache.cache(any(), any())(any(), any(), any())).
+        thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
     }
 
     val organisationDetailsCacheKey = "organisationDetails"
@@ -61,8 +67,6 @@ class RosmControllerSpec extends PlaySpec
 
     "redirect the user to business structure" when {
       "no business structure details are found in the cache" in {
-
-
         when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
@@ -209,7 +213,6 @@ class RosmControllerSpec extends PlaySpec
     }
 
     "handle a failed rosm registration" when {
-
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
@@ -243,7 +246,6 @@ class RosmControllerSpec extends PlaySpec
 
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
-
     }
 
     "audit a successful rosm registration" in {
@@ -284,6 +286,7 @@ class RosmControllerSpec extends PlaySpec
         address = rosmAddress,
         contactDetails = rosmContact
       )
+
       when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.get(fakeRequest))
@@ -306,7 +309,6 @@ class RosmControllerSpec extends PlaySpec
     }
 
     "audit a failed rosm registration" when {
-
       "the ct utr is 0000000000" in {
         val uri = controllers.routes.RosmController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
@@ -354,7 +356,6 @@ class RosmControllerSpec extends PlaySpec
             "emailAddress" -> registrationDetails.yourDetails.email))
         )(any())
       }
-
     }
 
     "cache subscriptionId and email as part of a successful rosm registration" in {
