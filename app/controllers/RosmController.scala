@@ -17,7 +17,7 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
-import connectors.RosmJsonFormats
+import connectors.{EmailConnector, RosmJsonFormats}
 import models.{ApplicationSent, LisaRegistration}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
@@ -33,6 +33,7 @@ trait RosmController extends LisaBaseController
 
   val auditService:AuditService
   val rosmService:RosmService
+  val emailConnector: EmailConnector
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -49,6 +50,15 @@ trait RosmController extends LisaBaseController
 
             sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM).map { _ =>
               shortLivedCache.remove(cacheId)
+
+              emailConnector.sendTemplatedEmail(
+                emailAddress = applicationSentVM.email,
+                templateName = "lisa_application_submit",
+                params = Map(
+                  "application_reference" -> applicationSentVM.subscriptionId,
+                  "email" -> applicationSentVM.email
+                )
+              )
 
               Redirect(routes.ApplicationSubmittedController.get())
             }
@@ -94,4 +104,5 @@ object RosmController extends RosmController {
   override val auditService = AuditService
   override val rosmService = RosmService
   override val authorisationService = AuthorisationService
+  override val emailConnector = EmailConnector
 }
