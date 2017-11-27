@@ -243,7 +243,7 @@ class RosmControllerSpec extends PlaySpec
       when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
 
-      when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
+      when(mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
