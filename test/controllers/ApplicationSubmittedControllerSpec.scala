@@ -18,7 +18,6 @@ package controllers
 
 import java.io.File
 
-import connectors.EmailConnector
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -33,10 +32,10 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment, Mode}
 import services.AuthorisationService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class ApplicationSubmittedControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
@@ -142,7 +141,6 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockEmailConnector: EmailConnector = mock[EmailConnector]
 
   object SUT extends ApplicationSubmittedController {
     override val config: Configuration = mockConfig
@@ -150,8 +148,6 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
     override val shortLivedCache: ShortLivedCache = mockCache
     override val sessionCache: SessionCache = mockSessionCache
     override val authorisationService: AuthorisationService = mockAuthorisationService
-
-    override val emailConnector: EmailConnector = mockEmailConnector
   }
 
   when(mockConfig.getString(matches("^appName$"), any())).
@@ -163,6 +159,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   when(mockConfig.getString(matches("^sosOrigin$"), any())).
     thenReturn(None)
 
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
+    thenReturn(Future.successful(Some(false)))
 
 }

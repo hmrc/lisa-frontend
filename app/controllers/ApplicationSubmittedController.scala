@@ -30,16 +30,12 @@ import scala.concurrent.Future
 
 trait ApplicationSubmittedController extends LisaBaseController {
 
-  val emailConnector: EmailConnector
-
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
       sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
-        case Some(application) =>
-          emailConnector.sendTemplatedEmail(application.email, templateName =  "lisa_application_submit", params = Map("application_reference" -> application.subscriptionId, "email" -> application.email))
-
+        case Some(application) => {
           Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
-
+        }
       }
     }, checkEnrolmentState = false)
   }
@@ -67,7 +63,6 @@ trait ApplicationSubmittedController extends LisaBaseController {
 }
 
 object ApplicationSubmittedController extends ApplicationSubmittedController {
-  override val emailConnector: EmailConnector = EmailConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val sessionCache = LisaSessionCache

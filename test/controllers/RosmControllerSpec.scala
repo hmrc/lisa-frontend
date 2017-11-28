@@ -18,7 +18,7 @@ package controllers
 
 import java.io.File
 
-import connectors.RosmConnector
+import connectors.{EmailConnector, RosmConnector}
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -210,6 +210,62 @@ class RosmControllerSpec extends PlaySpec
       )
 
       redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
+    }
+
+    "email the user on a successful rosm registration" in {
+      reset(mockEmailConnector)
+
+      val testEmail = "success@rosm.subscription"
+      val testSubId = "888777666"
+
+      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
+      val businessStructureForm = new BusinessStructure("LLP")
+      val yourForm = new YourDetails(
+        firstName = "Test",
+        lastName = "User",
+        role = "Role",
+        phone = "0191 123 4567",
+        email = testEmail)
+
+      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        thenReturn(Future.successful(Some(organisationForm)))
+
+      when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        thenReturn(Future.successful(Some("123456")))
+
+      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        thenReturn(Future.successful(Some(tradingForm)))
+
+      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        thenReturn(Future.successful(Some(businessStructureForm)))
+
+      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+        thenReturn(Future.successful(Some(yourForm)))
+
+      when(mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
+
+      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
+      val rosmContact = RosmContactDetails()
+      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
+        safeId = "",
+        isEditable = true,
+        isAnAgent = true,
+        isAnIndividual = true,
+        address = rosmAddress,
+        contactDetails = rosmContact
+      )
+
+      await(SUT.get(fakeRequest))
+
+      verify(mockEmailConnector).sendTemplatedEmail(
+        emailAddress = MatcherEquals(testEmail),
+        templateName = MatcherEquals("lisa_application_submit"),
+        params = MatcherEquals(Map(
+          "application_reference" -> testSubId,
+          "email" -> testEmail
+        ))
+      )(any())
     }
 
     "handle a failed rosm registration" when {
@@ -419,6 +475,7 @@ class RosmControllerSpec extends PlaySpec
   val mockAuditService: AuditService = mock[AuditService]
   val mockRosmService: RosmService = mock[RosmService]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
+  val mockEmailConnector: EmailConnector = mock[EmailConnector]
 
   object SUT extends RosmController {
     override val config: Configuration = mockConfig
@@ -428,6 +485,7 @@ class RosmControllerSpec extends PlaySpec
     override val auditService: AuditService = mockAuditService
     override val rosmService: RosmService = mockRosmService
     override val authorisationService: AuthorisationService = mockAuthorisationService
+    override val emailConnector: EmailConnector = mockEmailConnector
   }
 
   when(mockAuthorisationService.userStatus(any())).
