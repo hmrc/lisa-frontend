@@ -16,30 +16,26 @@
 
 package controllers
 
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class HomePageControllerSpec extends UnitSpec with WithFakeApplication {
+class HomePageControllerSpec extends PlaySpec with OneAppPerSuite {
 
   val fakeRequest = FakeRequest("GET", "/")
-
-
+  
   "GET /" should {
     "return 200" in {
       val result = HomePageController.home(fakeRequest)
-      status(result) shouldBe Status.OK
+      status(result) mustBe Status.OK
     }
 
     "return HTML" in {
       val result = HomePageController.home(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
+      contentType(result) mustBe Some("text/html")
+      charset(result) mustBe Some("utf-8")
     }
-
-
   }
-
 
 }

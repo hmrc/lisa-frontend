@@ -18,12 +18,11 @@ private object AppDependencies {
     ws,
     "uk.gov.hmrc" %% "frontend-bootstrap" % "8.11.0",
     "uk.gov.hmrc" %% "play-partials" % "6.1.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.3.0",
+    "uk.gov.hmrc" %% "auth-client" % "2.4.0",
     "uk.gov.hmrc" %% "http-caching-client" % "7.0.0"
   )
 
   def test(scope: String = "test") = Seq(
-    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % scope,
     "org.scalatest" %% "scalatest" % "2.2.6" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
     "org.jsoup" % "jsoup" % "1.10.2" % scope,
