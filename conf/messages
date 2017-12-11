@@ -7,6 +7,7 @@ org.details.corpbody=Corporate Body
 org.details.friendlysoc.view=Friendly Society
 org.details.friendlysoc=Friendly Society
 
+error.businessStructure=Select if your business is a limited liability partnership, limited company or friendly society.
 error.companyName=Enter a valid company name.
 error.ctrNumber=Enter a unique tax reference number that is 10 characters long.
 error.fsrRefNumber=Enter your 6 digit Financial Conduct Authority (FCA) reference number.
