@@ -8,8 +8,8 @@ POST       /organisation-name               controllers.OrganisationDetailsContr
 GET        /reference-numbers               controllers.TradingDetailsController.get
 POST       /reference-numbers               controllers.TradingDetailsController.post
 GET        /business-match-error            controllers.MatchingFailedController.get
-GET        /business-structure              controllers.BusinessStructureController.get
-POST       /business-structure              controllers.BusinessStructureController.post
+GET        /company-structure               controllers.BusinessStructureController.get
+POST       /company-structure               controllers.BusinessStructureController.post
 GET        /your-details                    controllers.YourDetailsController.get
 POST       /your-details                    controllers.YourDetailsController.post
 GET        /check-your-answers              controllers.SummaryController.get
