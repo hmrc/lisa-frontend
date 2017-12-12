@@ -20,40 +20,42 @@
 
 @(form: Form[YourDetails])(implicit request: Request[_], messages: Messages, title: String = "Your details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
+@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
-    @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
+    <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
 
-        @errorSummaryOrgTemplate(form)
-        <h1>Your details</h1>
-        <div class="subsection">
-            <p class="indent">HMRC might contact you, or someone else from your organisation,
-                to confirm the information in this application.</p>
+    @errorSummaryOrgTemplate(form)
+
+    <h1>Your details</h1>
+
+    <div class="subsection">
+        <p class="indent">
+            HMRC might need to contact your company to confirm the
+            information in this application.
+        </p>
+    </div>
+
+    <form method="post">
+        @CSRF.formField
+        <div class="form-group">
+            @input(form("firstName"), '_label -> "First name", '_inputClass -> "form-control form-control--block")
         </div>
+        <div class="form-group">
+            @input(form("lastName"), '_label -> "Last name", '_inputClass -> "form-control form-control--block")
+        </div>
+        <div class="form-group">
+            @input(form("role"), '_label -> "Role in the company", '_inputClass -> "form-control form-control--block")
+        </div>
+        <div class="form-group">
+            @input(form("phone"), '_label -> "Phone number", '_inputClass -> "form-control form-control--block")
+        </div>
+        <div class="form-group">
+            @input(form("email"), '_label -> "Email address", '_inputClass -> "form-control form-control--block")
+        </div>
+        <div class="form-field form-field--submit">
+            <input type="submit" class="button" value="Continue" id="continue">
+        </div>
+    </form>
 
-        <form method="post">
-            @CSRF.formField
-            <div class="form-group">
-                @input(form("firstName"), '_label -> "First name", '_inputClass -> "form-control form-control--block")
-            </div>
-            <div class="form-group">
-                @input(form("lastName"), '_label -> "Last name", '_inputClass -> "form-control form-control--block")
-            </div>
-            <div class="form-group">
-                @input(form("role"), '_label -> "Role in the organisation", '_inputClass -> "form-control form-control--block")
-            </div>
-            <div class="form-group">
-                @input(form("phone"), '_label -> "Phone number", '_inputClass -> "form-control form-control--block")
-            </div>
-            <div class="form-group">
-                @input(form("email"), '_label -> "Email address", '_inputClass -> "form-control form-control--block")
-            </div>
-            <div class="form-field form-field--submit">
-                <input type="submit" class="button" value="Continue" id="continue">
-            </div>
-            <div class="form-field form-field--submit">
-                <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
-            </div>
-        </form>
-
-        }
+}
 
