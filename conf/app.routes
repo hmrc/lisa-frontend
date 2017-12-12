@@ -3,8 +3,8 @@
 GET        /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
 GET        /                                controllers.HomePageController.home
 GET        /access-denied                   controllers.ErrorController.accessDenied
-GET        /organisation-name               controllers.OrganisationDetailsController.get
-POST       /organisation-name               controllers.OrganisationDetailsController.post
+GET        /company-details                 controllers.OrganisationDetailsController.get
+POST       /company-details                 controllers.OrganisationDetailsController.post
 GET        /reference-numbers               controllers.TradingDetailsController.get
 POST       /reference-numbers               controllers.TradingDetailsController.post
 GET        /business-match-error            controllers.MatchingFailedController.get
