@@ -24,6 +24,8 @@
 
 @views.html.main_template(title = "Application pending - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
+
     <h1>Application pending</h1>
 
     <p>Your application will be reviewed by HM Revenue and Customs.</p>
@@ -34,15 +36,8 @@
 
     <p>Email  <a href="mailto:savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a> if you have any questions regarding your application.</p>
 
-
-
     <div class="form-field form-field--submit">
         <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out">Sign out</a></p>
     </div>
-
-    <div class="form-field form-field--submit">
-        <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
-    </div>
-
 
 }

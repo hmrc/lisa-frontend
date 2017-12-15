@@ -23,6 +23,8 @@
 
 @views.html.main_template(title = "Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
+
     <h1>Application not successful</h1>
 
     <h2>What happens next</h2>
@@ -36,7 +38,4 @@
         <p><a href="@routes.ReapplyController.get()" class="button" id="submit">Submit new application</a></p>
     </div>
 
-    <div class="form-field form-field--submit">
-        <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
-    </div>
 }

@@ -24,7 +24,7 @@
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
-    <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
 
     @errorSummaryOrgTemplate(form)
 
