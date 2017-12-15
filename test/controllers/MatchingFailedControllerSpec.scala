@@ -53,7 +53,7 @@ class MatchingFailedControllerSpec extends PlaySpec
 
       val content = contentAsString(result)
 
-      content must include ("<h1>Your business details could not be found</h1>")
+      content must include ("Your company’s details could not be found</h1>")
     }
 
   }

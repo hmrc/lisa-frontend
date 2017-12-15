@@ -112,7 +112,8 @@ class BusinessStructureControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("This field is required")
+        content must include ("form-field--error") // css class indicating a form field error
+        content must include ("Select if your company is a limited liability partnership, limited company or friendly society") // error msg we expect
       }
     }
 
@@ -142,7 +143,7 @@ class BusinessStructureControllerSpec extends PlaySpec
 
   }
 
-  val pageTitle = ">Select your business structure</h1>"
+  val pageTitle = ">Select your company structure</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {

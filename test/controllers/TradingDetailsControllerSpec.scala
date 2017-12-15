@@ -152,7 +152,7 @@ class TradingDetailsControllerSpec extends PlaySpec
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
-  val pageTitle = "<h1>Your organisation's reference numbers</h1>"
+  val pageTitle = "<h1>Your company’s reference numbers</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {

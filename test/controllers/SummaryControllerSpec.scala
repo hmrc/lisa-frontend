@@ -200,7 +200,7 @@ class SummaryControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("Check your answers before submitting your application</h1>")
+        content must include ("Check your answers</h1>")
         content must include ("test@test.com")
       }
     }
