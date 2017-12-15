@@ -18,27 +18,29 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.error.errorSummaryOrgTemplate
 
-@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages,  title: String = "Select your business structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages,  title: String = "Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
-@errorSummaryOrgTemplate(form)
-<h1>Select your business structure</h1>
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
+
+    @errorSummaryOrgTemplate(form)
+
+    <h1>Select your company structure</h1>
 
     <form method="post">
         @CSRF.formField
 
-        @inputRadioGroup(form("businessStructure"), Seq(
-            (Messages("org.details.llp"), Messages("org.details.llp.view")),
-            (Messages("org.details.corpbody"), Messages("org.details.corpbody.view")),
-            (Messages("org.details.friendlysoc"), Messages("org.details.friendlysoc.view"))
-        ), '_labelClass -> "block-label", '_legend -> "Select your business structure", '_legendClass -> Some("visuallyhidden"))
+        <div class="form-field form-field--submit" id="businessStructure">
+            @inputRadioGroup(form("businessStructure"), Seq(
+                (Messages("org.details.llp"), Messages("org.details.llp.view")),
+                (Messages("org.details.corpbody"), Messages("org.details.corpbody.view")),
+                (Messages("org.details.friendlysoc"), Messages("org.details.friendlysoc.view"))
+            ), '_labelClass -> "block-label", '_legend -> "Select your company structure", '_legendClass -> Some("visuallyhidden"))
+        </div>
 
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue" id="continue">
-        </div>
-        <div class="form-field form-field--submit">
-            <p><a href="javascript:history.go(-1)" class="back-link" id="back">Back</a></p>
         </div>
     </form>
 

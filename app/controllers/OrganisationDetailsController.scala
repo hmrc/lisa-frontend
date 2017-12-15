@@ -33,9 +33,9 @@ trait OrganisationDetailsController extends LisaBaseController {
 
   private def businessLabels(businessStructure: BusinessStructure): String = {
     val acceptableValues = Map(
-      Messages("org.details.corpbody") -> "Corporation Tax reference number",
-      Messages("org.details.friendlysoc") -> "Corporation Tax reference number",
-      Messages("org.details.llp") -> "Partnership Unique Tax reference number"
+      Messages("org.details.corpbody") -> "Corporation Tax Unique Tax Reference (UTR)",
+      Messages("org.details.friendlysoc") -> "Corporation Tax Unique Tax Reference (UTR)",
+      Messages("org.details.llp") -> "Partnership Unique Tax Reference (UTR)"
     )
 
     acceptableValues(businessStructure.businessStructure)

@@ -1,25 +1,26 @@
-validation.summary.heading=Check your answers below
+validation.summary.heading=There is a problem
 
-org.details.llp.view=Limited Liability Partnership
+org.details.llp.view=Limited liability partnership
 org.details.llp=LLP
-org.details.corpbody.view=Limited Company
+org.details.corpbody.view=Limited company
 org.details.corpbody=Corporate Body
-org.details.friendlysoc.view=Friendly Society
+org.details.friendlysoc.view=Friendly society
 org.details.friendlysoc=Friendly Society
 
+error.businessStructure=Select if your company is a limited liability partnership, limited company or friendly society
 error.companyName=Enter a valid company name.
-error.ctrNumber=Enter a unique tax reference number that is 10 characters long.
+error.ctrNumber=Enter a UTR that is 10 characters long.
 error.fsrRefNumber=Enter your 6 digit Financial Conduct Authority (FCA) reference number.
-error.isaProviderRefNumber=Enter a valid ISA ref number. This starts with Z, and includes either 4 or 6 numbers.
+error.isaProviderRefNumber=Enter a valid ISA manager reference number. This starts with Z, and includes either 4 or 6 numbers.
 error.firstName=Enter a valid first name.
 error.lastName=Enter a valid last name.
-error.role=Enter a valid role in the organisation. You can enter up to 30 characters.
+error.role=Enter a valid role in the company. You can enter up to 30 characters.
 error.phone=Enter a valid contact phone number.
 error.email=Enter a valid email address.
 
 ##feedback
 
-label.youre_signed_out=You''re signed out
+label.youre_signed_out=You’re signed out
 label.youre_now_signed_out_of_your_lifetime_isa_account=You are now signed out of your Lifetime Isa account.
 label.explore_gov_uk=Explore GOV.UK
 label.satisfaction_survey=Satisfaction survey

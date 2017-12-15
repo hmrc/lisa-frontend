@@ -3,13 +3,13 @@
 GET        /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
 GET        /                                controllers.HomePageController.home
 GET        /access-denied                   controllers.ErrorController.accessDenied
-GET        /organisation-name               controllers.OrganisationDetailsController.get
-POST       /organisation-name               controllers.OrganisationDetailsController.post
+GET        /company-details                 controllers.OrganisationDetailsController.get
+POST       /company-details                 controllers.OrganisationDetailsController.post
 GET        /reference-numbers               controllers.TradingDetailsController.get
 POST       /reference-numbers               controllers.TradingDetailsController.post
-GET        /business-match-error            controllers.MatchingFailedController.get
-GET        /business-structure              controllers.BusinessStructureController.get
-POST       /business-structure              controllers.BusinessStructureController.post
+GET        /company-match-error             controllers.MatchingFailedController.get
+GET        /company-structure               controllers.BusinessStructureController.get
+POST       /company-structure               controllers.BusinessStructureController.post
 GET        /your-details                    controllers.YourDetailsController.get
 POST       /your-details                    controllers.YourDetailsController.post
 GET        /check-your-answers              controllers.SummaryController.get
