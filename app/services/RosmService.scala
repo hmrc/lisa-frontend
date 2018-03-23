@@ -30,12 +30,15 @@ trait RosmService extends RosmJsonFormats{
 
   val rosmConnector:RosmConnector
 
-  private def handleErrorResponse(response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
-    case failureResponse: JsSuccess[DesFailureResponse] =>
-      Logger.error(s"Des FailureResponse : ${failureResponse.get.code}")
+  private def handleErrorResponse(rosmType: String, response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
+    case failureResponse: JsSuccess[DesFailureResponse] => {
+      Logger.error(s"ROSM $rosmType failure: ${failureResponse.get.code}")
       Left(failureResponse.get.code)
-    case _: JsError => Logger.error("JsError in Response")
+    }
+    case _: JsError => {
+      Logger.error(s"ROSM $rosmType failure, unexpected error.")
       Left("INTERNAL_SERVER_ERROR")
+    }
   }
 
   private def getRosmBusinessStructure(input: BusinessStructure): String = {
@@ -50,14 +53,15 @@ trait RosmService extends RosmJsonFormats{
     val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName, getRosmBusinessStructure(businessStructure)))
 
     rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
-      Logger.debug("response received from: registerOnce")
+      Logger.warn(s"ROSM registration response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")
+
       res.json.validate[RosmRegistrationSuccessResponse] match {
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
-        case _ : JsError => handleErrorResponse(res)
+        case _ : JsError => handleErrorResponse("registration", res)
       }
     }.recover {
       case NonFatal(ex: Throwable) => {
-        Logger.error(s"rosm registration error: ${ex.getMessage}")
+        Logger.error(s"ROSM registration exception: ${ex.getMessage}")
         Left("INTERNAL_SERVER_ERROR")
       }
     }
@@ -85,11 +89,15 @@ trait RosmService extends RosmJsonFormats{
         approvalNumber = registration.tradingDetails.fsrRefNumber,
         companyName = companyName,
         applicantDetails = applicantDetails)
-    ).map(
-      subscribed => subscribed.json.validate[DesSubscriptionSuccessResponse] match {
-        case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
-        case _: JsError => handleErrorResponse(subscribed)
-      })
+    ).map(subscribed => {
+        Logger.warn(s"ROSM subscription response for $companyName ($utr): ${subscribed.json.toString()}")
+
+        subscribed.json.validate[DesSubscriptionSuccessResponse] match {
+          case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
+          case _: JsError => handleErrorResponse("submission", subscribed)
+        }
+    })
+
   }
 
 
