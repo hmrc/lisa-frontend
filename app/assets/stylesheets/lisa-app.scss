@@ -1,2 +1,18 @@
 @import 'partials/_variables';
 @import 'partials/_tabular-data';
+
+.flash.error-summary {
+    border-width: 4px;
+
+    a {
+        font-weight: bold;
+    }
+}
+
+.form-field--error {
+    border-left-width: 4px;
+
+    .error-notification {
+        font-weight: bold;
+    }
+}

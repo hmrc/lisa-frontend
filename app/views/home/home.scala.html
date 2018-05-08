@@ -16,12 +16,10 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-
-
 @views.html.main_template(title = "Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, showSignOutLink = false) {
 
-<h1>Apply to be an approved
-    Lifetime ISA Manager</h1>
+    <h1>Apply to be an approved Lifetime ISA Manager</h1>
+
     <section class="subsection">
 
         <p>Use this service to:</p>
@@ -33,31 +31,21 @@
             </ul>
         </div>
 
-    </section>
-
-    <p><a class="button button--get-started" href="@routes.BusinessStructureController.get()" role="button" id="continue">Start now</a></p>
-
-    <section class="subsection">
-
-        <h2>Before you start</h2>
-
-        <p>You must be registered with HMRC as an ISA manager.</p>
-
-        <p>You’ll need your organisation's:</p>
+        <p>You’ll need your company's:</p>
 
         <div class="gutter-left">
             <ul class="list list-bullet">
+                <li>Government Gateway ID and password</li>
                 <li>registered company name</li>
-                <li>Government Gateway ID</li>
-                <li>ISA manager reference number</li>
-                <li>Unique Tax reference number</li>
-                <li>Financial Conduct Authority reference number</li>
+                <li>Unique Taxpayer Reference (UTR) - this might also be called your tax reference and you’ll need the same number that you use on your company’s CT600 form</li>
+                <li>Financial Conduct Authority reference</li>
+                <li>ISA manager reference</li>
             </ul>
         </div>
 
-        <p>If you don't have a Government Gateway ID, or need to re-register, you can set one up as part of this service.</p>
-
     </section>
+
+    <p><a class="button button--get-started" href="@routes.BusinessStructureController.get()" role="button" id="continue">Start now</a></p>
 
 }
 

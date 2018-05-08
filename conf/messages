@@ -8,15 +8,15 @@ org.details.friendlysoc.view=Friendly society
 org.details.friendlysoc=Friendly Society
 
 error.businessStructure=Select if your company is a limited liability partnership, limited company or friendly society
-error.companyName=Enter a valid company name.
-error.ctrNumber=Enter a UTR that is 10 characters long.
-error.fsrRefNumber=Enter your 6 digit Financial Conduct Authority (FCA) reference number.
-error.isaProviderRefNumber=Enter a valid ISA manager reference number. This starts with Z, and includes either 4 or 6 numbers.
-error.firstName=Enter a valid first name.
-error.lastName=Enter a valid last name.
-error.role=Enter a valid role in the company. You can enter up to 30 characters.
-error.phone=Enter a valid contact phone number.
-error.email=Enter a valid email address.
+error.companyName=Enter a valid company name
+error.ctrNumber=Enter a UTR that is 10 characters long
+error.fsrRefNumber=Enter your 6 digit Financial Conduct Authority (FCA) reference number
+error.isaProviderRefNumber=Enter a valid ISA manager reference number. This starts with Z, and includes either 4 or 6 numbers
+error.firstName=Enter a valid first name
+error.lastName=Enter a valid last name
+error.role=Enter a valid role in the company. You can enter up to 30 characters
+error.phone=Enter a valid contact phone number
+error.email=Enter a valid email address
 
 ##feedback
 
