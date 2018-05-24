@@ -39,6 +39,8 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
   private val contactFormServiceIdentifier = "LISA"
   private val logoutCallback = configuration.getString("gg-urls.logout-callback.url").getOrElse("/lifetime-isa")
 
+  lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
+
   override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
   override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
   override lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
