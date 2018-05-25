@@ -86,8 +86,8 @@ trait OrganisationDetailsController extends LisaBaseController {
     val llp: String = Messages("org.details.llp")
 
     businessStructure.businessStructure match {
-      case `llp` => "Partnership Unique Tax Reference (UTR)"
-      case _ => "Corporation Tax Unique Tax Reference (UTR)"
+      case `llp` => "Partnership Unique Taxpayer Reference (UTR)"
+      case _ => "Corporation Tax Unique Taxpayer Reference (UTR)"
     }
   }
 
