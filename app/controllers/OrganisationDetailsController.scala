@@ -31,24 +31,14 @@ import scala.concurrent.Future
 trait OrganisationDetailsController extends LisaBaseController {
   val rosmService: RosmService
 
-  private def businessLabels(businessStructure: BusinessStructure): String = {
-    val acceptableValues = Map(
-      Messages("org.details.corpbody") -> "Corporation Tax Unique Tax Reference (UTR)",
-      Messages("org.details.friendlysoc") -> "Corporation Tax Unique Tax Reference (UTR)",
-      Messages("org.details.llp") -> "Partnership Unique Tax Reference (UTR)"
-    )
-
-    acceptableValues(businessStructure.businessStructure)
-  }
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
-            case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabels(businessStructure)))
-            case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabels(businessStructure)))
+            case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabel(businessStructure), businessHint(businessStructure)))
+            case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabel(businessStructure), businessHint(businessStructure)))
           }
         }
       }
@@ -63,7 +53,7 @@ trait OrganisationDetailsController extends LisaBaseController {
           shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
             case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
             case Some(businessStructure) => {
-              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
+              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabel(businessStructure), businessHint(businessStructure))))
             }
           }
         },
@@ -89,6 +79,25 @@ trait OrganisationDetailsController extends LisaBaseController {
           }
         }
       )
+    }
+  }
+
+  private def businessLabel(businessStructure: BusinessStructure): String = {
+    val llp: String = Messages("org.details.llp")
+
+    businessStructure.businessStructure match {
+      case `llp` => "Partnership Unique Tax Reference (UTR)"
+      case _ => "Corporation Tax Unique Tax Reference (UTR)"
+    }
+  }
+
+  private def businessHint(businessStructure: BusinessStructure): String = {
+    val llp: String = Messages("org.details.llp")
+
+    businessStructure.businessStructure match {
+      case `llp` => "This can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers."
+      case _ => "This is the same number that you use on your company’s CT600 form. It can be 10 or 13 numbers. " +
+                "If it is 13 numbers, enter only the last 10 numbers."
     }
   }
 }
