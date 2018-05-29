@@ -31,16 +31,6 @@ import scala.concurrent.Future
 trait OrganisationDetailsController extends LisaBaseController {
   val rosmService: RosmService
 
-  private def businessLabels(businessStructure: BusinessStructure): String = {
-    val acceptableValues = Map(
-      Messages("org.details.corpbody") -> "Corporation Tax Unique Tax Reference (UTR)",
-      Messages("org.details.friendlysoc") -> "Corporation Tax Unique Tax Reference (UTR)",
-      Messages("org.details.llp") -> "Partnership Unique Tax Reference (UTR)"
-    )
-
-    acceptableValues(businessStructure.businessStructure)
-  }
-
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
@@ -58,20 +48,17 @@ trait OrganisationDetailsController extends LisaBaseController {
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      OrganisationDetails.form.bindFromRequest.fold(
-        formWithErrors => {
-          shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-            case Some(businessStructure) => {
+      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case Some(businessStructure) => {
+          val form = if (isPartnership(businessStructure)) OrganisationDetails.partnershipForm else OrganisationDetails.form
+
+          form.bindFromRequest.fold(
+            formWithErrors => {
               Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
-            }
-          }
-        },
-        data => {
-          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
-            shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-              case Some(businessStructure) => {
+            },
+            data => {
+              shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
                 Logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId) => {
@@ -86,10 +73,19 @@ trait OrganisationDetailsController extends LisaBaseController {
                 }
               }
             }
-          }
+          )
         }
-      )
+      }
     }
+  }
+
+
+  private def businessLabels(businessStructure: BusinessStructure): String = {
+    if (isPartnership(businessStructure)) "Partnership Unique Tax Reference (UTR)" else "Corporation Tax Unique Tax Reference (UTR)"
+  }
+
+  private def isPartnership(businessStructure: BusinessStructure): Boolean = {
+    businessStructure.businessStructure == Messages("org.details.llp")
   }
 }
 

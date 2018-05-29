@@ -31,8 +31,21 @@ object OrganisationDetails {
 
   val form = Form(
     mapping(
-      "companyName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""".r, error="error.companyName")),
-      "ctrNumber" -> text.verifying(pattern("""^[0-9]{10}$""".r, error="error.ctrNumber"))
-    )(OrganisationDetails.apply)(OrganisationDetails.unapply)
+      "companyName" -> optional(text)
+        .verifying("error.companyName", i => i.getOrElse("").matches("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""")),
+      "ctrNumber" -> optional(text)
+        .verifying("error.ctrNumber", i => i.isDefined)
+        .verifying("error.ctrNumberPattern", i => i.getOrElse("").matches("(^$)|(^[0-9]{10}$)"))
+    )((name, utr) => OrganisationDetails(name.getOrElse(""), utr.getOrElse("")))( org => Some(Some(org.companyName), Some(org.ctrNumber)) )
+  )
+
+  val partnershipForm = Form(
+    mapping(
+      "companyName" -> optional(text)
+        .verifying("error.companyName", i => i.getOrElse("").matches("""^[A-Za-z0-9 \-,.&'\/]{1,65}$""")),
+      "ctrNumber" -> optional(text)
+        .verifying("error.partnershipUtr", i => i.isDefined)
+        .verifying("error.partnershipUtrPattern", i => i.getOrElse("").matches("(^$)|(^[0-9]{10}$)"))
+    )((name, utr) => OrganisationDetails(name.getOrElse(""), utr.getOrElse("")))( org => Some(Some(org.companyName), Some(org.ctrNumber)) )
   )
 }

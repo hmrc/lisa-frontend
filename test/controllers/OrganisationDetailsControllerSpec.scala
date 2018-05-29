@@ -149,7 +149,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("This field is required")
+        content must include ("Enter your company’s name")
+        content must include ("Enter your Partnership UTR")
       }
 
       "the company name is invalid" in {
@@ -169,6 +170,8 @@ class OrganisationDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
+        content must include ("Enter your company’s name")
+        content must include ("Enter a Corporation Tax UTR that only contains 10 numbers")
       }
 
     }
