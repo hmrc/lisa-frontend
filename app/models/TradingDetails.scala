@@ -51,7 +51,7 @@ object TradingDetails {
   )
 
   private def fsrExists(fsr: Option[String]) = {
-    fsr.isDefined
+    fsr.isDefined && !fsr.getOrElse("").matches("^123456$")
   }
 
   private def fsrIsNumeric(fsr: Option[String]) = {
