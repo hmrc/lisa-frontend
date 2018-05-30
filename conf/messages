@@ -13,13 +13,17 @@ error.ctrNumber=Enter your Corporation Tax UTR
 error.ctrNumberPattern=Enter a Corporation Tax UTR that only contains 10 numbers
 error.partnershipUtr=Enter your Partnership UTR
 error.partnershipUtrPattern=Enter a Partnership UTR that only contains 10 numbers
-error.fsrRefNumber=Enter your 6 digit Financial Conduct Authority (FCA) reference number
-error.isaProviderRefNumber=Enter a valid ISA manager reference number. This starts with Z, and includes either 4 or 6 numbers
-error.firstName=Enter a valid first name
-error.lastName=Enter a valid last name
-error.role=Enter a valid role in the company. You can enter up to 30 characters
-error.phone=Enter a valid contact phone number
-error.email=Enter a valid email address
+error.fsrRefNumber=Enter your 6 number Financial Conduct Authority reference
+error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
+error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the right format
+error.isaProviderRefNumber=Enter your ISA manager reference
+error.isaProviderRefNumberLength=ISA manager reference must be 4 or 6 numbers
+error.isaProviderRefNumberPattern=Enter your ISA manager reference in the right format
+error.firstName=Enter your first name
+error.lastName=Enter your last name
+error.role=Enter your role in the company
+error.phone=Enter your phone number
+error.email=Enter your email address
 
 ##feedback
 

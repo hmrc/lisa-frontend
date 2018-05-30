@@ -49,7 +49,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val tradingForm = new TradingDetails(fsrRefNumber = "123456", isaProviderRefNumber = "Z1234")
+        val tradingForm = new TradingDetails(fsrRefNumber = "654321", isaProviderRefNumber = "Z1234")
 
         when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
@@ -112,7 +112,8 @@ class TradingDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("This field is required")
+        content must include ("Enter your 6 number Financial Conduct Authority reference")
+        content must include ("Enter your ISA manager reference")
       }
     }
 
@@ -120,7 +121,7 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
-          "fsrRefNumber" -> "123456",
+          "fsrRefNumber" -> "654321",
           "isaProviderRefNumber" -> "Z1234"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
@@ -137,7 +138,7 @@ class TradingDetailsControllerSpec extends PlaySpec
       "the submitted data is valid" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val validJson = Json.obj(
-          "fsrRefNumber" -> "123456",
+          "fsrRefNumber" -> "654321",
           "isaProviderRefNumber" -> "Z1234"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
