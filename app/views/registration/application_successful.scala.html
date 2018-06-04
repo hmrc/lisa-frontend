@@ -21,19 +21,22 @@
 @(zref: String)(implicit request: Request[_], messages: Messages)
 
 @views.html.main_template(title = "Application successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
-
     <div class="transaction-banner--complete">
         <h1 class="transaction-banner__heading">Application successful</h1>
-        <p>LISA manager reference number: @zref</p>
+        <p class="transaction-banner__subheading">Your LISA and ISA manager references are the same:</p>
+        <p>@zref</p>
     </div>
 
     <h2>What happens next</h2>
 
-    <p>You can now use your Government Gateway credentials to connect to the Lifetime ISA API.</p>
+    <p>
+        You can now use your Government Gateway credentials to connect to the
+        <a href="@FrontendAppConfig.apiUrl">Lifetime ISA API</a>.
+    </p>
 
-    <p>Keep a note of this reference number as you’ll need it when reporting information to HM Revenue and Customs (HMRC).</p>
+    <p>Use your LISA manager reference when reporting information to HMRC.</p>
 
-    <p>You can sign back into this service at any time to see it.</p>
+    <p>You can sign back into this service at any time to see this reference.</p>
 
     <div class="form-field form-field--submit">
         <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out">Sign out</a></p>

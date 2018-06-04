@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.error.errorSummaryOrgTemplate
 
-@(form: Form[YourDetails])(implicit request: Request[_], messages: Messages, title: String = "Your details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[YourDetails])(implicit request: Request[_], messages: Messages, title: String = "Your name and contact details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
@@ -26,7 +26,7 @@
 
     @errorSummaryOrgTemplate(form)
 
-    <h1>Your details</h1>
+    <h1>Your name and contact details</h1>
 
     <div class="subsection">
         <p class="indent">

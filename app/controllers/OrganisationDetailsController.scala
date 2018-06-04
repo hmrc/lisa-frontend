@@ -37,8 +37,18 @@ trait OrganisationDetailsController extends LisaBaseController {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
-            case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabels(businessStructure)))
-            case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabels(businessStructure)))
+            case Some(data) =>
+              Ok(views.html.registration.organisation_details(
+                OrganisationDetails.form.fill(data),
+                businessLabel(businessStructure),
+                businessHint(businessStructure)
+              ))
+            case None =>
+              Ok(views.html.registration.organisation_details(
+                OrganisationDetails.form,
+                businessLabel(businessStructure),
+                businessHint(businessStructure)
+              ))
           }
         }
       }
@@ -55,7 +65,9 @@ trait OrganisationDetailsController extends LisaBaseController {
 
           form.bindFromRequest.fold(
             formWithErrors => {
-              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabels(businessStructure))))
+              Future.successful(
+                BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabel(businessStructure), businessHint(businessStructure)))
+              )
             },
             data => {
               shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
@@ -79,14 +91,24 @@ trait OrganisationDetailsController extends LisaBaseController {
     }
   }
 
-
-  private def businessLabels(businessStructure: BusinessStructure): String = {
-    if (isPartnership(businessStructure)) "Partnership Unique Tax Reference (UTR)" else "Corporation Tax Unique Tax Reference (UTR)"
+  private def businessLabel(businessStructure: BusinessStructure): String = {
+    if (isPartnership(businessStructure)) "Partnership Unique Taxpayer Reference (UTR)" else "Corporation Tax Unique Taxpayer Reference (UTR)"
   }
 
   private def isPartnership(businessStructure: BusinessStructure): Boolean = {
     businessStructure.businessStructure == Messages("org.details.llp")
   }
+
+  private def businessHint(businessStructure: BusinessStructure): String = {
+    val llp: String = Messages("org.details.llp")
+
+    businessStructure.businessStructure match {
+      case `llp` => "This can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers."
+      case _ => "This is the same number that you use on your company’s CT600 form. It can be 10 or 13 numbers. " +
+                "If it is 13 numbers, enter only the last 10 numbers."
+    }
+  }
+
 }
 
 object OrganisationDetailsController extends OrganisationDetailsController {
