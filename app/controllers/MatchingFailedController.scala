@@ -17,7 +17,9 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
+import models.BusinessStructure
 import play.api.Play.current
+import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.{Action, AnyContent}
@@ -28,8 +30,15 @@ import scala.concurrent.Future
 trait MatchingFailedController extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { _ =>
-      Future.successful(Ok(views.html.registration.matching_failed()))
+    authorisedForLisa { (cacheId) =>
+      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case Some(businessStructure) => {
+          val isPartnership = (businessStructure.businessStructure == Messages("org.details.llp"))
+
+          Future.successful(Ok(views.html.registration.matching_failed(isPartnership)))
+        }
+      }
     }
   }
 
