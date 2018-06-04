@@ -67,7 +67,7 @@ class YourDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your details</h1>")
+        content must include ("<h1>Your name and contact details</h1>")
         content must include ("test@test.com")
       }
 
@@ -87,7 +87,7 @@ class YourDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your details</h1>")
+        content must include ("<h1>Your name and contact details</h1>")
         content must include ("value=\"\"")
       }
 
@@ -116,7 +116,7 @@ class YourDetailsControllerSpec extends PlaySpec
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your details</h1>")
+        content must include ("<h1>Your name and contact details</h1>")
         content must include ("This field is required")
       }
     }
