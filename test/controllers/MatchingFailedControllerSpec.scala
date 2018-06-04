@@ -47,6 +47,9 @@ class MatchingFailedControllerSpec extends PlaySpec
   "GET Matching Failed" must {
 
     "return a page" in {
+      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
+        thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
+
       val result = SUT.get(addToken(FakeRequest("GET", "/")))
 
       status(result) mustBe Status.OK
