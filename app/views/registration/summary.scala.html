@@ -54,7 +54,7 @@
         </div>
         <!-- Org ref numbers -->
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-fsrRefNumber">FCA reference number</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-fsrRefNumber">Financial Conduct Authority reference</span>
             <span class="tabular-data__data-1" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</span>
             <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber">Change <span class="visuallyhidden">your FCA reference number</span></a>
         </div>
@@ -101,12 +101,11 @@
         <p class="important-notice">
             <i class="visuallyhidden">Legal notice</i>
             <b>
-                By sending your application you confirm that, to the best of your knowledge,
-                the information you’ve provided is correct.
+                By applying, you confirm the details you have provided are correct.
             </b>
         </p>
     </div>
 
-    <p><a href="@routes.RosmController.get" class="button" role="button" id="continue">Confirm and send</a></p>
+    <p><a href="@routes.RosmController.get" class="button" role="button" id="continue">Confirm and apply</a></p>
 
 }
