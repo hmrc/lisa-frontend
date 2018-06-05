@@ -34,11 +34,37 @@ object YourDetails {
 
   val form = Form(
     mapping(
-      "firstName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="error.firstName")),
-      "lastName" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""".r, error="error.lastName")),
-      "role" -> text.verifying(pattern("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""".r, error="error.role")),
-      "phone" -> text.verifying(pattern("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""".r, error="error.phone")),
-      "email" -> email
-    )(YourDetails.apply)(YourDetails.unapply)
+      "firstName" -> optional(text)
+        .verifying("error.firstNameRequired", _.isDefined)
+        .verifying("error.firstNameLength", i => i.isEmpty || i.getOrElse("").length <= 35)
+        .verifying("error.firstNamePattern", i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""")),
+
+      "lastName" -> optional(text)
+        .verifying("error.lastNameRequired", _.isDefined)
+        .verifying("error.lastNameLength", i => i.isEmpty || i.getOrElse("").length <= 35)
+        .verifying("error.lastNamePattern", i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z0-9 \-,.&'\\]{1,35}$""")),
+
+      "role" -> optional(text)
+        .verifying("error.roleRequired", _.isDefined)
+        .verifying("error.roleLength", i => i.isEmpty || i.getOrElse("").length <= 30)
+        .verifying("error.rolePattern", i => i.isEmpty || i.getOrElse("").length > 30 || i.getOrElse("").matches("""^[A-Za-z0-9 \-,.&'\/]{1,30}$""")),
+
+      "phone" -> optional(text)
+        .verifying("error.phoneRequired", _.isDefined)
+        .verifying("error.phonePattern", i => i.isEmpty || i.getOrElse("").matches("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""")),
+
+      "email" -> optional(email)
+        .verifying("error.emailRequired", _.isDefined)
+    )(
+      (firstName, lastName, role, phone, email) => YourDetails(
+        firstName.getOrElse(""),
+        lastName.getOrElse(""),
+        role.getOrElse(""),
+        phone.getOrElse(""),
+        email.getOrElse("")
+      )
+    )(
+      details => Some(Some(details.firstName), Some(details.lastName), Some(details.role), Some(details.phone), Some(details.email))
+    )
   )
 }

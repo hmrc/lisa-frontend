@@ -117,7 +117,11 @@ class YourDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include ("<h1>Your name and contact details</h1>")
-        content must include ("This field is required")
+        content must include ("Enter your first name")
+        content must include ("Enter your last name")
+        content must include ("Enter your role in the company")
+        content must include ("Enter your phone number")
+        content must include ("Enter your email address")
       }
     }
 

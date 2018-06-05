@@ -26,14 +26,46 @@ case class TradingDetails(fsrRefNumber: String,
 
 object TradingDetails {
 
-  implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
-
   val cacheKey = "tradingDetails"
+
+  implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
 
   val form = Form(
     mapping(
-      "fsrRefNumber" -> text.verifying(pattern("""^[0-9]{6}$""".r, error="error.fsrRefNumber")),
-      "isaProviderRefNumber" -> text.verifying(pattern("""^Z([0-9]{4}|[0-9]{6})$""".r, error="error.isaProviderRefNumber"))
-    )(TradingDetails.apply)(TradingDetails.unapply)
+      "fsrRefNumber" -> optional(text)
+        .verifying("error.fsrRefNumberRequired", fsr => fsrExists(fsr))
+        .verifying("error.fsrRefNumberPattern", fsr => !fsrExists(fsr) || fsrIsNumeric(fsr))
+        .verifying("error.fsrRefNumberLength", fsr => !fsrExists(fsr) || !fsrIsNumeric(fsr) || fsrIsSixCharacters(fsr)),
+      "isaProviderRefNumber" -> optional(text)
+        .verifying("error.isaProviderRefNumberRequired", zref => zrefExists(zref))
+        .verifying("error.isaProviderRefNumberPattern", zref => !zrefExists(zref) || zrefIsCorrectPattern(zref))
+    )(
+      (fsr, zref) => TradingDetails(
+        fsr.getOrElse(""),
+        zref.getOrElse("")
+      )
+    )(
+      td => Some(Some(td.fsrRefNumber), Some(td.isaProviderRefNumber))
+    )
   )
+
+  private def fsrExists(fsr: Option[String]) = {
+    fsr.isDefined
+  }
+
+  private def fsrIsNumeric(fsr: Option[String]) = {
+    fsr.getOrElse("").matches("^[0-9]+$")
+  }
+
+  private def fsrIsSixCharacters(fsr: Option[String]) = {
+    fsr.getOrElse("").matches("^[0-9]{6}$")
+  }
+
+  private def zrefExists(fsr: Option[String]) = {
+    fsr.isDefined
+  }
+
+  private def zrefIsCorrectPattern(fsr: Option[String]) = {
+    fsr.getOrElse ("").matches ("^Z([0-9]{4}|[0-9]{6})$")
+  }
 }

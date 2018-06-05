@@ -37,8 +37,18 @@ trait OrganisationDetailsController extends LisaBaseController {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
-            case Some(data) => Ok(views.html.registration.organisation_details(OrganisationDetails.form.fill(data), businessLabel(businessStructure), businessHint(businessStructure)))
-            case None => Ok(views.html.registration.organisation_details(OrganisationDetails.form, businessLabel(businessStructure), businessHint(businessStructure)))
+            case Some(data) =>
+              Ok(views.html.registration.organisation_details(
+                OrganisationDetails.form.fill(data),
+                businessLabel(businessStructure),
+                businessHint(businessStructure)
+              ))
+            case None =>
+              Ok(views.html.registration.organisation_details(
+                OrganisationDetails.form,
+                businessLabel(businessStructure),
+                businessHint(businessStructure)
+              ))
           }
         }
       }
@@ -48,20 +58,19 @@ trait OrganisationDetailsController extends LisaBaseController {
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
 
-      OrganisationDetails.form.bindFromRequest.fold(
-        formWithErrors => {
-          shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-            case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-            case Some(businessStructure) => {
-              Future.successful(BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabel(businessStructure), businessHint(businessStructure))))
-            }
-          }
-        },
-        data => {
-          shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
-            shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-              case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-              case Some(businessStructure) => {
+      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case Some(businessStructure) => {
+          val form = if (isPartnership(businessStructure)) OrganisationDetails.partnershipForm else OrganisationDetails.form
+
+          form.bindFromRequest.fold(
+            formWithErrors => {
+              Future.successful(
+                BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabel(businessStructure), businessHint(businessStructure)))
+              )
+            },
+            data => {
+              shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
                 Logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId) => {
@@ -76,19 +85,18 @@ trait OrganisationDetailsController extends LisaBaseController {
                 }
               }
             }
-          }
+          )
         }
-      )
+      }
     }
   }
 
   private def businessLabel(businessStructure: BusinessStructure): String = {
-    val llp: String = Messages("org.details.llp")
+    if (isPartnership(businessStructure)) "Partnership Unique Taxpayer Reference (UTR)" else "Corporation Tax Unique Taxpayer Reference (UTR)"
+  }
 
-    businessStructure.businessStructure match {
-      case `llp` => "Partnership Unique Taxpayer Reference (UTR)"
-      case _ => "Corporation Tax Unique Taxpayer Reference (UTR)"
-    }
+  private def isPartnership(businessStructure: BusinessStructure): Boolean = {
+    businessStructure.businessStructure == Messages("org.details.llp")
   }
 
   private def businessHint(businessStructure: BusinessStructure): String = {
@@ -100,6 +108,7 @@ trait OrganisationDetailsController extends LisaBaseController {
                 "If it is 13 numbers, enter only the last 10 numbers."
     }
   }
+
 }
 
 object OrganisationDetailsController extends OrganisationDetailsController {
