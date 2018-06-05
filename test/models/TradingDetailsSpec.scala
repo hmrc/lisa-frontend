@@ -76,7 +76,7 @@ class TradingDetailsSpec extends PlaySpec {
 
         res.errors.size mustBe 1
         res.errors.head.key mustBe "isaProviderRefNumber"
-        res.errors.head.message mustBe "error.isaProviderRefNumberLength"
+        res.errors.head.message mustBe "error.isaProviderRefNumberPattern"
       }
 
       "given a isa provider number with invalid characters" in {

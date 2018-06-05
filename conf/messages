@@ -24,7 +24,6 @@ error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
 error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the right format
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
-error.isaProviderRefNumberLength=ISA manager reference must be 4 or 6 numbers
 error.isaProviderRefNumberPattern=Enter your ISA manager reference in the right format
 
 error.firstNameRequired=Enter your first name

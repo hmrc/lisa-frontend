@@ -39,7 +39,6 @@ object TradingDetails {
       "isaProviderRefNumber" -> optional(text)
         .verifying("error.isaProviderRefNumberRequired", zref => zrefExists(zref))
         .verifying("error.isaProviderRefNumberPattern", zref => !zrefExists(zref) || zrefIsCorrectPattern(zref))
-        .verifying("error.isaProviderRefNumberLength", zref => !zrefExists(zref) || !zrefIsCorrectPattern(zref) || zrefIsCorrectLength(zref))
     )(
       (fsr, zref) => TradingDetails(
         fsr.getOrElse(""),
@@ -67,10 +66,6 @@ object TradingDetails {
   }
 
   private def zrefIsCorrectPattern(fsr: Option[String]) = {
-    fsr.getOrElse ("").matches ("^Z([0-9]+)$")
-  }
-
-  private def zrefIsCorrectLength(fsr: Option[String]) = {
-    fsr.getOrElse("").matches("^Z([0-9]{4}|[0-9]{6})$")
+    fsr.getOrElse ("").matches ("^Z([0-9]{4}|[0-9]{6})$")
   }
 }
