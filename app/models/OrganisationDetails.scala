@@ -34,9 +34,11 @@ object OrganisationDetails {
   val form = Form(
     mapping(
       "companyName" -> optional(text)
-        .verifying("error.companyName", i => i.getOrElse("").matches(COMPANY_NAME_REGEX)),
+        .verifying("error.companyNameRequired", _.isDefined)
+        .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
+        .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
       "ctrNumber" -> optional(text)
-        .verifying("error.ctrNumber", _.getOrElse("").matches("^.+$"))
+        .verifying("error.ctrNumberRequired", _.getOrElse("").matches("^.+$"))
         .verifying("error.ctrNumberPattern", i => i.isEmpty || i.getOrElse("").matches(UTR_REGEX))
     )(
       (name, utr) => OrganisationDetails(
@@ -51,9 +53,11 @@ object OrganisationDetails {
   val partnershipForm = Form(
     mapping(
       "companyName" -> optional(text)
-        .verifying("error.companyName", i => i.getOrElse("").matches(COMPANY_NAME_REGEX)),
+        .verifying("error.companyNameRequired", _.isDefined)
+        .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
+        .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
       "ctrNumber" -> optional(text)
-        .verifying("error.partnershipUtr", _.getOrElse("").matches("^.+$"))
+        .verifying("error.partnershipUtrRequired", _.getOrElse("").matches("^.+$"))
         .verifying("error.partnershipUtrPattern", i => i.isEmpty || i.getOrElse("").matches(UTR_REGEX))
     )(
       (name, utr) => OrganisationDetails(

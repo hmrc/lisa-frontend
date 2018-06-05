@@ -22,7 +22,7 @@ import play.api.data.FormError
 
 class YourDetailsSpec extends PlaySpec {
 
-  "Organisation Details form" must {
+  "Your Details form" must {
 
     "show field required errors" when {
 
@@ -30,8 +30,26 @@ class YourDetailsSpec extends PlaySpec {
         val test = Map[String, String]()
         val res = SUT.bind(test)
 
-        res.errors mustBe Seq[FormError](FormError("firstName", "error.required"), FormError("lastName", "error.required"),
-          FormError("role", "error.required"),FormError("phone", "error.required"),FormError("email", "error.required"))
+        res.errors mustBe Seq[FormError](
+          FormError("firstName", "error.firstNameRequired"),
+          FormError("lastName", "error.lastNameRequired"),
+          FormError("role", "error.roleRequired"),
+          FormError("phone", "error.phoneRequired"),
+          FormError("email", "error.emailRequired")
+        )
+      }
+
+    }
+
+    "show first name too long" when {
+
+      "given a first name with too many characters" in {
+        val tooLong = "!23456789012345678901234567890123456"
+        val test = Map[String, String]("firstName"->tooLong, "lastName"->"B", "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "firstName"
+        res.errors.head.message mustBe "error.firstNameLength"
       }
 
     }
@@ -39,11 +57,24 @@ class YourDetailsSpec extends PlaySpec {
     "show first name invalid error" when {
 
       "given a first name with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "?","lastName"->"B","role"->"Manager","phone"->"01234","email"->"me@test.com")
+        val test = Map[String, String]("firstName" -> "?", "lastName"->"B", "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "firstName"
-        res.errors.head.message mustBe "error.firstName"
+        res.errors.head.message mustBe "error.firstNamePattern"
+      }
+
+    }
+
+    "show last name too long" when {
+
+      "given a last name with too many characters" in {
+        val tooLong = "!23456789012345678901234567890123456"
+        val test = Map[String, String]("firstName"->"A", "lastName"->tooLong, "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "lastName"
+        res.errors.head.message mustBe "error.lastNameLength"
       }
 
     }
@@ -51,11 +82,24 @@ class YourDetailsSpec extends PlaySpec {
     "show last name invalid error" when {
 
       "given a last name with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A","lastName"->"?","role"->"Manager","phone"->"01234","email"->"me@test.com")
+        val test = Map[String, String]("firstName" -> "A", "lastName"->"?", "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "lastName"
-        res.errors.head.message mustBe "error.lastName"
+        res.errors.head.message mustBe "error.lastNamePattern"
+      }
+
+    }
+
+    "show role too long" when {
+
+      "given a role with too many characters" in {
+        val tooLong = "!234567890123456789012345678901"
+        val test = Map[String, String]("firstName"->"A", "lastName"->"B", "role"->tooLong, "phone"->"01234", "email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "role"
+        res.errors.head.message mustBe "error.roleLength"
       }
 
     }
@@ -63,11 +107,11 @@ class YourDetailsSpec extends PlaySpec {
     "show role invalid error" when {
 
       "given a role with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A","lastName"->"B","role"->"?","phone"->"01234","email"->"me@test.com")
+        val test = Map[String, String]("firstName" -> "A", "lastName"->"B", "role"->"?", "phone"->"01234", "email"->"me@test.com")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "role"
-        res.errors.head.message mustBe "error.role"
+        res.errors.head.message mustBe "error.rolePattern"
       }
 
     }
@@ -75,11 +119,11 @@ class YourDetailsSpec extends PlaySpec {
     "show phone invalid error" when {
 
       "given a phone with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A","lastName"->"B","role"->"Manager","phone"->"?","email"->"me@test.com")
+        val test = Map[String, String]("firstName" -> "A", "lastName"->"B", "role"->"Manager", "phone"->"?", "email"->"me@test.com")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "phone"
-        res.errors.head.message mustBe "error.phone"
+        res.errors.head.message mustBe "error.phonePattern"
       }
 
     }
@@ -87,7 +131,7 @@ class YourDetailsSpec extends PlaySpec {
     "show email invalid error" when {
 
       "given a email with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A","lastName"->"B","role"->"Manager","phone"->"01234","email"->"?")
+        val test = Map[String, String]("firstName" -> "A", "lastName"->"B", "role"->"Manager", "phone"->"01234", "email"->"?")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "email"

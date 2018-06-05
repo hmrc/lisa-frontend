@@ -39,7 +39,10 @@ class TradingDetailsSpec extends PlaySpec {
         val test = Map[String, String]()
         val res = SUT.bind(test)
 
-        res.errors mustBe Seq[FormError](FormError("fsrRefNumber", "error.fsrRefNumber"), FormError("isaProviderRefNumber", "error.isaProviderRefNumber"))
+        res.errors mustBe Seq[FormError](
+          FormError("fsrRefNumber", "error.fsrRefNumberRequired"),
+          FormError("isaProviderRefNumber", "error.isaProviderRefNumberRequired")
+        )
       }
 
     }

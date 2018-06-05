@@ -33,11 +33,11 @@ object TradingDetails {
   val form = Form(
     mapping(
       "fsrRefNumber" -> optional(text)
-        .verifying("error.fsrRefNumber", fsr => fsrExists(fsr))
+        .verifying("error.fsrRefNumberRequired", fsr => fsrExists(fsr))
         .verifying("error.fsrRefNumberPattern", fsr => !fsrExists(fsr) || fsrIsNumeric(fsr))
         .verifying("error.fsrRefNumberLength", fsr => !fsrExists(fsr) || !fsrIsNumeric(fsr) || fsrIsSixCharacters(fsr)),
       "isaProviderRefNumber" -> optional(text)
-        .verifying("error.isaProviderRefNumber", zref => zrefExists(zref))
+        .verifying("error.isaProviderRefNumberRequired", zref => zrefExists(zref))
         .verifying("error.isaProviderRefNumberPattern", zref => !zrefExists(zref) || zrefIsCorrectPattern(zref))
         .verifying("error.isaProviderRefNumberLength", zref => !zrefExists(zref) || !zrefIsCorrectPattern(zref) || zrefIsCorrectLength(zref))
     )(

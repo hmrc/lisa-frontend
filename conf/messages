@@ -7,23 +7,43 @@ org.details.corpbody=Corporate Body
 org.details.friendlysoc.view=Friendly society
 org.details.friendlysoc=Friendly Society
 
-error.businessStructure=Select if your company is a limited liability partnership, limited company or friendly society
-error.companyName=Enter your company’s name
-error.ctrNumber=Enter your Corporation Tax UTR
+error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
+
+error.companyNameRequired=Enter your company’s name
+error.companyNameLength=Enter only the first 65 characters of your company’s name
+error.companyNamePattern=Company name can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
+
+error.ctrNumberRequired=Enter your Corporation Tax UTR
 error.ctrNumberPattern=Enter a Corporation Tax UTR that only contains 10 numbers
-error.partnershipUtr=Enter your Partnership UTR
+
+error.partnershipUtrRequired=Enter your Partnership UTR
 error.partnershipUtrPattern=Enter a Partnership UTR that only contains 10 numbers
-error.fsrRefNumber=Enter your 6 number Financial Conduct Authority reference
+
+error.fsrRefNumberRequired=Enter your 6 number Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
 error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the right format
-error.isaProviderRefNumber=Enter your ISA manager reference
+
+error.isaProviderRefNumberRequired=Enter your ISA manager reference
 error.isaProviderRefNumberLength=ISA manager reference must be 4 or 6 numbers
 error.isaProviderRefNumberPattern=Enter your ISA manager reference in the right format
-error.firstName=Enter your first name
-error.lastName=Enter your last name
-error.role=Enter your role in the company
-error.phone=Enter your phone number
-error.email=Enter your email address
+
+error.firstNameRequired=Enter your first name
+error.firstNameLength=Enter only the first 35 characters of your first name
+error.firstNamePattern=First name can only include letters a to z, 0 to 9, ampersands, apostrophes, backslashes, full stops, hyphens and spaces
+
+error.lastNameRequired=Enter your last name
+error.lastNameLength=Enter only the first 35 characters of your last name
+error.lastNamePattern=Last name can only include letters a to z, 0 to 9, ampersands, apostrophes, backslashes, full stops, hyphens and spaces
+
+error.roleRequired=Enter your role in the company
+error.roleLength=Enter only the first 30 characters of your role
+error.rolePattern=Role can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
+
+error.phoneRequired=Enter your phone number
+error.phonePattern=Enter a telephone number, like 01642 123 456 or +33 1 23 45 67 88
+
+error.emailRequired=Enter your email address
+error.email=Enter an email address with a name, @ symbol and a domain name, like yourname@example.com
 
 ##feedback
 
