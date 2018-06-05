@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@()(implicit request: Request[_], messages: Messages)
+@(isPartnership: Boolean)(implicit request: Request[_], messages: Messages)
 
 @views.html.main_template(title = "Your company’s details could not be found - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
@@ -26,19 +26,48 @@
 
     <h1>Your company’s details could not be found</h1>
 
-    <p>
-        This is because your company’s name or Unique Tax Reference (UTR) does not match
-        the details on the letters from HMRC.
-    </p>
+    <p>This could be for one of two reasons.</p>
 
-    <p>Check the company name you gave and make sure it:</p>
+    <div class="subsection">
+        <h2>Company name is not an exact match</h2>
 
-    <div class="gutter-left">
-        <ul class="list list-bullet">
-            <li>matches the name shown in letters from HMRC</li>
-            <li>has the same capital letters and spaces</li>
-            <li>uses either limited or LTD</li>
-        </ul>
+        <p>Your company name should match exactly the name that is registered with Companies House.</p>
+
+        <p>Check if your company name uses:</p>
+
+        <div class="gutter-left">
+            <ul class="list list-bullet">
+                <li>capital letters</li>
+                <li>spaces</li>
+                @if(isPartnership) {
+                    <li>limited liability partnership or LLP</li>
+                } else {
+                    <li>limited or LTD</li>
+                }
+            </ul>
+        </div>
+
+        @if(isPartnership) {
+            <p>
+                If you do not know the exact company name,
+                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment">you can contact HMRC to find that out</a>.
+            </p>
+        } else {
+            <p>
+                If you do not know the exact company name,
+                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries">you can contact HMRC to find that out</a>.
+            </p>
+        }
+    </div>
+
+    <div class="subsection">
+        <h2>Your Unique Taxpayer Reference (UTR) does not match</h2>
+
+        <p>Your UTR should match the UTR on any letters you have from HMRC.@if(!isPartnership) { This is the same number that you use on your company’s CT600 form. }</p>
+
+        <p>It can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers.</p>
+
+        <p>You can <a href="https://www.gov.uk/find-lost-utr-number">find out a lost UTR by contacting HMRC</a>.</p>
     </div>
 
     <div class="form-field form-field--submit">
