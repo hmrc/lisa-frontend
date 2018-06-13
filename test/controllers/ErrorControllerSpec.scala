@@ -30,7 +30,10 @@ class ErrorControllerSpec extends PlaySpec with GuiceOneAppPerSuite {
     "return 403" in {
       val result = ErrorController.accessDenied(fakeRequest)
       status(result) mustBe Status.FORBIDDEN
-      contentAsString(result) must include("You can’t access this service with this account</h1>")
+      val content = contentAsString(result)
+
+      content must include("There is a problem</h1>")
+      content must include("You signed in as an individual or agent.")
     }
   }
 

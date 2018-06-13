@@ -40,13 +40,21 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
   private val logoutCallback = configuration.getString("gg-urls.logout-callback.url").getOrElse("/lifetime-isa")
 
   lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
+  lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 
   override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
   override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
   override lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   override lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  override lazy val signOutUrl = s"$caFrontendHost/gg/sign-out?continue=$logoutCallback"
+  override lazy val signOutUrl = getSignOutUrl(logoutCallback)
   override lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
   override lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
   override lazy val loginCallback: String = configuration.getString("gg-urls.login-callback.url").getOrElse("/lifetime-isa")
+
+  def getSignOutUrl(callbackUrl: String): String = {
+    val encodedCallbackUrl = java.net.URLEncoder.encode(callbackUrl, "UTF-8")
+
+    s"$caFrontendHost/gg/sign-out?continue=$encodedCallbackUrl"
+  }
+
 }

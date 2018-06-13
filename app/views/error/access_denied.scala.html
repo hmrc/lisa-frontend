@@ -14,25 +14,19 @@
  * limitations under the License.
  *@
 
-@(ggLoginUrl: String)(implicit request: Request[_], messages: Messages)
+@(ggLoginUrl: String, registerOrgUrl: String)(implicit request: Request[_], messages: Messages)
 
+@views.html.main_template(title = "There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+    <h1>There is a problem</h1>
 
+    <p>You signed in as an individual or agent.</p>
 
-@views.html.main_template(title = "Access denied", bodyClasses = None) {
-    <h1>You can’t access this service with this account</h1>
+    <p>To use the service, you must either:</p>
 
-    <section class="subsection">
-        <p>
-            To use this service you should sign in with an ‘organisation’ account, but it looks
-            like you've tried to use either an ‘individual’ or ‘agent’ account.
-        </p>
-
-        <p>
-            If you don't have an organisation account you can register for a new one.
-        </p>
-    </section>
-
-    <p>
-        <a class="button" href="@ggLoginUrl" role="button" id="sign-in">Sign in or register</a>
-    </p>
+    <div class="gutter-left">
+        <ul class="list list-bullet">
+            <li><a href="@ggLoginUrl" id="sign-in">sign in with your organisation details</a></li>
+            <li><a href="@registerOrgUrl" id="register">register as an organisation</a></li>
+        </ul>
+    </div>
 }
