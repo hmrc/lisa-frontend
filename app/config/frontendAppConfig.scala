@@ -51,6 +51,10 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
   override lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
   override lazy val loginCallback: String = configuration.getString("gg-urls.login-callback.url").getOrElse("/lifetime-isa")
 
-  def getSignOutUrl(callbackUrl: String): String = s"$caFrontendHost/gg/sign-out?continue=$callbackUrl"
+  def getSignOutUrl(callbackUrl: String): String = {
+    val encodedCallbackUrl = java.net.URLEncoder.encode(callbackUrl, "UTF-8")
+
+    s"$caFrontendHost/gg/sign-out?continue=$encodedCallbackUrl"
+  }
 
 }
