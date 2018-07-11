@@ -29,6 +29,9 @@
         <!--<p id="signed-out-text">@Messages("label.youre_now_signed_out_of_your_lifetime_isa_account")</p>-->
         <hr class="lisa-hr" />
         <h2 class="heading-medium" id="satisfaction-survey-heading">@Messages("label.satisfaction_survey")</h2>
+
+        <p>@Messages("label.survey_gpdr")</p>
+
         @helpers.form(action = controllers.routes.QuestionnaireController.submitQuestionnaire, 'class -> "satisfactionSurveyForm") {
 
         @inputRadioGroup(questionnaireForm("satisfactionLevel"),
