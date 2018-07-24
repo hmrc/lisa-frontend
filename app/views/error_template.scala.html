@@ -14,18 +14,14 @@
  * limitations under the License.
  *@
 
-@(pageTitle: String, heading: String, message: String, message2: Option[String] = None)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
 
 @contentHeader = {
   <h1>@heading</h1>
 }
 
 @mainContent = {
-  <p>@message</p>
-
-  @if(message2.isDefined) {
-    <p>@Html(message2.get)</p>
-  }
+  <p>@Html(message)</p>
 }
 
 @govuk_wrapper(appConfig = config.FrontendAppConfig, title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent, showSignOutLink = false)
