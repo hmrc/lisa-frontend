@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@(form: Form[_])
+@(form: Form[_], gaActionPage: String)
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
 
@@ -30,7 +30,7 @@
 
         <ul>
             @form.errors.map { error =>
-                <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error'>
+                <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error' data-journey='There is a problem - view:@gaActionPage:@error.message'>
                     <a href='#@error.key.replaceAll("""[\.\[\]]""", "_")'>
                         @Messages(error.message, error.args : _*)
                     </a>

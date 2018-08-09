@@ -22,9 +22,9 @@
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
 
-    @errorSummaryOrgTemplate(form)
+    @errorSummaryOrgTemplate(form, "Select your company structure")
 
     <h1>Select your company structure</h1>
 
@@ -40,7 +40,7 @@
         </div>
 
         <div class="form-field form-field--submit">
-            <input type="submit" class="button" value="Continue" id="continue">
+            <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Select your company structure:Continue">
         </div>
     </form>
 
