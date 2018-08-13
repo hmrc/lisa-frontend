@@ -22,7 +22,7 @@
 
 @views.html.main_template(title = "Your company’s details could not be found - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Your company’s details could not be found:Back">Back</a></p>
 
     <h1>Your company’s details could not be found</h1>
 
@@ -50,12 +50,12 @@
         @if(isPartnership) {
             <p>
                 If you do not know the exact company name,
-                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment">you can contact HMRC to find that out</a>.
+                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - self assessment">you can contact HMRC to find that out</a>.
             </p>
         } else {
             <p>
                 If you do not know the exact company name,
-                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries">you can contact HMRC to find that out</a>.
+                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - corporation tax">you can contact HMRC to find that out</a>.
             </p>
         }
     </div>
@@ -67,10 +67,10 @@
 
         <p>It can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers.</p>
 
-        <p>You can <a href="https://www.gov.uk/find-lost-utr-number">find out a lost UTR by contacting HMRC</a>.</p>
+        <p>You can <a href="https://www.gov.uk/find-lost-utr-number" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out a lost UTR">find out a lost UTR by contacting HMRC</a>.</p>
     </div>
 
     <div class="form-field form-field--submit">
-        <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="continue">Try again</a></p>
+        <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="continue" data-journey-click="button - click:Your company’s details could not be found:Try again">Try again</a></p>
     </div>
 }

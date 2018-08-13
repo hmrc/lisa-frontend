@@ -22,9 +22,9 @@
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back" id="back">Back</a></p>
+    <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Your name and contact details:Back">Back</a></p>
 
-    @errorSummaryOrgTemplate(form)
+    @errorSummaryOrgTemplate(form, "Your name and contact details")
 
     <h1>Your name and contact details</h1>
 
@@ -52,7 +52,7 @@
             @input(form("email"), '_label -> "Email address", '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-field form-field--submit">
-            <input type="submit" class="button" value="Continue" id="continue">
+            <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your name and contact details:Continue">
         </div>
     </form>
 
