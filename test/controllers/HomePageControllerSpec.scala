@@ -26,15 +26,10 @@ class HomePageControllerSpec extends PlaySpec with OneAppPerSuite {
   val fakeRequest = FakeRequest("GET", "/")
   
   "GET /" should {
-    "return 200" in {
+    "301 redirect the user to the company structure page" in {
       val result = HomePageController.home(fakeRequest)
-      status(result) mustBe Status.OK
-    }
-
-    "return HTML" in {
-      val result = HomePageController.home(fakeRequest)
-      contentType(result) mustBe Some("text/html")
-      charset(result) mustBe Some("utf-8")
+      status(result) mustBe Status.MOVED_PERMANENTLY
+      redirectLocation(result).getOrElse("") mustBe "/lifetime-isa/company-structure"
     }
   }
 
