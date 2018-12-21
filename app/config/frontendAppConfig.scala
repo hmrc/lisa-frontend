@@ -22,6 +22,8 @@ import uk.gov.hmrc.play.config.ServicesConfig
 trait AppConfig {
   val analyticsToken: String
   val analyticsHost: String
+  val gtmEnabled: Boolean
+  val gtmAppId: String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
   val signOutUrl: String
@@ -44,6 +46,8 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
 
   override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
   override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
+  override lazy val gtmEnabled: Boolean = configuration.getBoolean(s"google-tag-manager.enabled").getOrElse(false)
+  override lazy val gtmAppId: String = loadConfig(s"google-tag-manager.id")
   override lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   override lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
   override lazy val signOutUrl = getSignOutUrl(logoutCallback)
