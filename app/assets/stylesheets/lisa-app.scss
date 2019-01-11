@@ -3,22 +3,22 @@
 
 .flash.error-summary {
     border-width: 4px;
-    border-color: #b10e1e;
+    border-color: $error-red;
 
     a {
         font-weight: bold;
-        color: #b10e1e;
+        color: $error-red;
     }
 }
 
 .form-field--error {
     border-left-width: 4px;
-    border-left-color: #b10e1e;
+    border-left-color: $error-red;
 
     .error-notification {
         font-size: 19px;
         font-weight: bold;
-        color: #b10e1e;
+        color: $error-red;
     }
 }
 
