@@ -20,7 +20,17 @@
 
 @(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages,  title: String = "Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
-@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
+@scriptElement = {
+    <script type="text/javascript">
+        $(function() {
+            if ($('.error-summary--show').length) {
+                $('.error-summary--show').focus();
+            }
+        });
+    </script>
+}
+
+@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None, scriptElem = Some(scriptElement)) {
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
 
