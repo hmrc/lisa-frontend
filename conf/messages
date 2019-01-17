@@ -30,10 +30,10 @@ error.partnershipUtrPattern=Enter a Partnership UTR that only contains 10 number
 
 error.fsrRefNumberRequired=Enter your 6 number Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
-error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the right format
+error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the correct format
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
-error.isaProviderRefNumberPattern=Enter your ISA manager reference in the right format
+error.isaProviderRefNumberPattern=Enter your ISA manager reference in the correct format
 
 error.firstNameRequired=Enter your first name
 error.firstNameLength=Enter only the first 35 characters of your first name
