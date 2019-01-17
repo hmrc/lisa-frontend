@@ -14,7 +14,7 @@ org.details.friendlysoc=Friendly Society
 tradingdetails.fsrref.label=Financial Conduct Authority reference
 tradingdetails.fsrref.hint=This is 6 numbers.
 tradingdetails.isaref.label=ISA manager reference
-tradingdetails.isaref.hint=This begins with a capital ‘Z’ and includes 4 or 6 numbers.
+tradingdetails.isaref.hint=This begins with a ‘Z’ and includes 4 or 6 numbers.
 
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 

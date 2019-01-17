@@ -66,6 +66,10 @@ object TradingDetails {
   }
 
   private def zrefIsCorrectPattern(fsr: Option[String]) = {
-    fsr.getOrElse ("").matches ("^Z([0-9]{4}|[0-9]{6})$")
+    fsr.getOrElse ("").matches ("^(z|Z)([0-9]{4}|[0-9]{6})$")
+  }
+
+  def uppercaseZ(tradingDetails: TradingDetails): TradingDetails = {
+    TradingDetails(tradingDetails.fsrRefNumber, tradingDetails.isaProviderRefNumber.replace("z", "Z"))
   }
 }
