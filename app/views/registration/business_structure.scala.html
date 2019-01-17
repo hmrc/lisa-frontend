@@ -1,5 +1,5 @@
 @*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,21 @@
 
 @(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages,  title: String = "Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
-@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
+@scriptElement = {
+    <script type="text/javascript">
+        $(function() {
+            if ($('.error-summary--show').length) {
+                $('.error-summary--show').focus();
+            }
+        });
+    </script>
+}
+
+@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None, scriptElem = Some(scriptElement)) {
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
 
     @errorSummaryOrgTemplate(form, "Select your company structure")
-
-    <h1>Select your company structure</h1>
 
     <form method="post">
         @CSRF.formField
@@ -36,7 +44,7 @@
                 (Messages("org.details.llp"), Messages("org.details.llp.view")),
                 (Messages("org.details.corpbody"), Messages("org.details.corpbody.view")),
                 (Messages("org.details.friendlysoc"), Messages("org.details.friendlysoc.view"))
-            ), '_labelClass -> "block-label", '_legend -> "Select your company structure", '_legendClass -> Some("visuallyhidden"))
+            ), '_labelClass -> "block-label", '_legend -> <h1>Select your company structure</h1>)
         </div>
 
         <div class="form-field form-field--submit">
