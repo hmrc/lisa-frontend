@@ -20,8 +20,6 @@
 
 @(email: String, subscriptionId: String)(implicit request: Request[_], messages: Messages)
 
-
-
 @analyticsAdditionalJs = {
     ga('set', 'location', document.URL.split("?")[0]);
     ga('set', 'page', '/lifetime-isa/application-submitted');
@@ -30,17 +28,17 @@
 @views.html.main_template(title = "Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, analyticsAdditionalJs = Some(analyticsAdditionalJs)) {
 
     <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">Application submitted</h1>
-        <p>Your application reference is @subscriptionId</p>
+        <h1 class="transaction-banner__heading">@Messages("applicationsubmitted.banner.heading")</h1>
+        <p>@Messages("applicationsubmitted.banner.line1", subscriptionId)</p>
     </div>
 
-    <p>A confirmation email has been sent to @email.</p>
+    <p>@Messages("applicationsubmitted.text.line1", email)</p>
 
-    <h2>What happens next</h2>
+    <h2>@Messages("applicationsubmitted.text.line2")</h2>
 
-    <p>HMRC will review your application. This can take up to 14 calendar days.</p>
+    <p>@Messages("applicationsubmitted.text.line3")</p>
 
-    <p>We will send another email to @email when the decision has been made.</p>
+    <p>@Messages("applicationsubmitted.text.line4", email)</p>
 
     <p>If you need to change your application, email <a href="mailto:savings.audit@@hmrc.gsi.gov.uk" data-journey-click="link - click:Application submitted:Email savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a>.</p>
 
