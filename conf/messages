@@ -20,6 +20,14 @@ org.details.hint.llp=Self Assessment
 org.details.hint.notllp=Corporation Tax, including your CT600 form
 org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a href='https://www.gov.uk/find-lost-utr-number'>find a lost UTR number</a>.
 
+yourdetails.heading=Your name and contact details
+yourdetails.indent=HMRC might contact you to confirm the details in this application.
+yourdetails.firstname=First name
+yourdetails.lastname=Last name
+yourdetails.role=Job title
+yourdetails.phone=Phone number
+yourdetails.email=Email address
+
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
@@ -41,13 +49,13 @@ error.isaProviderRefNumberPattern=Enter your ISA manager reference in the right 
 
 error.firstNameRequired=Enter your first name
 error.firstNameLength=Enter only the first 35 characters of your first name
-error.firstNamePattern=First name can only include letters a to z, 0 to 9, ampersands, apostrophes, backslashes, full stops, hyphens and spaces
+error.firstNamePattern=First name can only include letters a to z, 0 to 9, ampersands, apostrophes, back slashes, full stops, hyphens and spaces
 
 error.lastNameRequired=Enter your last name
 error.lastNameLength=Enter only the first 35 characters of your last name
-error.lastNamePattern=Last name can only include letters a to z, 0 to 9, ampersands, apostrophes, backslashes, full stops, hyphens and spaces
+error.lastNamePattern=Last name can only include letters a to z, 0 to 9, ampersands, apostrophes, back slashes, full stops, hyphens and spaces
 
-error.roleRequired=Enter your role in the company
+error.roleRequired=Enter your job title
 error.roleLength=Enter only the first 30 characters of your role
 error.rolePattern=Role can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
 
