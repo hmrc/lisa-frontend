@@ -92,7 +92,7 @@ trait OrganisationDetailsController extends LisaBaseController {
   }
 
   private def businessLabel(businessStructure: BusinessStructure): String = {
-    if (isPartnership(businessStructure)) "Partnership Unique Taxpayer Reference (UTR)" else "Corporation Tax Unique Taxpayer Reference (UTR)"
+    if (isPartnership(businessStructure)) "Self Assessment Unique Taxpayer Reference" else "Corporation Tax Unique Taxpayer Reference"
   }
 
   private def isPartnership(businessStructure: BusinessStructure): Boolean = {
@@ -100,13 +100,13 @@ trait OrganisationDetailsController extends LisaBaseController {
   }
 
   private def businessHint(businessStructure: BusinessStructure): String = {
-    val llp: String = Messages("org.details.llp")
-
-    businessStructure.businessStructure match {
-      case `llp` => "This can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers."
-      case _ => "This is the same number that you use on your company’s CT600 form. It can be 10 or 13 numbers. " +
-                "If it is 13 numbers, enter only the last 10 numbers."
+    val businessStructureSpecificHelp: String = if (isPartnership(businessStructure)) {
+      "Self Assessment"
+    } else {
+      "Corporation Tax, including your CT600 form"
     }
+
+    s"This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about $businessStructureSpecificHelp. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can find a lost UTR number."
   }
 
 }
