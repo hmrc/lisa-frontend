@@ -23,9 +23,10 @@ org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax r
 applicationsubmitted.banner.heading=Application submitted
 applicationsubmitted.banner.line1=Your application reference is {0}
 applicationsubmitted.text.line1=A confirmation email has been sent to {0}
-applicationsubmitted.text.line2=What happens next
-applicationsubmitted.text.line3=HMRC will review your application. This can take up to 14 calendar days.
-applicationsubmitted.text.line4=We will send another email to {0} when the decision has been made.
+applicationsubmitted.text.line2.pre=If you need to change your application, email
+applicationsubmitted.text.line3=What happens next
+applicationsubmitted.text.line4=HMRC will review your application. This can take up to 14 calendar days.
+applicationsubmitted.text.line5=We will send another email to {0} when the decision has been made.
 
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
