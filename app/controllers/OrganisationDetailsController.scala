@@ -24,6 +24,7 @@ import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
+import play.twirl.api.Html
 import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
@@ -99,10 +100,10 @@ trait OrganisationDetailsController extends LisaBaseController {
     businessStructure.businessStructure == Messages("org.details.llp")
   }
 
-  private def businessHint(businessStructure: BusinessStructure): String = {
+  private def businessHint(businessStructure: BusinessStructure): Html = {
     val businessStructureSpecificHelp: String =
       if (isPartnership(businessStructure)) Messages("org.details.hint.llp") else Messages("org.details.hint.notllp")
-    Messages("org.details.hint", businessStructureSpecificHelp)
+    Html(Messages("org.details.hint", businessStructureSpecificHelp))
   }
 
 }
