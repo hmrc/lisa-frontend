@@ -11,6 +11,9 @@ org.details.corpbody=Corporate Body
 org.details.friendlysoc.view=Friendly society
 org.details.friendlysoc=Friendly Society
 
+org.details.companyname.label=Registered company name
+org.details.companyname.hint=This is the name registered with Companies House.
+
 org.details.label.llp=Self Assessment Unique Taxpayer Reference
 org.details.label.notllp=Corporation Tax Unique Taxpayer Reference
 org.details.hint.llp=Self Assessment
