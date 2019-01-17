@@ -102,7 +102,7 @@ trait OrganisationDetailsController extends LisaBaseController {
   private def businessHint(businessStructure: BusinessStructure): String = {
     val businessStructureSpecificHelp: String =
       if (isPartnership(businessStructure)) Messages("org.details.hint.llp") else Messages("org.details.hint.notllp")
-    Messages("org.details.hint", businessStructureSpecificHelp);
+    Messages("org.details.hint", businessStructureSpecificHelp)
   }
 
 }
