@@ -19,7 +19,7 @@
 @import views.html.error.errorSummaryOrgTemplate
 @import uk.gov.hmrc.play.views.html._
 
-@(form: Form[OrganisationDetails], utrLabel: String, utrHint: String)(implicit request: Request[_], messages: Messages,  title: String=  "Your company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[OrganisationDetails], utrLabel: String, utrHint: String)(implicit request: Request[_], messages: Messages, title: String=  "Your company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
