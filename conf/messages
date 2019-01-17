@@ -11,6 +11,12 @@ org.details.corpbody=Corporate Body
 org.details.friendlysoc.view=Friendly society
 org.details.friendlysoc=Friendly Society
 
+org.details.label.llp=Self Assessment Unique Taxpayer Reference
+org.details.label.notllp=Corporation Tax Unique Taxpayer Reference
+org.details.hint.llp=Self Assessment
+org.details.hint.notllp=Corporation Tax, including your CT600 form
+org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can find a lost UTR number.
+
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
