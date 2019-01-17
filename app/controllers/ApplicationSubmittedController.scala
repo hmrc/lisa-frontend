@@ -35,7 +35,6 @@ trait ApplicationSubmittedController extends LisaBaseController {
     authorisedForLisa((_) => {
       sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
         case Some(application) => {
-          val somthing = LocalDate.now().plusDays(14).format(DateTimeFormatter.BASIC_ISO_DATE)
           Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
         }
       }
