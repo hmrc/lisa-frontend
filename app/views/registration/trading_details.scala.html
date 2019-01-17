@@ -32,8 +32,8 @@
         @CSRF.formField
         <div class="form-group">
             @input(form("fsrRefNumber"),
-            '_label -> "Financial Conduct Authority reference",
-            '_inputHint -> "This is 6 numbers.",
+            '_label -> Messages("tradingdetails.fsrref.label"),
+            '_inputHint -> Messages("tradingdetails.fsrref.hint"),
             '_hintId -> "hint-fca-text",
             '_inputClass -> "form-control form-control--block",
             '_type -> "tel"
@@ -41,8 +41,8 @@
         </div>
         <div class="form-group">
             @input(form("isaProviderRefNumber"),
-            '_label -> "ISA manager reference",
-            '_inputHint -> "This begins with a capital ‘Z’ and includes 4 or 6 numbers.",
+            '_label -> Messages("tradingdetails.isaref.label"),
+            '_inputHint -> Messages("tradingdetails.isaref.hint"),
             '_inputClass -> "form-control form-control--block"
             )
         </div>
