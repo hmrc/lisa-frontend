@@ -20,6 +20,27 @@ org.details.hint.llp=Self Assessment
 org.details.hint.notllp=Corporation Tax, including your CT600 form
 org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a href='https://www.gov.uk/find-lost-utr-number'>find a lost UTR number</a>.
 
+summary.heading=Check your answers
+summary.companydetails.heading=Company details
+summary.companydetails.structure=Structure
+summary.companydetails.name=Name
+summary.companydetails.ctr=Unique Tax Reference (UTR)
+summary.companydetails.fsrref=Financial Conduct Authority reference
+summary.companydetails.isaref=ISA manager reference
+summary.companydetails.fsrref.hidden=your FCA reference number
+summary.companydetails.isaref.hidden=your ISA manager reference
+summary.yourdetails.heading=Your details
+summary.yourdetails.firstname=First name
+summary.yourdetails.lastname=Last name
+summary.yourdetails.role=Role in company
+summary.yourdetails.phone=Phone number
+summary.yourdetails.email=Email address
+summary.yourdetails.firstname.hidden=your first name
+summary.yourdetails.lastname.hidden=your last name
+summary.yourdetails.role.hidden=your role in the company
+summary.yourdetails.phone.hidden=your phone number
+summary.yourdetails.email.hidden=your email address
+
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name

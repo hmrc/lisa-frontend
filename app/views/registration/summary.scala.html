@@ -23,14 +23,14 @@
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Check your answers:Back">Back</a></p>
 
-    <h1 class="h1-heading">Check your answers</h1>
+    <h1 class="h1-heading">@Messages("summary.heading")</h1>
 
     <section class="subsection">
-        <h2 class="h2-heading">Company details</h2>
+        <h2 class="h2-heading">@Messages("summary.companydetails.heading")</h2>
 
         <!-- Business structure -->
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-businessStructure">Structure</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-businessStructure">@Messages("summary.companydetails.structure")</span>
             <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-businessStructure">
                 @if(data.businessStructure.businessStructure == Messages("org.details.llp")) {
                     @Messages("org.details.llp.view")
@@ -45,55 +45,55 @@
         </div>
         <!-- Org name -->
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-companyName">Name</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-companyName">@Messages("summary.companydetails.name")</span>
             <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-companyName">@data.organisationDetails.companyName</span>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-ctrNumber">Unique Tax Reference (UTR)</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-ctrNumber">@Messages("summary.companydetails.ctr")</span>
             <span class="tabular-data__data-1 tabular-data__data-1--2-col" id="value-ctrNumber">@data.organisationDetails.ctrNumber</span>
         </div>
         <!-- Org ref numbers -->
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-fsrRefNumber">Financial Conduct Authority reference</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-fsrRefNumber">@Messages("summary.companydetails.fsrref")</span>
             <span class="tabular-data__data-1" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</span>
-            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your FCA reference number">Change <span class="visuallyhidden">your FCA reference number</span></a>
+            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your FCA reference number">Change <span class="visuallyhidden">@Messages("summary.companydetails.fsrref.hidden")</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-isaProviderRefNumber">ISA manager reference</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-isaProviderRefNumber">@Messages("summary.companydetails.isaref")</span>
             <span class="tabular-data__data-1" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</span>
-            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-isaProviderRefNumber" data-journey-click="link - click:Check your answers:Change your ISA manager reference">Change <span class="visuallyhidden">your ISA manager reference</span></a>
+            <a class="tabular-data__data-2" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-isaProviderRefNumber" data-journey-click="link - click:Check your answers:Change your ISA manager reference">Change <span class="visuallyhidden">@Messages("summary.companydetails.isaref.hidden")</span></a>
         </div>
     </section>
 
 
     <!-- Your details -->
     <section class="subsection">
-        <h2 class="h2-heading">Your details</h2>
+        <h2 class="h2-heading">@Messages("summary.yourdetails.heading")</h2>
 
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-firstName">First name</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-firstName">@Messages("summary.yourdetails.firstname")</span>
             <span class="tabular-data__data-1" id="value-firstName">@data.yourDetails.firstName</span>
-            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-firstName" data-journey-click="link - click:Check your answers:Change your first name">Change <span class="visuallyhidden">your first name</span></a>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-firstName" data-journey-click="link - click:Check your answers:Change your first name">Change <span class="visuallyhidden">@Messages("summary.yourdetails.firstname.hidden")</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-lastName">Last name</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-lastName">@Messages("summary.yourdetails.lastname")</span>
             <span class="tabular-data__data-1" id="value-lastName">@data.yourDetails.lastName</span>
-            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-lastName" data-journey-click="link - click:Check your answers:Change your last name">Change <span class="visuallyhidden">your last name</span></a>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-lastName" data-journey-click="link - click:Check your answers:Change your last name">Change <span class="visuallyhidden">@Messages("summary.yourdetails.lastname.hidden")</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-role">Role in company</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-role">@Messages("summary.yourdetails.role")</span>
             <span class="tabular-data__data-1" id="value-role">@data.yourDetails.role</span>
-            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-role" data-journey-click="link - click:Check your answers:Change your role in the company">Change <span class="visuallyhidden">your role in the company</span></a>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-role" data-journey-click="link - click:Check your answers:Change your role in the company">Change <span class="visuallyhidden">@Messages("summary.yourdetails.role.hidden")</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-phone">Phone number</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-phone">@Messages("summary.yourdetails.phone")</span>
             <span class="tabular-data__data-1" id="value-phone">@data.yourDetails.phone</span>
-            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-phoneNumber" data-journey-click="link - click:Check your answers:Change your phone number">Change <span class="visuallyhidden">your phone number</span></a>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-phoneNumber" data-journey-click="link - click:Check your answers:Change your phone number">Change <span class="visuallyhidden">@Messages("summary.yourdetails.phone.hidden")</span></a>
         </div>
         <div class="tabular-data__entry tabular-data__entry--grouped divider--bottom">
-            <span class="tabular-data__heading tabular-data__heading--label" id="title-email">Email address</span>
+            <span class="tabular-data__heading tabular-data__heading--label" id="title-email">@Messages("summary.yourdetails.email")</span>
             <span class="tabular-data__data-1" id="value-email">@data.yourDetails.email</span>
-            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-email" data-journey-click="link - click:Check your answers:Change your email address">Change <span class="visuallyhidden">your email address</span></a>
+            <a class="tabular-data__data-2" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-email" data-journey-click="link - click:Check your answers:Change your email address">Change <span class="visuallyhidden">@Messages("summary.yourdetails.email.hidden")</span></a>
         </div>
     </section>
 
