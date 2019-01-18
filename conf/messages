@@ -20,6 +20,10 @@ org.details.hint.llp=Self Assessment
 org.details.hint.notllp=Corporation Tax, including your CT600 form
 org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a href='https://www.gov.uk/find-lost-utr-number'>find a lost UTR number</a>.
 
+applicationpending.heading=We are reviewing your application
+applicationpending.text.line1=The review process can take up to 14 calendar days from the date you submitted your application. We will email you when we have made the decision.
+applicationpending.text.line2.pre=If you need to change your application, email
+
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
