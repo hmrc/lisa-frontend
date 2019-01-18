@@ -24,6 +24,7 @@ import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
+import play.twirl.api.Html
 import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
@@ -92,21 +93,17 @@ trait OrganisationDetailsController extends LisaBaseController {
   }
 
   private def businessLabel(businessStructure: BusinessStructure): String = {
-    if (isPartnership(businessStructure)) "Partnership Unique Taxpayer Reference (UTR)" else "Corporation Tax Unique Taxpayer Reference (UTR)"
+    if (isPartnership(businessStructure)) Messages("org.details.label.llp") else Messages("org.details.label.notllp")
   }
 
   private def isPartnership(businessStructure: BusinessStructure): Boolean = {
     businessStructure.businessStructure == Messages("org.details.llp")
   }
 
-  private def businessHint(businessStructure: BusinessStructure): String = {
-    val llp: String = Messages("org.details.llp")
-
-    businessStructure.businessStructure match {
-      case `llp` => "This can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers."
-      case _ => "This is the same number that you use on your company’s CT600 form. It can be 10 or 13 numbers. " +
-                "If it is 13 numbers, enter only the last 10 numbers."
-    }
+  private def businessHint(businessStructure: BusinessStructure): Html = {
+    val businessStructureSpecificHelp: String =
+      if (isPartnership(businessStructure)) Messages("org.details.hint.llp") else Messages("org.details.hint.notllp")
+    Html(Messages("org.details.hint", businessStructureSpecificHelp))
   }
 
 }

@@ -51,6 +51,11 @@
                 ga('send', 'event', 'link - click', pageTitle, 'sign out');
             });
         });
+        $(function() {
+            if ($('.error-summary--show').length) {
+                $('.error-summary--show').focus();
+            }
+        });
     </script>
     @scriptElem
 }
