@@ -42,6 +42,10 @@ applicationsubmitted.text.line3=What happens next
 applicationsubmitted.text.line4=HMRC will review your application by {0}.
 applicationsubmitted.text.line5=We will send another email to {0} when we have made a decision.
 
+applicationpending.heading=We are reviewing your application
+applicationpending.text.line1=The review process can take up to 14 calendar days from the date you submitted your application. We will email you when we have made the decision.
+applicationpending.text.line2.pre=If you need to change your application, email
+
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name

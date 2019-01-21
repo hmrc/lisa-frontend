@@ -20,20 +20,11 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
+@views.html.main_template(title = "Reviewing your application - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
+    <h1>@Messages("applicationpending.heading")</h1>
 
-@views.html.main_template(title = "Application pending - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+    <p>@Messages("applicationpending.text.line1")</p>
 
-    <h1>Application pending</h1>
-
-    <p>We are reviewing your application.</p>
-
-    <p>The review process can take up to 14 calendar days. We will email you when we have made the decision.</p>
-
-    <p>If you need to make a change to your application, email <a href="mailto:savings.audit@@hmrc.gsi.gov.uk" data-journey-click="link - click:Application pending:Email savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a>.</p>
-
-    <div class="form-field form-field--submit">
-        <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out" data-journey-click="button - click:Application pending:Sign out">Sign out</a></p>
-    </div>
-
+    <p>@Messages("applicationpending.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application pending:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk</a></p>
 }
