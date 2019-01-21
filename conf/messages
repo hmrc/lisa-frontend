@@ -69,7 +69,7 @@ summary.yourdetails.role.change=Change your job title
 summary.yourdetails.phone.change=Change your phone number
 summary.yourdetails.email.change=Change your email address
 
-error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
+error.companyStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
 error.companyNameLength=Enter only the first 65 characters of your company’s name
