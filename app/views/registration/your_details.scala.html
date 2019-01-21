@@ -24,32 +24,32 @@
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Your name and contact details:Back">Back</a></p>
 
-    @errorSummaryOrgTemplate(form, "Your name and contact details")
+    @errorSummaryOrgTemplate(form, Messages("yourdetails.heading"))
 
-    <h1>Your name and contact details</h1>
+    <h1>@Messages("yourdetails.heading")</h1>
 
     <div class="subsection">
         <p class="indent">
-            HMRC might contact you to confirm the details in this application.
+            @Messages("yourdetails.indent")
         </p>
     </div>
 
     <form method="post">
         @CSRF.formField
         <div class="form-group">
-            @input(form("firstName"), '_label -> "First name", '_inputClass -> "form-control form-control--block")
+            @input(form("firstName"), '_label -> Messages("yourdetails.firstname"), '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-group">
-            @input(form("lastName"), '_label -> "Last name", '_inputClass -> "form-control form-control--block")
+            @input(form("lastName"), '_label -> Messages("yourdetails.lastname"), '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-group">
-            @input(form("role"), '_label -> "Role in the company", '_inputClass -> "form-control form-control--block")
+            @input(form("role"), '_label -> Messages("yourdetails.role"), '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-group">
-            @input(form("phone"), '_label -> "Phone number", '_inputClass -> "form-control form-control--block")
+            @input(form("phone"), '_label -> Messages("yourdetails.phone"), '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-group">
-            @input(form("email"), '_label -> "Email address", '_inputClass -> "form-control form-control--block")
+            @input(form("email"), '_label -> Messages("yourdetails.email"), '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your name and contact details:Continue">
