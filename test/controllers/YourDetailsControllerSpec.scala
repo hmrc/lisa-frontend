@@ -119,7 +119,7 @@ class YourDetailsControllerSpec extends PlaySpec
         content must include ("<h1>Your name and contact details</h1>")
         content must include ("Enter your first name")
         content must include ("Enter your last name")
-        content must include ("Enter your role in the company")
+        content must include ("Enter your job title")
         content must include ("Enter your phone number")
         content must include ("Enter your email address")
       }

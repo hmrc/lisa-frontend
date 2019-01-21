@@ -17,9 +17,7 @@
 package controllers
 
 import config.{LisaSessionCache, LisaShortLivedCache}
-import connectors.EmailConnector
 import models.ApplicationSent
-import org.apache.commons.io.FileUtils
 import services.AuthorisationService
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._

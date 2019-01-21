@@ -131,7 +131,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val submittedPageTitle = ">Application submitted</h1>"
-  val pendingPageTitle = ">Application pending</h1>"
+  val pendingPageTitle = ">We are reviewing your application</h1>"
   val successPageTitle = ">Application successful</h1>"
   val rejectedPageTitle = ">Application not successful</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
