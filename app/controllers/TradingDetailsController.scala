@@ -46,7 +46,7 @@ trait TradingDetailsController extends LisaBaseController {
           Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
         },
         data => {
-          shortLivedCache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, data).flatMap { _ =>
+          shortLivedCache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, TradingDetails.uppercaseZ(data)).flatMap { _ =>
             handleRedirect(routes.YourDetailsController.get().url)
           }
         }
