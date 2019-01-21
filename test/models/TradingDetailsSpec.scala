@@ -25,7 +25,13 @@ class TradingDetailsSpec extends PlaySpec {
 
     "have no errors" when {
 
-      "both fields are correct" in {
+      "both fields are correct - lowercase z in isa ref" in {
+        val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "z123456")
+        val res = SUT.bind(test)
+        res.errors mustBe Nil
+      }
+
+      "both fields are correct - uppercase z in isa ref" in {
         val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "Z123456")
         val res = SUT.bind(test)
         res.errors mustBe Nil
