@@ -37,6 +37,11 @@
 @scriptElement = {
     <script type="text/javascript">
         $(function() {
+            if ($('.error-summary--show').length) {
+                $('.error-summary--show').focus();
+            }
+        });
+        $(function() {
             var pageTitle = $('title').text();
 
             $("#get-help-action").click(function() {

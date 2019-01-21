@@ -11,6 +11,7 @@ org.details.corpbody=Corporate Body
 org.details.friendlysoc.view=Friendly society
 org.details.friendlysoc=Friendly Society
 
+
 org.details.companyname.label=Registered company name
 org.details.companyname.hint=This is the name registered with Companies House.
 
@@ -19,6 +20,11 @@ org.details.label.notllp=Corporation Tax Unique Taxpayer Reference
 org.details.hint.llp=Self Assessment
 org.details.hint.notllp=Corporation Tax, including your CT600 form
 org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can <a href='https://www.gov.uk/find-lost-utr-number'>find a lost UTR number</a>.
+
+tradingdetails.fsrref.label=Financial Conduct Authority reference
+tradingdetails.fsrref.hint=This is 6 numbers.
+tradingdetails.isaref.label=ISA manager reference
+tradingdetails.isaref.hint=This begins with a ‘Z’ and includes 4 or 6 numbers.
 
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
@@ -34,10 +40,10 @@ error.partnershipUtrPattern=Enter a Partnership UTR that only contains 10 number
 
 error.fsrRefNumberRequired=Enter your 6 number Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
-error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the right format
+error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the correct format
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
-error.isaProviderRefNumberPattern=Enter your ISA manager reference in the right format
+error.isaProviderRefNumberPattern=Enter your ISA manager reference in the correct format
 
 error.firstNameRequired=Enter your first name
 error.firstNameLength=Enter only the first 35 characters of your first name

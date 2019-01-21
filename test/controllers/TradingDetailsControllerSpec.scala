@@ -49,7 +49,7 @@ class TradingDetailsControllerSpec extends PlaySpec
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val tradingForm = new TradingDetails(fsrRefNumber = "654321", isaProviderRefNumber = "Z1234")
+        val tradingForm = new TradingDetails(fsrRefNumber = "validFSRRefNumber", isaProviderRefNumber = "validISARefNumber")
 
         when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
@@ -63,7 +63,8 @@ class TradingDetailsControllerSpec extends PlaySpec
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("123")
+        content must include (tradingForm.fsrRefNumber)
+        content must include (tradingForm.isaProviderRefNumber)
       }
 
     }
@@ -118,33 +119,35 @@ class TradingDetailsControllerSpec extends PlaySpec
     }
 
     "redirect the user to your details" when {
-      "the submitted data is valid" in {
+      "the submitted data is valid - lowercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
-        val validJson = Json.obj(
-          "fsrRefNumber" -> "654321",
-          "isaProviderRefNumber" -> "Z1234"
-        )
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonLowercase))
         when(mockCache.cache[TradingDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
-
         status(result) mustBe Status.SEE_OTHER
-
+        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+      }
+      "the submitted data is valid - uppercase z" in {
+        val uri = controllers.routes.TradingDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
+        when(mockCache.cache[TradingDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        val result = SUT.post(request)
+        status(result) mustBe Status.SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
       }
     }
 
     "store trading details in cache" when {
-      "the submitted data is valid" in {
+      "the submitted data is valid - lowercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
-        val validJson = Json.obj(
-          "fsrRefNumber" -> "654321",
-          "isaProviderRefNumber" -> "Z1234"
-        )
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonLowercase))
         await(SUT.post(request))
-
+        verify(mockCache).cache[TradingDetails](any(), any(), any())(any(), any(), any())
+      }
+      "the submitted data is valid - uppercase z" in {
+        val uri = controllers.routes.TradingDetailsController.post().url
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
+        await(SUT.post(request))
         verify(mockCache).cache[TradingDetails](any(), any(), any())(any(), any(), any())
       }
     }
@@ -155,6 +158,15 @@ class TradingDetailsControllerSpec extends PlaySpec
 
   val pageTitle = "<h1>Your company’s reference numbers</h1>"
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
+
+  val validJsonLowercase = Json.obj(
+    "fsrRefNumber" -> "654321",
+    "isaProviderRefNumber" -> "z1234"
+  )
+  val validJsonUppercase = Json.obj(
+    "fsrRefNumber" -> "654321",
+    "isaProviderRefNumber" -> "Z1234"
+  )
 
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
     addToken(FakeRequest("POST", uri, FakeHeaders(), body))
