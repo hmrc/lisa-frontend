@@ -56,7 +56,7 @@ object OrganisationDetails {
         .verifying("error.companyNameRequired", _.isDefined)
         .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
         .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
-      "ctrNumber" -> optional(text)
+      "strNumber" -> optional(text)
         .verifying("error.partnershipUtrRequired", _.getOrElse("").matches("^.+$"))
         .verifying("error.partnershipUtrPattern", i => i.isEmpty || i.getOrElse("").matches(UTR_REGEX))
     )(
