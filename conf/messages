@@ -46,6 +46,11 @@ applicationpending.heading=We are reviewing your application
 applicationpending.text.line1=The review process can take up to 14 calendar days from the date you submitted your application. We will email you when we have made the decision.
 applicationpending.text.line2.pre=If you need to change your application, email
 
+applicationrejected.heading=Application not successful
+applicationrejected.text.line1=Your application to become an approved Lifetime ISA Manager was not successful
+applicationrejected.text.line2.pre=If you want more information, email
+applicationrejected.text.line3=Alternatively you can submit a new application.
+
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
