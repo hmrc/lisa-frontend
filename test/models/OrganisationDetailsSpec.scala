@@ -93,7 +93,7 @@ class OrganisationDetailsSpec extends PlaySpec {
         val test = Map[String, String]()
         val res = PartnershipSUT.bind(test)
 
-        res.errors mustBe Seq[FormError](FormError("companyName", "error.companyNameRequired"), FormError("ctrNumber", "error.partnershipUtrRequired"))
+        res.errors mustBe Seq[FormError](FormError("companyName", "error.companyNameRequired"), FormError("strNumber", "error.partnershipUtrRequired"))
       }
 
     }
@@ -101,7 +101,7 @@ class OrganisationDetailsSpec extends PlaySpec {
     "show company name invalid error" when {
 
       "given a empty company name" in {
-        val test = Map[String, String]("ctrNumber" -> "0123456789")
+        val test = Map[String, String]("strNumber" -> "0123456789")
         val res = PartnershipSUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
@@ -110,7 +110,7 @@ class OrganisationDetailsSpec extends PlaySpec {
 
       "given a company name that's too long" in {
         val tooLong = "!234567890123456789012345678901234567890123456789012345678901234567"
-        val test = Map[String, String]("companyName" -> tooLong, "ctrNumber" -> "0123456789")
+        val test = Map[String, String]("companyName" -> tooLong, "strNumber" -> "0123456789")
         val res = PartnershipSUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
@@ -118,7 +118,7 @@ class OrganisationDetailsSpec extends PlaySpec {
       }
 
       "given a company name with invalid characters" in {
-        val test = Map[String, String]("companyName" -> "?", "ctrNumber" -> "0123456789")
+        val test = Map[String, String]("companyName" -> "?", "strNumber" -> "0123456789")
         val res = PartnershipSUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "companyName"
@@ -133,15 +133,15 @@ class OrganisationDetailsSpec extends PlaySpec {
         val test = Map[String, String]("companyName" -> "ACME Ltd")
         val res = PartnershipSUT.bind(test)
         res.errors.size mustBe 1
-        res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.key mustBe "strNumber"
         res.errors.head.message mustBe "error.partnershipUtrRequired"
       }
 
       "given a utr that doesn't match the expected format" in {
-        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "?")
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "?")
         val res = PartnershipSUT.bind(test)
         res.errors.size mustBe 1
-        res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.key mustBe "strNumber"
         res.errors.head.message mustBe "error.partnershipUtrPattern"
       }
 

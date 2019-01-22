@@ -12,6 +12,10 @@
 
   .tabular-data__entry {
     table-layout: fixed;
+    margin: 0.63158em 4em 0.21053em 0;
+    a, span {
+        font-size: 19px;
+    }
   }
 
   .tabular-data__data-1 {

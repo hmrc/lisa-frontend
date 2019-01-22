@@ -20,7 +20,30 @@
 @import views.html.error.errorSummaryOrgTemplate
 @import uk.gov.hmrc.play.views.html._
 
-@(form: Form[OrganisationDetails], utrLabel: String, utrHint: Html)(implicit request: Request[_], messages: Messages, title: String=  "Your company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[OrganisationDetails], isPartnership: Boolean)(implicit request: Request[_], messages: Messages, title: String=  "Your company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+
+@utrName = @{if(isPartnership) {
+        "str"
+    } else {
+        "ctr"
+    }
+}
+
+@label = @{if(isPartnership) {
+        Messages("org.details.label.llp")
+    } else {
+        Messages("org.details.label.notllp")
+    }
+}
+
+@hint = @{
+    val businessStructureSpecificHelp = if(isPartnership) {
+        Messages("org.details.hint.llp")
+    } else {
+        Messages("org.details.hint.notllp")
+    }
+    Html(Messages("org.details.hint", businessStructureSpecificHelp))
+}
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
@@ -41,9 +64,9 @@
                 )
             </div>
             <div class="form-group">
-                @input(form("ctrNumber"),
-                '_label -> utrLabel,
-                '_inputHint -> utrHint,
+                @input(form(s"${utrName}Number"),
+                '_label -> label,
+                '_inputHint -> hint,
                 '_hintId -> "hint-utr-text",
                 '_inputClass -> "form-control form-control--block",
                 '_type -> "tel"
