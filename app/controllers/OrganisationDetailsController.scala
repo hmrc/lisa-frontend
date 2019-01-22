@@ -37,20 +37,20 @@ trait OrganisationDetailsController extends LisaBaseController {
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
+          val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership(businessStructure)) {
+            OrganisationDetails.partnershipForm
+          } else {
+            OrganisationDetails.form
+          }
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
             case Some(data) =>
-              val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership(businessStructure)) {
-                OrganisationDetails.partnershipForm.fill(data)
-              } else {
-                OrganisationDetails.form.fill(data)
-              }
               Ok(views.html.registration.organisation_details(
-                orgDetailsForm,
+                orgDetailsForm.fill(data),
                 isPartnership(businessStructure)
               ))
             case None =>
               Ok(views.html.registration.organisation_details(
-                OrganisationDetails.form,
+                orgDetailsForm,
                 isPartnership(businessStructure)
               ))
           }
