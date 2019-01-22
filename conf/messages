@@ -50,7 +50,7 @@ applicationrejected.heading=Application not successful
 applicationrejected.text.line1=Your application to become an approved Lifetime ISA Manager was not successful.
 applicationrejected.text.line2.pre=If you want more information, email
 applicationrejected.text.line3=You’ll need to give your application reference.
-applicationrejected.text.line4=Or you can <a href="/lifetime-isa/company-structure">apply again</a>
+applicationrejected.text.line4=Or you can <a id="apply-again" href="/lifetime-isa/company-structure">apply again</a>
 
 error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
