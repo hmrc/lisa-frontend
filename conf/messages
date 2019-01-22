@@ -54,7 +54,37 @@ applicationsuccessful.text.line1.link=Lifetime ISA API
 applicationsuccessful.text.line2=Use your LISA manager reference when reporting information to HMRC.
 applicationsuccessful.text.line3=You can sign back into this service at any time to see this reference.
 
-error.businessStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
+applicationrejected.heading=Application not successful
+applicationrejected.text.line1=Your application to become an approved Lifetime ISA Manager was not successful.
+applicationrejected.text.line2.pre=If you want more information, email
+applicationrejected.text.line3=You’ll need to give your application reference.
+applicationrejected.text.line4.pre=Or you can
+applicationrejected.text.line4.link=apply again
+
+summary.heading=Check your answers
+summary.change=Change
+summary.companydetails.heading=Company details
+summary.companydetails.structure=Company structure
+summary.companydetails.name=Registered company name
+summary.companydetails.str=Self Assessment Unique Taxpayer Reference
+summary.companydetails.ctr=Corporation Tax Unique Taxpayer Reference
+summary.companydetails.fsrref=Financial Conduct Authority reference
+summary.companydetails.isaref=ISA manager reference
+summary.companydetails.fsrref.change=Change your FCA reference number
+summary.companydetails.isaref.change=Change your ISA manager reference
+summary.yourdetails.heading=Your details
+summary.yourdetails.firstname=First name
+summary.yourdetails.lastname=Last name
+summary.yourdetails.role=Job title
+summary.yourdetails.phone=Phone number
+summary.yourdetails.email=Email address
+summary.yourdetails.firstname.change=Change your first name
+summary.yourdetails.lastname.change=Change your last name
+summary.yourdetails.role.change=Change your job title
+summary.yourdetails.phone.change=Change your phone number
+summary.yourdetails.email.change=Change your email address
+
+error.companyStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
 error.companyNameLength=Enter only the first 65 characters of your company’s name

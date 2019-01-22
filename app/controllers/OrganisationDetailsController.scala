@@ -20,11 +20,11 @@ import config.{FrontendAuthConnector, LisaSessionCache, LisaShortLivedCache}
 import models.OrganisationDetails._
 import models._
 import play.api.Play.current
+import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger, Play}
-import play.twirl.api.Html
 import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
@@ -37,18 +37,21 @@ trait OrganisationDetailsController extends LisaBaseController {
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
+          val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership(businessStructure)) {
+            OrganisationDetails.partnershipForm
+          } else {
+            OrganisationDetails.form
+          }
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
             case Some(data) =>
               Ok(views.html.registration.organisation_details(
-                OrganisationDetails.form.fill(data),
-                businessLabel(businessStructure),
-                businessHint(businessStructure)
+                orgDetailsForm.fill(data),
+                isPartnership(businessStructure)
               ))
             case None =>
               Ok(views.html.registration.organisation_details(
-                OrganisationDetails.form,
-                businessLabel(businessStructure),
-                businessHint(businessStructure)
+                orgDetailsForm,
+                isPartnership(businessStructure)
               ))
           }
         }
@@ -67,7 +70,7 @@ trait OrganisationDetailsController extends LisaBaseController {
           form.bindFromRequest.fold(
             formWithErrors => {
               Future.successful(
-                BadRequest(views.html.registration.organisation_details(formWithErrors, businessLabel(businessStructure), businessHint(businessStructure)))
+                BadRequest(views.html.registration.organisation_details(formWithErrors, isPartnership(businessStructure)))
               )
             },
             data => {
@@ -92,18 +95,8 @@ trait OrganisationDetailsController extends LisaBaseController {
     }
   }
 
-  private def businessLabel(businessStructure: BusinessStructure): String = {
-    if (isPartnership(businessStructure)) Messages("org.details.label.llp") else Messages("org.details.label.notllp")
-  }
-
   private def isPartnership(businessStructure: BusinessStructure): Boolean = {
     businessStructure.businessStructure == Messages("org.details.llp")
-  }
-
-  private def businessHint(businessStructure: BusinessStructure): Html = {
-    val businessStructureSpecificHelp: String =
-      if (isPartnership(businessStructure)) Messages("org.details.hint.llp") else Messages("org.details.hint.notllp")
-    Html(Messages("org.details.hint", businessStructureSpecificHelp))
   }
 
 }

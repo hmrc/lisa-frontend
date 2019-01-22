@@ -120,7 +120,7 @@ class BusinessStructureControllerSpec extends PlaySpec
     "redirect the user to organisation details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.BusinessStructureController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("businessStructure" -> "LLP")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
         when(mockCache.cache[BusinessStructure](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
 
@@ -133,7 +133,7 @@ class BusinessStructureControllerSpec extends PlaySpec
     "store business structure details in cache" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.BusinessStructureController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("businessStructure" -> "LLP")))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
 
         await(SUT.post(request))
 
