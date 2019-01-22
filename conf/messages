@@ -46,6 +46,14 @@ applicationpending.heading=We are reviewing your application
 applicationpending.text.line1=The review process can take up to 14 calendar days from the date you submitted your application. We will email you when we have made the decision.
 applicationpending.text.line2.pre=If you need to change your application, email
 
+applicationsuccessful.banner.heading=Application successful
+applicationsuccessful.banner.subheading=Your LISA and ISA manager references are the same:
+applicationsuccessful.heading=What this means for you
+applicationsuccessful.text.line1.pre=You can use your software to connect to the
+applicationsuccessful.text.line1.link=Lifetime ISA API
+applicationsuccessful.text.line2=Use your LISA manager reference when reporting information to HMRC.
+applicationsuccessful.text.line3=You can sign back into this service at any time to see this reference.
+
 applicationrejected.heading=Application not successful
 applicationrejected.text.line1=Your application to become an approved Lifetime ISA Manager was not successful.
 applicationrejected.text.line2.pre=If you want more information, email
