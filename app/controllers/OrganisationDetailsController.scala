@@ -20,6 +20,7 @@ import config.{FrontendAuthConnector, LisaSessionCache, LisaShortLivedCache}
 import models.OrganisationDetails._
 import models._
 import play.api.Play.current
+import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
@@ -38,8 +39,13 @@ trait OrganisationDetailsController extends LisaBaseController {
         case Some(businessStructure) => {
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
             case Some(data) =>
+              val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership(businessStructure)) {
+                OrganisationDetails.partnershipForm.fill(data)
+              } else {
+                OrganisationDetails.form.fill(data)
+              }
               Ok(views.html.registration.organisation_details(
-                OrganisationDetails.form.fill(data),
+                orgDetailsForm,
                 isPartnership(businessStructure)
               ))
             case None =>
