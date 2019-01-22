@@ -38,7 +38,10 @@ import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class OrganisationDetailsControllerSpec extends PlaySpec
+class
+
+
+OrganisationDetailsControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
   with MockitoSugar
   with CSRFTest
