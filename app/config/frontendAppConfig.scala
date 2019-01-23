@@ -31,7 +31,8 @@ trait AppConfig {
   val signOutUrl: String
   val betaFeedbackUrl: String
   val betaFeedbackUnauthenticatedUrl: String
-  val loginCallback:String
+  val loginCallback: String
+  val apiUrl: String
 }
 
 @Singleton
@@ -48,7 +49,7 @@ class FrontendAppConfig @Inject()(
   private val contactFormServiceIdentifier = "LISA"
   private val logoutCallback = getString("gg-urls.logout-callback.url")
 
-  lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
+  override lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
   lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 
   override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
