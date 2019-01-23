@@ -15,24 +15,21 @@
  *@
 
 @import helper.CSRF
+@import play.twirl.api.Html
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
 @()(implicit request: Request[_], messages: Messages)
 
-
 @views.html.main_template(title = "Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 
-    <h1>Application not successful</h1>
+    <h1>@Messages("applicationrejected.heading")</h1>
 
-    <p>Your application to become an approved Lifetime ISA Manager was not successful.</p>
+    <p>@Messages("applicationrejected.text.line1")</p>
 
-    <p>If you want more information, email <a href="mailto:savings.audit@@hmrc.gsi.gov.uk" data-journey-click="link - click:Application not successful:Email savings.audit@@hmrc.gsi.gov.uk">savings.audit@@hmrc.gsi.gov.uk</a>. You’ll need to quote your application reference.</p>
+    <p>@Messages("applicationrejected.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application not successful:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk</a></p>
 
-    <p>Alternatively you can submit a new application.</p>
+    <p>@Messages("applicationrejected.text.line3")</p>
 
-    <div class="form-field form-field--submit">
-        <p><a href="@routes.ReapplyController.get()" class="button" id="submit" data-journey-click="button - click:Application not successful:Submit new application">Submit new application</a></p>
-    </div>
-
+    <p>@Messages("applicationrejected.text.line4.pre") <a id="apply-again" href=@routes.ReapplyController.get()>@Messages("applicationrejected.text.line4.link")</a></p>
 }

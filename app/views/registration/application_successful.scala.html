@@ -22,24 +22,20 @@
 
 @views.html.main_template(title = "Application successful - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
     <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">Application successful</h1>
-        <p class="transaction-banner__subheading">Your LISA and ISA manager references are the same:</p>
+        <h1 class="transaction-banner__heading">@Messages("applicationsuccessful.banner.heading")</h1>
+        <p class="transaction-banner__subheading">@Messages("applicationsuccessful.banner.subheading")</p>
         <p>@zref</p>
     </div>
 
-    <h2>What happens next</h2>
+    <h2>@Messages("applicationsuccessful.heading")</h2>
 
     <p>
-        You can now use your software to connect to the
-        <a href="@FrontendAppConfig.apiUrl" data-journey-click="link - click:Application successful:Link to LISA's section on HMRC's Developer Hub">Lifetime ISA API</a>.
+        @Messages("applicationsuccessful.text.line1.pre")
+        <a href="@FrontendAppConfig.apiUrl" data-journey-click="link - click:Application successful:Link to LISA's section on HMRC's Developer Hub">@Messages("applicationsuccessful.text.line1.link")</a>.
     </p>
 
-    <p>Use your LISA manager reference when reporting information to HMRC.</p>
+    <p>@Messages("applicationsuccessful.text.line2")</p>
 
-    <p>You can sign back into this service at any time to see this reference.</p>
-
-    <div class="form-field form-field--submit">
-        <p><a href="@FrontendAppConfig.signOutUrl" class="button" id="sign-out" data-journey-click="button - click:Application successful:Sign out">Sign out</a></p>
-    </div>
+    <p>@Messages("applicationsuccessful.text.line3")</p>
 }
 
