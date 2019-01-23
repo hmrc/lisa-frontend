@@ -16,30 +16,34 @@
 
 package connectors
 
-import config.WSHttp
+import com.google.inject.Inject
 import metrics.EmailMetrics
 import models.SendEmailRequest
-import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
+import play.api.{Configuration, Environment, Logger}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut }
 
 
 sealed trait EmailStatus
 case object EmailSent extends EmailStatus
 case object EmailNotSent extends EmailStatus
 
-trait EmailConnector extends ServicesConfig with RawResponseReads {
+class EmailConnector @Inject()(
+  val http: WSHttp,
+  val runModeConfiguration: Configuration,
+  environment: Environment
+) extends ServicesConfig with RawResponseReads {
 
+  val mode = environment.mode
   val sendEmailUri: String = "hmrc/email"
 
   lazy val serviceUrl: String = baseUrl("email")
-
-  val http: HttpGet with HttpPost with HttpPut = WSHttp
 
   def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit hc: HeaderCarrier): Future[EmailStatus] = {
 
@@ -65,5 +69,3 @@ trait EmailConnector extends ServicesConfig with RawResponseReads {
     }
   }
 }
-
-object EmailConnector extends EmailConnector

@@ -16,15 +16,26 @@
 
 package controllers
 
+import com.google.inject.Inject
+import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
+import play.api.i18n.Messages
 import play.api.mvc._
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.{Configuration, Environment}
+import services.AuthorisationService
 
 import scala.concurrent.Future
 
-trait HomePageController extends FrontendController {
+class HomePageController @Inject()(
+                                 val sessionCache: LisaSessionCache,
+                                 val shortLivedCache: LisaShortLivedCache,
+                                 val env: Environment,
+                                 val config: Configuration,
+                                 val authorisationService: AuthorisationService,
+                                 implicit val appConfig: AppConfig,
+                                 implicit val messages: Messages
+                               ) extends LisaBaseController {
+
   val home: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Redirect(routes.BusinessStructureController.get(), MOVED_PERMANENTLY))
   }
 }
-
-object HomePageController extends HomePageController

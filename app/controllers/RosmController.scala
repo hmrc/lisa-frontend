@@ -16,7 +16,8 @@
 
 package controllers
 
-import config.{LisaSessionCache, LisaShortLivedCache}
+import com.google.inject.Inject
+import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
 import connectors.{EmailConnector, RosmJsonFormats}
 import models.{ApplicationSent, LisaRegistration}
 import play.api.mvc.{Action, _}
@@ -28,12 +29,18 @@ import play.api.i18n.Messages.Implicits._
 
 import scala.concurrent.Future
 
-trait RosmController extends LisaBaseController
-  with RosmJsonFormats {
-
-  val auditService:AuditService
-  val rosmService:RosmService
-  val emailConnector: EmailConnector
+class RosmController @Inject()(
+  val sessionCache: LisaSessionCache,
+  val shortLivedCache: LisaShortLivedCache,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  val auditService: AuditService,
+  val rosmService: RosmService,
+  val emailConnector: EmailConnector,
+  implicit val appConfig: AppConfig,
+  implicit val messages: Messages
+) extends LisaBaseController with RosmJsonFormats {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -94,15 +101,4 @@ trait RosmController extends LisaBaseController
     )
   }
 
-}
-
-object RosmController extends RosmController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val auditService = AuditService
-  override val rosmService = RosmService
-  override val authorisationService = AuthorisationService
-  override val emailConnector = EmailConnector
 }

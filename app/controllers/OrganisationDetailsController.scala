@@ -16,21 +16,27 @@
 
 package controllers
 
-import config.{FrontendAuthConnector, LisaSessionCache, LisaShortLivedCache}
-import models.OrganisationDetails._
-import models._
-import play.api.Play.current
+import com.google.inject.Inject
+import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
+import models.{BusinessStructure, OrganisationDetails}
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.i18n.Messages.Implicits._
-import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Logger, Play}
+import play.api.mvc.{Action, AnyContent}
+import play.api.{Configuration, Environment, Logger}
 import services.{AuthorisationService, RosmService}
 
 import scala.concurrent.Future
 
-trait OrganisationDetailsController extends LisaBaseController {
-  val rosmService: RosmService
+class OrganisationDetailsController @Inject()(
+  val sessionCache: LisaSessionCache,
+  val shortLivedCache: LisaShortLivedCache,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  val rosmService: RosmService,
+  implicit val appConfig: AppConfig,
+  implicit val messages: Messages
+) extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -99,15 +105,4 @@ trait OrganisationDetailsController extends LisaBaseController {
     businessStructure.businessStructure == Messages("org.details.llp")
   }
 
-}
-
-object OrganisationDetailsController extends OrganisationDetailsController {
-  val authConnector = FrontendAuthConnector
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val rosmService = RosmService
-
-  override val authorisationService = AuthorisationService
 }

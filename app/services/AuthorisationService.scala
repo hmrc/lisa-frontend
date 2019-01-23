@@ -16,22 +16,23 @@
 
 package services
 
-import config.FrontendAuthConnector
+import com.google.inject.Inject
 import connectors.UserDetailsConnector
 import models._
 import play.api.Logger
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait AuthorisationService extends AuthorisedFunctions {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-  val userDetailsConnector: UserDetailsConnector
-  val taxEnrolmentService: TaxEnrolmentService
+class AuthorisationService @Inject()(
+  val authConnector: AuthConnector,
+  val userDetailsConnector: UserDetailsConnector,
+  val taxEnrolmentService: TaxEnrolmentService) extends AuthorisedFunctions {
 
   def enrolmentAuthorised(implicit hc: HeaderCarrier): Future[Either[Boolean, String]] = {
     authorised(Enrolment("HMRC-LISA-ORG")).retrieve(authorisedEnrolments) { enr =>
@@ -99,10 +100,4 @@ trait AuthorisationService extends AuthorisedFunctions {
     }
   }
 
-}
-
-object AuthorisationService extends AuthorisationService {
-  val authConnector: AuthConnector = FrontendAuthConnector
-  override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
-  override val taxEnrolmentService: TaxEnrolmentService = TaxEnrolmentService
 }

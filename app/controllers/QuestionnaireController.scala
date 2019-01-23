@@ -16,25 +16,32 @@
 
 package controllers
 
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import com.google.inject.Inject
+import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
 import models.Questionnaire
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
-import services.AuditService
+import play.api.i18n.Messages
+import play.api.mvc.{Action, AnyContent}
+import play.api.{Configuration, Environment}
+import services.{AuditService, AuthorisationService}
 
 import scala.concurrent.Future
 
+class QuestionnaireController @Inject()(
+ val sessionCache: LisaSessionCache,
+ val shortLivedCache: LisaShortLivedCache,
+ val env: Environment,
+ val config: Configuration,
+ val authorisationService: AuthorisationService,
+ val auditService: AuditService,
+ implicit val appConfig: AppConfig,
+ implicit val messages: Messages
+) extends LisaBaseController {
 
-trait QuestionnaireController extends FrontendController {
-
-  val auditService:AuditService
-
-  def showQuestionnaire = Action.async { implicit request =>
+  def showQuestionnaire: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(views.html.feedback.feedbackQuestionnaire(Questionnaire.form)))
   }
 
-  def submitQuestionnaire = Action.async {
+  def submitQuestionnaire: Action[AnyContent] = Action.async {
     implicit request =>
       Questionnaire.form.bindFromRequest.fold(
         formWithErrors => {
@@ -42,26 +49,21 @@ trait QuestionnaireController extends FrontendController {
           )
         },
         data => {
-          auditService.audit(auditType="lisaFeedbackSurvey", path=routes.QuestionnaireController.submitQuestionnaire().url,CreateQuestionnaireAudit(data))
+          auditService.audit(auditType="lisaFeedbackSurvey", path=routes.QuestionnaireController.submitQuestionnaire().url,createQuestionnaireAudit(data))
           Future.successful(Redirect(routes.QuestionnaireController.feedbackThankyou()))
         }
       )
   }
 
-  def feedbackThankyou = Action.async {
+  def feedbackThankyou: Action[AnyContent] = Action.async {
     implicit request =>
     Future.successful(Ok(views.html.feedback.thanks()))
   }
 
-  private def CreateQuestionnaireAudit(survey: Questionnaire): Map[String, String] = {
+  private def createQuestionnaireAudit(survey: Questionnaire): Map[String, String] = {
     Map(
       "satisfactionLevel" -> survey.satisfactionLevel.mkString,
       "whyGiveThisRating" -> survey.whyGiveThisRating.mkString
     )
   }
-}
-
-
-object QuestionnaireController extends QuestionnaireController {
-  override val auditService = AuditService
 }

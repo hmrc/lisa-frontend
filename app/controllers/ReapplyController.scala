@@ -16,13 +16,24 @@
 
 package controllers
 
-import config.{LisaSessionCache, LisaShortLivedCache}
+import com.google.inject.Inject
+import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
 import models.Reapplication
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment, Play}
-import services.AuthorisationService
+import services.{AuditService, AuthorisationService}
 
-trait ReapplyController extends LisaBaseController {
+class ReapplyController @Inject()(
+  val sessionCache: LisaSessionCache,
+  val shortLivedCache: LisaShortLivedCache,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit val messages: Messages
+) extends LisaBaseController {
+
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( (cacheId) =>{
         shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { res =>
@@ -31,12 +42,4 @@ trait ReapplyController extends LisaBaseController {
       }, checkEnrolmentState = false
     )
   }
-}
-
-object ReapplyController extends ReapplyController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val authorisationService = AuthorisationService
 }

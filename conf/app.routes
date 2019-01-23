@@ -1,24 +1,24 @@
 # microservice specific routes
 
-GET        /assets/*file                    controllers.Assets.versioned(path="/public", file: Asset)
-GET        /                                controllers.HomePageController.home
-GET        /access-denied                   controllers.ErrorController.accessDenied
-GET        /company-details                 controllers.OrganisationDetailsController.get
-POST       /company-details                 controllers.OrganisationDetailsController.post
-GET        /reference-numbers               controllers.TradingDetailsController.get
-POST       /reference-numbers               controllers.TradingDetailsController.post
-GET        /company-match-error             controllers.MatchingFailedController.get
-GET        /company-structure               controllers.BusinessStructureController.get
-POST       /company-structure               controllers.BusinessStructureController.post
-GET        /your-details                    controllers.YourDetailsController.get
-POST       /your-details                    controllers.YourDetailsController.post
-GET        /check-your-answers              controllers.SummaryController.get
-GET        /submit-registration             controllers.RosmController.get
-GET        /application-submitted           controllers.ApplicationSubmittedController.get
-GET        /reviewing-your-application      controllers.ApplicationSubmittedController.pending
-GET        /application-successful          controllers.ApplicationSubmittedController.successful
-GET        /application-unsuccessful        controllers.ApplicationSubmittedController.rejected
-GET        /signed-out                      controllers.QuestionnaireController.showQuestionnaire
-POST       /signed-out                      controllers.QuestionnaireController.submitQuestionnaire
-GET        /thank-you                       controllers.QuestionnaireController.feedbackThankyou
-GET        /re-apply                        controllers.ReapplyController.get
+GET        /assets/*file                    @controllers.Assets.versioned(path="/public", file: Asset)
+GET        /                                @controllers.HomePageController.home
+GET        /access-denied                   @controllers.ErrorController.accessDenied
+GET        /company-details                 @controllers.OrganisationDetailsController.get
+POST       /company-details                 @controllers.OrganisationDetailsController.post
+GET        /reference-numbers               @controllers.TradingDetailsController.get
+POST       /reference-numbers               @controllers.TradingDetailsController.post
+GET        /company-match-error             @controllers.MatchingFailedController.get
+GET        /company-structure               @controllers.BusinessStructureController.get
+POST       /company-structure               @controllers.BusinessStructureController.post
+GET        /your-details                    @controllers.YourDetailsController.get
+POST       /your-details                    @controllers.YourDetailsController.post
+GET        /check-your-answers              @controllers.SummaryController.get
+GET        /submit-registration             @controllers.RosmController.get
+GET        /application-submitted           @controllers.ApplicationSubmittedController.get
+GET        /reviewing-your-application      @controllers.ApplicationSubmittedController.pending
+GET        /application-successful          @controllers.ApplicationSubmittedController.successful
+GET        /application-unsuccessful        @controllers.ApplicationSubmittedController.rejected
+GET        /signed-out                      @controllers.QuestionnaireController.showQuestionnaire
+POST       /signed-out                      @controllers.QuestionnaireController.submitQuestionnaire
+GET        /thank-you                       @controllers.QuestionnaireController.feedbackThankyou
+GET        /re-apply                        @controllers.ReapplyController.get

@@ -14,9 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.AppConfig
-@import config.FrontendAppConfig
-
 @(appConfig: config.AppConfig,
   title: String,
   mainClass: Option[String] = None,
@@ -48,7 +45,7 @@
 
 @headerNavLinks = {
     @if(showSignOutLink) {
-        <li><a id="navSignout" href="@FrontendAppConfig.signOutUrl" id="nav-sign-out">Sign out</a></li>
+        <li><a id="navSignout" href="@appConfig.signOutUrl" id="nav-sign-out">Sign out</a></li>
     }
 }
 
