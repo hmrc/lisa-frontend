@@ -37,7 +37,8 @@ case object EmailNotSent extends EmailStatus
 class EmailConnector @Inject()(
   val http: WSHttp,
   val runModeConfiguration: Configuration,
-  environment: Environment
+  environment: Environment,
+  metrics: EmailMetrics
 ) extends ServicesConfig with RawResponseReads {
 
   val mode = environment.mode
@@ -57,12 +58,12 @@ class EmailConnector @Inject()(
       response.status match {
         case ACCEPTED => {
           Logger.info("Email sent successfully.")
-          EmailMetrics.emailSentCounter()
+          metrics.emailSentCounter()
           EmailSent
         }
         case status => {
           Logger.warn("Email not sent.")
-          EmailMetrics.emailNotSentCounter()
+          metrics.emailNotSentCounter()
           EmailNotSent
         }
       }
