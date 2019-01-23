@@ -131,8 +131,8 @@ error.lastNameLength=Enter only the first 35 characters of your last name
 error.lastNamePattern=Last name can only include letters a to z, 0 to 9, ampersands, apostrophes, back slashes, full stops, hyphens and spaces
 
 error.roleRequired=Enter your job title
-error.roleLength=Enter only the first 30 characters of your role
-error.rolePattern=Role can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
+error.roleLength=Enter only the first 30 characters of your job title
+error.rolePattern=Job title can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
 
 error.phoneRequired=Enter your phone number
 error.phonePattern=Enter a telephone number, like 01642 123 456 or +33 1 23 45 67 88
