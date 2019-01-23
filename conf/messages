@@ -84,6 +84,25 @@ summary.yourdetails.role.change=Change your job title
 summary.yourdetails.phone.change=Change your phone number
 summary.yourdetails.email.change=Change your email address
 
+matchingfailed.heading=Your company’s details could not be found
+matchingfailed.text=This could be for one of two reasons.
+matchingfailed.subsection1.heading=Company name is not an exact match
+matchingfailed.subsection1.text.line1=Your company name should match exactly the name that is registered with Companies House.
+matchingfailed.subsection1.text.line2=Check if your company name uses:
+matchingfailed.subsection1.text.line2.list1=capital letters
+matchingfailed.subsection1.text.line2.list2=spaces
+matchingfailed.subsection1.text.line2.list3.llp=Limited Liability Partnership or LLP
+matchingfailed.subsection1.text.line2.list3.notllp=Limited or LTD<
+matchingfailed.subsection1.text.line3.pre=If you do not know the exact company name,
+matchingfailed.subsection1.text.line3.link=you can contact HMRC to find that out
+matchingfailed.subsection2.heading=Your Unique Taxpayer Reference (UTR) does not match
+matchingfailed.subsection2.text.line1=Your UTR should match the UTR on any letters you have from HMRC.
+matchingfailed.subsection2.text.line1.post.notllp=This is the same number that you use on your company’s CT600 form.
+matchingfailed.subsection2.text.line2=It can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers.
+matchingfailed.subsection2.text.line3.pre=You can
+matchingfailed.subsection2.text.line3.link=find out a lost UTR by contacting HMRC
+matchingfailed.tryagain=Try again
+
 error.companyStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name
