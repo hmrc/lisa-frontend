@@ -22,16 +22,20 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.ws.WSHttp
+import play.api.libs.concurrent.Execution.defaultContext
 
 import scala.concurrent.Future
 
 class UserDetailsConnector @Inject()(
-  val httpGet: WSHttp, val runModeConfiguration: Configuration, environment: Environment) extends ServicesConfig with UserDetailsJsonFormats {
+  val httpGet: WSHttp,
+  val runModeConfiguration: Configuration,
+  environment: Environment
+) extends ServicesConfig with UserDetailsJsonFormats {
 
   override val mode = environment.mode
 
   def getUserDetails(url: String)(implicit hc: HeaderCarrier): Future[UserDetails] = {
-    httpGet.GET[UserDetails](url)(implicitly, hc, implicitly)
+    httpGet.GET[UserDetails](url)(implicitly, hc, defaultContext)
   }
 
 }

@@ -16,6 +16,7 @@
 
 package services
 
+import com.google.inject.Inject
 import connectors.{RosmConnector, RosmJsonFormats}
 import models._
 import play.api.Logger
@@ -24,11 +25,9 @@ import play.api.libs.json.{JsError, JsSuccess}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-trait RosmService extends RosmJsonFormats{
-
-  val rosmConnector:RosmConnector
+class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFormats {
 
   private def handleErrorResponse(rosmType: String, response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
     case failureResponse: JsSuccess[DesFailureResponse] => {
@@ -100,9 +99,5 @@ trait RosmService extends RosmJsonFormats{
 
   }
 
-
-}
-object RosmService extends RosmService{
- override val rosmConnector: RosmConnector = RosmConnector
 
 }

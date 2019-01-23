@@ -18,14 +18,10 @@ package controllers
 
 import com.google.inject.Inject
 import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
-import connectors.{EmailConnector, RosmJsonFormats}
-import models._
-import play.api.Play.current
 import play.api.i18n.Messages
-import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Play}
-import services.{AuditService, AuthorisationService, RosmService}
+import play.api.{Configuration, Environment}
+import services.AuthorisationService
 
 import scala.concurrent.Future
 
