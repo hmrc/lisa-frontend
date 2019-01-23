@@ -34,7 +34,7 @@
 
         @helpers.form(action = controllers.routes.QuestionnaireController.submitQuestionnaire, 'class -> "satisfactionSurveyForm") {
 
-        @inputRadioGroup(questionnaireForm("satisfactionLevel"),
+        @input_radio_group(questionnaireForm("satisfactionLevel"),
         Seq(
         "4" -> Messages("label.very_satisfied"),
         "3" -> Messages("label.satisfied"),

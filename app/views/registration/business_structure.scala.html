@@ -30,7 +30,7 @@
         @CSRF.formField
 
         <div class="form-field form-field--submit" id="companyStructure">
-            @inputRadioGroup(form("companyStructure"), Seq(
+            @input_radio_group(form("companyStructure"), Seq(
                 (Messages("org.details.llp"), Messages("org.details.llp.view")),
                 (Messages("org.details.corpbody"), Messages("org.details.corpbody.view")),
                 (Messages("org.details.friendlysoc"), Messages("org.details.friendlysoc.view"))

@@ -16,71 +16,60 @@
 
 package config
 
-import com.typesafe.config.Config
-import net.ceedubs.ficus.Ficus._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import com.google.inject.{Inject, Singleton}
+import play.api.i18n.MessagesApi
 import play.api.mvc.Request
-import play.api.{Application, Configuration, Play}
-import play.twirl.api.Html
+import play.api.{Configuration, Environment}
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
-import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode, ServicesConfig}
-import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
-import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFilter, MicroserviceFilterSupport}
+import uk.gov.hmrc.play.bootstrap.http.{FrontendErrorHandler, HttpClient}
+import uk.gov.hmrc.play.config.ServicesConfig
 
-object FrontendGlobal
-  extends DefaultFrontendGlobal {
-
-  override val auditConnector = FrontendAuditConnector
-  override val loggingFilter = LoggingFilter
-  override val frontendAuditFilter = AuditFilter
-
-  override def onStart(app: Application) {
-    super.onStart(app)
-    ApplicationCrypto.verifyConfiguration()
-  }
-
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
+class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration, implicit val appConfig: AppConfig) extends FrontendErrorHandler {
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
+                                    (implicit request: Request[_]): HtmlFormat.Appendable = {
     views.html.error_template(pageTitle, heading, message)
-
-  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
+  }
 }
 
-object ControllerConfiguration extends ControllerConfig {
-  lazy val controllerConfigs: Config = Play.current.configuration.underlying.as[Config]("controllers")
+@Singleton
+class LisaSessionCache @Inject()(
+  val http: HttpClient,
+  val runModeConfiguration: Configuration,
+  environment: Environment) extends SessionCache with ServicesConfig {
+
+  override val mode = environment.mode
+
+  override lazy val defaultSource: String = runModeConfiguration.getString("appName").
+    getOrElse(throw new Exception("appName not defined"))
+
+  override lazy val baseUri: String = baseUrl("cachable.session-cache")
+
+  override lazy val domain: String = getString("cachable.session-cache.domain")
 }
 
-object LoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSupport {
-  override def controllerNeedsLogging(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsLogging
+@Singleton
+class LisaShortLivedHttpCaching @Inject()(
+  val http: HttpClient,
+  val runModeConfiguration: Configuration,
+  environment: Environment) extends ShortLivedHttpCaching with ServicesConfig {
+
+  override val mode = environment.mode
+
+  override lazy val defaultSource: String = runModeConfiguration.getString("appName").
+    getOrElse(throw new Exception("appName not defined"))
+
+  override lazy val baseUri: String = baseUrl("cachable.short-lived-cache")
+
+  override lazy val domain: String = getString("cachable.short-lived-cache.domain")
+
 }
 
-object AuditFilter extends FrontendAuditFilter with RunMode with AppName with MicroserviceFilterSupport {
+@Singleton
+class LisaShortLivedCache @Inject()(
+  val appCrypto: ApplicationCrypto,
+  override val shortLiveCache: LisaShortLivedHttpCaching) extends ShortLivedCache {
 
-  override lazy val maskedFormFields = Seq("password")
-
-  override lazy val applicationPort = None
-
-  override lazy val auditConnector = FrontendAuditConnector
-
-  override def controllerNeedsAuditing(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuditing
-}
-
-object LisaShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with ServicesConfig {
-  override lazy val http = WSHttp
-  override lazy val defaultSource = appName
-  override lazy val baseUri = baseUrl("cachable.short-lived-cache")
-  override lazy val domain = getConfString("cachable.short-lived-cache.domain", throw new Exception(s"Could not find config 'cachable.short-lived-cache.domain'"))
-}
-
-object LisaShortLivedCache extends ShortLivedCache {
-  override implicit lazy val crypto = ApplicationCrypto.JsonCrypto
-  override lazy val shortLiveCache = LisaShortLivedHttpCaching
-}
-
-object LisaSessionCache extends SessionCache with AppName with ServicesConfig {
-  override lazy val http = WSHttp
-  override lazy val defaultSource = appName
-  override lazy val baseUri = baseUrl("cachable.session-cache")
-  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+  override implicit lazy val crypto = appCrypto.JsonCrypto
 }

@@ -16,20 +16,21 @@
 
 package controllers
 
-import config.FrontendAppConfig
+import config.AppConfig
 import models._
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
-import uk.gov.hmrc.play.frontend.config.AuthRedirects
 
 trait LisaBaseController extends FrontendController
   with AuthRedirects {
 
+  val appConfig: AppConfig
   val sessionCache: SessionCache
   val shortLivedCache: ShortLivedCache
   val authorisationService: AuthorisationService
@@ -37,7 +38,7 @@ trait LisaBaseController extends FrontendController
   def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentState: Boolean = true)
                        (implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
-      case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
+      case UserNotLoggedIn => Future.successful(toGGLogin(appConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
