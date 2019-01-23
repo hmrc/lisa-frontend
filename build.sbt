@@ -27,6 +27,7 @@ lazy val lisafrontend = (project in file("."))
   .settings(
     name := "lisa-frontend",
     majorVersion := 1,
+    PlayKeys.playDefaultPort := 8884,
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
