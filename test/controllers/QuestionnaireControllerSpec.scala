@@ -19,15 +19,14 @@ package controllers
 import java.io.File
 
 import config.AppConfig
-import org.mockito.Matchers.{eq => matcherEq}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.{AuditService, AuthorisationService, RosmService}
+import play.api.{Configuration, Environment, Mode}
+import services.{AuditService, AuthorisationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 

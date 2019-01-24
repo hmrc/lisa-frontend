@@ -21,7 +21,7 @@ import java.io.File
 import config.AppConfig
 import helpers.CSRFTest
 import models._
-import org.mockito.Matchers.{eq => matcherEq, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
@@ -29,16 +29,14 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
 import play.api.i18n.Messages
-import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.{Configuration, Environment, Mode}
-import services.{AuthorisationService, RosmService}
+import services.AuthorisationService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class MatchingFailedControllerSpec extends PlaySpec
   with GuiceOneAppPerSuite
