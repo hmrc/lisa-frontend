@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import base.SpecBase
 import config.AppConfig
 import helpers.CSRFTest
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
@@ -38,14 +39,11 @@ import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with CSRFTest {
-
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
+class ReapplyControllerSpec extends SpecBase {
 
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
-
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(true)))
 
       val result = SUT.get(fakeRequest)
@@ -56,20 +54,6 @@ class ReapplyControllerSpec extends PlaySpec with MockitoSugar with GuiceOneAppP
     }
   }
 
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new ReapplyController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(mockCache.cache[Any](any(), any(), any())(any(), any(), any())).
-    thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
+  val SUT = new ReapplyController()
 
 }

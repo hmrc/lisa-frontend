@@ -21,7 +21,6 @@ import config.AppConfig
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
 import play.api.http.Status
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.FakeRequest
@@ -216,10 +215,5 @@ class LisaBaseControllerSpec extends SpecBase {
   }
 
   val SUT = new TestClass()
-
-  when(authorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
 }

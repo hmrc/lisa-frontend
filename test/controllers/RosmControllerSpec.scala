@@ -16,51 +16,18 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
-import connectors.{EmailConnector, RosmConnector}
-import helpers.CSRFTest
+import base.SpecBase
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.libs.json.JsValue
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, Mode}
-import services.{AuditService, AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class RosmControllerSpec extends PlaySpec
-  with GuiceOneAppPerSuite
-  with MockitoSugar
-  with CSRFTest
-  with BeforeAndAfter {
+class RosmControllerSpec extends SpecBase {
 
   "GET Rosm Registration" must {
-
-    before {
-      reset(mockSessionCache)
-      reset(mockCache)
-      reset(mockRosmConnector)
-      reset(mockAuditService)
-
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(false)))
-
-      when(mockSessionCache.cache(any(), any())(any(), any(), any())).
-        thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
-    }
 
     val organisationDetailsCacheKey = "organisationDetails"
     val tradingDetailsCacheKey = "tradingDetails"
@@ -69,7 +36,7 @@ class RosmControllerSpec extends PlaySpec
 
     "redirect the user to business structure" when {
       "no business structure details are found in the cache" in {
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -84,10 +51,10 @@ class RosmControllerSpec extends PlaySpec
       "no organisation details are found in the cache" in {
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -100,13 +67,13 @@ class RosmControllerSpec extends PlaySpec
         val businessStructureForm = new BusinessStructure("LLP")
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
 
@@ -123,16 +90,16 @@ class RosmControllerSpec extends PlaySpec
         val businessStructureForm = new BusinessStructure("LLP")
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -149,19 +116,19 @@ class RosmControllerSpec extends PlaySpec
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -183,22 +150,22 @@ class RosmControllerSpec extends PlaySpec
         phone = "0191 123 4567",
         email = "test@test.com")
 
-      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
 
-      when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
         thenReturn(Future.successful(Some("123456")))
 
-      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(tradingForm)))
 
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
 
-      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
 
-      when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789")))
+      when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789")))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -215,7 +182,7 @@ class RosmControllerSpec extends PlaySpec
     }
 
     "email the user on a successful rosm registration" in {
-      reset(mockEmailConnector)
+      reset(emailConnector)
 
       val testEmail = "success@rosm.subscription"
       val testSubId = "888777666"
@@ -230,22 +197,22 @@ class RosmControllerSpec extends PlaySpec
         phone = "0191 123 4567",
         email = testEmail)
 
-      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
 
-      when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
         thenReturn(Future.successful(Some("123456")))
 
-      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(tradingForm)))
 
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
 
-      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
 
-      when(mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
+      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -260,7 +227,7 @@ class RosmControllerSpec extends PlaySpec
 
       await(SUT.get(fakeRequest))
 
-      verify(mockEmailConnector).sendTemplatedEmail(
+      verify(emailConnector).sendTemplatedEmail(
         emailAddress = MatcherEquals(testEmail),
         templateName = MatcherEquals("lisa_application_submit"),
         params = MatcherEquals(Map(
@@ -283,22 +250,22 @@ class RosmControllerSpec extends PlaySpec
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
-        when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
+        when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
         val result = SUT.get(fakeRequest)
 
@@ -319,19 +286,19 @@ class RosmControllerSpec extends PlaySpec
         email = "test@test.com")
       val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
 
-      when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
         thenReturn(Future.successful(Some("123456")))
 
-      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(tradingForm)))
 
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
 
-      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
@@ -345,11 +312,11 @@ class RosmControllerSpec extends PlaySpec
         contactDetails = rosmContact
       )
 
-      when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+      when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.get(fakeRequest))
 
-      verify(mockAuditService).audit(
+      verify(auditService).audit(
         auditType = MatcherEquals("applicationReceived"),
         path = MatcherEquals("/lifetime-isa/submit-registration"),
         auditData = MatcherEquals(Map(
@@ -380,25 +347,25 @@ class RosmControllerSpec extends PlaySpec
           email = "test@test.com")
         val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
-        when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
+        when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.get(fakeRequest))
 
-        verify(mockAuditService).audit(
+        verify(auditService).audit(
           auditType = MatcherEquals("applicationNotReceived"),
           path = MatcherEquals("/lifetime-isa/submit-registration"),
           auditData = MatcherEquals(Map(
@@ -429,19 +396,19 @@ class RosmControllerSpec extends PlaySpec
         email = "test@test.com")
       val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
 
-      when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
         thenReturn(Future.successful(Some("123456")))
 
-      when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(tradingForm)))
 
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
 
-      when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(yourForm)))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
@@ -454,57 +421,17 @@ class RosmControllerSpec extends PlaySpec
         address = rosmAddress,
         contactDetails = rosmContact
       )
-      when (mockRosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+      when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.get(fakeRequest))
 
       val applicationSentVM = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
 
-      verify(mockSessionCache).cache(MatcherEquals(ApplicationSent.cacheKey), MatcherEquals(applicationSentVM))(any(), any(), any())
+      verify(sessionCache).cache(MatcherEquals(ApplicationSent.cacheKey), MatcherEquals(applicationSentVM))(any(), any(), any())
     }
 
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  val SUT = new RosmController()
 
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
-
-  val mockRosmConnector: RosmConnector = mock[RosmConnector]
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockRosmService: RosmService = mock[RosmService]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockEmailConnector: EmailConnector = mock[EmailConnector]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new RosmController(
-    mockSessionCache,
-    mockCache,
-    mockEnvironment,
-    mockConfig,
-    mockAuthorisationService,
-    mockAuditService,
-    mockRosmService,
-    mockEmailConnector,
-    mockAppConfig,
-    mockMessages
-  )
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(mockConfig.getString(matches("^appName$"), any())).
-    thenReturn(Some("lisa-frontend"))
-
-  when(mockConfig.getString(matches("^.*company-auth-frontend.host$"), any())).
-    thenReturn(Some(""))
-
-  when(mockConfig.getString(matches("^sosOrigin$"), any())).
-    thenReturn(None)
-
-
-  }
+}

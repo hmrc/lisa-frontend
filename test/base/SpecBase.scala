@@ -17,6 +17,7 @@
 package base
 
 import config.AppConfig
+import connectors.EmailConnector
 import helpers.CSRFTest
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
 import org.mockito.Matchers.any
@@ -31,7 +32,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.{Configuration, Environment}
-import services.{AuthorisationService, RosmService}
+import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 
@@ -41,12 +42,20 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
 
   before {
     reset(shortLivedCache)
+    reset(sessionCache)
+    reset(authorisationService)
+    reset(rosmService)
+    reset(auditService)
+    reset(emailConnector)
+
     when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
       thenReturn(Future.successful(Some(false)))
     when(shortLivedCache.cache[Any](any(), any(), any())(any(), any(), any())).
       thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
 
-    reset(authorisationService)
+    when(sessionCache.cache(any(), any())(any(), any(), any())).
+      thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
+
     when(authorisationService.userStatus(any())).
       thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
   }
@@ -74,5 +83,9 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
   implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
 
   implicit val rosmService: RosmService = mock[RosmService]
+
+  implicit val auditService: AuditService = mock[AuditService]
+
+  implicit val emailConnector: EmailConnector = mock[EmailConnector]
 
 }
