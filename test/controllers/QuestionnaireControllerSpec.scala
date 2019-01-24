@@ -16,14 +16,20 @@
 
 package controllers
 
+import java.io.File
+
+import config.AppConfig
 import org.mockito.Matchers.{eq => matcherEq}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.AuditService
+import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 class QuestionnaireControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -51,10 +57,15 @@ class QuestionnaireControllerSpec extends PlaySpec with MockitoSugar with OneApp
   val fakeRequest = FakeRequest("GET", "/")
   val fakePostRequest = FakeRequest("POST", "/signed-out")
 
+  val mockConfig: Configuration = mock[Configuration]
+  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
+  val mockCache: ShortLivedCache = mock[ShortLivedCache]
+  val mockSessionCache: SessionCache = mock[SessionCache]
+  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
   val mockAuditService: AuditService = mock[AuditService]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockMessages: Messages = mock[Messages]
 
-  object SUT extends QuestionnaireController {
-    override val auditService = mockAuditService
-  }
+  val SUT = new QuestionnaireController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAuditService, mockAppConfig, mockMessages)
 
 }

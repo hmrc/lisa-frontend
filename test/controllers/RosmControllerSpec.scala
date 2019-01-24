@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import config.AppConfig
 import connectors.{EmailConnector, RosmConnector}
 import helpers.CSRFTest
 import models._
@@ -28,6 +29,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
+import play.api.i18n.Messages
 import play.api.libs.json.JsValue
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
@@ -476,17 +478,21 @@ class RosmControllerSpec extends PlaySpec
   val mockRosmService: RosmService = mock[RosmService]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
   val mockEmailConnector: EmailConnector = mock[EmailConnector]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockMessages: Messages = mock[Messages]
 
-  object SUT extends RosmController {
-    override val config: Configuration = mockConfig
-    override val env: Environment = mockEnvironment
-    override val sessionCache: SessionCache = mockSessionCache
-    override val shortLivedCache: ShortLivedCache = mockCache
-    override val auditService: AuditService = mockAuditService
-    override val rosmService: RosmService = mockRosmService
-    override val authorisationService: AuthorisationService = mockAuthorisationService
-    override val emailConnector: EmailConnector = mockEmailConnector
-  }
+  val SUT = new RosmController(
+    mockSessionCache,
+    mockCache,
+    mockEnvironment,
+    mockConfig,
+    mockAuthorisationService,
+    mockAuditService,
+    mockRosmService,
+    mockEmailConnector,
+    mockAppConfig,
+    mockMessages
+  )
 
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))

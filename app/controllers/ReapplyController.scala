@@ -17,16 +17,17 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
+import config.AppConfig
 import models.Reapplication
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent}
-import play.api.{Configuration, Environment, Play}
-import services.{AuditService, AuthorisationService}
+import play.api.{Configuration, Environment}
+import services.AuthorisationService
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 class ReapplyController @Inject()(
-  val sessionCache: LisaSessionCache,
-  val shortLivedCache: LisaShortLivedCache,
+  val sessionCache: SessionCache,
+  val shortLivedCache: ShortLivedCache,
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
@@ -36,7 +37,7 @@ class ReapplyController @Inject()(
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( (cacheId) =>{
-        shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { res =>
+        shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { _ =>
          Redirect(routes.BusinessStructureController.get())
         }
       }, checkEnrolmentState = false

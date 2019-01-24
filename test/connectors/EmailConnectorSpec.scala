@@ -16,6 +16,7 @@
 
 package connectors
 
+import metrics.EmailMetrics
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -23,22 +24,20 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.http.ws.{WSGet, WSPost, WSPut}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut, HttpResponse }
 
 class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with BeforeAndAfterEach {
 
-  class MockHttp extends HttpGet with WSGet with HttpPost with WSPost with HttpPut with WSPut {
-    override val hooks = NoneRequired
-  }
+  val mockWSHttp = mock[WSHttp]
+  val mockConfiguration = mock[Configuration]
+  val mockEnvironment = mock[Environment]
+  val mockMetrics = mock[EmailMetrics]
 
-  val mockWSHttp = mock[MockHttp]
-
-  val testEmailConnector = new EmailConnector{
-    override val http:  HttpGet with HttpPost with HttpPut = mockWSHttp
-  }
+  val testEmailConnector = new EmailConnector(mockWSHttp, mockConfiguration, mockEnvironment, mockMetrics)
 
   override def beforeEach() {
     reset(mockWSHttp)

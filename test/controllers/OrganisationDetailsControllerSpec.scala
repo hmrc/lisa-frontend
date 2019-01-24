@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import config.AppConfig
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => matcherEq, _}
@@ -27,6 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
+import play.api.i18n.Messages
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
 import play.api.test.Helpers._
@@ -284,16 +286,10 @@ class OrganisationDetailsControllerSpec extends PlaySpec
   val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
   val mockRosmService:RosmService = mock[RosmService]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockMessages: Messages = mock[Messages]
 
-  object SUT extends OrganisationDetailsController {
-    override val config: Configuration = mockConfig
-    override val env: Environment = mockEnvironment
-    override val shortLivedCache: ShortLivedCache = mockCache
-    override val sessionCache: SessionCache = mockSessionCache
-    override val authorisationService: AuthorisationService = mockAuthorisationService
-    override val rosmService:RosmService = mockRosmService
-
-  }
+  val SUT = new OrganisationDetailsController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockRosmService, mockAppConfig, mockMessages)
 
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))

@@ -17,19 +17,20 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
+import config.AppConfig
 import models.{BusinessStructure, OrganisationDetails}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment, Logger}
 import services.{AuthorisationService, RosmService}
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
 class OrganisationDetailsController @Inject()(
-  val sessionCache: LisaSessionCache,
-  val shortLivedCache: LisaShortLivedCache,
+  val sessionCache: SessionCache,
+  val shortLivedCache: ShortLivedCache,
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,

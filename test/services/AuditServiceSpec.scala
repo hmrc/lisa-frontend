@@ -23,6 +23,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Configuration
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,6 +37,7 @@ class AuditServiceSpec extends PlaySpec
 
     before {
       reset(mockAuditConnector)
+      when(mockAppNameConfiguration.getString("appName")).thenReturn(Some("lisa-frontend"))
     }
 
     "build an audit event with the correct details" in {
@@ -63,8 +65,8 @@ class AuditServiceSpec extends PlaySpec
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  val mockAppNameConfiguration: Configuration = mock[Configuration]
 
-  object SUT extends AuditService {
-    override val connector: AuditConnector = mockAuditConnector
-  }
+  object SUT extends AuditService(mockAuditConnector, mockAppNameConfiguration)
+
 }

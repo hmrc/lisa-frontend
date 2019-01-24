@@ -17,19 +17,20 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{AppConfig, LisaSessionCache, LisaShortLivedCache}
+import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
 import models.{ApplicationSent, LisaRegistration}
 import play.api.i18n.Messages
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger}
 import services.{AuditService, AuthorisationService, RosmService}
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
 class RosmController @Inject()(
-  val sessionCache: LisaSessionCache,
-  val shortLivedCache: LisaShortLivedCache,
+  val sessionCache: SessionCache,
+  val shortLivedCache: ShortLivedCache,
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,

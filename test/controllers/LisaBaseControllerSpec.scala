@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import config.AppConfig
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
@@ -210,8 +211,17 @@ class LisaBaseControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
+  val mockAppConfig: AppConfig = mock[AppConfig]
 
-  trait SUT extends LisaBaseController {
+  class TestClass(
+    val config: Configuration,
+    val env: Environment,
+    val sessionCache: SessionCache,
+    val appConfig: AppConfig,
+    val shortLivedCache: ShortLivedCache,
+    val authorisationService: AuthorisationService
+  ) extends LisaBaseController {
+
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
       authorisedForLisa(handleResult)
     }
@@ -226,13 +236,7 @@ class LisaBaseControllerSpec extends PlaySpec
     }
   }
 
-  object SUT extends SUT {
-    override val config: Configuration = mockConfig
-    override val env: Environment = mockEnvironment
-    override val shortLivedCache: ShortLivedCache = mockCache
-    override val sessionCache: SessionCache = mockSessionCache
-    override val authorisationService: AuthorisationService = mockAuthorisationService
-  }
+  val SUT = new TestClass(mockConfig, mockEnvironment, mockSessionCache, mockAppConfig, mockCache, mockAuthorisationService)
 
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))

@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import config.AppConfig
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -27,6 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
+import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -141,14 +143,10 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockMessages: Messages = mock[Messages]
 
-  object SUT extends ApplicationSubmittedController {
-    override val config: Configuration = mockConfig
-    override val env: Environment = mockEnvironment
-    override val shortLivedCache: ShortLivedCache = mockCache
-    override val sessionCache: SessionCache = mockSessionCache
-    override val authorisationService: AuthorisationService = mockAuthorisationService
-  }
+  val SUT = new ApplicationSubmittedController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
 
   when(mockConfig.getString(matches("^appName$"), any())).
     thenReturn(Some("lisa-frontend"))

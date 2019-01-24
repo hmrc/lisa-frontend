@@ -18,6 +18,7 @@ package controllers
 
 import java.io.File
 
+import config.AppConfig
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
@@ -27,6 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
+import play.api.i18n.Messages
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -212,18 +214,14 @@ class SummaryControllerSpec extends PlaySpec
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
   val mockConfig: Configuration = mock[Configuration]
+  val mockAppConfig: AppConfig = mock[AppConfig]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockCache: ShortLivedCache = mock[ShortLivedCache]
   val mockSessionCache: SessionCache = mock[SessionCache]
   val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
+  val mockMessages: Messages = mock[Messages]
 
-  object SUT extends SummaryController {
-    override val config: Configuration = mockConfig
-    override val env: Environment = mockEnvironment
-    override val shortLivedCache: ShortLivedCache = mockCache
-    override val sessionCache: SessionCache = mockSessionCache
-    override val authorisationService: AuthorisationService = mockAuthorisationService
-  }
+  val SUT = new SummaryController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
 
   when(mockAuthorisationService.userStatus(any())).
     thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
