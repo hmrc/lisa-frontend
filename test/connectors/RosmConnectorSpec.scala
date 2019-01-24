@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.AppConfig
 import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers._
@@ -23,14 +24,13 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Configuration, Environment}
-import play.api.libs.json.{JsError, Json}
+import play.api.libs.json.Json
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
-import uk.gov.hmrc.play.http.ws.WSHttp
 
 class RosmConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -110,11 +110,10 @@ class RosmConnectorSpec extends PlaySpec
   }
 
   val mockHttp = mock[WSHttp]
-  val mockConfiguration = mock[Configuration]
-  val mockEnvironment = mock[Environment]
+  val mockAppConfig = mock[AppConfig]
   implicit val hc = HeaderCarrier()
 
-  val SUT = new RosmConnector(mockHttp, mockConfiguration, mockEnvironment)
+  val SUT = new RosmConnector(mockHttp, mockAppConfig)
 
   val rosmIndividual = RosmIndividual(
     firstName = "Test",

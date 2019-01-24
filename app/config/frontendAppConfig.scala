@@ -34,6 +34,8 @@ trait AppConfig {
   val loginCallback: String
   val apiUrl: String
   val registerOrgUrl: String
+  val lisaServiceUrl: String
+  val emailServiceUrl: String
   def getSignOutUrl(callbackUrl: String): String
 }
 
@@ -45,6 +47,9 @@ class FrontendAppConfig @Inject()(
   override val mode = environment.mode
 
   private def loadConfig(key: String) = getString(key)
+
+  override lazy val lisaServiceUrl = baseUrl("lisa")
+  override lazy val emailServiceUrl = baseUrl("email")
 
   private val caFrontendHost = getString("ca-frontend.host")
   private val contactHost = getString("contact-frontend.host")

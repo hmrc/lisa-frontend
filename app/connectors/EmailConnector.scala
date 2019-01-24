@@ -17,6 +17,7 @@
 package connectors
 
 import com.google.inject.Inject
+import config.AppConfig
 import metrics.EmailMetrics
 import models.SendEmailRequest
 import play.api.http.Status._
@@ -36,22 +37,15 @@ case object EmailNotSent extends EmailStatus
 
 class EmailConnector @Inject()(
   val http: WSHttp,
-  val runModeConfiguration: Configuration,
-  environment: Environment,
+  appConfig: AppConfig,
   metrics: EmailMetrics
-) extends ServicesConfig with RawResponseReads {
-
-  val mode = environment.mode
-  val sendEmailUri: String = "hmrc/email"
-
-  lazy val serviceUrl: String = baseUrl("email")
+) extends RawResponseReads {
 
   def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit hc: HeaderCarrier): Future[EmailStatus] = {
 
     val sendEmailReq = SendEmailRequest(List(emailAddress), templateName, params, force = true)
 
-
-    val postUrl = s"$serviceUrl/$sendEmailUri"
+    val postUrl = s"${appConfig.emailServiceUrl}/hmrc/email"
     val jsonData = Json.toJson(sendEmailReq)
 
     http.POST(postUrl, jsonData).map { response =>

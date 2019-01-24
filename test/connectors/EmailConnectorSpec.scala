@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.AppConfig
 import metrics.EmailMetrics
 import org.mockito.Matchers
 import org.mockito.Mockito._
@@ -33,21 +34,16 @@ import scala.concurrent.Future
 class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with BeforeAndAfterEach {
 
   val mockWSHttp = mock[WSHttp]
-  val mockConfiguration = mock[Configuration]
-  val mockEnvironment = mock[Environment]
+  val mockAppConfig = mock[AppConfig]
   val mockMetrics = mock[EmailMetrics]
 
-  val testEmailConnector = new EmailConnector(mockWSHttp, mockConfiguration, mockEnvironment, mockMetrics)
+  val testEmailConnector = new EmailConnector(mockWSHttp, mockAppConfig, mockMetrics)
 
   override def beforeEach() {
     reset(mockWSHttp)
   }
 
   "EmailConnector" must {
-
-    "have a service url" in {
-      testEmailConnector.serviceUrl == "email"
-    }
 
     "return a 202 accepted" when {
 

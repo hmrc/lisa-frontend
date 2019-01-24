@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.AppConfig
 import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers._
@@ -24,7 +25,6 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
-import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.http.ws.WSHttp
 
@@ -50,11 +50,10 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   }
 
   val mockHttp = mock[WSHttp]
-  val mockConfiguration = mock[Configuration]
-  val mockEnvironment = mock[Environment]
+  val mockAppConfig = mock[AppConfig]
   implicit val hc = HeaderCarrier()
 
-  val SUT = new TaxEnrolmentConnector(mockHttp, mockConfiguration, mockEnvironment)
+  val SUT = new TaxEnrolmentConnector(mockHttp, mockAppConfig)
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(
     created = new DateTime(),
