@@ -22,6 +22,7 @@ import uk.gov.hmrc.play.config.ServicesConfig
 
 @ImplementedBy(classOf[FrontendAppConfig])
 trait AppConfig {
+  val appName: String
   val analyticsToken: String
   val analyticsHost: String
   val gtmEnabled: Boolean
@@ -56,6 +57,7 @@ class FrontendAppConfig @Inject()(
   private val contactFormServiceIdentifier = "LISA"
   private val logoutCallback = getString("gg-urls.logout-callback.url")
 
+  override lazy val appName: String = getString("appName")
   override lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
   override lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 

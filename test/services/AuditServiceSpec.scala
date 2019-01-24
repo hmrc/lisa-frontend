@@ -16,6 +16,7 @@
 
 package services
 
+import config.AppConfig
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -37,7 +38,7 @@ class AuditServiceSpec extends PlaySpec
 
     before {
       reset(mockAuditConnector)
-      when(mockAppNameConfiguration.getString("appName")).thenReturn(Some("lisa-frontend"))
+      when(mockAppConfig.appName).thenReturn("lisa-frontend")
     }
 
     "build an audit event with the correct details" in {
@@ -58,15 +59,14 @@ class AuditServiceSpec extends PlaySpec
 
       event.detail must contain ("companyName" -> "New Bank")
       event.detail must contain ("firstName" -> "John")
-      event.detail must contain key "Authorization"
     }
 
   }
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  val mockAppNameConfiguration: Configuration = mock[Configuration]
+  val mockAppConfig: AppConfig = mock[AppConfig]
 
-  object SUT extends AuditService(mockAuditConnector, mockAppNameConfiguration)
+  object SUT extends AuditService(mockAuditConnector, mockAppConfig)
 
 }
