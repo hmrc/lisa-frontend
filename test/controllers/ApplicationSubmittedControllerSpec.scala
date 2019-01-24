@@ -24,7 +24,6 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -123,8 +122,5 @@ class ApplicationSubmittedControllerSpec extends SpecBase
   val rejectedPageTitle = ">Application not successful</h1>"
 
   val SUT = new ApplicationSubmittedController()
-
-  when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
-    thenReturn(Future.successful(Some(false)))
 
 }

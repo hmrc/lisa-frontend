@@ -17,25 +17,45 @@
 package base
 
 import config.AppConfig
+import helpers.CSRFTest
+import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.{reset, when}
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
+import play.api.libs.json.JsValue
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.{Configuration, Environment}
-import services.AuthorisationService
+import services.{AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 
-trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite {
+import scala.concurrent.Future
+
+trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter with CSRFTest {
+
+  before {
+    reset(shortLivedCache)
+    when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
+      thenReturn(Future.successful(Some(false)))
+    when(shortLivedCache.cache[Any](any(), any(), any())(any(), any(), any())).
+      thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
+
+    reset(authorisationService)
+    when(authorisationService.userStatus(any())).
+      thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+  }
 
   val injector: Injector = app.injector
 
   val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
 
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("", ""))
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -52,5 +72,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite {
   implicit val sessionCache: SessionCache = mock[SessionCache]
 
   implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
+
+  implicit val rosmService: RosmService = mock[RosmService]
 
 }

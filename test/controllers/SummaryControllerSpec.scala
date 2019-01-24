@@ -17,26 +17,17 @@
 package controllers
 
 import base.SpecBase
-import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
 import play.api.http.Status
 import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends SpecBase
-  with CSRFTest
-  with BeforeAndAfter {
+class SummaryControllerSpec extends SpecBase {
 
   "GET Summary" must {
-
-    before {
-      reset(shortLivedCache)
-      when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
-    }
 
     val organisationDetailsCacheKey = "organisationDetails"
     val tradingDetailsCacheKey = "tradingDetails"

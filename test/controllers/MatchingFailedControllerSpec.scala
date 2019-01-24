@@ -16,41 +16,24 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
-import helpers.CSRFTest
+import base.SpecBase
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, Mode}
-import services.AuthorisationService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-class MatchingFailedControllerSpec extends PlaySpec
-  with GuiceOneAppPerSuite
-  with MockitoSugar
-  with CSRFTest
-  with BeforeAndAfter {
+class MatchingFailedControllerSpec extends SpecBase {
 
   "GET Matching Failed" must {
 
     "return a page" in {
-      when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
+      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-      val result = SUT.get(addToken(FakeRequest("GET", "/")))
+      val result = SUT.get(fakeRequest)
 
       status(result) mustBe Status.OK
 
@@ -61,21 +44,6 @@ class MatchingFailedControllerSpec extends PlaySpec
 
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
-
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new MatchingFailedController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+  val SUT = new MatchingFailedController()
 
 }

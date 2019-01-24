@@ -29,12 +29,12 @@ import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import scala.concurrent.Future
 
 class OrganisationDetailsController @Inject()(
-  val sessionCache: SessionCache,
-  val shortLivedCache: ShortLivedCache,
-  val env: Environment,
-  val config: Configuration,
-  val authorisationService: AuthorisationService,
-  val rosmService: RosmService,
+  implicit val sessionCache: SessionCache,
+  implicit val shortLivedCache: ShortLivedCache,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val rosmService: RosmService,
   implicit val appConfig: AppConfig,
   implicit val messages: Messages
 ) extends LisaBaseController {

@@ -28,11 +28,11 @@ import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 import scala.concurrent.Future
 
 class MatchingFailedController @Inject()(
-  val sessionCache: SessionCache,
-  val shortLivedCache: ShortLivedCache,
-  val env: Environment,
-  val config: Configuration,
-  val authorisationService: AuthorisationService,
+  implicit val sessionCache: SessionCache,
+  implicit val shortLivedCache: ShortLivedCache,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
   implicit val messages: Messages
 ) extends LisaBaseController {

@@ -16,35 +16,21 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
+import base.SpecBase
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.i18n.Messages
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson}
+import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
-import play.api.{Configuration, Environment, Mode}
-import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class YourDetailsControllerSpec extends PlaySpec
-  with GuiceOneAppPerSuite
-  with MockitoSugar
-  with CSRFTest
-  with BeforeAndAfter {
+class YourDetailsControllerSpec extends SpecBase with CSRFTest {
 
   "GET Your Details" must {
 
@@ -58,9 +44,9 @@ class YourDetailsControllerSpec extends PlaySpec
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
         val result = SUT.get(fakeRequest)
@@ -78,9 +64,9 @@ class YourDetailsControllerSpec extends PlaySpec
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -98,15 +84,6 @@ class YourDetailsControllerSpec extends PlaySpec
   }
 
   "POST Your Details" must {
-
-    before {
-      reset(mockCache)
-
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
-
-      when(mockCache.cache[Any](any(), any(), any())(any(), any(), any())).
-        thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
-    }
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
@@ -138,7 +115,7 @@ class YourDetailsControllerSpec extends PlaySpec
           "email" -> "test@test.com"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-        when(mockCache.cache[YourDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
+        when(shortLivedCache.cache[YourDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -149,7 +126,7 @@ class YourDetailsControllerSpec extends PlaySpec
 
     "store your details in cache" when {
       "the submitted data is valid" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
         val uri = controllers.routes.YourDetailsController.post().url
@@ -165,41 +142,17 @@ class YourDetailsControllerSpec extends PlaySpec
 
         await(SUT.post(request))
 
-        verify(mockCache).cache[YourDetails](any(), any(), any())(any(), any(), any())
+        verify(shortLivedCache).cache[YourDetails](any(), any(), any())(any(), any(), any())
       }
 
     }
 
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
-
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
-
   def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
     addToken(FakeRequest("POST", uri, FakeHeaders(), body))
   }
 
-  val mockConfig: Configuration = mock[Configuration]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new YourDetailsController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(mockConfig.getString(matches("^appName$"), any())).
-    thenReturn(Some("lisa-frontend"))
-
-  when(mockConfig.getString(matches("^.*company-auth-frontend.host$"), any())).
-    thenReturn(Some(""))
-
-  when(mockConfig.getString(matches("^sosOrigin$"), any())).
-    thenReturn(None)
+  val SUT = new YourDetailsController()
 
 }

@@ -32,13 +32,9 @@ import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-class LisaBaseControllerSpec extends SpecBase with BeforeAndAfter {
+class LisaBaseControllerSpec extends SpecBase {
 
   "Lisa Base Controller" should {
-
-    before {
-      reset(sessionCache)
-    }
 
     "redirect to login" when {
 
