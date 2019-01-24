@@ -16,23 +16,11 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Configuration, Environment, Mode}
+import base.SpecBase
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-class ErrorControllerSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
-
-  val fakeRequest = FakeRequest("GET", "/")
+class ErrorControllerSpec extends SpecBase {
 
   "GET /access-denied" should {
     "return 403" in {
@@ -45,14 +33,6 @@ class ErrorControllerSpec extends PlaySpec with GuiceOneAppPerSuite with Mockito
     }
   }
 
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new ErrorController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
+  val SUT = new ErrorController()
 
 }

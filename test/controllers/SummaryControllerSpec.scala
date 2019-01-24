@@ -16,40 +16,26 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
+import base.SpecBase
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, Mode}
-import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class SummaryControllerSpec extends PlaySpec
-  with GuiceOneAppPerSuite
-  with MockitoSugar
+class SummaryControllerSpec extends SpecBase
   with CSRFTest
   with BeforeAndAfter {
 
   "GET Summary" must {
 
     before {
-      reset(mockCache)
-      when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+      reset(shortLivedCache)
+      when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
     }
 
     val organisationDetailsCacheKey = "organisationDetails"
@@ -61,7 +47,7 @@ class SummaryControllerSpec extends PlaySpec
       "no business structure details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -78,10 +64,10 @@ class SummaryControllerSpec extends PlaySpec
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -95,13 +81,13 @@ class SummaryControllerSpec extends PlaySpec
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -118,16 +104,16 @@ class SummaryControllerSpec extends PlaySpec
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
         thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -145,19 +131,19 @@ class SummaryControllerSpec extends PlaySpec
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -181,19 +167,19 @@ class SummaryControllerSpec extends PlaySpec
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(mockCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(organisationForm)))
 
-        when(mockCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
           thenReturn(Future.successful(Some("123456")))
 
-        when(mockCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        when(mockCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(mockCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
         val result = SUT.get(fakeRequest)
@@ -209,30 +195,6 @@ class SummaryControllerSpec extends PlaySpec
 
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
-
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
-
-  val mockConfig: Configuration = mock[Configuration]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new SummaryController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(mockConfig.getString(matches("^appName$"), any())).
-    thenReturn(Some("lisa-frontend"))
-
-  when(mockConfig.getString(matches("^.*company-auth-frontend.host$"), any())).
-    thenReturn(Some(""))
-
-  when(mockConfig.getString(matches("^sosOrigin$"), any())).
-    thenReturn(None)
+  val SUT = new SummaryController()
 
 }

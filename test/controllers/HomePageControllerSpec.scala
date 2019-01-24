@@ -16,23 +16,12 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.{Configuration, Environment, Mode}
+import base.SpecBase
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-class HomePageControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class HomePageControllerSpec extends SpecBase {
 
-  val fakeRequest = FakeRequest("GET", "/")
-  
   "GET /" should {
     "301 redirect the user to the company structure page" in {
       val result = SUT.home(fakeRequest)
@@ -41,14 +30,6 @@ class HomePageControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSu
     }
   }
 
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMessages: Messages = mock[Messages]
-
-  val SUT = new HomePageController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
+  val SUT = new HomePageController()
 
 }

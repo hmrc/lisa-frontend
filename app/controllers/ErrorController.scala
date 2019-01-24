@@ -21,20 +21,17 @@ import config.AppConfig
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment}
-import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
 
 class ErrorController @Inject()(
-  val sessionCache: SessionCache,
-  val shortLivedCache: ShortLivedCache,
-  val env: Environment,
-  val config: Configuration,
-  val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  implicit val messages: Messages
-) extends LisaBaseController {
+  implicit val config: Configuration,
+  implicit val env: Environment,
+  implicit val messages: Messages,
+  implicit val appConfig: AppConfig
+) extends FrontendController with AuthRedirects {
 
   val accessDenied: Action[AnyContent] = Action.async { implicit request =>
     val loginUrl = ggLoginUrl + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url

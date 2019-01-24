@@ -66,12 +66,12 @@
 
 @bodyEnd = {
     @uiLayouts.footer(
-      analyticsToken = Some(appConfig.analyticsToken),
-      analyticsHost = appConfig.analyticsHost,
+      analyticsToken = Some(""),
+      analyticsHost = "",
       ssoUrl = None,
-      scriptElem = scriptElem,
+      scriptElem = None,
       gaCalls = None,
-      analyticsAdditionalJs = analyticsAdditionalJs)
+      analyticsAdditionalJs = None)
 }
 
 @footerTop = {}

@@ -16,32 +16,19 @@
 
 package controllers
 
-import java.io.File
-
-import config.AppConfig
+import base.SpecBase
 import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, Mode}
-import services.AuthorisationService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-class ApplicationSubmittedControllerSpec extends PlaySpec
-  with GuiceOneAppPerSuite
-  with MockitoSugar
+class ApplicationSubmittedControllerSpec extends SpecBase
   with CSRFTest
   with BeforeAndAfter {
 
@@ -49,10 +36,10 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the submitted page with correct email address" in {
 
-      when(mockAuthorisationService.userStatus(any())).
+      when(authorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentPending)))
 
-      when(mockSessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any(), any())).
+      when(sessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
 
       val result = SUT.get()(fakeRequest)
@@ -73,7 +60,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the pending page" in {
 
-      when(mockAuthorisationService.userStatus(any())).
+      when(authorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
       val result = SUT.pending()(fakeRequest)
@@ -92,10 +79,10 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the successful page" in {
 
-      when(mockAuthorisationService.userStatus(any())).
+      when(authorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
-      when(mockSessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any(), any())).
+      when(sessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any(), any())).
         thenReturn(Future.successful(Some("Z9999")))
 
       val result = SUT.successful()(fakeRequest)
@@ -115,7 +102,7 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
     "return the unsuccessful page" in {
 
-      when(mockAuthorisationService.userStatus(any())).
+      when(authorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest)
@@ -130,34 +117,14 @@ class ApplicationSubmittedControllerSpec extends PlaySpec
 
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
-
   val submittedPageTitle = ">Application submitted</h1>"
   val pendingPageTitle = ">We are reviewing your application</h1>"
   val successPageTitle = ">Application successful</h1>"
   val rejectedPageTitle = ">Application not successful</h1>"
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("GET", "/"))
 
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMessages: Messages = mock[Messages]
+  val SUT = new ApplicationSubmittedController()
 
-  val SUT = new ApplicationSubmittedController(mockSessionCache, mockCache, mockEnvironment, mockConfig, mockAuthorisationService, mockAppConfig, mockMessages)
-
-  when(mockConfig.getString(matches("^appName$"), any())).
-    thenReturn(Some("lisa-frontend"))
-
-  when(mockConfig.getString(matches("^.*company-auth-frontend.host$"), any())).
-    thenReturn(Some(""))
-
-  when(mockConfig.getString(matches("^sosOrigin$"), any())).
-    thenReturn(None)
-
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
+  when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
     thenReturn(Future.successful(Some(false)))
 
 }
