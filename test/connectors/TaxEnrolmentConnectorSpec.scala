@@ -26,7 +26,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -49,7 +49,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   }
 
-  val mockHttp = mock[WSHttp]
+  val mockHttp = mock[HttpClient]
   val mockAppConfig = mock[AppConfig]
   implicit val hc = HeaderCarrier()
 

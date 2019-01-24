@@ -33,7 +33,6 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Co
   }
 }
 
-@Singleton
 class LisaSessionCache @Inject()(
   val http: HttpClient,
   val runModeConfiguration: Configuration,
@@ -49,7 +48,6 @@ class LisaSessionCache @Inject()(
   override lazy val domain: String = getString("cachable.session-cache.domain")
 }
 
-@Singleton
 class LisaShortLivedHttpCaching @Inject()(
   val http: HttpClient,
   val runModeConfiguration: Configuration,
@@ -66,7 +64,6 @@ class LisaShortLivedHttpCaching @Inject()(
 
 }
 
-@Singleton
 class LisaShortLivedCache @Inject()(
   val appCrypto: ApplicationCrypto,
   override val shortLiveCache: LisaShortLivedHttpCaching) extends ShortLivedCache {

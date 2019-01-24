@@ -22,13 +22,13 @@ import models._
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class TaxEnrolmentConnector @Inject()(
-  val httpGet: WSHttp,
+  val httpGet: HttpClient,
   val appConfig: AppConfig
 ) extends TaxEnrolmentJsonFormats {
 

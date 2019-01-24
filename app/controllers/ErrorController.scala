@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import config.AppConfig
-import play.api.i18n.Messages
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
@@ -29,9 +29,9 @@ import scala.concurrent.Future
 class ErrorController @Inject()(
   implicit val config: Configuration,
   implicit val env: Environment,
-  implicit val messages: Messages,
+  implicit val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig
-) extends FrontendController with AuthRedirects {
+) extends FrontendController with AuthRedirects with I18nSupport {
 
   val accessDenied: Action[AnyContent] = Action.async { implicit request =>
     val loginUrl = ggLoginUrl + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url

@@ -24,7 +24,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -48,7 +48,7 @@ class UserDetailsConnectorSpec extends PlaySpec
 
   }
 
-  val mockHttp = mock[WSHttp]
+  val mockHttp = mock[HttpClient]
   val mockConfiguration = mock[Configuration]
   val mockEnvironment = mock[Environment]
 

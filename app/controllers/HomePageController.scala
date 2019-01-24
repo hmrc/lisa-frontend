@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import config.AppConfig
-import play.api.i18n.Messages
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
@@ -33,8 +33,8 @@ class HomePageController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messages: Messages
-) extends LisaBaseController {
+  implicit val messagesApi: MessagesApi
+) extends LisaBaseController with I18nSupport {
 
   val home: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Redirect(routes.BusinessStructureController.get(), MOVED_PERMANENTLY))

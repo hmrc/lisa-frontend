@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import models._
-import play.api.i18n.Messages
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
@@ -34,7 +34,7 @@ class BusinessStructureController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messages: Messages
+  implicit val messagesApi: MessagesApi
 ) extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

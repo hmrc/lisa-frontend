@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
 import models.{ApplicationSent, LisaRegistration}
-import play.api.i18n.Messages
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment, Logger}
 import services.{AuditService, AuthorisationService, RosmService}
@@ -38,7 +38,7 @@ class RosmController @Inject()(
   implicit val rosmService: RosmService,
   implicit val emailConnector: EmailConnector,
   implicit val appConfig: AppConfig,
-  implicit val messages: Messages
+  implicit val messagesApi: MessagesApi
 ) extends LisaBaseController with RosmJsonFormats {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

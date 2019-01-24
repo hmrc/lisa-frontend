@@ -62,15 +62,13 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
 
   val injector: Injector = app.injector
 
-  val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("", ""))
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
+  implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
 
-  implicit val messages: Messages = messagesApi.preferred(fakeRequest)
+  implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
 
   implicit val env: Environment = injector.instanceOf[Environment]
 

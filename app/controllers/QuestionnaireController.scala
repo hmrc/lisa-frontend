@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import models.Questionnaire
-import play.api.i18n.Messages
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService}
@@ -35,7 +35,7 @@ class QuestionnaireController @Inject()(
   implicit val authorisationService: AuthorisationService,
   implicit val auditService: AuditService,
   implicit val appConfig: AppConfig,
-  implicit val messages: Messages
+  implicit val messagesApi: MessagesApi
 ) extends LisaBaseController {
 
   def showQuestionnaire: Action[AnyContent] = Action.async { implicit request =>

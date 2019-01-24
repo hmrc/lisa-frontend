@@ -21,13 +21,13 @@ import models._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.ws.WSHttp
 import play.api.libs.concurrent.Execution.defaultContext
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
 
 class UserDetailsConnector @Inject()(
-  val httpGet: WSHttp,
+  val httpGet: HttpClient,
   val runModeConfiguration: Configuration,
   environment: Environment
 ) extends ServicesConfig with UserDetailsJsonFormats {

@@ -22,6 +22,7 @@ import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import play.api.http.Status
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -197,7 +198,8 @@ class LisaBaseControllerSpec extends SpecBase {
     implicit val sessionCache: SessionCache,
     implicit val appConfig: AppConfig,
     implicit val shortLivedCache: ShortLivedCache,
-    implicit val authorisationService: AuthorisationService
+    implicit val authorisationService: AuthorisationService,
+    implicit val messagesApi: MessagesApi
   ) extends LisaBaseController {
 
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>

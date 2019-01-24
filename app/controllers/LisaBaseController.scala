@@ -19,6 +19,7 @@ package controllers
 import config.AppConfig
 import models._
 import play.api.Logger
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import scala.concurrent.Future
 
 trait LisaBaseController extends FrontendController
-  with AuthRedirects {
+  with AuthRedirects with I18nSupport {
 
   val appConfig: AppConfig
   val sessionCache: SessionCache
