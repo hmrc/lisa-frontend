@@ -21,7 +21,9 @@ import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.http.Status
+import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -38,8 +40,8 @@ class SummaryControllerSpec extends SpecBase {
       "no business structure details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
         val result = SUT.get(fakeRequest)
 
@@ -55,11 +57,10 @@ class SummaryControllerSpec extends SpecBase {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -72,14 +73,11 @@ class SummaryControllerSpec extends SpecBase {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -95,17 +93,14 @@ class SummaryControllerSpec extends SpecBase {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(businessStructureForm)))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
 
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString("")
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -122,20 +117,13 @@ class SummaryControllerSpec extends SpecBase {
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString(""),
+            TradingDetails.cacheKey -> Json.toJson(tradingForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -158,20 +146,14 @@ class SummaryControllerSpec extends SpecBase {
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(yourForm)))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString(""),
+            TradingDetails.cacheKey -> Json.toJson(tradingForm),
+            YourDetails.cacheKey -> Json.toJson(yourForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 

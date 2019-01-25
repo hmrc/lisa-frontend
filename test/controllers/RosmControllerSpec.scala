@@ -17,11 +17,13 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.{BusinessStructure, OrganisationDetails, _}
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import play.api.http.Status
+import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
 
@@ -35,9 +37,19 @@ class RosmControllerSpec extends SpecBase {
     val yourDetailsCacheKey = "yourDetails"
 
     "redirect the user to business structure" when {
-      "no business structure details are found in the cache" in {
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+      "no data is found in the cache" in {
+        when(shortLivedCache.fetch(any())(any(), any())).
           thenReturn(Future.successful(None))
+
+        val result = SUT.get(fakeRequest)
+
+        status(result) mustBe Status.SEE_OTHER
+
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+      }
+      "no business structure details are found in the cache" in {
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
         val result = SUT.get(fakeRequest)
 
@@ -51,11 +63,10 @@ class RosmControllerSpec extends SpecBase {
       "no organisation details are found in the cache" in {
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -67,15 +78,11 @@ class RosmControllerSpec extends SpecBase {
         val businessStructureForm = new BusinessStructure("LLP")
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(None))
-
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -90,17 +97,12 @@ class RosmControllerSpec extends SpecBase {
         val businessStructureForm = new BusinessStructure("LLP")
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString("")
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -116,20 +118,13 @@ class RosmControllerSpec extends SpecBase {
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString(""),
+            TradingDetails.cacheKey -> Json.toJson(tradingForm)
+          )))))
 
         val result = SUT.get(fakeRequest)
 
@@ -150,22 +145,16 @@ class RosmControllerSpec extends SpecBase {
         phone = "0191 123 4567",
         email = "test@test.com")
 
-      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
+      when(shortLivedCache.fetch(any())(any(), any())).
+        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+          "safeId" -> JsString(""),
+          TradingDetails.cacheKey -> Json.toJson(tradingForm),
+          YourDetails.cacheKey -> Json.toJson(yourForm)
+        )))))
 
-      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-        thenReturn(Future.successful(Some("123456")))
-
-      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(tradingForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(businessStructureForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(yourForm)))
-
-      when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789")))
+      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789")))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -197,20 +186,14 @@ class RosmControllerSpec extends SpecBase {
         phone = "0191 123 4567",
         email = testEmail)
 
-      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-        thenReturn(Future.successful(Some("123456")))
-
-      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(tradingForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(businessStructureForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(yourForm)))
+      when(shortLivedCache.fetch(any())(any(), any())).
+        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+          "safeId" -> JsString(""),
+          TradingDetails.cacheKey -> Json.toJson(tradingForm),
+          YourDetails.cacheKey -> Json.toJson(yourForm)
+        )))))
 
       when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
 
@@ -238,7 +221,7 @@ class RosmControllerSpec extends SpecBase {
     }
 
     "handle a failed rosm registration" when {
-      "the ct utr is 0000000000" in {
+      "the rosm service returns a failure" in {
         val uri = controllers.routes.RosmController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
@@ -250,22 +233,16 @@ class RosmControllerSpec extends SpecBase {
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString(""),
+            TradingDetails.cacheKey -> Json.toJson(tradingForm),
+            YourDetails.cacheKey -> Json.toJson(yourForm)
+          )))))
 
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(yourForm)))
-
-        when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
+        when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
         val result = SUT.get(fakeRequest)
 
@@ -286,20 +263,14 @@ class RosmControllerSpec extends SpecBase {
         email = "test@test.com")
       val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-        thenReturn(Future.successful(Some("123456")))
-
-      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(tradingForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(businessStructureForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(yourForm)))
+      when(shortLivedCache.fetch(any())(any(), any())).
+        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+          "safeId" -> JsString(""),
+          TradingDetails.cacheKey -> Json.toJson(tradingForm),
+          YourDetails.cacheKey -> Json.toJson(yourForm)
+        )))))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -312,7 +283,7 @@ class RosmControllerSpec extends SpecBase {
         contactDetails = rosmContact
       )
 
-      when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.get(fakeRequest))
 
@@ -347,21 +318,16 @@ class RosmControllerSpec extends SpecBase {
           email = "test@test.com")
         val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(organisationForm)))
+        when(shortLivedCache.fetch(any())(any(), any())).
+          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+            "safeId" -> JsString(""),
+            TradingDetails.cacheKey -> Json.toJson(tradingForm),
+            YourDetails.cacheKey -> Json.toJson(yourForm)
+          )))))
 
-        when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-          thenReturn(Future.successful(Some("123456")))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(businessStructureForm)))
-
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(yourForm)))
-        when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
+        when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.get(fakeRequest))
 
@@ -396,20 +362,14 @@ class RosmControllerSpec extends SpecBase {
         email = "test@test.com")
       val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(organisationForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[String](any(), org.mockito.Matchers.eq("safeId"))(any(), any(), any())).
-        thenReturn(Future.successful(Some("123456")))
-
-      when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(tradingDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(tradingForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(businessStructureForm)))
-
-      when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(yourDetailsCacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(yourForm)))
+      when(shortLivedCache.fetch(any())(any(), any())).
+        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
+          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
+          "safeId" -> JsString(""),
+          TradingDetails.cacheKey -> Json.toJson(tradingForm),
+          YourDetails.cacheKey -> Json.toJson(yourForm)
+        )))))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -421,7 +381,7 @@ class RosmControllerSpec extends SpecBase {
         address = rosmAddress,
         contactDetails = rosmContact
       )
-      when (rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.get(fakeRequest))
 
