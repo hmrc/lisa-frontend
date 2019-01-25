@@ -40,12 +40,11 @@ class LisaSessionCache @Inject()(
 
   override val mode = environment.mode
 
-  override lazy val defaultSource: String = runModeConfiguration.getString("appName").
-    getOrElse(throw new Exception("appName not defined"))
+  override lazy val defaultSource: String = getString("appName")
 
   override lazy val baseUri: String = baseUrl("cachable.session-cache")
 
-  override lazy val domain: String = getString("cachable.session-cache.domain")
+  override lazy val domain: String = getString("microservice.services.cachable.session-cache.domain")
 }
 
 class LisaShortLivedHttpCaching @Inject()(
@@ -55,12 +54,11 @@ class LisaShortLivedHttpCaching @Inject()(
 
   override val mode = environment.mode
 
-  override lazy val defaultSource: String = runModeConfiguration.getString("appName").
-    getOrElse(throw new Exception("appName not defined"))
+  override lazy val defaultSource: String = getString("appName")
 
   override lazy val baseUri: String = baseUrl("cachable.short-lived-cache")
 
-  override lazy val domain: String = getString("cachable.short-lived-cache.domain")
+  override lazy val domain: String = getString("microservice.services.cachable.short-lived-cache.domain")
 
 }
 
