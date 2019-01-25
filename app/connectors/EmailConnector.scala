@@ -20,12 +20,11 @@ import com.google.inject.Inject
 import config.AppConfig
 import metrics.EmailMetrics
 import models.SendEmailRequest
+import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
-import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,7 +35,7 @@ case object EmailSent extends EmailStatus
 case object EmailNotSent extends EmailStatus
 
 class EmailConnector @Inject()(
-  val http: WSHttp,
+  val http: HttpClient,
   appConfig: AppConfig,
   metrics: EmailMetrics
 ) extends RawResponseReads {

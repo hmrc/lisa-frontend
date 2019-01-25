@@ -20,13 +20,13 @@ import com.google.inject.Inject
 import config.AppConfig
 import models._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
-import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.Future
 
 class RosmConnector @Inject()(
-  val httpPost: WSHttp,
+  val httpPost: HttpClient,
   val appConfig: AppConfig
 ) extends RosmJsonFormats {
 
