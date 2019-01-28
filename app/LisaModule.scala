@@ -24,12 +24,8 @@ import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 class LisaModule extends AbstractModule {
 
   override def configure(): Unit = {
-
-    bind(classOf[HttpClient]).to(classOf[DefaultHttpClient])
     bind(classOf[SessionCache]).to(classOf[LisaSessionCache])
     bind(classOf[ShortLivedCache]).to(classOf[LisaShortLivedCache])
-    bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
-
   }
 
 }

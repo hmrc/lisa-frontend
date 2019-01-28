@@ -21,7 +21,6 @@ import config.AppConfig
 import models._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 import scala.concurrent.Future
 
@@ -36,12 +35,12 @@ class RosmConnector @Inject()(
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"
-    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly, implicitly)
   }
 
   def subscribe(lisaManagerRef: String, lisaSubscribe:LisaSubscription)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
-      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly, implicitly)
   }
 
 }
