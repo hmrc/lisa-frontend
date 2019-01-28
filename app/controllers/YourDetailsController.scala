@@ -16,17 +16,26 @@
 
 package controllers
 
-import config.{LisaSessionCache, LisaShortLivedCache}
+import com.google.inject.Inject
+import config.AppConfig
 import models._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Play}
+import play.api.{Configuration, Environment}
 import services.AuthorisationService
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-trait YourDetailsController extends LisaBaseController {
+class YourDetailsController @Inject()(
+  implicit val sessionCache: SessionCache,
+  implicit val shortLivedCache: ShortLivedCache,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit val messagesApi: MessagesApi
+) extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -56,12 +65,4 @@ trait YourDetailsController extends LisaBaseController {
     }
   }
 
-}
-
-object YourDetailsController extends YourDetailsController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val authorisationService = AuthorisationService
 }

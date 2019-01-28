@@ -21,7 +21,7 @@
   mainClass: Option[String] = None,
   scriptElem: Option[Html] = None,
   showSignOutLink: Boolean = true,
-  analyticsAdditionalJs: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+  analyticsAdditionalJs: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @import uk.gov.hmrc.play.views.html.layouts
 
@@ -55,7 +55,7 @@
     @scriptElem
 }
 
-@govuk_wrapper(appConfig = config.FrontendAppConfig,
+@govuk_wrapper(appConfig = appConfig,
                title = title,
                mainClass = mainClass,
                bodyClasses = bodyClasses,

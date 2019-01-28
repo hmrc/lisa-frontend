@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package controllers
+import com.google.inject.AbstractModule
+import config.{LisaSessionCache, LisaShortLivedCache}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
+import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
-import base.SpecBase
-import play.api.http.Status
-import play.api.test.Helpers._
+class LisaModule extends AbstractModule {
 
-class ErrorControllerSpec extends SpecBase {
-
-  "GET /access-denied" should {
-    "return 403" in {
-      val result = SUT.accessDenied(fakeRequest)
-      status(result) mustBe Status.FORBIDDEN
-      val content = contentAsString(result)
-
-      content must include("There is a problem</h1>")
-      content must include("You signed in as an individual or agent.")
-    }
+  override def configure(): Unit = {
+    bind(classOf[SessionCache]).to(classOf[LisaSessionCache])
+    bind(classOf[ShortLivedCache]).to(classOf[LisaShortLivedCache])
   }
-
-  val SUT = new ErrorController()
 
 }

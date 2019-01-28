@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@(email: String, subscriptionId: String)(implicit request: Request[_], messages: Messages)
+@(email: String, subscriptionId: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @analyticsAdditionalJs = {
     ga('set', 'location', document.URL.split("?")[0]);

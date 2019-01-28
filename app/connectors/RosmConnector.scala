@@ -16,34 +16,32 @@
 
 package connectors
 
-import config.WSHttp
+import com.google.inject.Inject
+import config.AppConfig
 import models._
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
-trait RosmConnector extends ServicesConfig with RosmJsonFormats {
-
-  val httpPost:HttpPost = WSHttp
-  lazy val rosmUrl = baseUrl("lisa")
+class RosmConnector @Inject()(
+  val httpPost: HttpClient,
+  val appConfig: AppConfig
+) extends RosmJsonFormats {
 
   val httpReads:HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
     override def read(method: String, url: String, response: HttpResponse) = response
   }
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    val uri = s"$rosmUrl/lisa/$utr/register"
-    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"
+    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly, implicitly)
   }
 
   def subscribe(lisaManagerRef: String, lisaSubscribe:LisaSubscription)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    val uri = s"$rosmUrl/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
-      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val uri = s"${appConfig.lisaServiceUrl}/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
+      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly, implicitly)
   }
-
-}
-
-object RosmConnector extends RosmConnector {
 
 }

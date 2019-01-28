@@ -16,21 +16,20 @@
 
 package controllers
 
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import base.SpecBase
 import play.api.http.Status
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class HomePageControllerSpec extends PlaySpec with OneAppPerSuite {
+class HomePageControllerSpec extends SpecBase {
 
-  val fakeRequest = FakeRequest("GET", "/")
-  
   "GET /" should {
     "301 redirect the user to the company structure page" in {
-      val result = HomePageController.home(fakeRequest)
+      val result = SUT.home(fakeRequest)
       status(result) mustBe Status.MOVED_PERMANENTLY
       redirectLocation(result).getOrElse("") mustBe "/lifetime-isa/company-structure"
     }
   }
+
+  val SUT = new HomePageController()
 
 }

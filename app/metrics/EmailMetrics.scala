@@ -16,22 +16,17 @@
 
 package metrics
 
-import java.util.concurrent.TimeUnit
 import com.codahale.metrics.MetricRegistry
+import com.google.inject.Inject
+import com.kenshoo.play.metrics.Metrics
 
-import uk.gov.hmrc.play.graphite.MicroserviceMetrics
 
-
-trait EmailMetrics {
-  def emailSentCounter(): Unit
-  def emailNotSentCounter(): Unit
-}
-
-object EmailMetrics extends EmailMetrics with MicroserviceMetrics {
+class EmailMetrics @Inject()(val metrics: Metrics) {
 
   val registry: MetricRegistry = metrics.defaultRegistry
 
-  override def emailNotSentCounter(): Unit = registry.counter("emailNotSentCounter").inc()
+  def emailNotSentCounter(): Unit = registry.counter("emailNotSentCounter").inc()
 
-  override def emailSentCounter(): Unit = registry.counter("emailSentCounter").inc()
+  def emailSentCounter(): Unit = registry.counter("emailSentCounter").inc()
+
 }

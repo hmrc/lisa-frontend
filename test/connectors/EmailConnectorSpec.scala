@@ -16,6 +16,8 @@
 
 package connectors
 
+import config.AppConfig
+import metrics.EmailMetrics
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -23,32 +25,24 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.http.ws.{WSGet, WSPost, WSPut}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut, HttpResponse }
 
 class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSugar with BeforeAndAfterEach {
 
-  class MockHttp extends HttpGet with WSGet with HttpPost with WSPost with HttpPut with WSPut {
-    override val hooks = NoneRequired
-  }
+  val mockHttpClient = mock[HttpClient]
+  val mockAppConfig = mock[AppConfig]
+  val mockMetrics = mock[EmailMetrics]
 
-  val mockWSHttp = mock[MockHttp]
-
-  val testEmailConnector = new EmailConnector{
-    override val http:  HttpGet with HttpPost with HttpPut = mockWSHttp
-  }
+  val testEmailConnector = new EmailConnector(mockHttpClient, mockAppConfig, mockMetrics)
 
   override def beforeEach() {
-    reset(mockWSHttp)
+    reset(mockHttpClient)
   }
 
   "EmailConnector" must {
-
-    "have a service url" in {
-      testEmailConnector.serviceUrl == "email"
-    }
 
     "return a 202 accepted" when {
 
@@ -58,7 +52,7 @@ class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         val templateId = "lisa_application_submit"
         val params = Map("testParam" -> "testParam")
 
-        when(mockWSHttp.POST[JsValue, HttpResponse](Matchers.any(), Matchers.any(),
+        when(mockHttpClient.POST[JsValue, HttpResponse](Matchers.any(), Matchers.any(),
           Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any()))
           .thenReturn(Future.successful(HttpResponse(202, responseJson = None)))
 
@@ -77,7 +71,7 @@ class EmailConnectorSpec extends PlaySpec with OneServerPerSuite with MockitoSug
         val templateId = "lisa_application_submit"
         val params = Map("testParam" -> "testParam")
 
-        when(mockWSHttp.POST[JsValue, HttpResponse](Matchers.any(), Matchers.any(),
+        when(mockHttpClient.POST[JsValue, HttpResponse](Matchers.any(), Matchers.any(),
           Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any(), Matchers.any()))
           .thenReturn(Future.successful(HttpResponse(404, responseJson = None)))
 

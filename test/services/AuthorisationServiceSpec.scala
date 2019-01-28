@@ -231,11 +231,7 @@ class AuthorisationServiceSpec extends PlaySpec
   val mockUserDetailsConnector = mock[UserDetailsConnector]
   val mockTaxEnrolmentService = mock[TaxEnrolmentService]
 
-  object SUT extends AuthorisationService {
-    val authConnector: AuthConnector = mockAuthConnector
-    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
-    override val taxEnrolmentService: TaxEnrolmentService = mockTaxEnrolmentService
-  }
+  object SUT extends AuthorisationService(mockAuthConnector, mockUserDetailsConnector, mockTaxEnrolmentService)
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 

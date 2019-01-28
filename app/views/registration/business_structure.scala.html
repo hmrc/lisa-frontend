@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.error.errorSummaryOrgTemplate
 
-@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, title: String = "Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, title: String = "Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
 
 @views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
 
@@ -30,7 +30,7 @@
         @CSRF.formField
 
         <div class="form-field form-field--submit" id="companyStructure">
-            @inputRadioGroup(form("companyStructure"), Seq(
+            @input_radio_group(form("companyStructure"), Seq(
                 (Messages("org.details.llp"), Messages("org.details.llp.view")),
                 (Messages("org.details.corpbody"), Messages("org.details.corpbody.view")),
                 (Messages("org.details.friendlysoc"), Messages("org.details.friendlysoc.view"))

@@ -16,17 +16,26 @@
 
 package controllers
 
-import config.{LisaSessionCache, LisaShortLivedCache}
+import com.google.inject.Inject
+import config.AppConfig
 import models.ApplicationSent
-import services.AuthorisationService
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.MessagesApi
 import play.api.mvc._
-import play.api.{Configuration, Environment, Logger, Play}
+import play.api.{Configuration, Environment}
+import services.AuthorisationService
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-trait ApplicationSubmittedController extends LisaBaseController {
+class ApplicationSubmittedController @Inject()(
+  implicit val sessionCache: SessionCache,
+  implicit val shortLivedCache: ShortLivedCache,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit val messagesApi: MessagesApi
+) extends LisaBaseController {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {
@@ -58,12 +67,4 @@ trait ApplicationSubmittedController extends LisaBaseController {
       Future.successful(Ok(views.html.registration.application_rejected()))
     }, checkEnrolmentState = false)
   }
-}
-
-object ApplicationSubmittedController extends ApplicationSubmittedController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val authorisationService = AuthorisationService
 }

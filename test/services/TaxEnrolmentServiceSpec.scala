@@ -35,9 +35,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   val mockConnector:TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
 
-  val SUT = new TaxEnrolmentService {
-    override val connector:TaxEnrolmentConnector = mockConnector
-  }
+  val SUT = new TaxEnrolmentService(mockConnector)
 
   "Get LISA subscription" must {
 

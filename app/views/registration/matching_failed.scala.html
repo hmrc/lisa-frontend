@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import config.FrontendAppConfig
 
-@(isPartnership: Boolean)(implicit request: Request[_], messages: Messages)
+@(isPartnership: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = "Your company’s details could not be found - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
 

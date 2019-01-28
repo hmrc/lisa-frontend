@@ -16,29 +16,28 @@
 
 package controllers
 
-import config.FrontendAppConfig
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import com.google.inject.Inject
+import config.AppConfig
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
-import play.api.{Configuration, Environment, Play}
-import uk.gov.hmrc.play.frontend.config.AuthRedirects
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
 
-trait ErrorController extends FrontendController
-  with AuthRedirects {
+class ErrorController @Inject()(
+  implicit val config: Configuration,
+  implicit val env: Environment,
+  implicit val messagesApi: MessagesApi,
+  implicit val appConfig: AppConfig
+) extends FrontendController with AuthRedirects with I18nSupport {
 
   val accessDenied: Action[AnyContent] = Action.async { implicit request =>
     val loginUrl = ggLoginUrl + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url
-    val registerUrl = FrontendAppConfig.getSignOutUrl(FrontendAppConfig.registerOrgUrl)
+    val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
 
     Future.successful(Forbidden(views.html.error.access_denied(loginUrl, registerUrl)))
   }
 
-}
-
-object ErrorController extends ErrorController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 }

@@ -16,54 +16,50 @@
 
 package connectors
 
-import config.WSHttp
+import com.google.inject.Inject
+import config.AppConfig
 import metrics.EmailMetrics
 import models.SendEmailRequest
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut }
 
 
 sealed trait EmailStatus
 case object EmailSent extends EmailStatus
 case object EmailNotSent extends EmailStatus
 
-trait EmailConnector extends ServicesConfig with RawResponseReads {
-
-  val sendEmailUri: String = "hmrc/email"
-
-  lazy val serviceUrl: String = baseUrl("email")
-
-  val http: HttpGet with HttpPost with HttpPut = WSHttp
+class EmailConnector @Inject()(
+  val http: HttpClient,
+  appConfig: AppConfig,
+  metrics: EmailMetrics
+) extends RawResponseReads {
 
   def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit hc: HeaderCarrier): Future[EmailStatus] = {
 
     val sendEmailReq = SendEmailRequest(List(emailAddress), templateName, params, force = true)
 
-
-    val postUrl = s"$serviceUrl/$sendEmailUri"
+    val postUrl = s"${appConfig.emailServiceUrl}/hmrc/email"
     val jsonData = Json.toJson(sendEmailReq)
 
     http.POST(postUrl, jsonData).map { response =>
       response.status match {
         case ACCEPTED => {
           Logger.info("Email sent successfully.")
-          EmailMetrics.emailSentCounter()
+          metrics.emailSentCounter()
           EmailSent
         }
         case status => {
           Logger.warn("Email not sent.")
-          EmailMetrics.emailNotSentCounter()
+          metrics.emailNotSentCounter()
           EmailNotSent
         }
       }
     }
   }
 }
-
-object EmailConnector extends EmailConnector

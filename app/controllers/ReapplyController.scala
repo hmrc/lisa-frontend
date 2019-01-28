@@ -16,27 +16,31 @@
 
 package controllers
 
-import config.{LisaSessionCache, LisaShortLivedCache}
+import com.google.inject.Inject
+import config.AppConfig
 import models.Reapplication
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
-import play.api.{Configuration, Environment, Play}
+import play.api.{Configuration, Environment}
 import services.AuthorisationService
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-trait ReapplyController extends LisaBaseController {
+class ReapplyController @Inject()(
+  implicit val sessionCache: SessionCache,
+  implicit val shortLivedCache: ShortLivedCache,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit val messagesApi: MessagesApi
+) extends LisaBaseController {
+
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( (cacheId) =>{
-        shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { res =>
+        shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { _ =>
          Redirect(routes.BusinessStructureController.get())
         }
       }, checkEnrolmentState = false
     )
   }
-}
-
-object ReapplyController extends ReapplyController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val authorisationService = AuthorisationService
 }

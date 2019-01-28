@@ -16,24 +16,30 @@
 
 package controllers
 
-import config.{LisaSessionCache, LisaShortLivedCache}
+import com.google.inject.Inject
+import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
 import models.{ApplicationSent, LisaRegistration}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, _}
-import play.api.{Configuration, Environment, Logger, Play}
+import play.api.{Configuration, Environment, Logger}
 import services.{AuditService, AuthorisationService, RosmService}
-import play.api.Play.current
-import play.api.i18n.Messages
-import play.api.i18n.Messages.Implicits._
+import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-trait RosmController extends LisaBaseController
-  with RosmJsonFormats {
-
-  val auditService:AuditService
-  val rosmService:RosmService
-  val emailConnector: EmailConnector
+class RosmController @Inject()(
+  implicit val sessionCache: SessionCache,
+  implicit val shortLivedCache: ShortLivedCache,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val auditService: AuditService,
+  implicit val rosmService: RosmService,
+  implicit val emailConnector: EmailConnector,
+  implicit val appConfig: AppConfig,
+  implicit val messagesApi: MessagesApi
+) extends LisaBaseController with RosmJsonFormats {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -94,15 +100,4 @@ trait RosmController extends LisaBaseController
     )
   }
 
-}
-
-object RosmController extends RosmController {
-  val config: Configuration = Play.current.configuration
-  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  override val sessionCache = LisaSessionCache
-  override val shortLivedCache = LisaShortLivedCache
-  override val auditService = AuditService
-  override val rosmService = RosmService
-  override val authorisationService = AuthorisationService
-  override val emailConnector = EmailConnector
 }

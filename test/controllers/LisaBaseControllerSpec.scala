@@ -16,41 +16,30 @@
 
 package controllers
 
-import java.io.File
-
+import base.SpecBase
+import config.AppConfig
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, Mode}
+import play.api.{Configuration, Environment}
 import services.AuthorisationService
-import uk.gov.hmrc.auth.core.{AuthorisationException, InvalidBearerToken}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-class LisaBaseControllerSpec extends PlaySpec
-  with GuiceOneAppPerSuite
-  with MockitoSugar
-  with BeforeAndAfter {
+class LisaBaseControllerSpec extends SpecBase {
 
   "Lisa Base Controller" should {
-
-    before {
-      reset(mockSessionCache)
-    }
 
     "redirect to login" when {
 
       "a not logged in response is returned from auth" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserNotLoggedIn))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -68,7 +57,7 @@ class LisaBaseControllerSpec extends PlaySpec
     "redirect to access denied" when {
 
       "a unauthorised response is returned from auth" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserUnauthorised))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -81,7 +70,7 @@ class LisaBaseControllerSpec extends PlaySpec
     "redirect to pending subscription" when {
 
       "an authorised user has a pending subscription" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -95,7 +84,7 @@ class LisaBaseControllerSpec extends PlaySpec
     "redirect to rejected subscription" when {
 
       "an authorised user has a errored subscription" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentError)))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -109,14 +98,14 @@ class LisaBaseControllerSpec extends PlaySpec
     "redirect to successful subscription" when {
 
       "an authorised user has a successful subscription" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorisedAndEnrolled("", UserDetails(None, None, ""), "Z9876")))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
 
-        verify(mockSessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z9876"))(any(), any(), any())
+        verify(sessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z9876"))(any(), any(), any())
 
       }
 
@@ -125,7 +114,7 @@ class LisaBaseControllerSpec extends PlaySpec
     "avoid redirections" when {
 
       "enrolment state check is disabled for a successful subscription" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", UserDetails(None, None, ""), "Z9876")))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
@@ -136,7 +125,7 @@ class LisaBaseControllerSpec extends PlaySpec
       }
 
       "enrolment state check is disabled for a pending subscription" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
@@ -151,7 +140,7 @@ class LisaBaseControllerSpec extends PlaySpec
     "allow access" when {
 
       "an authorised user has no subscriptions in progress" in {
-        when(mockAuthorisationService.userStatus(any())).
+        when(authorisationService.userStatus(any())).
           thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -203,15 +192,16 @@ class LisaBaseControllerSpec extends PlaySpec
 
   }
 
-  val fakeRequest = FakeRequest("GET", "/")
+  class TestClass(
+    implicit val config: Configuration,
+    implicit val env: Environment,
+    implicit val sessionCache: SessionCache,
+    implicit val appConfig: AppConfig,
+    implicit val shortLivedCache: ShortLivedCache,
+    implicit val authorisationService: AuthorisationService,
+    implicit val messagesApi: MessagesApi
+  ) extends LisaBaseController {
 
-  val mockConfig: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
-  val mockCache: ShortLivedCache = mock[ShortLivedCache]
-  val mockSessionCache: SessionCache = mock[SessionCache]
-  val mockAuthorisationService: AuthorisationService = mock[AuthorisationService]
-
-  trait SUT extends LisaBaseController {
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
       authorisedForLisa(handleResult)
     }
@@ -226,26 +216,6 @@ class LisaBaseControllerSpec extends PlaySpec
     }
   }
 
-  object SUT extends SUT {
-    override val config: Configuration = mockConfig
-    override val env: Environment = mockEnvironment
-    override val shortLivedCache: ShortLivedCache = mockCache
-    override val sessionCache: SessionCache = mockSessionCache
-    override val authorisationService: AuthorisationService = mockAuthorisationService
-  }
-
-  when(mockAuthorisationService.userStatus(any())).
-    thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
-
-  when(mockConfig.getString(matches("^appName$"), any())).
-    thenReturn(Some("lisa-frontend"))
-
-  when(mockConfig.getString(matches("^.*company-auth-frontend.host$"), any())).
-    thenReturn(Some(""))
-
-  when(mockConfig.getString(matches("^sosOrigin$"), any())).
-    thenReturn(None)
-
-  when(mockCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+  val SUT = new TestClass()
 
 }

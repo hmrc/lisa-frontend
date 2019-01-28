@@ -41,9 +41,7 @@ class RosmServiceSpec extends PlaySpec
 
   val mockRosmConnector:RosmConnector = mock[RosmConnector]
 
-  val SUT = new RosmService {
-    override val rosmConnector:RosmConnector  = mockRosmConnector
-  }
+  val SUT = new RosmService(mockRosmConnector)
 
   before {
     reset(mockRosmConnector)

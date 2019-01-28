@@ -16,20 +16,22 @@
 
 package controllers
 
-import config.FrontendAppConfig
+import config.AppConfig
 import models._
 import play.api.Logger
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, Request, Result}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
-import uk.gov.hmrc.play.frontend.config.AuthRedirects
 
 trait LisaBaseController extends FrontendController
-  with AuthRedirects {
+  with AuthRedirects with I18nSupport {
 
+  val appConfig: AppConfig
   val sessionCache: SessionCache
   val shortLivedCache: ShortLivedCache
   val authorisationService: AuthorisationService
@@ -37,7 +39,7 @@ trait LisaBaseController extends FrontendController
   def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentState: Boolean = true)
                        (implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
-      case UserNotLoggedIn => Future.successful(toGGLogin(FrontendAppConfig.loginCallback))
+      case UserNotLoggedIn => Future.successful(toGGLogin(appConfig.loginCallback))
       case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
@@ -95,44 +97,31 @@ trait LisaBaseController extends FrontendController
     }
   }
 
-  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])
+  def hasAllSubmissionData(cacheId: String)
+                          (callback: (LisaRegistration) => Future[Result])
                           (implicit request: Request[AnyContent]): Future[Result] = {
 
-    // get business structure
-    shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-      case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-      case Some(busData) => {
+    shortLivedCache.fetch(cacheId) flatMap {
+      case Some(cache) => {
+        val businessStructure = cache.getEntry[BusinessStructure](BusinessStructure.cacheKey)
+        val organisationDetails = cache.getEntry[OrganisationDetails](OrganisationDetails.cacheKey)
+        val safeId = cache.getEntry[String]("safeId")
+        val tradingDetails = cache.getEntry[TradingDetails](TradingDetails.cacheKey)
+        val yourDetails = cache.getEntry[YourDetails](YourDetails.cacheKey)
 
-        // get organisation details
-        shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).flatMap {
-          case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
-          case Some(orgData) => {
-
-            // get safe Id
-            shortLivedCache.fetchAndGetEntry[String](cacheId, "safeId").flatMap {
-              case None => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
-              case Some(safeId) => {
-
-                // get trading details
-                shortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).flatMap {
-                  case None => Future.successful(Redirect(routes.TradingDetailsController.get()))
-                  case Some(tradData) => {
-
-                    // get user details
-                    shortLivedCache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).flatMap {
-                      case None => Future.successful(Redirect(routes.YourDetailsController.get()))
-                      case Some(yourData) => {
-                        val data = new LisaRegistration(orgData, tradData, busData, yourData, safeId)
-                        callback(data)
-                      }
-                    }
-                  }
-                }
-              }
-            }
+        (businessStructure, organisationDetails, safeId, tradingDetails, yourDetails) match {
+          case (Some(_), None, None, None, None) => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
+          case (Some(_), Some(_), None, None, None) => Future.successful(Redirect(routes.OrganisationDetailsController.get()))
+          case (Some(_), Some(_), Some(_), None, None) => Future.successful(Redirect(routes.TradingDetailsController.get()))
+          case (Some(_), Some(_), Some(_), Some(_), None) => Future.successful(Redirect(routes.YourDetailsController.get()))
+          case (Some(bs), Some(org), Some(sId), Some(trad), Some(you)) => {
+            val data = new LisaRegistration(org, trad, bs, you, sId)
+            callback(data)
           }
+          case _ => Future.successful(Redirect(routes.BusinessStructureController.get()))
         }
       }
+      case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
     }
   }
 

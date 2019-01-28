@@ -16,6 +16,7 @@
 
 package services
 
+import com.google.inject.Inject
 import connectors.TaxEnrolmentConnector
 import models._
 import org.joda.time.DateTime
@@ -24,11 +25,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait TaxEnrolmentService {
+class TaxEnrolmentService @Inject()(val connector: TaxEnrolmentConnector) {
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
-
-  val connector: TaxEnrolmentConnector
 
   def getNewestLisaSubscription(groupId: String)(implicit hc:HeaderCarrier): Future[Option[TaxEnrolmentSubscription]] = {
     val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)(hc)
@@ -44,8 +43,4 @@ trait TaxEnrolmentService {
     }
   }
 
-}
-
-object TaxEnrolmentService extends TaxEnrolmentService {
-  override val connector: TaxEnrolmentConnector = TaxEnrolmentConnector
 }
