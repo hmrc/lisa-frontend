@@ -20,6 +20,7 @@
 
   .tabular-data__data-1 {
     overflow-wrap: break-word;
+    word-wrap: break-word;
     @media (min-width: $tablet-breakpoint){
       box-sizing: border-box;
       padding-left: 2%;
