@@ -24,53 +24,50 @@
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Your company’s details could not be found:Back">Back</a></p>
 
-    <h1>Your company’s details could not be found</h1>
+    <h1>@Messages("matchingfailed.heading")</h1>
 
-    <p>This could be for one of two reasons.</p>
+    <p>@Messages("matchingfailed.text")</p>
 
     <div class="subsection">
-        <h2>Company name is not an exact match</h2>
+        <h2>@Messages("matchingfailed.subsection1.heading")</h2>
 
-        <p>Your company name should match exactly the name that is registered with Companies House.</p>
+        <p>@Messages("matchingfailed.subsection1.text.line1")</p>
 
-        <p>Check if your company name uses:</p>
+        <p>@Messages("matchingfailed.subsection1.text.line2")</p>
 
         <div class="gutter-left">
             <ul class="list list-bullet">
-                <li>capital letters</li>
-                <li>spaces</li>
+                <li>@Messages("matchingfailed.subsection1.text.line2.list1")</li>
+                <li>@Messages("matchingfailed.subsection1.text.line2.list2")</li>
                 @if(isPartnership) {
-                    <li>Limited Liability Partnership or LLP</li>
+                    <li>@Messages("matchingfailed.subsection1.text.line2.list3.llp")</li>
                 } else {
-                    <li>Limited or LTD</li>
+                    <li>@Messages("matchingfailed.subsection1.text.line2.list3.notllp")</li>
                 }
             </ul>
         </div>
 
-        @if(isPartnership) {
-            <p>
-                If you do not know the exact company name,
-                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - self assessment">you can contact HMRC to find that out</a>.
-            </p>
-        } else {
-            <p>
-                If you do not know the exact company name,
-                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - corporation tax">you can contact HMRC to find that out</a>.
-            </p>
-        }
+        <p>
+            @Messages("matchingfailed.subsection1.text.line3.pre")
+            @if(isPartnership) {
+            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - self assessment">@Messages("matchingfailed.subsection1.text.line3.link")</a>.
+            } else {
+            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - corporation tax">@Messages("matchingfailed.subsection1.text.line3.link")</a>.
+            }
+        </p>
     </div>
 
     <div class="subsection">
-        <h2>Your Unique Taxpayer Reference (UTR) does not match</h2>
+        <h2>@Messages("matchingfailed.subsection2.heading")</h2>
 
-        <p>Your UTR should match the UTR on any letters you have from HMRC.@if(!isPartnership) { This is the same number that you use on your company’s CT600 form. }</p>
+        <p>@Messages("matchingfailed.subsection2.text.line1")@if(!isPartnership) { @Messages("matchingfailed.subsection2.text.line1.post.notllp") }</p>
 
-        <p>It can be 10 or 13 numbers. If it is 13 numbers, enter only the last 10 numbers.</p>
+        <p>@Messages("matchingfailed.subsection2.text.line2")</p>
 
-        <p>You can <a href="https://www.gov.uk/find-lost-utr-number" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out a lost UTR">find out a lost UTR by contacting HMRC</a>.</p>
+        <p>@Messages("matchingfailed.subsection2.text.line3.pre") <a href="https://www.gov.uk/find-lost-utr-number" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out a lost UTR">@Messages("matchingfailed.subsection2.text.line3.link")</a>.</p>
     </div>
 
     <div class="form-field form-field--submit">
-        <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="continue" data-journey-click="button - click:Your company’s details could not be found:Try again">Try again</a></p>
+        <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="continue" data-journey-click="button - click:Your company’s details could not be found:Try again">@Messages("matchingfailed.tryagain")</a></p>
     </div>
 }
