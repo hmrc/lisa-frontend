@@ -40,7 +40,9 @@
 
     <h2>@Messages("applicationsubmitted.text.line3")</h2>
 
-    <p>@Messages("applicationsubmitted.text.line4", LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")))</p>
+    <p>@Messages("applicationsubmitted.text.line4")</p>
 
-    <p>@Messages("applicationsubmitted.text.line5", email)</p>
+    <p>@Messages("applicationsubmitted.text.line5", LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")))</p>
+
+    <p>@Messages("applicationsubmitted.text.line6", email)</p>
 }
