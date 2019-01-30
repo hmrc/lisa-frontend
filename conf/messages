@@ -39,8 +39,9 @@ applicationsubmitted.banner.line1=Your application reference is {0}
 applicationsubmitted.text.line1=A confirmation email has been sent to {0}
 applicationsubmitted.text.line2.pre=If you need to change your application, email
 applicationsubmitted.text.line3=What happens next
-applicationsubmitted.text.line4=HMRC will review your application by {0}.
-applicationsubmitted.text.line5=We will send another email to {0} when we have made a decision.
+applicationsubmitted.text.line4=We will send you a readiness declaration by email. You must print out this form, complete it and return it to us by post.
+applicationsubmitted.text.line5=We will review your online application and readiness declaration together by {0}.
+applicationsubmitted.text.line6=We will send another email to {0} when we have made a decision.
 
 applicationpending.heading=We are reviewing your application
 applicationpending.text.line1=The review process can take up to 14 calendar days from the date you submitted your application. We will email you when we have made the decision.
