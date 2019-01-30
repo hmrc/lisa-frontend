@@ -129,7 +129,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with CSRFTest {
 
         content must include (pageTitle)
         content must include ("Enter your company’s name")
-        content must include ("Enter your Partnership UTR")
+        content must include ("Enter your Self Assessment UTR")
       }
 
       "the company name is invalid" in {
