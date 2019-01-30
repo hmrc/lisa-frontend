@@ -113,8 +113,8 @@ error.companyNamePattern=Company name can only include letters a to z, 0 to 9, a
 error.ctrNumberRequired=Enter your Corporation Tax UTR
 error.ctrNumberPattern=Enter a Corporation Tax UTR that only contains 10 numbers
 
-error.partnershipUtrRequired=Enter your Partnership UTR
-error.partnershipUtrPattern=Enter a Partnership UTR that only contains 10 numbers
+error.partnershipUtrRequired=Enter your Self Assessment UTR
+error.partnershipUtrPattern=Enter a Self Assessment UTR that only contains 10 numbers
 
 error.fsrRefNumberRequired=Enter your 6 number Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
