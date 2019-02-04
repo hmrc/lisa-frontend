@@ -19,9 +19,7 @@
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 
-
-
-@views.html.main_template(title = "Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, showSignOutLink = false) {
+@views.html.main_template(title = s"${Messages("label.youre_signed_out")} - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, showSignOutLink = false) {
 
    <div class="logged-out-page">
 
@@ -32,25 +30,34 @@
 
         <p>@Messages("label.survey_gpdr")</p>
 
-        @helpers.form(action = controllers.routes.QuestionnaireController.submitQuestionnaire, 'class -> "satisfactionSurveyForm") {
+        @form(action = controllers.routes.QuestionnaireController.submitQuestionnaire, 'class -> "satisfactionSurveyForm") {
 
-        @input_radio_group(questionnaireForm("satisfactionLevel"),
-        Seq(
-        "4" -> Messages("label.very_satisfied"),
-        "3" -> Messages("label.satisfied"),
-        "2" -> Messages("label.neither_satisfied_or_dissatisfied"),
-        "1" -> Messages("label.dissatisfied"),
-        "0" -> Messages("label.very_dissatisfied")
-        ),
-        '_legend -> Messages("label.how_satisfied_were_you_with_the_service"),
-        '_labelAfter -> true
-        )
-        @helper.textarea(questionnaireForm("whyGiveThisRating"),
-        'rows -> 5,
-        '_label -> Messages("label.why_did_you_give_this_rating"))
+            <div class="form-group">
+                @input_radio_group(
+                    questionnaireForm("satisfactionLevel"),
+                    Seq(
+                        "4" -> Messages("label.very_satisfied"),
+                        "3" -> Messages("label.satisfied"),
+                        "2" -> Messages("label.neither_satisfied_or_dissatisfied"),
+                        "1" -> Messages("label.dissatisfied"),
+                        "0" -> Messages("label.very_dissatisfied")
+                    ),
+                    '_legend -> Messages("label.how_satisfied_were_you_with_the_service"),
+                    '_labelAfter -> true
+                )
+            </div>
 
-        <p id="dont-include-text">@Messages("label.please_dont_include_any_personal_or_financial_information")</p>
-        <button id="submit" type="submit" class="button" data-journey-click="button - click:Feedback questionnaire:@Messages("label.send_feedback")">@Messages("label.send_feedback")</button>
+            <div class="form-group">
+                @textArea(
+                    questionnaireForm("whyGiveThisRating"),
+                    '_label -> Messages("label.why_did_you_give_this_rating"),
+                    '_inputClass -> "form-control form-control-3-4",
+                    '_rows -> 5
+                )
+                <p id="dont-include-text">@Messages("label.please_dont_include_any_personal_or_financial_information")</p>
+            </div>
+
+            <button id="submit" type="submit" class="button" data-journey-click="button - click:Feedback questionnaire:@Messages("label.send_feedback")">@Messages("label.send_feedback")</button>
 
         }
 
