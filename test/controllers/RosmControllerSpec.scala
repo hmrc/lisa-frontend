@@ -219,7 +219,9 @@ class RosmControllerSpec extends SpecBase {
         params = MatcherEquals(Map(
           "application_reference" -> testSubId,
           "email" -> testEmail,
-          "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y"))
+          "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
+          "first_name" -> yourForm.firstName,
+          "last_name" -> yourForm.lastName
         ))
       )(any())
     }

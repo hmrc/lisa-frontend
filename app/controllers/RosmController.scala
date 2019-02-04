@@ -65,7 +65,9 @@ class RosmController @Inject()(
                 params = Map(
                   "application_reference" -> applicationSentVM.subscriptionId,
                   "email" -> applicationSentVM.email,
-                  "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y"))
+                  "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
+                  "first_name" -> registrationDetails.yourDetails.firstName,
+                  "last_name" -> registrationDetails.yourDetails.lastName
                 )
               )
 
