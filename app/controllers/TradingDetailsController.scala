@@ -39,12 +39,10 @@ class TradingDetailsController @Inject()(
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
-
       shortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).map {
         case Some(data) => Ok(views.html.registration.trading_details(TradingDetails.form.fill(data)))
         case None => Ok(views.html.registration.trading_details(TradingDetails.form))
       }
-
     }
   }
 
@@ -60,7 +58,6 @@ class TradingDetailsController @Inject()(
           }
         }
       )
-
     }
   }
 
