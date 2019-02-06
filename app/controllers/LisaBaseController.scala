@@ -89,9 +89,9 @@ trait LisaBaseController extends FrontendController
     Logger.warn("User Authorised And Enrolled")
 
     if (checkEnrolmentState) {
-      sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber)
-
-      Future.successful(Redirect(routes.ApplicationSubmittedController.successful()))
+      sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber).map { _ =>
+        Redirect(routes.ApplicationSubmittedController.successful())
+      }
     }
     else {
       callback(s"${user.internalId}-lisa-registration")
