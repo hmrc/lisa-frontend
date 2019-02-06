@@ -52,7 +52,7 @@ class BusinessStructureControllerSpec extends SpecBase with CSRFTest {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("checked")
+        content must include ("checked=\"checked\"")
       }
 
     }
@@ -70,9 +70,8 @@ class BusinessStructureControllerSpec extends SpecBase with CSRFTest {
         status(result) mustBe Status.OK
 
         val content = contentAsString(result)
-
         content must include (pageTitle)
-        content must not include ("checked")
+        content must not include ("checked=\"checked\"")
       }
 
     }
