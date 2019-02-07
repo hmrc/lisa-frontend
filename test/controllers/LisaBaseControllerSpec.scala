@@ -48,8 +48,8 @@ class LisaBaseControllerSpec extends SpecBase {
 
         val redirectUrl = redirectLocation(result).getOrElse("")
 
-        redirectUrl must startWith("/gg/sign-in?continue=%2Flifetime-isa")
-        redirectUrl must endWith("&origin=lisa-frontend")
+        redirectUrl must startWith("/gg/sign-in")
+        redirectUrl must endWith("lifetime-isa%2Fcompany-structure&origin=lisa-frontend")
       }
 
     }
