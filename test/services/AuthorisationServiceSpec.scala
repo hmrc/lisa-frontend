@@ -16,235 +16,154 @@
 
 package services
 
-import connectors.UserDetailsConnector
 import models._
 import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Logger
-import uk.gov.hmrc.auth.core.ConfidenceLevel.L300
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
-import scala.concurrent.ExecutionContext.Implicits.global._
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AuthorisationServiceSpec extends PlaySpec
-  with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach {
+import scala.concurrent.Future
+import scala.language.postfixOps
 
-  override def beforeEach(): Unit = {
-    reset(mockAuthConnector)
-    reset(mockUserDetailsConnector)
-  }
+class AuthorisationServiceSpec extends PlaySpec
+  with MockitoSugar with OneAppPerSuite with ScalaFutures {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  "user status" must {
+  "user status" should {
 
-    "return an authorised user" when {
+    "return an enrolled user" when {
 
-      "a user without a subscription is returned" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(successfulRetrieval)
+      "an enrolment is in auth" in {
+        val enrolmentIdentifier = EnrolmentIdentifier("ZREF", "Z123456")
+        val validEnrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated")
 
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set(validEnrolment)))
 
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentDoesNotExist)
+        whenReady(SUT.userStatus){
+          _ mustBe UserAuthorisedAndEnrolled("1234", "Z123456")
+        }
       }
 
-      "a user with a pending subscription is returned" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(successfulRetrieval)
+      "a successful enrolment is in tax enrolments" in {
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
+          thenReturn(Future.successful(Some(validTaxEnrolmentSubscription)))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription.copy(state = TaxEnrolmentPending))))
-
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentPending)
+        whenReady(SUT.userStatus){
+          _ mustBe UserAuthorisedAndEnrolled("1234", "Z0001")
+        }
       }
 
-      "a user with a successful subscription is returned" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(successfulRetrieval)
+    }
 
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+    "return an authorised user when no enrolment is in auth and" when {
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription)))
+      "a pending state enrolment is in tax enrolments" in {
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        val result = Await.result(SUT.userStatus, Duration.Inf)
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
+          thenReturn(Future.successful(Some(
+            validTaxEnrolmentSubscription.copy(state = TaxEnrolmentPending, identifiers = Nil))))
 
-        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z0001")
-
+        whenReady(SUT.userStatus){
+          _ mustBe UserAuthorised("1234", TaxEnrolmentPending)
+        }
       }
 
-      "the user has an auth enrolment for HMRC-LISA-ORG" in {
-        when(mockAuthConnector.authorise[Any](any(), any())(any(), any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(enrolments))
+      "an error state enrolment is in tax enrolments" in {
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
+          thenReturn(Future.successful(Some(
+            validTaxEnrolmentSubscription.copy(state = TaxEnrolmentError, identifiers = Nil))))
 
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-
-        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z123456")
-
+        whenReady(SUT.userStatus){
+          _ mustBe UserAuthorised("1234", TaxEnrolmentError)
+        }
       }
 
-      "the user does not have an auth enrolment for HMRC-LISA-ORG" in {
-        when(mockAuthConnector.authorise[Any](any(), any())(any(), any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(new Exception("Not authorised")))
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+      "an enrolment is not in tax enrolments" in {
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription)))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
+          thenReturn(Future.successful(None))
 
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-        result mustBe UserAuthorisedAndEnrolled("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), "Z0001")
-
+        whenReady(SUT.userStatus){
+          _ mustBe UserAuthorised("1234", TaxEnrolmentDoesNotExist)
+        }
       }
 
-      "get identifier returns error should result in TaxEnrolmentPending" in {
-        when(mockAuthConnector.authorise[Any](any(), any())(any(), any())).thenReturn(successfulRetrieval).thenReturn(Future.successful(brokenEnrolments))
-
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
-
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription.copy(state = TaxEnrolmentPending))))
-
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-        result mustBe UserAuthorised("1234", UserDetails(None, None, "", groupIdentifier = Some("group")), TaxEnrolmentPending)
-
-      }
     }
 
     "return user not logged in" when {
 
       "a NoActiveSession exception is returned from auth" in {
         when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(Future.failed(new BearerTokenExpired()))
+          thenReturn(Future.failed(BearerTokenExpired()))
 
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-        result mustBe UserNotLoggedIn
+        whenReady(SUT.userStatus){
+          _ mustBe UserNotLoggedIn
+        }
       }
 
     }
 
     "return user unauthorised" when {
 
-      "a AuthorisationException exception is returned from auth" in {
+      "an AuthorisationException exception is returned from auth" in {
         when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(Future.failed(new InsufficientEnrolments()))
+          thenReturn(Future.failed(InsufficientEnrolments()))
 
-        val result = Await.result(SUT.userStatus, Duration.Inf)
-
-        result mustBe UserUnauthorised
-      }
-
-    }
-
-    "throw an error" when {
-
-      "an internalId isn't returned from auth" in {
-        val invalidRetrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(None, Some("/")))
-
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(invalidRetrievalResult)
-
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
-
-        val result = SUT.userStatus
-
-        ScalaFutures.whenReady(result.failed) { e =>
-          e mustBe a[RuntimeException]
-          e.getMessage mustBe "No internalId for user"
+        whenReady(SUT.userStatus){
+          _ mustBe UserUnauthorised
         }
       }
 
-      "a userDetailsUri isn't returned from auth" in {
-        val invalidRetrievalResult: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), None))
+      "internalId retrieval from auth fails" in {
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(None, Some("/"), Set()))
 
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(invalidRetrievalResult)
-
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
-
-        val result = SUT.userStatus
-
-        ScalaFutures.whenReady(result.failed) { e =>
-          e mustBe a[RuntimeException]
-          e.getMessage mustBe "No userDetailsUri for user"
+        whenReady(SUT.userStatus){
+          _ mustBe UserUnauthorised
         }
       }
 
-      "the user does not have a groupId" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(successfulRetrieval)
+      "groupId retrieval from auth fails" in {
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
+          thenReturn(buildRetrieval(Some("1234"), None, Set()))
 
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = None)))
-
-        val result = SUT.userStatus
-
-        ScalaFutures.whenReady(result.failed) { e =>
-          e mustBe a[RuntimeException]
-          e.getMessage mustBe "No groupIdentifier for user"
+        whenReady(SUT.userStatus){
+          _ mustBe UserUnauthorised
         }
       }
 
-      "the user has a hmrc subscription with a success state and no zref" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(successfulRetrieval)
-
-        when(mockUserDetailsConnector.getUserDetails(any())(any())).
-          thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
-
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(Some(subscription.copy(identifiers = Nil))))
-
-        val result = SUT.userStatus
-
-        ScalaFutures.whenReady(result.failed) { e =>
-          e mustBe a[RuntimeException]
-          e.getMessage mustBe "No zref for successful enrolment"
-        }
-      }
     }
 
   }
 
-  val mockAuthConnector = mock[AuthConnector]
-  val mockUserDetailsConnector = mock[UserDetailsConnector]
-  val mockTaxEnrolmentService = mock[TaxEnrolmentService]
 
-  object SUT extends AuthorisationService(mockAuthConnector, mockUserDetailsConnector, mockTaxEnrolmentService)
+  private val mockAuthConnector = mock[AuthConnector]
+  private val mockTaxEnrolmentService = mock[TaxEnrolmentService]
 
-  val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+  object SUT extends AuthorisationService(mockAuthConnector, mockTaxEnrolmentService)
 
-  when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).thenReturn(Future.successful(None))
+  private def buildRetrieval(id: Option[String], groupId: Option[String], enrolments: Set[Enrolment]): Future[Option[String] ~ Option[String] ~ Enrolments] = {
+    Future.successful(new ~(new ~(id, groupId), Enrolments(enrolments)))
+  }
 
-  private val enrolmentIdentifier = EnrolmentIdentifier("ZREF", "Z123456")
-  private val enrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated",None)
-  private val enrolments = new Enrolments(Set(enrolment))
-
-  val brokenEnrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(EnrolmentIdentifier("test", "test")), state = "Activated", None)
-  private val brokenEnrolments = new Enrolments(Set(brokenEnrolment))
-
-  private val subscription = TaxEnrolmentSubscription(
+  private val validTaxEnrolmentSubscription = TaxEnrolmentSubscription(
     created = new DateTime(),
     lastModified = new DateTime(),
     credId = "",

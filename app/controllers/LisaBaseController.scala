@@ -48,13 +48,8 @@ trait LisaBaseController extends FrontendController
   }
 
   private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] = {
-    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", Reapplication.cacheKey) map { bool =>
-      bool
-      match {
-        case Some(true) => true
-        case _ => false
-      }
-    }
+    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", Reapplication.cacheKey)
+      .map(_.getOrElse(false))
   }
 
 

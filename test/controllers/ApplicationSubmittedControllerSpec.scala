@@ -36,7 +36,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
     "return the submitted page with correct email address" in {
 
       when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentPending)))
+        thenReturn(Future.successful(UserAuthorised("id",TaxEnrolmentPending)))
 
       when(sessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
@@ -60,7 +60,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
     "return the pending page" in {
 
       when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+        thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.pending()(fakeRequest)
 
@@ -79,7 +79,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
     "return the successful page" in {
 
       when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+        thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       when(sessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any(), any())).
         thenReturn(Future.successful(Some("Z9999")))
@@ -102,7 +102,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
     "return the unsuccessful page" in {
 
       when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+        thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest)
 

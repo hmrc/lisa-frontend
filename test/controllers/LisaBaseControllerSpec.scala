@@ -71,7 +71,7 @@ class LisaBaseControllerSpec extends SpecBase {
 
       "an authorised user has a pending subscription" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentPending)))
+          thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -85,7 +85,7 @@ class LisaBaseControllerSpec extends SpecBase {
 
       "an authorised user has a errored subscription" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentError)))
+          thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentError)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -99,7 +99,7 @@ class LisaBaseControllerSpec extends SpecBase {
 
       "an authorised user has a successful subscription" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorisedAndEnrolled("", UserDetails(None, None, ""), "Z9876")))
+          thenReturn(Future.successful(UserAuthorisedAndEnrolled("", "Z9876")))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -115,7 +115,7 @@ class LisaBaseControllerSpec extends SpecBase {
 
       "enrolment state check is disabled for a successful subscription" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", UserDetails(None, None, ""), "Z9876")))
+          thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", "Z9876")))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
 
@@ -126,7 +126,7 @@ class LisaBaseControllerSpec extends SpecBase {
 
       "enrolment state check is disabled for a pending subscription" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentPending)))
+          thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
 
@@ -141,7 +141,7 @@ class LisaBaseControllerSpec extends SpecBase {
 
       "an authorised user has no subscriptions in progress" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("12345", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+          thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentDoesNotExist)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 

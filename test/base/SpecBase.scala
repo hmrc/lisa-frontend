@@ -19,14 +19,14 @@ package base
 import config.AppConfig
 import connectors.EmailConnector
 import helpers.CSRFTest
-import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.inject.Injector
 import play.api.libs.json.JsValue
 import play.api.mvc.AnyContentAsEmpty
@@ -57,7 +57,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
       thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
 
     when(authorisationService.userStatus(any())).
-      thenReturn(Future.successful(UserAuthorised("", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+      thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
 
   val injector: Injector = app.injector
