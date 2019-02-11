@@ -24,6 +24,15 @@ The unit tests can be run by running
 sbt test
 ```
 
+To run a single unit test
+```
+sbt testOnly SPEC_NAME
+```
+
+## URL
+
+`http://localhost:8884/lifetime-isa`
+
 ## License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
