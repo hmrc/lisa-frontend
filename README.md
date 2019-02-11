@@ -1,6 +1,6 @@
 # Lifetime ISA
 
-[![Build Status](https://travis-ci.org/hmrc/lisa-frontend.svg?branch=master)](https://travis-ci.org/hmrc/lisa-frontend) [ ![Download](https://api.bintray.com/packages/hmrc/releases/lisa-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/lisa-frontend/_latestVersion)
+[![Build Status](https://build.tax.service.gov.uk/job/LISA/job/lisa-frontend/)](https://build.tax.service.gov.uk/job/LISA/job/lisa-frontend/) [ ![Download](https://api.bintray.com/packages/hmrc/releases/lisa-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/lisa-frontend/_latestVersion)
 
 This service provides the ability for ISA managers to apply for approval to become a Lifetime ISA provider.
 
@@ -15,9 +15,9 @@ This customer logs into this service using [GOV.UK Verify](https://www.gov.uk/go
 ## Running Locally
 
 1. **[Install Service-Manager](https://github.com/hmrc/service-manager/wiki/Install#install-service-manager)**
-2. `sm --start LISA_ALL -f`
-3. `git clone git@github.com:hmrc/lisa-frontend.git`
-4. `sbt "run 8884"`
+2. `git clone git@github.com:hmrc/lisa-frontend.git`
+3. `sbt "run 8884"`
+4. `sm --start LISA_ALL -f`
 
 The unit tests can be run by running
 ```
