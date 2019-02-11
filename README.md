@@ -29,6 +29,10 @@ To run a single unit test
 sbt testOnly SPEC_NAME
 ```
 
+## User Journeys
+
+See the LISA User Journeys documentation on Confluence for help with these.
+
 ## URL
 
 `http://localhost:8884/lifetime-isa`
