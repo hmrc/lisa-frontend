@@ -17,7 +17,7 @@ This customer logs into this service using [GOV.UK Verify](https://www.gov.uk/go
 1. **[Install Service-Manager](https://github.com/hmrc/service-manager/wiki/Install#install-service-manager)**
 2. `git clone git@github.com:hmrc/lisa-frontend.git`
 3. `sbt "run 8884"`
-4. `sm --start LISA_ALL -f`
+4. `sm --start LISA_FRONTEND_ALL -f`
 
 The unit tests can be run by running
 ```
