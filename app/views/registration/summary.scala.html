@@ -35,11 +35,11 @@
     <section class="subsection summary-subsection">
         <h2 class="h2-heading">@Messages("summary.companydetails.heading")</h2>
 
-        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-            <div class="govuk-summary-list__row">
+        <dl class="govuk-check-your-answers cya-questions-long">
+            <div>
                 <!-- Business structure -->
-                <dt class="govuk-summary-list__key" id="title-companyStructure">@Messages("summary.companydetails.structure")</dt>
-                <dd class="govuk-summary-list__value" id="value-companyStructure">
+                <dt class="cya-question" id="title-companyStructure">@Messages("summary.companydetails.structure")</dt>
+                <dd class="cya-answer" id="value-companyStructure">
                     @if(data.businessStructure.businessStructure == Messages("org.details.llp")) {
                         @Messages("org.details.llp.view")
                     } else {
@@ -50,34 +50,34 @@
                         }
                     }
                 </dd>
-                <dd class="govuk-summary-list__actions"></dd>
+                <dd class="cya-change"></dd>
             </div>
-            <div class="govuk-summary-list__row">
+            <div>
                 <!-- Org name -->
-                <dt class="govuk-summary-list__key" id="title-companyName">@Messages("summary.companydetails.name")</dt>
-                <dd class="govuk-summary-list__value" id="value-companyName">@data.organisationDetails.companyName</dd>
-                <dd class="govuk-summary-list__actions"></dd>
+                <dt class="cya-question" id="title-companyName">@Messages("summary.companydetails.name")</dt>
+                <dd class="cya-answer" id="value-companyName">@data.organisationDetails.companyName</dd>
+                <dd class="cya-change"></dd>
             </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id=@{s"title-${utrName}Number"}>@Messages(s"summary.companydetails.${utrName}")</dt>
-                <dd class="govuk-summary-list__value" id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber</dd>
-                <dd class="govuk-summary-list__actions"></dd>
+            <div>
+                <dt class="cya-question" id=@{s"title-${utrName}Number"}>@Messages(s"summary.companydetails.${utrName}")</dt>
+                <dd class="cya-answer" id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber</dd>
+                <dd class="cya-change"></dd>
             </div>
-            <div class="govuk-summary-list__row">
+            <div>
                 <!-- Org ref numbers -->
-                <dt class="govuk-summary-list__key" id="title-fsrRefNumber">@Messages("summary.companydetails.fsrref")</dt>
-                <dd class="govuk-summary-list__value" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</dd>
-                <dd class="govuk-summary-list__actions">
+                <dt class="cya-question" id="title-fsrRefNumber">@Messages("summary.companydetails.fsrref")</dt>
+                <dd class="cya-answer" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</dd>
+                <dd class="cya-change">
                     <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your FCA reference number">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.companydetails.fsrref.change")</span>
                     </a>
                 </dd>
             </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id="title-isaProviderRefNumber">@Messages("summary.companydetails.isaref")</dt>
-                <dd class="govuk-summary-list__value" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</dd>
-                <dd class="govuk-summary-list__actions">
+            <div>
+                <dt class="cya-question" id="title-isaProviderRefNumber">@Messages("summary.companydetails.isaref")</dt>
+                <dd class="cya-answer" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</dd>
+                <dd class="cya-change">
                     <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-isaProviderRefNumber" data-journey-click="link - click:Check your answers:Change your ISA manager reference">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.companydetails.isaref.change")</span>
@@ -91,11 +91,11 @@
     <section class="subsection summary-subsection">
         <h2 class="h2-heading">@Messages("summary.yourdetails.heading")</h2>
 
-        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id="title-firstName">@Messages("summary.yourdetails.firstname")</dt>
-                <dd class="govuk-summary-list__value" id="value-firstName">@data.yourDetails.firstName</dd>
-                <dd class="govuk-summary-list__actions">
+        <dl class="govuk-check-your-answers cya-questions-short">
+            <div>
+                <dt class="cya-question" id="title-firstName">@Messages("summary.yourdetails.firstname")</dt>
+                <dd class="cya-answer" id="value-firstName">@data.yourDetails.firstName</dd>
+                <dd class="cya-change">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-firstName" data-journey-click="link - click:Check your answers:Change your first name">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.yourdetails.firstname.change")</span>
@@ -103,10 +103,10 @@
                 </dd>
             </div>
 
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id="title-lastName">@Messages("summary.yourdetails.lastname")</dt>
-                <dd class="govuk-summary-list__value" id="value-lastName">@data.yourDetails.lastName</dd>
-                <dd class="govuk-summary-list__actions">
+            <div>
+                <dt class="cya-question" id="title-lastName">@Messages("summary.yourdetails.lastname")</dt>
+                <dd class="cya-answer" id="value-lastName">@data.yourDetails.lastName</dd>
+                <dd class="cya-change">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-lastName" data-journey-click="link - click:Check your answers:Change your last name">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.yourdetails.lastname.change")</span>
@@ -114,10 +114,10 @@
                 </dd>
             </div>
 
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id="title-role">@Messages("summary.yourdetails.role")</dt>
-                <dd class="govuk-summary-list__value" id="value-role">@data.yourDetails.role</dd>
-                <dd class="govuk-summary-list__actions">
+            <div>
+                <dt class="cya-question" id="title-role">@Messages("summary.yourdetails.role")</dt>
+                <dd class="cya-answer" id="value-role">@data.yourDetails.role</dd>
+                <dd class="cya-change">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-role" data-journey-click="link - click:Check your answers:Change your job title">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.yourdetails.role.change")</span>
@@ -125,10 +125,10 @@
                 </dd>
             </div>
 
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id="title-phone">@Messages("summary.yourdetails.phone")</dt>
-                <dd class="govuk-summary-list__value" id="value-phone">@data.yourDetails.phone</dd>
-                <dd class="govuk-summary-list__actions">
+            <div>
+                <dt class="cya-question" id="title-phone">@Messages("summary.yourdetails.phone")</dt>
+                <dd class="cya-answer" id="value-phone">@data.yourDetails.phone</dd>
+                <dd class="cya-change">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-phoneNumber" data-journey-click="link - click:Check your answers:Change your phone number">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.yourdetails.phone.change")</span>
@@ -136,10 +136,10 @@
                 </dd>
             </div>
 
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id="title-email">@Messages("summary.yourdetails.email")</dt>
-                <dd class="govuk-summary-list__value" id="value-email">@data.yourDetails.email</dd>
-                <dd class="govuk-summary-list__actions">
+            <div>
+                <dt class="cya-question" id="title-email">@Messages("summary.yourdetails.email")</dt>
+                <dd class="cya-answer" id="value-email">@data.yourDetails.email</dd>
+                <dd class="cya-change">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-email" data-journey-click="link - click:Check your answers:Change your email address">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.yourdetails.email.change")</span>
