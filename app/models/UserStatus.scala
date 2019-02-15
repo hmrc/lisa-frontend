@@ -20,5 +20,6 @@ sealed trait UserStatus
 
 case object UserNotLoggedIn extends UserStatus
 case object UserUnauthorised extends UserStatus
+case object UserNotAdmin extends UserStatus
 case class UserAuthorised(internalId: String, enrolmentState: TaxEnrolmentState) extends UserStatus
 case class UserAuthorisedAndEnrolled(internalId: String, lisaManagerReferenceNumber: String) extends UserStatus

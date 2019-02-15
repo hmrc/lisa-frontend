@@ -120,6 +120,19 @@ class AuthorisationServiceSpec extends PlaySpec
 
     }
 
+    "return user not admin" when {
+
+      "a UnsupportedCredentialRole exception is returned from auth" in {
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
+          thenReturn(Future.failed(UnsupportedCredentialRole()))
+
+        whenReady(SUT.userStatus){
+          _ mustBe UserNotAdmin
+        }
+      }
+
+    }
+
     "return user unauthorised" when {
 
       "an AuthorisationException exception is returned from auth" in {

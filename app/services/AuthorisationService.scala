@@ -33,7 +33,7 @@ class AuthorisationService @Inject()(
 
   def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] = {
     authorised(
-      AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
+      AffinityGroup.Organisation and AuthProviders(GovernmentGateway) and Admin
     ).retrieve(internalId and groupIdentifier and authorisedEnrolments) {
       case Some(id) ~ Some(groupId) ~ enrolments =>
         statusFromAuth(id, enrolments)
@@ -42,6 +42,7 @@ class AuthorisationService @Inject()(
           .map(_.getOrElse(UserAuthorised(id, TaxEnrolmentDoesNotExist)))
       case _ => Future.successful(UserUnauthorised)
     } recover {
+      case _: UnsupportedCredentialRole => UserNotAdmin
       case _: NoActiveSession => UserNotLoggedIn
       case _: AuthorisationException => UserUnauthorised
     }

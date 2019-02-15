@@ -28,6 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
+import uk.gov.hmrc.auth.core.UnsupportedCredentialRole
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
@@ -62,7 +63,16 @@ class LisaBaseControllerSpec extends SpecBase {
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        redirectLocation(result) mustBe Some(routes.ErrorController.accessDenied().url)
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDeniedIndividualOrAgent().url)
+      }
+
+      "an assistant role response is returned from auth" in {
+        when(authorisationService.userStatus(any())).
+          thenReturn(Future.successful(UserNotAdmin))
+
+        val result = SUT.testAuthorisation(fakeRequest)
+
+        redirectLocation(result) mustBe Some(routes.ErrorController.accessDeniedAssistant().url)
       }
 
     }

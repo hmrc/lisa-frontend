@@ -41,7 +41,8 @@ trait LisaBaseController extends FrontendController
                        (implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(appConfig.loginCallback))
-      case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDenied()))
+      case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDeniedIndividualOrAgent()))
+      case UserNotAdmin => Future.successful(Redirect(routes.ErrorController.accessDeniedAssistant()))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
     }
@@ -55,20 +56,20 @@ trait LisaBaseController extends FrontendController
 
   private def handleUserAuthorised(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
                                   (implicit request: Request[AnyContent]): Future[Result] = {
-    Logger.warn("User Authorised")
+    Logger.debug("User Authorised")
     isReapplication(user) flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
           case TaxEnrolmentPending => {
-            Logger.warn("Enrollment Pending")
+            Logger.debug("Enrollment Pending")
             Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
           }
           case TaxEnrolmentError => {
-            Logger.warn("Enrollment Rejected")
+            Logger.debug("Enrollment Rejected")
             Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
           }
           case TaxEnrolmentDoesNotExist => {
-            Logger.warn("Enrollment Does Not Exist")
+            Logger.debug("Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
           }
         }
@@ -81,7 +82,7 @@ trait LisaBaseController extends FrontendController
 
   private def handleUserAuthorisedAndEnrolled(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
                                              (implicit request: Request[AnyContent]): Future[Result] = {
-    Logger.warn("User Authorised And Enrolled")
+    Logger.debug("User Authorised And Enrolled")
 
     if (checkEnrolmentState) {
       sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber).map { _ =>
