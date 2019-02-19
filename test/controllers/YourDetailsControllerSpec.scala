@@ -127,7 +127,7 @@ class YourDetailsControllerSpec extends SpecBase with CSRFTest {
     "store your details in cache" when {
       "the submitted data is valid" in {
         when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("id", UserDetails(None, None, ""), TaxEnrolmentDoesNotExist)))
+          thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
         val uri = controllers.routes.YourDetailsController.post().url
         val validJson = Json.obj(

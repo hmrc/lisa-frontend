@@ -17,86 +17,55 @@
 package services
 
 import com.google.inject.Inject
-import connectors.UserDetailsConnector
 import models._
-import play.api.Logger
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AuthorisationService @Inject()(
-  val authConnector: AuthConnector,
-  val userDetailsConnector: UserDetailsConnector,
-  val taxEnrolmentService: TaxEnrolmentService) extends AuthorisedFunctions {
+                                      val authConnector: AuthConnector,
+                                      val taxEnrolmentService: TaxEnrolmentService) extends AuthorisedFunctions {
 
-  def enrolmentAuthorised(implicit hc: HeaderCarrier): Future[Either[Boolean, String]] = {
-    authorised(Enrolment("HMRC-LISA-ORG")).retrieve(authorisedEnrolments) { enr =>
-      enr.getEnrolment("HMRC-LISA-ORG") match {
-        case None => {
-          Logger.warn("Authorised but no enrolment object")
-          Future.successful(Left(false))
-        }
-        case Some(e) => {
-          Logger.info("Got enrolment object for HMRC-LISA-ORG")
-          Future.successful(Right(e.getIdentifier("ZREF").get.value))
-        }
-      }
-    } recoverWith {
-      case _ => {
-        Logger.warn("The enrolment is not authorised")
-        Future.successful(Left(false))
-      }
+  def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] = {
+    authorised(
+      AffinityGroup.Organisation and AuthProviders(GovernmentGateway) and Admin
+    ).retrieve(internalId and groupIdentifier and authorisedEnrolments) {
+      case Some(id) ~ Some(groupId) ~ enrolments =>
+        statusFromAuth(id, enrolments)
+          .map(a => Future.successful(Some(a)))
+          .getOrElse(statusFromTaxEnrolments(id, groupId))
+          .map(_.getOrElse(UserAuthorised(id, TaxEnrolmentDoesNotExist)))
+      case _ => Future.successful(UserUnauthorised)
+    } recover {
+      case _: UnsupportedCredentialRole => UserNotAdmin
+      case _: NoActiveSession => UserNotLoggedIn
+      case _: AuthorisationException => UserUnauthorised
     }
   }
 
-  def userStatus(implicit hc: HeaderCarrier): Future[LisaUserStatus] = {
-    authorised(
-      AffinityGroup.Organisation and AuthProviders(GovernmentGateway)
-    ).retrieve(internalId and userDetailsUri) { case (id ~ uri) =>
-      val userId = id.getOrElse(throw new RuntimeException("No internalId for user"))
-      val userUri = uri.getOrElse(throw new RuntimeException("No userDetailsUri for user"))
+  def statusFromAuth(id: String, enrolments: Enrolments): Option[UserStatus] = {
+    for {
+      enrolment <- enrolments.getEnrolment("HMRC-LISA-ORG")
+      zref <- enrolment.getIdentifier("ZREF") if enrolment.isActivated
+    } yield UserAuthorisedAndEnrolled(id, zref.value)
+  }
 
-      userDetailsConnector.getUserDetails(userUri)(hc) flatMap { user =>
-        val groupId = user.groupIdentifier.getOrElse(throw new RuntimeException("No groupIdentifier for user"))
-
-        enrolmentAuthorised(hc) flatMap { res =>
-          res match {
-            case Right(zref) => {
-              Logger.info("HMRC-LISA-ORG Enrolment is Authorised")
-              Future.successful(UserAuthorisedAndEnrolled(userId, user, zref))
-            }
-            case Left(_) => {
-
-              Logger.info("The enrolment has not been authorised yet so checking Enrolments service the group id is " + groupId)
-              taxEnrolmentService.getNewestLisaSubscription(groupId)(hc) map {
-
-                case Some(s) => {
-                  Logger.info("The enrolments service came back with " + s.state.toString)
-                  s.state match {
-                    case TaxEnrolmentSuccess => {
-                      val zref = s.zref.getOrElse(throw new RuntimeException("No zref for successful enrolment"))
-
-                      UserAuthorisedAndEnrolled(userId, user, zref)
-                    }
-                    case _ => {
-                      UserAuthorised(userId, user, s.state)
-                    }
-                  }
-                }
-                case None => UserAuthorised(userId, user, TaxEnrolmentDoesNotExist)
-              }
-            }
+  def statusFromTaxEnrolments(id: String, groupId: String)(implicit hc: HeaderCarrier): Future[Option[UserStatus]] = {
+    taxEnrolmentService.getNewestLisaSubscription(groupId)(hc).map {
+      _.flatMap {
+        subscription =>
+          subscription.state match {
+            case TaxEnrolmentSuccess =>
+              subscription.zref.map(UserAuthorisedAndEnrolled(id, _))
+            case state: TaxEnrolmentState =>
+              Some(UserAuthorised(id, state))
           }
-        }
       }
-    } recover {
-      case _: NoActiveSession => UserNotLoggedIn
-      case _: AuthorisationException => UserUnauthorised
     }
   }
 

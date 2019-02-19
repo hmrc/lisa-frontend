@@ -22,14 +22,25 @@ import play.api.test.Helpers._
 
 class ErrorControllerSpec extends SpecBase {
 
-  "GET /access-denied" should {
-    "return 403" in {
-      val result = SUT.accessDenied(fakeRequest)
+  "Individual or Agent endpoint" should {
+    "return a forbidden status page with correct messaging" in {
+      val result = SUT.accessDeniedIndividualOrAgent(fakeRequest)
       status(result) mustBe Status.FORBIDDEN
       val content = contentAsString(result)
 
       content must include("There is a problem</h1>")
       content must include("You signed in as an individual or agent.")
+    }
+  }
+
+  "Assistant endpoint" should {
+    "return a forbidden status page with correct messaging" in {
+      val result = SUT.accessDeniedAssistant(fakeRequest)
+      status(result) mustBe Status.FORBIDDEN
+      val content = contentAsString(result)
+
+      content must include("There is a problem</h1>")
+      content must include("You signed in as an assistant.")
     }
   }
 
