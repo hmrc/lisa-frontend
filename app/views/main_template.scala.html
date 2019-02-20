@@ -50,6 +50,19 @@
             $("#navSignout").click(function () {
                 ga('send', 'event', 'link - click', pageTitle, 'sign out');
             });
+
+            if ($("#companyStructure").length) {
+                $("form").submit(function() {
+                    var selectedElem = $("input[name=companyStructure]:checked");
+                    var selectedValue = "undefined";
+
+                    if (selectedElem.length) {
+                        selectedValue = $("label[for=" + selectedElem[0].id + "").html().trim();
+                    }
+
+                    ga('send', 'event', 'data - submitted', "Select your company structure", "company structure:" + selectedValue);
+                });
+            }
         });
     </script>
     @scriptElem

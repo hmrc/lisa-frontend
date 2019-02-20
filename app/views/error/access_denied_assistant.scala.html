@@ -1,0 +1,32 @@
+@*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(ggLoginUrl: String, registerOrgUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+
+@views.html.main_template(title = "There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+    <h1>@Messages("accessdenied.assistant.heading")</h1>
+
+    <p id="error-message">@Messages("accessdenied.assistant.text.line1")</p>
+
+    <p>@Messages("accessdenied.assistant.text.line2")</p>
+
+    <div class="gutter-left">
+        <ul class="list list-bullet">
+            <li><a href="@ggLoginUrl" id="sign-in" data-journey-click="link - click:There is a problem:Sign in">@Messages("accessdenied.assistant.text.signin")</a></li>
+            <li><a href="@registerOrgUrl" id="register" data-journey-click="link - click:There is a problem:Register">@Messages("accessdenied.assistant.text.register")</a></li>
+        </ul>
+    </div>
+}

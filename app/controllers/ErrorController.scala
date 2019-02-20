@@ -33,11 +33,18 @@ class ErrorController @Inject()(
   implicit val appConfig: AppConfig
 ) extends FrontendController with AuthRedirects with I18nSupport {
 
-  val accessDenied: Action[AnyContent] = Action.async { implicit request =>
+  val accessDeniedIndividualOrAgent: Action[AnyContent] = Action.async { implicit request =>
     val loginUrl = ggLoginUrl + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url
     val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
 
-    Future.successful(Forbidden(views.html.error.access_denied(loginUrl, registerUrl)))
+    Future.successful(Forbidden(views.html.error.access_denied_individual_or_agent(loginUrl, registerUrl)))
+  }
+
+  val accessDeniedAssistant: Action[AnyContent] = Action.async { implicit request =>
+    val loginUrl = ggLoginUrl + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url
+    val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
+
+    Future.successful(Forbidden(views.html.error.access_denied_assistant(loginUrl, registerUrl)))
   }
 
 }

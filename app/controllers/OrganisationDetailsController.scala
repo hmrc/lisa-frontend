@@ -86,8 +86,9 @@ class OrganisationDetailsController @Inject()(
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId) => {
                     Logger.debug("rosmRegister Successful")
-                    shortLivedCache.cache[String](cacheId, "safeId", safeId)
-                    handleRedirect(routes.TradingDetailsController.get().url)
+                    shortLivedCache.cache[String](cacheId, "safeId", safeId).flatMap { _ =>
+                      handleRedirect(routes.TradingDetailsController.get().url)
+                    }
                   }
                   case Left(error) => {
                     Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")

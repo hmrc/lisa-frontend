@@ -104,6 +104,18 @@ matchingfailed.subsection2.text.line3.pre=You can
 matchingfailed.subsection2.text.line3.link=find out a lost UTR by contacting HMRC
 matchingfailed.tryagain=Try again
 
+accessdenied.individualoragent.heading=There is a problem
+accessdenied.individualoragent.text.line1=You signed in as an individual or agent.
+accessdenied.individualoragent.text.line2=To use the service, you must either:
+accessdenied.individualoragent.text.signin=sign in with your organisation details
+accessdenied.individualoragent.text.register=register as an organisation
+
+accessdenied.assistant.heading=There is a problem
+accessdenied.assistant.text.line1=You signed in as an assistant.
+accessdenied.assistant.text.line2=To use the service, you must either:
+accessdenied.assistant.text.signin=sign in with an administrator account
+accessdenied.assistant.text.register=register for an administrator account
+
 error.companyStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
 error.companyNameRequired=Enter your company’s name

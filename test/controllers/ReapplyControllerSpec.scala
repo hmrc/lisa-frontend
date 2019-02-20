@@ -16,26 +16,12 @@
 
 package controllers
 
-import java.io.File
-
 import base.SpecBase
-import config.AppConfig
-import helpers.CSRFTest
-import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised, UserDetails}
+import models.Reapplication
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.i18n.Messages
-import play.api.libs.json.JsValue
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, status, _}
-import play.api.{Configuration, Environment, Mode}
-import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
