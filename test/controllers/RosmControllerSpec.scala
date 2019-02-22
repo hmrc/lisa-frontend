@@ -16,6 +16,9 @@
 
 package controllers
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import base.SpecBase
 import models.{BusinessStructure, OrganisationDetails, _}
 import org.mockito.Matchers.{eq => MatcherEquals, _}
@@ -215,7 +218,10 @@ class RosmControllerSpec extends SpecBase {
         templateName = MatcherEquals("lisa_application_submit"),
         params = MatcherEquals(Map(
           "application_reference" -> testSubId,
-          "email" -> testEmail
+          "email" -> testEmail,
+          "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
+          "first_name" -> yourForm.firstName,
+          "last_name" -> yourForm.lastName
         ))
       )(any())
     }

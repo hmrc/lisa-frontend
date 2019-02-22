@@ -19,6 +19,8 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
+import java.time.format.DateTimeFormatter
+import java.time.LocalDate
 import models.{ApplicationSent, LisaRegistration}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, _}
@@ -62,7 +64,10 @@ class RosmController @Inject()(
                 templateName = "lisa_application_submit",
                 params = Map(
                   "application_reference" -> applicationSentVM.subscriptionId,
-                  "email" -> applicationSentVM.email
+                  "email" -> applicationSentVM.email,
+                  "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
+                  "first_name" -> registrationDetails.yourDetails.firstName,
+                  "last_name" -> registrationDetails.yourDetails.lastName
                 )
               )
 
