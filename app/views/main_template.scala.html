@@ -47,7 +47,7 @@
             $("#get-help-action").click(function() {
                 ga('send', 'event', 'link - click', pageTitle, 'get help with this page');
             });
-            $("#navSignout").click(function () {
+            $("#navSignout").click(function() {
                 ga('send', 'event', 'link - click', pageTitle, 'sign out');
             });
 
@@ -63,6 +63,13 @@
                     ga('send', 'event', 'data - submitted', "Select your company structure", "company structure:" + selectedValue);
                 });
             }
+
+            $("#join-user-panel").click(function() {
+                ga('send', 'event', 'link - click', "@Messages("applicationsubmitted.banner.heading")", 'Join user panel');
+            });
+            $("#dismiss-user-panel").click(function() {
+                ga('send', 'event', 'link - click', "@Messages("applicationsubmitted.banner.heading")", 'Dismiss user panel');
+            });
         });
     </script>
     @scriptElem

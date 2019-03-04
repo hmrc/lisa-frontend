@@ -22,18 +22,13 @@
 
 @(email: String, subscriptionId: String, displayURBanner: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@analyticsAdditionalJs = {
-    ga('set', 'location', document.URL.split("?")[0]);
-    ga('set', 'page', '/lifetime-isa/application-submitted');
-}
-
 @urBanner = {
     @if(displayURBanner) {
         <div class="js-hidden notice-banner" id="notice-banner">
             <div class="centered-content">
                 <div class="notice-banner__wrapper grid-layout">
                     <div class="grid-layout__column--2-3">
-                        <a class="notice-banner__content" href="/" id="recruitment-page-link" data-journey-click="link - click:Application submitted:Join user panel" target="_blank" rel="noopener">
+                        <a class="notice-banner__content" href="/" id="join-user-panel" data-journey-click="link - click:Application submitted:Join user panel" target="_blank" rel="noopener">
                             @Messages("applicationsubmitted.banner.recruitment.link")
                         </a>
                     </div>
@@ -48,7 +43,7 @@
     }
 }
 
-@views.html.main_template(title = "Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, analyticsAdditionalJs = Some(analyticsAdditionalJs), afterHeader = Some(urBanner)) {
+@views.html.main_template(title = "Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None, afterHeader = Some(urBanner)) {
 
     <div class="transaction-banner--complete">
         <h1 class="transaction-banner__heading">@Messages("applicationsubmitted.banner.heading")</h1>
