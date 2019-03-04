@@ -41,7 +41,7 @@ class ApplicationSubmittedController @Inject()(
     authorisedForLisa((_) => {
       sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
         case Some(application) => {
-          Ok(views.html.registration.application_submitted(application.email, application.subscriptionId))
+          Ok(views.html.registration.application_submitted(application.email, application.subscriptionId, appConfig.displayURBanner))
         }
       }
     }, checkEnrolmentState = false)
