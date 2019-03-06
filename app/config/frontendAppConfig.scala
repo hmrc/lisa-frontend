@@ -79,6 +79,6 @@ class FrontendAppConfig @Inject()(
     s"$caFrontendHost/gg/sign-out?continue=$encodedCallbackUrl"
   }
 
-  override lazy val displayURBanner: Boolean = true
+  override lazy val displayURBanner: Boolean = false
 
 }
