@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.Future
 
-class QuestionnaireController @Inject()(
+class SignOutController @Inject()(
   implicit val sessionCache: SessionCache,
   implicit val shortLivedCache: ShortLivedCache,
   implicit val env: Environment,
@@ -38,33 +38,7 @@ class QuestionnaireController @Inject()(
   implicit val messagesApi: MessagesApi
 ) extends LisaBaseController {
 
-  def showQuestionnaire: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(views.html.feedback.feedbackQuestionnaire(Questionnaire.form)))
-  }
-
-  def submitQuestionnaire: Action[AnyContent] = Action.async {
-    implicit request =>
-      Questionnaire.form.bindFromRequest.fold(
-        formWithErrors => {
-          Future.successful(BadRequest(views.html.feedback.feedbackQuestionnaire(formWithErrors))
-          )
-        },
-        data => {
-          auditService.audit(auditType="lisaFeedbackSurvey", path=routes.QuestionnaireController.submitQuestionnaire().url,createQuestionnaireAudit(data))
-          Future.successful(Redirect(routes.QuestionnaireController.feedbackThankyou()))
-        }
-      )
-  }
-
-  def feedbackThankyou: Action[AnyContent] = Action.async {
-    implicit request =>
-    Future.successful(Ok(views.html.feedback.thanks()))
-  }
-
-  private def createQuestionnaireAudit(survey: Questionnaire): Map[String, String] = {
-    Map(
-      "satisfactionLevel" -> survey.satisfactionLevel.mkString,
-      "whyGiveThisRating" -> survey.whyGiveThisRating.mkString
-    )
+  def redirect: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Redirect("http://localhost:9514/feedback/lisa").withNewSession)
   }
 }

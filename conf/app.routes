@@ -19,7 +19,5 @@ GET        /application-submitted           @controllers.ApplicationSubmittedCon
 GET        /reviewing-your-application      @controllers.ApplicationSubmittedController.pending
 GET        /application-successful          @controllers.ApplicationSubmittedController.successful
 GET        /application-unsuccessful        @controllers.ApplicationSubmittedController.rejected
-GET        /signed-out                      @controllers.QuestionnaireController.showQuestionnaire
-POST       /signed-out                      @controllers.QuestionnaireController.submitQuestionnaire
-GET        /thank-you                       @controllers.QuestionnaireController.feedbackThankyou
+GET        /signed-out                      @controllers.SignOutController.redirect
 GET        /re-apply                        @controllers.ReapplyController.get
