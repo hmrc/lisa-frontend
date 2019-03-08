@@ -34,6 +34,7 @@ trait AppConfig {
   val betaFeedbackUnauthenticatedUrl: String
   val loginCallback: String
   val apiUrl: String
+  val feedbackRedirectUrl: String
   val registerOrgUrl: String
   val lisaServiceUrl: String
   val emailServiceUrl: String
@@ -59,6 +60,7 @@ class FrontendAppConfig @Inject()(
 
   override lazy val appName: String = getString("appName")
   override lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
+  override lazy val feedbackRedirectUrl: String = loadConfig("external-urls.feedback-frontend.url")
   override lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 
   override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")

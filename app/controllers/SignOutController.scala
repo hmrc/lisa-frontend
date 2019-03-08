@@ -39,6 +39,6 @@ class SignOutController @Inject()(
 ) extends LisaBaseController {
 
   def redirect: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Redirect("http://localhost:9514/feedback/lifetime-isa").withNewSession)
+    Future.successful(Redirect(appConfig.feedbackRedirectUrl).withNewSession)
   }
 }
