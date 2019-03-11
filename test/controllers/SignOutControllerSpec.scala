@@ -20,29 +20,14 @@ import base.SpecBase
 import play.api.http.Status
 import play.api.test.Helpers._
 
-class QuestionnaireControllerSpec extends SpecBase {
+class SignOutControllerSpec extends SpecBase {
 
-  "Calling the QuestionnaireController.showQuestionnaire" should {
+  "Calling the SignOutController.redirect" should {
     "respond with OK" in {
-      val result = SUT.showQuestionnaire(fakeRequest)
-      status(result) mustBe Status.OK
-    }
-  }
-
-  "Calling the QuestionnaireController.submitQuestionnaire" should {
-    "respond with OK" in {
-      val result = SUT.submitQuestionnaire(fakeRequest)
+      val result = SUT.redirect(fakeRequest)
       status(result) mustBe Status.SEE_OTHER
     }
   }
 
-  "Calling the QuestionnaireController.feedbackThankyou" should {
-    "respond with OK" in {
-      val result = SUT.feedbackThankyou(fakeRequest)
-      status(result) mustBe Status.OK
-    }
-  }
-
-  val SUT = new QuestionnaireController()
-
+  val SUT = new SignOutController()
 }
