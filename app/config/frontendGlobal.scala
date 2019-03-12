@@ -16,9 +16,10 @@
 
 package config
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import play.api.i18n.MessagesApi
-import play.api.mvc.Request
+import play.api.mvc.Results._
+import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.crypto.ApplicationCrypto
@@ -26,10 +27,19 @@ import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedH
 import uk.gov.hmrc.play.bootstrap.http.{FrontendErrorHandler, HttpClient}
 import uk.gov.hmrc.play.config.ServicesConfig
 
+import scala.concurrent.Future
+
 class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration, implicit val appConfig: AppConfig) extends FrontendErrorHandler {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
                                     (implicit request: Request[_]): HtmlFormat.Appendable = {
     views.html.error_template(pageTitle, heading, message)
+  }
+
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+    statusCode match {
+      case play.mvc.Http.Status.FORBIDDEN => Future.successful(Forbidden(internalServerErrorTemplate(Request(request, ""))))
+      case _                              => super.onClientError(request, statusCode, message)
+    }
   }
 }
 

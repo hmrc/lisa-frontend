@@ -44,7 +44,7 @@ class RosmControllerSpec extends SpecBase {
         when(shortLivedCache.fetch(any())(any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -54,7 +54,7 @@ class RosmControllerSpec extends SpecBase {
         when(shortLivedCache.fetch(any())(any(), any())).
           thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -71,7 +71,7 @@ class RosmControllerSpec extends SpecBase {
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -87,7 +87,7 @@ class RosmControllerSpec extends SpecBase {
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -107,7 +107,7 @@ class RosmControllerSpec extends SpecBase {
             "safeId" -> JsString("")
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -129,7 +129,7 @@ class RosmControllerSpec extends SpecBase {
             TradingDetails.cacheKey -> Json.toJson(tradingForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -170,7 +170,7 @@ class RosmControllerSpec extends SpecBase {
         contactDetails = rosmContact
       )
 
-      redirectLocation(SUT.get(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
+      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
     }
 
     "email the user on a successful rosm registration" in {
@@ -211,7 +211,7 @@ class RosmControllerSpec extends SpecBase {
         contactDetails = rosmContact
       )
 
-      await(SUT.get(fakeRequest))
+      await(SUT.post(fakeRequest))
 
       verify(emailConnector).sendTemplatedEmail(
         emailAddress = MatcherEquals(testEmail),
@@ -228,7 +228,7 @@ class RosmControllerSpec extends SpecBase {
 
     "handle a failed rosm registration" when {
       "the rosm service returns a failure" in {
-        val uri = controllers.routes.RosmController.get().url
+        val uri = controllers.routes.RosmController.post().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
@@ -250,14 +250,14 @@ class RosmControllerSpec extends SpecBase {
 
         when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.post(fakeRequest)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
 
     "audit a successful rosm registration" in {
-      val uri = controllers.routes.RosmController.get().url
+      val uri = controllers.routes.RosmController.post().url
       val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
       val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
@@ -291,7 +291,7 @@ class RosmControllerSpec extends SpecBase {
 
       when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
-      await(SUT.get(fakeRequest))
+      await(SUT.post(fakeRequest))
 
       verify(auditService).audit(
         auditType = MatcherEquals("applicationReceived"),
@@ -312,7 +312,7 @@ class RosmControllerSpec extends SpecBase {
 
     "audit a failed rosm registration" when {
       "the ct utr is 0000000000" in {
-        val uri = controllers.routes.RosmController.get().url
+        val uri = controllers.routes.RosmController.post().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
@@ -335,7 +335,7 @@ class RosmControllerSpec extends SpecBase {
 
         when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
-        await(SUT.get(fakeRequest))
+        await(SUT.post(fakeRequest))
 
         verify(auditService).audit(
           auditType = MatcherEquals("applicationNotReceived"),
@@ -356,7 +356,7 @@ class RosmControllerSpec extends SpecBase {
     }
 
     "cache subscriptionId and email as part of a successful rosm registration" in {
-      val uri = controllers.routes.RosmController.get().url
+      val uri = controllers.routes.RosmController.post().url
       val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
       val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
@@ -389,7 +389,7 @@ class RosmControllerSpec extends SpecBase {
       )
       when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
 
-      await(SUT.get(fakeRequest))
+      await(SUT.post(fakeRequest))
 
       val applicationSentVM = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
 

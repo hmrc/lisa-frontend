@@ -14,12 +14,10 @@ POST       /company-structure               @controllers.BusinessStructureContro
 GET        /your-details                    @controllers.YourDetailsController.get
 POST       /your-details                    @controllers.YourDetailsController.post
 GET        /check-your-answers              @controllers.SummaryController.get
-GET        /submit-registration             @controllers.RosmController.get
+POST       /submit-registration             @controllers.RosmController.post
 GET        /application-submitted           @controllers.ApplicationSubmittedController.get
 GET        /reviewing-your-application      @controllers.ApplicationSubmittedController.pending
 GET        /application-successful          @controllers.ApplicationSubmittedController.successful
 GET        /application-unsuccessful        @controllers.ApplicationSubmittedController.rejected
-GET        /signed-out                      @controllers.QuestionnaireController.showQuestionnaire
-POST       /signed-out                      @controllers.QuestionnaireController.submitQuestionnaire
-GET        /thank-you                       @controllers.QuestionnaireController.feedbackThankyou
+GET        /signed-out                      @controllers.SignOutController.redirect
 GET        /re-apply                        @controllers.ReapplyController.get
