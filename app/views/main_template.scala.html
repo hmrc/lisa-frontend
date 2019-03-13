@@ -16,12 +16,12 @@
 
 @(title: String,
   sidebarLinks: Option[Html] = None,
-
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = None,
   scriptElem: Option[Html] = None,
   showSignOutLink: Boolean = true,
-  analyticsAdditionalJs: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages, appConfig: config.AppConfig)
+  analyticsAdditionalJs: Option[Html] = None,
+  afterHeader: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @import uk.gov.hmrc.play.views.html.layouts
 
@@ -47,7 +47,7 @@
             $("#get-help-action").click(function() {
                 ga('send', 'event', 'link - click', pageTitle, 'get help with this page');
             });
-            $("#navSignout").click(function () {
+            $("#navSignout").click(function() {
                 ga('send', 'event', 'link - click', pageTitle, 'sign out');
             });
 
@@ -63,6 +63,13 @@
                     ga('send', 'event', 'data - submitted', "Select your company structure", "company structure:" + selectedValue);
                 });
             }
+
+            $("#join-user-panel").click(function() {
+                ga('send', 'event', 'link - click', "@Messages("applicationsubmitted.banner.heading")", 'Join user panel');
+            });
+            $("#dismiss-user-panel").click(function() {
+                ga('send', 'event', 'link - click', "@Messages("applicationsubmitted.banner.heading")", 'Dismiss user panel');
+            });
         });
     </script>
     @scriptElem
@@ -77,5 +84,6 @@
                serviceInfoContent = serviceInfoContent,
                scriptElem = Some(scriptElement),
                showSignOutLink = showSignOutLink,
-               analyticsAdditionalJs = analyticsAdditionalJs
+               analyticsAdditionalJs = analyticsAdditionalJs,
+               afterHeader = afterHeader
 )

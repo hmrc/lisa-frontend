@@ -39,6 +39,7 @@ trait AppConfig {
   val lisaServiceUrl: String
   val emailServiceUrl: String
   def getSignOutUrl(callbackUrl: String): String
+  val displayURBanner: Boolean
 }
 
 @Singleton
@@ -79,5 +80,7 @@ class FrontendAppConfig @Inject()(
 
     s"$caFrontendHost/gg/sign-out?continue=$encodedCallbackUrl"
   }
+
+  override lazy val displayURBanner: Boolean = getBoolean("display-ur-banner")
 
 }
