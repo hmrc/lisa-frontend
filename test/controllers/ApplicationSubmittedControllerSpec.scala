@@ -23,14 +23,17 @@ import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.Injecting
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase
   with CSRFTest
-  with BeforeAndAfter {
+  with BeforeAndAfter
+  with Injecting {
 
   "GET Application Submitted" must {
 
@@ -121,7 +124,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
   val pendingPageTitle = ">We are reviewing your application</h1>"
   val successPageTitle = ">Application successful</h1>"
   val rejectedPageTitle = ">Application not successful</h1>"
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new ApplicationSubmittedController()
 
 }

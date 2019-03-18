@@ -22,13 +22,15 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends SpecBase {
+class SummaryControllerSpec extends SpecBase with Injecting {
 
   "GET Summary" must {
 
@@ -168,7 +170,7 @@ class SummaryControllerSpec extends SpecBase {
     }
 
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new SummaryController()
 
 }

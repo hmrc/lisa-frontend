@@ -18,10 +18,13 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SignOutControllerSpec extends SpecBase {
+class SignOutControllerSpec extends SpecBase with Injecting {
 
   "Calling the SignOutController.redirect" should {
     "respond with OK" in {
@@ -29,6 +32,6 @@ class SignOutControllerSpec extends SpecBase {
       status(result) mustBe Status.SEE_OTHER
     }
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new SignOutController()
 }

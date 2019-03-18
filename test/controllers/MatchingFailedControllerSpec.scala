@@ -21,12 +21,14 @@ import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.http.Status
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.Injecting
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MatchingFailedControllerSpec extends SpecBase {
+class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
   "GET Matching Failed" must {
 
@@ -44,7 +46,7 @@ class MatchingFailedControllerSpec extends SpecBase {
     }
 
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new MatchingFailedController()
 
 }

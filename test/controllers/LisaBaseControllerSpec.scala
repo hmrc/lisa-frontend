@@ -23,18 +23,18 @@ import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, Result}
-import play.api.test.FakeRequest
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.auth.core.UnsupportedCredentialRole
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
-import scala.concurrent.Future
-
-class LisaBaseControllerSpec extends SpecBase {
+class LisaBaseControllerSpec extends SpecBase with Injecting {
 
   "Lisa Base Controller" should {
 
@@ -203,6 +203,8 @@ class LisaBaseControllerSpec extends SpecBase {
 
   }
 
+  implicit val mcc = inject[MessagesControllerComponents]
+
   class TestClass(
     implicit val config: Configuration,
     implicit val env: Environment,
@@ -210,8 +212,10 @@ class LisaBaseControllerSpec extends SpecBase {
     implicit val appConfig: AppConfig,
     implicit val shortLivedCache: ShortLivedCache,
     implicit val authorisationService: AuthorisationService,
-    implicit val messagesApi: MessagesApi
-  ) extends LisaBaseController {
+    override implicit val messagesApi: MessagesApi,
+    override implicit val ec: ExecutionContext,
+    implicit val messagesControllerComponents: MessagesControllerComponents
+  ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
       authorisedForLisa(handleResult)
