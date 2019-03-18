@@ -24,6 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import play.twirl.api.HtmlFormat
 
 import scala.concurrent.{ExecutionContext, Future}
 
