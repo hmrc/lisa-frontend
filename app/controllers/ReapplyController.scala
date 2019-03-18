@@ -25,6 +25,8 @@ import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
+import scala.concurrent.ExecutionContext
+
 class ReapplyController @Inject()(
   implicit val sessionCache: SessionCache,
   implicit val shortLivedCache: ShortLivedCache,
@@ -32,7 +34,8 @@ class ReapplyController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
+  implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext
 ) extends LisaBaseController {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

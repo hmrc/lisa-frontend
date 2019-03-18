@@ -25,7 +25,7 @@ import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SignOutController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -35,7 +35,8 @@ class SignOutController @Inject()(
   implicit val authorisationService: AuthorisationService,
   implicit val auditService: AuditService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
+  implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext
 ) extends LisaBaseController {
 
   def redirect: Action[AnyContent] = Action.async { implicit request =>

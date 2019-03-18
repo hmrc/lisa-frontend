@@ -25,7 +25,7 @@ import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ApplicationSubmittedController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -34,7 +34,8 @@ class ApplicationSubmittedController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
+  implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext
 ) extends LisaBaseController {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>

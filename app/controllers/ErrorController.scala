@@ -24,13 +24,14 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ErrorController @Inject()(
   implicit val config: Configuration,
   implicit val env: Environment,
   implicit val messagesApi: MessagesApi,
-  implicit val appConfig: AppConfig
+  implicit val appConfig: AppConfig,
+  implicit val ec: ExecutionContext
 ) extends FrontendController with AuthRedirects with I18nSupport {
 
   val accessDeniedIndividualOrAgent: Action[AnyContent] = Action.async { implicit request =>

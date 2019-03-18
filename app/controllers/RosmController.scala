@@ -21,6 +21,7 @@ import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
 import java.time.format.DateTimeFormatter
 import java.time.LocalDate
+
 import models.{ApplicationSent, LisaRegistration}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, _}
@@ -28,7 +29,7 @@ import play.api.{Configuration, Environment, Logger}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RosmController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -40,7 +41,8 @@ class RosmController @Inject()(
   implicit val rosmService: RosmService,
   implicit val emailConnector: EmailConnector,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
+  implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext
 ) extends LisaBaseController with RosmJsonFormats {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
