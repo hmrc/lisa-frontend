@@ -36,7 +36,7 @@ class HomePageController @Inject()(
   override implicit val messagesApi: MessagesApi,
   implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) with I18nSupport {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with I18nSupport {
 
   val home: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Redirect(routes.BusinessStructureController.get(), MOVED_PERMANENTLY))

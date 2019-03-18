@@ -37,7 +37,7 @@ class ApplicationSubmittedController @Inject()(
   override implicit val messagesApi: MessagesApi,
   implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa((_) => {

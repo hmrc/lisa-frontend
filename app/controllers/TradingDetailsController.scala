@@ -37,7 +37,7 @@ class TradingDetailsController @Inject()(
   override implicit val messagesApi: MessagesApi,
   implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>

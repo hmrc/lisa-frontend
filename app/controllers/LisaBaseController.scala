@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LisaBaseController(messagesControllerComponents: MessagesControllerComponents) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
+abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
   with AuthRedirects with I18nSupport {
 
   val appConfig: AppConfig
