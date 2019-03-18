@@ -30,6 +30,7 @@ import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.auth.core.UnsupportedCredentialRole
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

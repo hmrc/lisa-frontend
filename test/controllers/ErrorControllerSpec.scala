@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.http.Status
 import play.api.test.Helpers._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ErrorControllerSpec extends SpecBase {
 

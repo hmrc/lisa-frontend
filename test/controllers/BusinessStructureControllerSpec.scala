@@ -27,6 +27,7 @@ import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

@@ -27,6 +27,7 @@ import play.api.http.Status
 import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

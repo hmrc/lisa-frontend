@@ -22,6 +22,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.http.Status
 import play.api.test.Helpers.{redirectLocation, status, _}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
