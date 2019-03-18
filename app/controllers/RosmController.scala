@@ -41,9 +41,10 @@ class RosmController @Inject()(
   implicit val rosmService: RosmService,
   implicit val emailConnector: EmailConnector,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi,
-  implicit val ec: ExecutionContext
-) extends LisaBaseController with RosmJsonFormats {
+  override implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) with RosmJsonFormats {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>

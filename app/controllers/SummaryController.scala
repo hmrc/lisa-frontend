@@ -33,9 +33,10 @@ class SummaryController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi,
-  implicit val ec: ExecutionContext
-) extends LisaBaseController {
+  override implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>

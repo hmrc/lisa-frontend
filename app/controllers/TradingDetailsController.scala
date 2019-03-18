@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.TradingDetails
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
@@ -34,9 +34,10 @@ class TradingDetailsController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi,
-  implicit val ec: ExecutionContext
-) extends LisaBaseController {
+  override implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>

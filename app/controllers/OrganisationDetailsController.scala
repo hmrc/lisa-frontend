@@ -21,7 +21,7 @@ import config.AppConfig
 import models.{BusinessStructure, OrganisationDetails}
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment, Logger}
 import services.{AuthorisationService, RosmService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
@@ -36,9 +36,10 @@ class OrganisationDetailsController @Inject()(
   implicit val authorisationService: AuthorisationService,
   implicit val rosmService: RosmService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi,
-  implicit val ec: ExecutionContext
-) extends LisaBaseController {
+  override implicit val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
