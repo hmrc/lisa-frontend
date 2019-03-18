@@ -23,10 +23,11 @@ import org.mockito.Matchers.{eq => matcherEq, _}
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents}
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.CSRFTokenHelper._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -251,8 +252,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with CSRFTest with Inje
 
   val pageTitle = "Your company’s details</h1>"
 
-  def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
-    addToken(FakeRequest("POST", uri, FakeHeaders(), body))
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
   implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new OrganisationDetailsController()
