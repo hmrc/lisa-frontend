@@ -85,9 +85,9 @@ class RosmController @Inject()(
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
             Future.successful(InternalServerError(views.html.error_template(
-              Messages("global.error.InternalServerError500.title"),
-              Messages("global.error.InternalServerError500.heading"),
-              Messages("global.error.InternalServerError500.message"))))
+              "global.error.InternalServerError500.title",
+              "global.error.InternalServerError500.heading",
+              "global.error.InternalServerError500.message")))
           }
         }
       }

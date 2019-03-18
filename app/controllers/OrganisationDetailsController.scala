@@ -46,7 +46,7 @@ class OrganisationDetailsController @Inject()(
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          val isPartnership = businessStructure.businessStructure == Messages("org.details.llp")
+          val isPartnership = businessStructure.businessStructure == "LLP"
           val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership) {
             OrganisationDetails.partnershipForm
           } else {
@@ -75,7 +75,7 @@ class OrganisationDetailsController @Inject()(
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          val isPartnership = businessStructure.businessStructure == Messages("org.details.llp")
+          val isPartnership = businessStructure.businessStructure == "LLP"
           val form = if (isPartnership) OrganisationDetails.partnershipForm else OrganisationDetails.form
 
           form.bindFromRequest.fold(

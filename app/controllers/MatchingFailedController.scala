@@ -45,7 +45,7 @@ class MatchingFailedController @Inject()(
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          val isPartnership = (businessStructure.businessStructure == Messages("org.details.llp"))
+          val isPartnership = businessStructure.businessStructure == "LLP"
 
           Future.successful(Ok(views.html.registration.matching_failed(isPartnership)))
         }
