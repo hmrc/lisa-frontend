@@ -46,7 +46,8 @@ class OrganisationDetailsController @Inject()(
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership(businessStructure)) {
+          val isPartnership = businessStructure.businessStructure == Messages("org.details.llp")
+          val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership) {
             OrganisationDetails.partnershipForm
           } else {
             OrganisationDetails.form
@@ -55,12 +56,12 @@ class OrganisationDetailsController @Inject()(
             case Some(data) =>
               Ok(views.html.registration.organisation_details(
                 orgDetailsForm.fill(data),
-                isPartnership(businessStructure)
+                isPartnership
               ))
             case None =>
               Ok(views.html.registration.organisation_details(
                 orgDetailsForm,
-                isPartnership(businessStructure)
+                isPartnership
               ))
           }
         }
@@ -74,12 +75,13 @@ class OrganisationDetailsController @Inject()(
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          val form = if (isPartnership(businessStructure)) OrganisationDetails.partnershipForm else OrganisationDetails.form
+          val isPartnership = businessStructure.businessStructure == Messages("org.details.llp")
+          val form = if (isPartnership) OrganisationDetails.partnershipForm else OrganisationDetails.form
 
           form.bindFromRequest.fold(
             formWithErrors => {
               Future.successful(
-                BadRequest(views.html.registration.organisation_details(formWithErrors, isPartnership(businessStructure)))
+                BadRequest(views.html.registration.organisation_details(formWithErrors, isPartnership))
               )
             },
             data => {
@@ -103,10 +105,6 @@ class OrganisationDetailsController @Inject()(
         }
       }
     }
-  }
-
-  private def isPartnership(businessStructure: BusinessStructure): Boolean = {
-    businessStructure.businessStructure == Messages("org.details.llp")
   }
 
 }
