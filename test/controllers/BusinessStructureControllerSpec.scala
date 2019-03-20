@@ -47,7 +47,7 @@ class BusinessStructureControllerSpec extends SpecBase with CSRFTest with Inject
         when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(form)))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 
@@ -67,7 +67,7 @@ class BusinessStructureControllerSpec extends SpecBase with CSRFTest with Inject
         when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 

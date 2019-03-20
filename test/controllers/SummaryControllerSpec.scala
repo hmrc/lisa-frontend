@@ -26,6 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.CSRFTokenHelper._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
         when(shortLivedCache.fetch(any())(any(), any())).
           thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -65,7 +66,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -82,7 +83,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -105,7 +106,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
             "safeId" -> JsString("")
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -128,7 +129,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
             TradingDetails.cacheKey -> Json.toJson(tradingForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -158,7 +159,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
             YourDetails.cacheKey -> Json.toJson(yourForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 

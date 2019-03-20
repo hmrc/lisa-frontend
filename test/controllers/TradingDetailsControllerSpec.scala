@@ -45,7 +45,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 
@@ -66,7 +66,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 
