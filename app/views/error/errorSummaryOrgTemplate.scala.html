@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@(form: Form[_], gaActionPage: String)
+@(form: Form[_], gaActionPage: String)(implicit messages: Messages)
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
-
 
 @if(form.hasErrors) {
     <div class="flash error-summary error-summary--show"
@@ -26,13 +25,13 @@
          aria-labelledby="error-summary-heading"
          tabindex="-1">
 
-        <h2 id="error-summary-heading" class="h3-heading">Messages("validation.summary.heading")</h2>
+        <h2 id="error-summary-heading" class="h3-heading">@Messages("validation.summary.heading")</h2>
 
         <ul>
             @form.errors.map { error =>
                 <li role="tooltip" id='@error.key.replaceAll("""[\.\[\]]""", "_")Error' data-journey='There is a problem - view:@gaActionPage:@error.message'>
                     <a href='#@error.key.replaceAll("""[\.\[\]]""", "_")'>
-                        Messages(error.message, error.args : _*)
+                        @Messages(error.message, error.args : _*)
                     </a>
                 </li>
             }
