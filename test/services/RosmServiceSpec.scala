@@ -23,7 +23,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 
@@ -33,7 +33,6 @@ import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class RosmServiceSpec extends PlaySpec
   with MockitoSugar
-  with OneAppPerSuite
   with RosmJsonFormats
   with BeforeAndAfter {
 
