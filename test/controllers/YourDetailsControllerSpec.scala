@@ -51,7 +51,8 @@ class YourDetailsControllerSpec extends SpecBase with CSRFTest with Injecting {
         when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
-        val result = SUT.get(fakeRequest)
+        val request = fakeRequest.withCSRFToken
+        val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
@@ -71,7 +72,8 @@ class YourDetailsControllerSpec extends SpecBase with CSRFTest with Injecting {
         when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val request = fakeRequest.withCSRFToken
+        val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 

@@ -52,7 +52,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with CSRFTest with Inje
         when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some((organisationForm))))
 
-        val result = SUT.get(fakeRequest)
+        val request = fakeRequest.withCSRFToken
+        val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
@@ -75,7 +76,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with CSRFTest with Inje
         when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val request = fakeRequest.withCSRFToken
+        val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
