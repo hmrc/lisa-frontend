@@ -31,7 +31,7 @@ lazy val lisafrontend = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    routesGenerator := StaticRoutesGenerator,
+    routesGenerator := InjectedRoutesGenerator,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
     resolvers ++= Seq(
       Resolver.bintrayRepo("hmrc", "releases"),
