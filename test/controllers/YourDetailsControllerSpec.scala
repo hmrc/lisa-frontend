@@ -17,20 +17,21 @@
 package controllers
 
 import base.SpecBase
-import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.AnyContentAsJson
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.CSRFTokenHelper._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class YourDetailsControllerSpec extends SpecBase with CSRFTest {
+class YourDetailsControllerSpec extends SpecBase with Injecting {
 
   "GET Your Details" must {
 
@@ -49,7 +50,8 @@ class YourDetailsControllerSpec extends SpecBase with CSRFTest {
         when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(yourForm)))
 
-        val result = SUT.get(fakeRequest)
+        val request = fakeRequest.withCSRFToken
+        val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
@@ -69,7 +71,8 @@ class YourDetailsControllerSpec extends SpecBase with CSRFTest {
         when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val request = fakeRequest.withCSRFToken
+        val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
@@ -149,10 +152,10 @@ class YourDetailsControllerSpec extends SpecBase with CSRFTest {
 
   }
 
-  def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
-    addToken(FakeRequest("POST", uri, FakeHeaders(), body))
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new YourDetailsController()
 
 }

@@ -22,14 +22,16 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.AnyContentAsJson
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.test.{FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.CSRFTokenHelper._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TradingDetailsControllerSpec extends SpecBase {
+class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
   "GET Trading Details" must {
 
@@ -43,7 +45,7 @@ class TradingDetailsControllerSpec extends SpecBase {
         when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(Some(tradingForm)))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 
@@ -64,7 +66,7 @@ class TradingDetailsControllerSpec extends SpecBase {
         when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
           thenReturn(Future.successful(None))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 
@@ -143,10 +145,10 @@ class TradingDetailsControllerSpec extends SpecBase {
     "isaProviderRefNumber" -> "Z1234"
   )
 
-  def createFakePostRequest[T](uri: String, body:T):FakeRequest[T] = {
-    addToken(FakeRequest("POST", uri, FakeHeaders(), body))
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new TradingDetailsController()
 
 }

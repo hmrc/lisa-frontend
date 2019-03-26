@@ -25,12 +25,15 @@ import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RosmControllerSpec extends SpecBase {
+class RosmControllerSpec extends SpecBase with Injecting {
 
   "GET Rosm Registration" must {
 
@@ -397,7 +400,7 @@ class RosmControllerSpec extends SpecBase {
     }
 
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new RosmController()
 
 }

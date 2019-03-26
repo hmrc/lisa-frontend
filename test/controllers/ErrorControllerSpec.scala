@@ -18,9 +18,13 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
 
-class ErrorControllerSpec extends SpecBase {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class ErrorControllerSpec extends SpecBase with Injecting {
 
   "Individual or Agent endpoint" should {
     "return a forbidden status page with correct messaging" in {
@@ -44,6 +48,7 @@ class ErrorControllerSpec extends SpecBase {
     }
   }
 
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new ErrorController()
 
 }

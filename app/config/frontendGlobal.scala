@@ -25,14 +25,14 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.bootstrap.http.{FrontendErrorHandler, HttpClient}
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 import scala.concurrent.Future
 
 class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration, implicit val appConfig: AppConfig) extends FrontendErrorHandler {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
                                     (implicit request: Request[_]): HtmlFormat.Appendable = {
-    views.html.error_template(pageTitle, heading, message)
+    views.html.error_template()
   }
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
@@ -46,9 +46,8 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Co
 class LisaSessionCache @Inject()(
   val http: HttpClient,
   val runModeConfiguration: Configuration,
-  environment: Environment) extends SessionCache with ServicesConfig {
-
-  override val mode = environment.mode
+  runMode: RunMode,
+  environment: Environment) extends ServicesConfig(runModeConfiguration: Configuration, runMode: RunMode) with SessionCache {
 
   override lazy val defaultSource: String = getString("appName")
 
@@ -60,9 +59,8 @@ class LisaSessionCache @Inject()(
 class LisaShortLivedHttpCaching @Inject()(
   val http: HttpClient,
   val runModeConfiguration: Configuration,
-  environment: Environment) extends ShortLivedHttpCaching with ServicesConfig {
-
-  override val mode = environment.mode
+  runMode: RunMode,
+  environment: Environment) extends ServicesConfig(runModeConfiguration: Configuration, runMode: RunMode) with ShortLivedHttpCaching {
 
   override lazy val defaultSource: String = getString("appName")
 

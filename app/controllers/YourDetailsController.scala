@@ -25,7 +25,7 @@ import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class YourDetailsController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -34,8 +34,10 @@ class YourDetailsController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
-) extends LisaBaseController {
+  override implicit val messagesApi: MessagesApi,
+  override implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>

@@ -27,9 +27,9 @@ import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait LisaBaseController extends FrontendController
+abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
   with AuthRedirects with I18nSupport {
 
   val appConfig: AppConfig

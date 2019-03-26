@@ -18,18 +18,23 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
+import play.api.test.CSRFTokenHelper._
 
-class HomePageControllerSpec extends SpecBase {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class HomePageControllerSpec extends SpecBase with Injecting {
 
   "GET /" should {
     "301 redirect the user to the company structure page" in {
-      val result = SUT.home(fakeRequest)
+      val result = SUT.home(fakeRequest.withCSRFToken)
       status(result) mustBe Status.MOVED_PERMANENTLY
       redirectLocation(result).getOrElse("") mustBe "/lifetime-isa/company-structure"
     }
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new HomePageController()
 
 }

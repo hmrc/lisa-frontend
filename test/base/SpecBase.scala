@@ -18,7 +18,6 @@ package base
 
 import config.AppConfig
 import connectors.EmailConnector
-import helpers.CSRFTest
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{reset, when}
@@ -35,10 +34,11 @@ import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
+import play.api.test.CSRFTokenHelper._
 
 import scala.concurrent.Future
 
-trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter with CSRFTest {
+trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter {
 
   before {
     reset(shortLivedCache)
@@ -62,7 +62,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
 
   val injector: Injector = app.injector
 
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = addToken(FakeRequest("", ""))
+  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 

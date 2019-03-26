@@ -22,12 +22,16 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.CSRFTokenHelper._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends SpecBase {
+class SummaryControllerSpec extends SpecBase with Injecting {
 
   "GET Summary" must {
 
@@ -43,7 +47,7 @@ class SummaryControllerSpec extends SpecBase {
         when(shortLivedCache.fetch(any())(any(), any())).
           thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -62,7 +66,7 @@ class SummaryControllerSpec extends SpecBase {
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -79,7 +83,7 @@ class SummaryControllerSpec extends SpecBase {
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -102,7 +106,7 @@ class SummaryControllerSpec extends SpecBase {
             "safeId" -> JsString("")
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -125,7 +129,7 @@ class SummaryControllerSpec extends SpecBase {
             TradingDetails.cacheKey -> Json.toJson(tradingForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -155,7 +159,7 @@ class SummaryControllerSpec extends SpecBase {
             YourDetails.cacheKey -> Json.toJson(yourForm)
           )))))
 
-        val result = SUT.get(fakeRequest)
+        val result = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 
@@ -167,7 +171,7 @@ class SummaryControllerSpec extends SpecBase {
     }
 
   }
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new SummaryController()
 
 }

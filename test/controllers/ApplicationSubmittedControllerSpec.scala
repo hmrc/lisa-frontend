@@ -17,19 +17,22 @@
 package controllers
 
 import base.SpecBase
-import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import play.api.test.Injecting
+import play.api.test.CSRFTokenHelper._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase
-  with CSRFTest
-  with BeforeAndAfter {
+  with BeforeAndAfter
+  with Injecting {
 
   "GET Application Submitted" must {
 
@@ -41,7 +44,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(sessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any(), any())).
         thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
 
-      val result = SUT.get()(fakeRequest)
+      val result = SUT.get()(fakeRequest.withCSRFToken)
 
       status(result) mustBe Status.OK
 
@@ -62,7 +65,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(authorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-      val result = SUT.pending()(fakeRequest)
+      val result = SUT.pending()(fakeRequest.withCSRFToken)
 
       status(result) mustBe Status.OK
 
@@ -84,7 +87,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(sessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any(), any())).
         thenReturn(Future.successful(Some("Z9999")))
 
-      val result = SUT.successful()(fakeRequest)
+      val result = SUT.successful()(fakeRequest.withCSRFToken)
 
       status(result) mustBe Status.OK
 
@@ -104,7 +107,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(authorisationService.userStatus(any())).
         thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-      val result = SUT.rejected()(fakeRequest)
+      val result = SUT.rejected()(fakeRequest.withCSRFToken)
 
       status(result) mustBe Status.OK
 
@@ -120,7 +123,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
   val pendingPageTitle = ">We are reviewing your application</h1>"
   val successPageTitle = ">Application successful</h1>"
   val rejectedPageTitle = ">Application not successful</h1>"
-
+  implicit val mcc = inject[MessagesControllerComponents]
   val SUT = new ApplicationSubmittedController()
 
 }

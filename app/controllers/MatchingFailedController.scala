@@ -20,12 +20,12 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.BusinessStructure
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class MatchingFailedController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -34,15 +34,17 @@ class MatchingFailedController @Inject()(
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
-) extends LisaBaseController {
+  override implicit val messagesApi: MessagesApi,
+  override implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
         case Some(businessStructure) => {
-          val isPartnership = (businessStructure.businessStructure == Messages("org.details.llp"))
+          val isPartnership = businessStructure.businessStructure == "LLP"
 
           Future.successful(Ok(views.html.registration.matching_failed(isPartnership)))
         }

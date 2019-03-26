@@ -20,12 +20,12 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.Questionnaire
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SignOutController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -35,8 +35,10 @@ class SignOutController @Inject()(
   implicit val authorisationService: AuthorisationService,
   implicit val auditService: AuditService,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
-) extends LisaBaseController {
+  override implicit val messagesApi: MessagesApi,
+  override implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   def redirect: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Redirect(appConfig.feedbackRedirectUrl).withNewSession)

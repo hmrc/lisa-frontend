@@ -16,64 +16,38 @@
 
 package config
 
-import com.google.inject.{ImplementedBy, Inject, Singleton}
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.config.ServicesConfig
-
-@ImplementedBy(classOf[FrontendAppConfig])
-trait AppConfig {
-  val appName: String
-  val analyticsToken: String
-  val analyticsHost: String
-  val gtmEnabled: Boolean
-  val gtmAppId: String
-  val reportAProblemPartialUrl: String
-  val reportAProblemNonJSUrl: String
-  val signOutUrl: String
-  val betaFeedbackUrl: String
-  val betaFeedbackUnauthenticatedUrl: String
-  val loginCallback: String
-  val apiUrl: String
-  val feedbackRedirectUrl: String
-  val registerOrgUrl: String
-  val lisaServiceUrl: String
-  val emailServiceUrl: String
-  def getSignOutUrl(callbackUrl: String): String
-  val displayURBanner: Boolean
-}
+import javax.inject.{Inject, Singleton}
+import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 @Singleton
-class FrontendAppConfig @Inject()(
-  val runModeConfiguration: Configuration,
-  environment: Environment) extends AppConfig with ServicesConfig {
-
-  override val mode = environment.mode
+class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode) extends ServicesConfig(runModeConfiguration: Configuration, runMode: RunMode) {
 
   private def loadConfig(key: String) = getString(key)
 
-  override lazy val lisaServiceUrl = baseUrl("lisa")
-  override lazy val emailServiceUrl = baseUrl("email")
+  lazy val lisaServiceUrl = baseUrl("lisa")
+  lazy val emailServiceUrl = baseUrl("email")
 
   private val caFrontendHost = getString("ca-frontend.host")
   private val contactHost = getString("contact-frontend.host")
   private val contactFormServiceIdentifier = "LISA"
   private val logoutCallback = getString("gg-urls.logout-callback.url")
 
-  override lazy val appName: String = getString("appName")
-  override lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
-  override lazy val feedbackRedirectUrl: String = loadConfig("external-urls.feedback-frontend.url")
-  override lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
+  lazy val appName: String = getString("appName")
+  lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
+  lazy val feedbackRedirectUrl: String = loadConfig("external-urls.feedback-frontend.url")
+  lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 
-  override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
-  override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
-  override lazy val gtmEnabled: Boolean = getBoolean(s"google-tag-manager.enabled")
-  override lazy val gtmAppId: String = loadConfig(s"google-tag-manager.id")
-  override lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  override lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  override lazy val signOutUrl = getSignOutUrl(logoutCallback)
-  override lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
-  override lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
-  override lazy val loginCallback: String = getString("gg-urls.login-callback.url")
+  lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
+  lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
+  lazy val gtmEnabled: Boolean = getBoolean(s"google-tag-manager.enabled")
+  lazy val gtmAppId: String = loadConfig(s"google-tag-manager.id")
+  lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  lazy val signOutUrl = getSignOutUrl(logoutCallback)
+  lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
+  lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
+  lazy val loginCallback: String = getString("gg-urls.login-callback.url")
 
   def getSignOutUrl(callbackUrl: String): String = {
     val encodedCallbackUrl = java.net.URLEncoder.encode(callbackUrl, "UTF-8")
@@ -81,6 +55,6 @@ class FrontendAppConfig @Inject()(
     s"$caFrontendHost/gg/sign-out?continue=$encodedCallbackUrl"
   }
 
-  override lazy val displayURBanner: Boolean = getBoolean("display-ur-banner")
+  lazy val displayURBanner: Boolean = getBoolean("display-ur-banner")
 
 }

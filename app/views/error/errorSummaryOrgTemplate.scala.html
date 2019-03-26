@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@(form: Form[_], gaActionPage: String)
+@(form: Form[_], gaActionPage: String)(implicit messages: Messages)
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
-
 
 @if(form.hasErrors) {
     <div class="flash error-summary error-summary--show"

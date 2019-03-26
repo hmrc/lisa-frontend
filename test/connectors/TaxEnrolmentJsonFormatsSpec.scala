@@ -19,8 +19,7 @@ package connectors
 import models._
 import org.joda.time.DateTimeZone
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, Json}
+import play.api.libs.json.{JsPath, Json, JsonValidationError}
 
 class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats {
 
@@ -74,10 +73,10 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
         val parsed = Json.parse(invalidStateJson).validate[List[TaxEnrolmentSubscription]]
 
         parsed.fold(
-          (invalid: Seq[(JsPath, Seq[ValidationError])]) => {
+          (invalid: Seq[(JsPath, Seq[JsonValidationError])]) => {
             invalid.size mustBe 1
             invalid.head._2.size mustBe 1
-            invalid.head._2.head mustBe ValidationError("error.formatting.state")
+            invalid.head._2.head mustBe JsonValidationError("error.formatting.state")
           },
           (_) => {
             fail("passed validation")

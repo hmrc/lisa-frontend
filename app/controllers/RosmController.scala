@@ -21,14 +21,15 @@ import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
 import java.time.format.DateTimeFormatter
 import java.time.LocalDate
+
 import models.{ApplicationSent, LisaRegistration}
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, _}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment, Logger}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RosmController @Inject()(
   implicit val sessionCache: SessionCache,
@@ -40,8 +41,10 @@ class RosmController @Inject()(
   implicit val rosmService: RosmService,
   implicit val emailConnector: EmailConnector,
   implicit val appConfig: AppConfig,
-  implicit val messagesApi: MessagesApi
-) extends LisaBaseController with RosmJsonFormats {
+  override implicit val messagesApi: MessagesApi,
+  override implicit val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with RosmJsonFormats {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { (cacheId) =>
@@ -81,10 +84,7 @@ class RosmController @Inject()(
               path = routes.RosmController.post().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
-            Future.successful(InternalServerError(views.html.error_template(
-              Messages("global.error.InternalServerError500.title"),
-              Messages("global.error.InternalServerError500.heading"),
-              Messages("global.error.InternalServerError500.message"))))
+            Future.successful(InternalServerError(views.html.error_template()))
           }
         }
       }
