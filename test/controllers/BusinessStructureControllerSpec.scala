@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import helpers.CSRFTest
 import models._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,8 +31,7 @@ import play.api.test.CSRFTokenHelper._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-class BusinessStructureControllerSpec extends SpecBase with CSRFTest with Injecting {
+class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   "GET Business Structure" must {
 

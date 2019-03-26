@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import helpers.CSRFTest
 import models._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.when
@@ -32,7 +31,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase
-  with CSRFTest
   with BeforeAndAfter
   with Injecting {
 
