@@ -18,9 +18,9 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.error.errorSummaryOrgTemplate
 
-@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, title: String = "Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
+@views.html.main_template(title = if(form.hasErrors) "Error: " + Messages("title.business-structure") else Messages("title.business-structure"), bodyClasses = None) {
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
 

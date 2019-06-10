@@ -18,9 +18,9 @@
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.error.errorSummaryOrgTemplate
 
-@(form: Form[TradingDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, title:String = "Your company’s reference numbers - Apply to be an approved Lifetime ISA Manager - GOV.UK")
+@(form: Form[TradingDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = if(form.hasErrors) "Error: " + title else title, bodyClasses = None) {
+@views.html.main_template(title = if(form.hasErrors) "Error: " + Messages("title.trading-details") else Messages("title.trading-details"), bodyClasses = None) {
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Your company’s reference numbers:Back">Back</a></p>
 
