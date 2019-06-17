@@ -1,6 +1,6 @@
-global.error.InternalServerError500.title=There is a problem with the service – Apply to be an approved Lifetime ISA Manager – GOV.UK
-global.error.InternalServerError500.heading=There is a problem with the service
-global.error.InternalServerError500.message=Try again later.</p><p>If you need to speak to someone about your LISA manager application, contact <a href="mailto:sdsteam@hmrc.gsi.gov.uk">sdsteam@hmrc.gsi.gov.uk</a>
+global.error.InternalServerError500.title=Sorry, there is a problem with the service – Apply to be an approved Lifetime ISA Manager – GOV.UK
+global.error.InternalServerError500.heading=Sorry, there is a problem with the service
+global.error.InternalServerError500.message=Try again later.</p><p>Contact <a href="mailto:sdsteam@hmrc.gsi.gov.uk">sdsteam@hmrc.gsi.gov.uk</a>, if you have an enquiry about your LISA manager application.
 
 validation.summary.heading=There is a problem
 
