@@ -20,7 +20,7 @@
 
 @(form: Form[YourDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = if(form.hasErrors) "Error: " + Messages("title.your-details") else Messages("title.your-details"), bodyClasses = None) {
+@views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.your-details")) else Messages("title.your-details"), bodyClasses = None) {
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Your name and contact details:Back">Back</a></p>
 

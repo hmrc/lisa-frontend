@@ -168,6 +168,8 @@ error.phonePattern=Enter a telephone number, like 01642 123 456 or +33 1 23 45 6
 error.emailRequired=Enter your email address
 error.email=Enter an email address with a name, @ symbol and a domain name, like yourname@example.com
 
+error.title=Error: {0}
+
 ##feedback
 
 label.youre_signed_out=You are signed out
