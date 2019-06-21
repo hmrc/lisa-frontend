@@ -16,7 +16,7 @@
 
 @(ggLoginUrl: String, registerOrgUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = "There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK", bodyClasses = None) {
+@views.html.main_template(title = Messages("title.access-denied-individual-or-agent"), bodyClasses = None) {
     <h1>@Messages("accessdenied.individualoragent.heading")</h1>
 
     <p id="error-message">@Messages("accessdenied.individualoragent.text.line1")</p>

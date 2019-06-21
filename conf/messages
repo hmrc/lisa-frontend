@@ -26,6 +26,19 @@ tradingdetails.fsrref.hint=This is 6 numbers.
 tradingdetails.isaref.label=ISA manager reference
 tradingdetails.isaref.hint=This begins with a ‘Z’ and includes 4 or 6 numbers.
 
+title.application-pending=Reviewing your application - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.application-rejected=Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.application-submitted=Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.application-successful=Application successful - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.matching-failed=Your company’s details could not be found - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.organisation-details=Your company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.summary=Check your answers - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.trading-details=Your company’s reference numbers - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.your-details=Your name and contact details - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.access-denied=There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.access-denied-individual-or-agent=There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.business-structure=Select your company structure - Apply to be an approved Lifetime ISA Manager - GOV.UK
+
 yourdetails.heading=Your name and contact details
 yourdetails.indent=HMRC might contact you to confirm the details in this application.
 yourdetails.firstname=First name
@@ -154,6 +167,8 @@ error.phonePattern=Enter a telephone number, like 01642 123 456 or +33 1 23 45 6
 
 error.emailRequired=Enter your email address
 error.email=Enter an email address with a name, @ symbol and a domain name, like yourname@example.com
+
+error.title=Error: {0}
 
 ##feedback
 
