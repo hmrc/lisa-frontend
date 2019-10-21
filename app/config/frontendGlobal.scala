@@ -21,7 +21,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment}
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.bootstrap.http.{FrontendErrorHandler, HttpClient}
@@ -33,6 +33,10 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Co
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
                                     (implicit request: Request[_]): HtmlFormat.Appendable = {
     views.html.error_template()
+  }
+
+  override def notFoundTemplate(implicit request: Request[_]): Html = {
+    views.html.page_not_found_template()
   }
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
