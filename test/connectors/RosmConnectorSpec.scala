@@ -81,7 +81,7 @@ class RosmConnectorSpec extends PlaySpec
 
   }
 
-  "Subscribe MArgumentMatchers.any endpoint" must {
+  "Subscribe any endpoint" must {
     "return success" when {
       "rosm returns a valid payload with utr" in {
         when(mockHttp.POST[LisaSubscription, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
