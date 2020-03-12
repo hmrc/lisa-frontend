@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsString, JsValue, Json}
@@ -44,8 +44,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
       "no business structure details are found in the cache" in {
         val uri = controllers.routes.SummaryController.get().url
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
 
@@ -61,8 +61,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
           )))))
 
@@ -77,8 +77,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
           )))))
@@ -99,8 +99,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
 
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString("")
@@ -121,8 +121,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString(""),
@@ -150,8 +150,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString(""),
@@ -171,7 +171,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     }
 
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new SummaryController()
 
 }

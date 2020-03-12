@@ -22,7 +22,7 @@ import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.crypto.{ApplicationCrypto, CryptoWithKeysFromConfig}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.play.bootstrap.http.{FrontendErrorHandler, HttpClient}
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
@@ -78,5 +78,5 @@ class LisaShortLivedCache @Inject()(
   val appCrypto: ApplicationCrypto,
   override val shortLiveCache: LisaShortLivedHttpCaching) extends ShortLivedCache {
 
-  override implicit lazy val crypto = appCrypto.JsonCrypto
+  override implicit lazy val crypto: CryptoWithKeysFromConfig = appCrypto.JsonCrypto
 }

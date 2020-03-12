@@ -18,11 +18,12 @@ package services
 
 import models._
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,7 +32,7 @@ import scala.concurrent.Future
 import scala.language.postfixOps
 
 class AuthorisationServiceSpec extends PlaySpec
-  with MockitoSugar with OneAppPerSuite with ScalaFutures {
+  with MockitoSugar with GuiceOneAppPerSuite with ScalaFutures {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -43,8 +44,9 @@ class AuthorisationServiceSpec extends PlaySpec
         val enrolmentIdentifier = EnrolmentIdentifier("ZREF", "Z123456")
         val validEnrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated")
 
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set(validEnrolment)))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set(validEnrolment)))
 
         whenReady(SUT.userStatus){
           _ mustBe UserAuthorisedAndEnrolled("1234", "Z123456")
@@ -52,11 +54,12 @@ class AuthorisationServiceSpec extends PlaySpec
       }
 
       "a successful enrolment is in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
-          thenReturn(Future.successful(Some(validTaxEnrolmentSubscription)))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(validTaxEnrolmentSubscription)))
 
         whenReady(SUT.userStatus){
           _ mustBe UserAuthorisedAndEnrolled("1234", "Z0001")
@@ -68,11 +71,12 @@ class AuthorisationServiceSpec extends PlaySpec
     "return an authorised user when no enrolment is in auth and" when {
 
       "a pending state enrolment is in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
-          thenReturn(Future.successful(Some(
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(
             validTaxEnrolmentSubscription.copy(state = TaxEnrolmentPending, identifiers = Nil))))
 
         whenReady(SUT.userStatus){
@@ -81,10 +85,11 @@ class AuthorisationServiceSpec extends PlaySpec
       }
 
       "an error state enrolment is in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).
           thenReturn(Future.successful(Some(
             validTaxEnrolmentSubscription.copy(state = TaxEnrolmentError, identifiers = Nil))))
 
@@ -94,10 +99,11 @@ class AuthorisationServiceSpec extends PlaySpec
       }
 
       "an enrolment is not in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(any())).
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).
           thenReturn(Future.successful(None))
 
         whenReady(SUT.userStatus){
@@ -110,8 +116,9 @@ class AuthorisationServiceSpec extends PlaySpec
     "return user not logged in" when {
 
       "a NoActiveSession exception is returned from auth" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(Future.failed(BearerTokenExpired()))
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.failed(BearerTokenExpired()))
 
         whenReady(SUT.userStatus){
           _ mustBe UserNotLoggedIn
@@ -123,8 +130,9 @@ class AuthorisationServiceSpec extends PlaySpec
     "return user not admin" when {
 
       "a UnsupportedCredentialRole exception is returned from auth" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(Future.failed(UnsupportedCredentialRole()))
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.failed(UnsupportedCredentialRole()))
 
         whenReady(SUT.userStatus){
           _ mustBe UserNotAdmin
@@ -136,8 +144,9 @@ class AuthorisationServiceSpec extends PlaySpec
     "return user unauthorised" when {
 
       "an AuthorisationException exception is returned from auth" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
-          thenReturn(Future.failed(InsufficientEnrolments()))
+        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.failed(InsufficientEnrolments()))
 
         whenReady(SUT.userStatus){
           _ mustBe UserUnauthorised
@@ -145,8 +154,9 @@ class AuthorisationServiceSpec extends PlaySpec
       }
 
       "internalId retrieval from auth fails" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(None, Some("/"), Set()))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(None, Some("/"), Set()))
 
         whenReady(SUT.userStatus){
           _ mustBe UserUnauthorised
@@ -154,8 +164,9 @@ class AuthorisationServiceSpec extends PlaySpec
       }
 
       "groupId retrieval from auth fails" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](any(), any())(any(), any())).
-          thenReturn(buildRetrieval(Some("1234"), None, Set()))
+        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(buildRetrieval(Some("1234"), None, Set()))
 
         whenReady(SUT.userStatus){
           _ mustBe UserUnauthorised

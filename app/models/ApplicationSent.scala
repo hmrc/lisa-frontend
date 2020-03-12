@@ -16,12 +16,12 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ApplicationSent(email: String, subscriptionId: String)
 
 object ApplicationSent {
-  implicit val formats = Json.format[ApplicationSent]
+  implicit val formats: OFormat[ApplicationSent] = Json.format[ApplicationSent]
 
   val cacheKey = "applicationSent"
 }

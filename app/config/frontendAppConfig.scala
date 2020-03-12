@@ -25,8 +25,8 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
 
   private def loadConfig(key: String) = getString(key)
 
-  lazy val lisaServiceUrl = baseUrl("lisa")
-  lazy val emailServiceUrl = baseUrl("email")
+  lazy val lisaServiceUrl: String = baseUrl("lisa")
+  lazy val emailServiceUrl: String = baseUrl("email")
 
   private val caFrontendHost = getString("ca-frontend.host")
   private val contactHost = getString("contact-frontend.host")
@@ -44,7 +44,7 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val gtmAppId: String = loadConfig(s"google-tag-manager.id")
   lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  lazy val signOutUrl = getSignOutUrl(logoutCallback)
+  lazy val signOutUrl: String = getSignOutUrl(logoutCallback)
   lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
   lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
   lazy val loginCallback: String = getString("gg-urls.login-callback.url")

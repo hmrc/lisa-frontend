@@ -19,17 +19,17 @@ package services
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
 import models._
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.test.Helpers._
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with TaxEnrolmentJsonFormats {
+class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
@@ -42,7 +42,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     "return the appropriate state" when {
 
       "given a single lisa subscription in the connector response" in {
-        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -51,7 +51,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
 
       "given two lisa subscriptions in the connector response - newest first" in {
-        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(List(lisaErrorSubscription, lisaSuccessSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -60,7 +60,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
 
       "given two lisa subscriptions in the connector response - oldest first" in {
-        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -69,7 +69,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
 
       "given multiple different subscriptions in the connector response" in {
-        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription, randomPendingSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -82,7 +82,7 @@ class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     "return a does not exist state" when {
 
       "there are no lisa subscriptions" in {
-        when(mockConnector.getSubscriptionsByGroupId(any())(any())).thenReturn(
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(List()))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)

@@ -20,24 +20,24 @@ object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-26" % "0.40.0",
-    "uk.gov.hmrc" %% "govuk-template" % "5.35.0-play-26",
-    "uk.gov.hmrc" %% "play-ui" % "7.33.0-play-26",
-    "uk.gov.hmrc" %% "play-partials" % "6.5.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.21.0-play-26",
-    "uk.gov.hmrc" %% "http-caching-client" % "8.0.0"
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.5.0",
+    "uk.gov.hmrc" %% "govuk-template" % "5.52.0-play-26",
+    "uk.gov.hmrc" %% "play-ui" % "8.8.0-play-26",
+    "uk.gov.hmrc" %% "play-partials" % "6.9.0-play-26",
+    "uk.gov.hmrc" %% "auth-client" % "2.35.0-play-26",
+    "uk.gov.hmrc" %% "http-caching-client" % "9.0.0-play-26"
   )
 
-  val test = Seq(
-    "org.scalatest" %% "scalatest" % "2.2.6",
+  val test: Seq[ModuleID] = Seq(
+    "org.scalatest" %% "scalatest" % "3.0.8",
     "org.pegdown" % "pegdown" % "1.6.0",
-    "org.jsoup" % "jsoup" % "1.10.2",
+    "org.jsoup" % "jsoup" % "1.13.1",
     "com.typesafe.play" %% "play-test" % PlayVersion.current,
-    "org.mockito" % "mockito-core" % "1.9.0",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0"
+    "org.mockito" % "mockito-core" % "3.3.0",
+    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3"
   ).map(_ % Test)
 
-  def apply() = compile ++ test
+  def apply(): Seq[ModuleID] = compile ++ test
 }

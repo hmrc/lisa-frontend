@@ -17,7 +17,7 @@
 package models
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.FormError
+import play.api.data.{Form, FormError}
 
 class TradingDetailsSpec extends PlaySpec {
 
@@ -98,6 +98,6 @@ class TradingDetailsSpec extends PlaySpec {
 
   }
 
-  val SUT = TradingDetails.form
+  val SUT: Form[TradingDetails] = TradingDetails.form
 
 }

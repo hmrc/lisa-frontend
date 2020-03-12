@@ -18,7 +18,6 @@ package models
 
 import play.api.data.Forms._
 import play.api.data._
-import play.api.data.validation.Constraints.pattern
 import play.api.libs.json.{Json, OFormat}
 
 case class YourDetails(firstName: String,

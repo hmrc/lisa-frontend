@@ -19,9 +19,9 @@ package connectors
 import config.AppConfig
 import models._
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
@@ -41,8 +41,9 @@ class RosmConnectorSpec extends PlaySpec
 
     "return success" when {
       "rosm returns a success message" in {
-        when(mockHttp.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
-          thenReturn(Future.successful(HttpResponse(
+        when(mockHttp.POST[RosmRegistration, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(rosmSuccessResponse))
           )))
@@ -55,8 +56,9 @@ class RosmConnectorSpec extends PlaySpec
 
     "return failure" when {
       "rosm returns a success status but a failure response" in {
-        when(mockHttp.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
-          thenReturn(Future.successful(HttpResponse(
+        when(mockHttp.POST[RosmRegistration, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(rosmFailureResponse)))))
 
@@ -65,8 +67,9 @@ class RosmConnectorSpec extends PlaySpec
         }
       }
       "rosm returns a success status and an unexpected json response" in {
-        when(mockHttp.POST[RosmRegistration, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
-          thenReturn(Future.successful(HttpResponse(
+        when(mockHttp.POST[RosmRegistration, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.parse("{}")))))
 
@@ -78,11 +81,12 @@ class RosmConnectorSpec extends PlaySpec
 
   }
 
-  "Subscribe Many endpoint" must {
+  "Subscribe any endpoint" must {
     "return success" when {
       "rosm returns a valid payload with utr" in {
-        when(mockHttp.POST[LisaSubscription, HttpResponse](any(), any(), any())(any(), any(), any(), any())).
-          thenReturn(Future.successful(HttpResponse(
+        when(mockHttp.POST[LisaSubscription, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(
             responseStatus = CREATED,
             responseJson = Some(Json.toJson(desSubscribeSuccessResponse))
           )))
@@ -93,7 +97,7 @@ class RosmConnectorSpec extends PlaySpec
       }
     }
   }
-  private def doRegistrationRequest(callback: (HttpResponse) => Unit) = {
+  private def doRegistrationRequest(callback: HttpResponse => Unit): Unit = {
     val request = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false,
       Organisation(organisationName ="CompName",organisationType="LLP"))
     val response = Await.result(SUT.registerOnce("1234567890", request), Duration.Inf)
@@ -101,7 +105,7 @@ class RosmConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doSubscribe(callback: (HttpResponse) => Unit) = {
+  private def doSubscribe(callback: HttpResponse => Unit): Unit = {
     val payload =  LisaSubscription("4567890123","SAFEID0124",
       "FCA1234", "compName", ApplicantDetails("name","lastname","role",ContactDetails("7234545","email@email.com")))
     val response = Await.result(SUT.subscribe("Z1234", payload), Duration.Inf)
@@ -109,9 +113,9 @@ class RosmConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  val mockHttp = mock[HttpClient]
-  val mockAppConfig = mock[AppConfig]
-  implicit val hc = HeaderCarrier()
+  val mockHttp: HttpClient = mock[HttpClient]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new RosmConnector(mockHttp, mockAppConfig)
 

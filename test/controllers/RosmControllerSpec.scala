@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 
 import base.SpecBase
 import models.{BusinessStructure, OrganisationDetails, _}
-import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsString, JsValue, Json}
@@ -44,8 +44,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to business structure" when {
       "no data is found in the cache" in {
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val result = SUT.post(fakeRequest)
 
@@ -54,8 +54,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
       }
       "no business structure details are found in the cache" in {
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
 
         val result = SUT.post(fakeRequest)
 
@@ -69,8 +69,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
       "no organisation details are found in the cache" in {
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
           )))))
 
@@ -84,8 +84,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         val businessStructureForm = new BusinessStructure("LLP")
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
           )))))
@@ -103,8 +103,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         val businessStructureForm = new BusinessStructure("LLP")
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString("")
@@ -124,8 +124,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString(""),
@@ -151,8 +151,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         phone = "0191 123 4567",
         email = "test@test.com")
 
-      when(shortLivedCache.fetch(any())(any(), any())).
-        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
           BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
           OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
           "safeId" -> JsString(""),
@@ -160,7 +160,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
           YourDetails.cacheKey -> Json.toJson(yourForm)
         )))))
 
-      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789")))
+      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Right("123456789")))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -192,8 +193,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         phone = "0191 123 4567",
         email = testEmail)
 
-      when(shortLivedCache.fetch(any())(any(), any())).
-        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
           BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
           OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
           "safeId" -> JsString(""),
@@ -201,7 +202,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
           YourDetails.cacheKey -> Json.toJson(yourForm)
         )))))
 
-      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right(testSubId)))
+      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Right(testSubId)))
 
       val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
       val rosmContact = RosmContactDetails()
@@ -217,16 +219,14 @@ class RosmControllerSpec extends SpecBase with Injecting {
       await(SUT.post(fakeRequest))
 
       verify(emailConnector).sendTemplatedEmail(
-        emailAddress = MatcherEquals(testEmail),
-        templateName = MatcherEquals("lisa_application_submit"),
-        params = MatcherEquals(Map(
+        emailAddress = ArgumentMatchers.eq(testEmail),
+        templateName = ArgumentMatchers.eq("lisa_application_submit"),
+        params = ArgumentMatchers.eq(Map(
           "application_reference" -> testSubId,
           "email" -> testEmail,
           "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
           "first_name" -> yourForm.firstName,
-          "last_name" -> yourForm.lastName
-        ))
-      )(any())
+          "last_name" -> yourForm.lastName)))(ArgumentMatchers.any())
     }
 
     "handle a failed rosm registration" when {
@@ -242,8 +242,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString(""),
@@ -251,7 +251,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
             YourDetails.cacheKey -> Json.toJson(yourForm)
           )))))
 
-        when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
+        when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
         val result = SUT.post(fakeRequest)
 
@@ -272,8 +273,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         email = "test@test.com")
       val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(shortLivedCache.fetch(any())(any(), any())).
-        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
           BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
           OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
           "safeId" -> JsString(""),
@@ -292,14 +293,15 @@ class RosmControllerSpec extends SpecBase with Injecting {
         contactDetails = rosmContact
       )
 
-      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
 
       verify(auditService).audit(
-        auditType = MatcherEquals("applicationReceived"),
-        path = MatcherEquals("/lifetime-isa/submit-registration"),
-        auditData = MatcherEquals(Map(
+        auditType = ArgumentMatchers.eq("applicationReceived"),
+        path = ArgumentMatchers.eq("/lifetime-isa/submit-registration"),
+        auditData = ArgumentMatchers.eq(Map(
           "subscriptionId" -> "123456789012",
           "companyName" -> registrationDetails.organisationDetails.companyName,
           "utr" -> registrationDetails.organisationDetails.ctrNumber,
@@ -309,8 +311,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
           "lastName" -> registrationDetails.yourDetails.lastName,
           "roleInOrganisation" -> registrationDetails.yourDetails.role,
           "phoneNumber" -> registrationDetails.yourDetails.phone,
-          "emailAddress" -> registrationDetails.yourDetails.email))
-      )(any())
+          "emailAddress" -> registrationDetails.yourDetails.email)))(ArgumentMatchers.any())
     }
 
     "audit a failed rosm registration" when {
@@ -327,8 +328,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
           email = "test@test.com")
         val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-        when(shortLivedCache.fetch(any())(any(), any())).
-          thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
             BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
             OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
             "safeId" -> JsString(""),
@@ -336,14 +337,15 @@ class RosmControllerSpec extends SpecBase with Injecting {
             YourDetails.cacheKey -> Json.toJson(yourForm)
           )))))
 
-        when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
+        when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.post(fakeRequest))
 
         verify(auditService).audit(
-          auditType = MatcherEquals("applicationNotReceived"),
-          path = MatcherEquals("/lifetime-isa/submit-registration"),
-          auditData = MatcherEquals(Map(
+          auditType = ArgumentMatchers.eq("applicationNotReceived"),
+          path = ArgumentMatchers.eq("/lifetime-isa/submit-registration"),
+          auditData = ArgumentMatchers.eq(Map(
             "reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
             "companyName" -> registrationDetails.organisationDetails.companyName,
             "utr" -> registrationDetails.organisationDetails.ctrNumber,
@@ -354,7 +356,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
             "roleInOrganisation" -> registrationDetails.yourDetails.role,
             "phoneNumber" -> registrationDetails.yourDetails.phone,
             "emailAddress" -> registrationDetails.yourDetails.email))
-        )(any())
+        )(ArgumentMatchers.any())
       }
     }
 
@@ -371,8 +373,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
         email = "test@test.com")
       val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(shortLivedCache.fetch(any())(any(), any())).
-        thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
+      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
           BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
           OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
           "safeId" -> JsString(""),
@@ -390,17 +392,18 @@ class RosmControllerSpec extends SpecBase with Injecting {
         address = rosmAddress,
         contactDetails = rosmContact
       )
-      when(rosmService.performSubscription(any())(any())).thenReturn(Future.successful(Right("123456789012")))
+      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
 
       val applicationSentVM = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
 
-      verify(sessionCache).cache(MatcherEquals(ApplicationSent.cacheKey), MatcherEquals(applicationSentVM))(any(), any(), any())
+      verify(sessionCache).cache(ArgumentMatchers.eq(ApplicationSent.cacheKey), ArgumentMatchers.eq(applicationSentVM))(
+        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
     }
 
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new RosmController()
 
 }

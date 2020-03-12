@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import models.Reapplication
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
@@ -40,7 +40,7 @@ class ReapplyController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa ( (cacheId) =>{
+    authorisedForLisa ( cacheId =>{
         shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { _ =>
          Redirect(routes.BusinessStructureController.get())
         }

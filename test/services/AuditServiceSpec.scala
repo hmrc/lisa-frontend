@@ -18,13 +18,12 @@ package services
 
 import config.AppConfig
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Configuration
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
@@ -46,7 +45,7 @@ class AuditServiceSpec extends PlaySpec
 
       val captor = ArgumentCaptor.forClass(classOf[DataEvent])
 
-      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
+      verify(mockAuditConnector).sendEvent(captor.capture())(ArgumentMatchers.any(), ArgumentMatchers.any())
 
       val event = captor.getValue
 

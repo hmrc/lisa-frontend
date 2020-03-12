@@ -31,7 +31,7 @@ class RosmConnector @Inject()(
 ) extends RosmJsonFormats {
 
   val httpReads:HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
-    override def read(method: String, url: String, response: HttpResponse) = response
+    override def read(method: String, url: String, response: HttpResponse): HttpResponse = response
   }
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {

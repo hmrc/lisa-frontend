@@ -18,7 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import config.AppConfig
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService

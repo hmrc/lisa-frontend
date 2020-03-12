@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
@@ -38,11 +38,12 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
     "return the submitted page with correct email address" in {
 
-      when(authorisationService.userStatus(any())).
+      when(authorisationService.userStatus(ArgumentMatchers.any())).
         thenReturn(Future.successful(UserAuthorised("id",TaxEnrolmentPending)))
 
-      when(sessionCache.fetchAndGetEntry[ApplicationSent](MatcherEquals(ApplicationSent.cacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
+      when(sessionCache.fetchAndGetEntry[ApplicationSent](ArgumentMatchers.eq(ApplicationSent.cacheKey))(
+        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
 
       val result = SUT.get()(fakeRequest.withCSRFToken)
 
@@ -62,8 +63,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
     "return the pending page" in {
 
-      when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
+      when(authorisationService.userStatus(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.pending()(fakeRequest.withCSRFToken)
 
@@ -81,11 +82,12 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
     "return the successful page" in {
 
-      when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
+      when(authorisationService.userStatus(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-      when(sessionCache.fetchAndGetEntry[String](MatcherEquals("lisaManagerReferenceNumber"))(any(), any(), any())).
-        thenReturn(Future.successful(Some("Z9999")))
+      when(sessionCache.fetchAndGetEntry[String](ArgumentMatchers.eq("lisaManagerReferenceNumber"))(
+        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some("Z9999")))
 
       val result = SUT.successful()(fakeRequest.withCSRFToken)
 
@@ -104,8 +106,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
     "return the unsuccessful page" in {
 
-      when(authorisationService.userStatus(any())).
-        thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
+      when(authorisationService.userStatus(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest.withCSRFToken)
 
@@ -123,7 +125,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
   val pendingPageTitle = ">We are reviewing your application</h1>"
   val successPageTitle = ">Application successful</h1>"
   val rejectedPageTitle = ">Application not successful</h1>"
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new ApplicationSubmittedController()
 
 }
