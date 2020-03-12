@@ -18,10 +18,10 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
 import play.api.test.{FakeHeaders, FakeRequest, Injecting}
@@ -40,10 +40,13 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the cache returns a value" in {
         val tradingForm = new TradingDetails(fsrRefNumber = "validFSRRefNumber", isaProviderRefNumber = "validISARefNumber")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(tradingForm)))
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(TradingDetails.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(tradingForm)))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
 
@@ -61,10 +64,13 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](any(), org.mockito.Matchers.eq(TradingDetails.cacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetchAndGetEntry[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(TradingDetails.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
 
@@ -102,7 +108,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid - lowercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonLowercase))
-        when(shortLivedCache.cache[TradingDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
         status(result) mustBe Status.SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
@@ -110,7 +117,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid - uppercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
-        when(shortLivedCache.cache[TradingDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
         status(result) mustBe Status.SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
@@ -122,13 +130,15 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.TradingDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonLowercase))
         await(SUT.post(request))
-        verify(shortLivedCache).cache[TradingDetails](any(), any(), any())(any(), any(), any())
+        verify(shortLivedCache).cache[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
       "the submitted data is valid - uppercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         await(SUT.post(request))
-        verify(shortLivedCache).cache[TradingDetails](any(), any(), any())(any(), any(), any())
+        verify(shortLivedCache).cache[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }
 
@@ -136,11 +146,11 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
   val pageTitle = "<h1>Your company’s reference numbers</h1>"
   
-  val validJsonLowercase = Json.obj(
+  val validJsonLowercase: JsObject = Json.obj(
     "fsrRefNumber" -> "654321",
     "isaProviderRefNumber" -> "z1234"
   )
-  val validJsonUppercase = Json.obj(
+  val validJsonUppercase: JsObject = Json.obj(
     "fsrRefNumber" -> "654321",
     "isaProviderRefNumber" -> "Z1234"
   )
@@ -148,7 +158,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
     FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new TradingDetailsController()
 
 }

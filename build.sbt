@@ -18,8 +18,11 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
+scalaVersion := "2.12.10"
+
 lazy val lisafrontend = (project in file("."))
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(scoverageSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
@@ -29,6 +32,7 @@ lazy val lisafrontend = (project in file("."))
     majorVersion := 1,
     PlayKeys.playDefaultPort := 8884,
     libraryDependencies ++= AppDependencies(),
+    dependencyOverrides += "commons-codec" % "commons-codec" % "1.12",
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     routesGenerator := InjectedRoutesGenerator,
@@ -56,7 +60,7 @@ val ScoverageExclusionPatterns = List(
 lazy val scoverageSettings = {
   Seq(
     ScoverageKeys.coverageExcludedPackages := ScoverageExclusionPatterns.mkString("",";",""),
-    ScoverageKeys.coverageMinimum := 70,
+    ScoverageKeys.coverageMinimum := 90,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
     parallelExecution in Test := false

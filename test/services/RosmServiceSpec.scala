@@ -19,17 +19,17 @@ package services
 import connectors.{RosmConnector, RosmJsonFormats}
 import models._
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class RosmServiceSpec extends PlaySpec
   with MockitoSugar
@@ -51,7 +51,7 @@ class RosmServiceSpec extends PlaySpec
     "register with ROSM" when {
 
       "given a valid registration request" in {
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"), org), Duration.Inf)
@@ -64,16 +64,16 @@ class RosmServiceSpec extends PlaySpec
     "register a business structure of Corporate Body" when {
 
       "given a business structure of Friendly Society" in {
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
 
         val captor = ArgumentCaptor.forClass(classOf[RosmRegistration])
 
         Await.result(SUT.rosmRegister(BusinessStructure("Friendly Society"), org), Duration.Inf)
 
-        verify(mockRosmConnector).registerOnce(any(), captor.capture())(any())
+        verify(mockRosmConnector).registerOnce(ArgumentMatchers.any(), captor.capture())(ArgumentMatchers.any())
 
-        val submitted = captor.getValue()
+        val submitted = captor.getValue
 
         submitted.organisation.organisationType mustBe "Corporate Body"
       }
@@ -83,7 +83,7 @@ class RosmServiceSpec extends PlaySpec
     "return an error from registration" when {
 
       "it receives a failure response from ROSM" in {
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
@@ -92,7 +92,7 @@ class RosmServiceSpec extends PlaySpec
       }
 
       "it receives an invalid response from ROSM" in {
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
@@ -105,9 +105,9 @@ class RosmServiceSpec extends PlaySpec
     "subscribe with ROSM" when {
 
       "given a valid submission request" in {
-        when(mockRosmConnector.registerOnce(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
-        when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson(desSubscribeSuccessResponse)))))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
@@ -120,7 +120,7 @@ class RosmServiceSpec extends PlaySpec
     "return an error from submission" when {
 
       "it receives a failure response from ROSM" in {
-        when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
@@ -129,7 +129,7 @@ class RosmServiceSpec extends PlaySpec
       }
 
       "it receives an invalid response from ROSM" in {
-        when(mockRosmConnector.subscribe(any(), any())(any())).thenReturn(
+        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
           Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)

@@ -43,12 +43,12 @@ trait RosmJsonFormats {
     }
   )(unlift(RosmIndividual.unapply))
 
-  implicit val orgFormats = Json.format[RosmOrganisation]
-  implicit val addrFormats = Json.format[RosmAddress]
-  implicit val contFormats = Json.format[RosmContactDetails]
-  implicit val succFormats = Json.format[RosmRegistrationSuccessResponse]
-  implicit val failFormats = Json.format[DesFailureResponse]
-  implicit val desSubscribeFormats = Json.format[DesSubscriptionSuccessResponse]
+  implicit val orgFormats: OFormat[RosmOrganisation] = Json.format[RosmOrganisation]
+  implicit val addrFormats: OFormat[RosmAddress] = Json.format[RosmAddress]
+  implicit val contFormats: OFormat[RosmContactDetails] = Json.format[RosmContactDetails]
+  implicit val succFormats: OFormat[RosmRegistrationSuccessResponse] = Json.format[RosmRegistrationSuccessResponse]
+  implicit val failFormats: OFormat[DesFailureResponse] = Json.format[DesFailureResponse]
+  implicit val desSubscribeFormats: OFormat[DesSubscriptionSuccessResponse] = Json.format[DesSubscriptionSuccessResponse]
 
 
 }

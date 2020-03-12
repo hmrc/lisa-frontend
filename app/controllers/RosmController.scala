@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDate
 
 import models.{ApplicationSent, LisaRegistration}
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment, Logger}
 import services.{AuditService, AuthorisationService, RosmService}
@@ -47,7 +47,7 @@ class RosmController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with RosmJsonFormats {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
         rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) => {

@@ -27,8 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthorisationService @Inject()(
-                                      val authConnector: AuthConnector,
+class AuthorisationService @Inject()(val authConnector: AuthConnector,
                                       val taxEnrolmentService: TaxEnrolmentService) extends AuthorisedFunctions {
 
   def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] = {

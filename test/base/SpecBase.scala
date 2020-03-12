@@ -19,10 +19,10 @@ package base
 import config.AppConfig
 import connectors.EmailConnector
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.MessagesApi
@@ -34,7 +34,6 @@ import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
-import play.api.test.CSRFTokenHelper._
 
 import scala.concurrent.Future
 
@@ -48,16 +47,19 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
     reset(auditService)
     reset(emailConnector)
 
-    when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
-      thenReturn(Future.successful(Some(false)))
-    when(shortLivedCache.cache[Any](any(), any(), any())(any(), any(), any())).
-      thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
+    when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), org.mockito.ArgumentMatchers.eq(Reapplication.cacheKey))
+      (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(Some(false)))
 
-    when(sessionCache.cache(any(), any())(any(), any(), any())).
-      thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
+    when(shortLivedCache.cache[Any](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+      (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
 
-    when(authorisationService.userStatus(any())).
-      thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
+    when(sessionCache.cache(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
+
+    when(authorisationService.userStatus(ArgumentMatchers.any()))
+      .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
 
   val injector: Injector = app.injector

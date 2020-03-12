@@ -16,12 +16,12 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class Organisation(organisationName:String,organisationType:String)
 
 object Organisation {
-  implicit val formats = Json.format[Organisation]
+  implicit val formats: OFormat[Organisation] = Json.format[Organisation]
 }
 
 case class RosmRegistration(regime: String,
@@ -30,5 +30,5 @@ case class RosmRegistration(regime: String,
                             organisation: Organisation)
 
 object RosmRegistration {
-  implicit val formats = Json.format[RosmRegistration]
+  implicit val formats: OFormat[RosmRegistration] = Json.format[RosmRegistration]
 }

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers.{eq => matcherEq, _}
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
@@ -43,13 +43,17 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
       "the cache returns a value" in {
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some((organisationForm))))
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(organisationForm)))
 
         val request = fakeRequest.withCSRFToken
         val result = SUT.get().apply(request)
@@ -67,13 +71,17 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
         val result = SUT.get().apply(request)
@@ -91,13 +99,17 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "redirect the user to business structure" when {
 
       "The business structure details are missing from the cache" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
 
@@ -118,10 +130,12 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.post()(request)
@@ -139,10 +153,12 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
           thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](any(), org.mockito.Matchers.eq(organisationDetailsCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
           thenReturn(Future.successful(None))
 
         val result = SUT.post(request)
@@ -164,13 +180,16 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(shortLivedCache.cache[OrganisationDetails](any(),any(),any())(any(), any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
+        when(shortLivedCache.cache[OrganisationDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(any(),any())(any())).
-          thenReturn(Future.successful(Right("3456789")))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(),ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Right("3456789")))
 
         val result = SUT.post(request)
 
@@ -188,10 +207,11 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
           thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(rosmService.rosmRegister(any(), any())(any())).
+        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).
           thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
 
         val result = SUT.post(request)
@@ -213,15 +233,17 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(any(),any())(any())).
-          thenReturn(Future.successful(Right("3456789")))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(),ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[OrganisationDetails](any(), matcherEq(OrganisationDetails.cacheKey), any())(any(), any(), any())
+        verify(shortLivedCache).cache[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(OrganisationDetails.cacheKey), ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
 
     }
@@ -234,17 +256,21 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(shortLivedCache.cache[OrganisationDetails](any(),org.mockito.Matchers.eq(organisationDetailsCacheKey),any())(any(), any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
+        when(shortLivedCache.cache[OrganisationDetails](ArgumentMatchers.any(),ArgumentMatchers.eq(organisationDetailsCacheKey),ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(businessStructureCacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(any(),any())(any())).
-          thenReturn(Future.successful(Right("3456789")))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(),ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[OrganisationDetails](any(), matcherEq("safeId"), any())(any(), any(), any())
+        verify(shortLivedCache).cache[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq("safeId"), ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
 
     }
@@ -256,7 +282,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
     FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new OrganisationDetailsController()
 
 

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
@@ -40,10 +40,13 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
       "the cache returns a value" in {
         val form = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(form)))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(BusinessStructure.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(form)))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
 
@@ -60,10 +63,13 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(BusinessStructure.cacheKey))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
 
@@ -100,7 +106,9 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid" in {
         val uri = controllers.routes.BusinessStructureController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
-        when(shortLivedCache.cache[BusinessStructure](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(shortLivedCache.cache[BusinessStructure](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -116,7 +124,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[BusinessStructure](any(), any(), any())(any(), any(), any())
+        verify(shortLivedCache).cache[BusinessStructure](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }
 
@@ -127,7 +136,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
     FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new BusinessStructureController()
 
 }

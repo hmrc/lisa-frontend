@@ -34,7 +34,7 @@ class HomePageControllerSpec extends SpecBase with Injecting {
       redirectLocation(result).getOrElse("") mustBe "/lifetime-isa/company-structure"
     }
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new HomePageController()
 
 }

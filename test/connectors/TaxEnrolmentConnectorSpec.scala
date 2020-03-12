@@ -19,9 +19,9 @@ package connectors
 import config.AppConfig
 import models._
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
@@ -39,8 +39,8 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   "Get Subscriptions by Group ID endpoint" must {
 
     "return whatever it receives" in {
-      when(mockHttp.GET[HttpResponse](any())(any(), any(), any())).
-      thenReturn(Future.successful(HttpResponse(200, Some(Json.toJson(subs)), Map[String,Seq[String]]("test"->Seq("test1","test2")), None)))
+      when(mockHttp.GET[HttpResponse](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(HttpResponse(200, Some(Json.toJson(subs)), Map[String,Seq[String]]("test"->Seq("test1","test2")), None)))
 
       val response = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
 
@@ -49,9 +49,9 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   }
 
-  val mockHttp = mock[HttpClient]
-  val mockAppConfig = mock[AppConfig]
-  implicit val hc = HeaderCarrier()
+  val mockHttp: HttpClient = mock[HttpClient]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new TaxEnrolmentConnector(mockHttp, mockAppConfig)
 

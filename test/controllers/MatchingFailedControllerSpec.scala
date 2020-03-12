@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
@@ -33,8 +33,9 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
   "GET Matching Failed" must {
 
     "return a page" in {
-      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](any(), org.mockito.Matchers.eq(BusinessStructure.cacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
+      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(BusinessStructure.cacheKey))(
+        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
       val result = SUT.get(fakeRequest)
 
@@ -46,7 +47,7 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
     }
 
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new MatchingFailedController()
 
 }

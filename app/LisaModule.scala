@@ -16,10 +16,7 @@
 
 import com.google.inject.AbstractModule
 import config.{LisaSessionCache, LisaShortLivedCache}
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
-import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
-import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
 class LisaModule extends AbstractModule {
 

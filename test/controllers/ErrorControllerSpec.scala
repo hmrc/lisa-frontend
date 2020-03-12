@@ -48,7 +48,7 @@ class ErrorControllerSpec extends SpecBase with Injecting {
     }
   }
 
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new ErrorController()
 
 }

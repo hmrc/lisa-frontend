@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{RosmIndividual, TaxEnrolmentPending}
+import models.RosmIndividual
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json

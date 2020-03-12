@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
@@ -45,10 +45,13 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           phone = "0191 123 4567",
           email = "test@test.com")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), org.mockito.Matchers.eq(YourDetails.cacheKey))(any(), any(), any())).
-          thenReturn(Future.successful(Some(yourForm)))
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(YourDetails.cacheKey))
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(yourForm)))
 
         val request = fakeRequest.withCSRFToken
         val result = SUT.get().apply(request)
@@ -66,10 +69,13 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).thenReturn(Future.successful(Some(false)))
+        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](any(), any())(any(), any(), any())).
-          thenReturn(Future.successful(None))
+        when(shortLivedCache.fetchAndGetEntry[YourDetails](ArgumentMatchers.any(), ArgumentMatchers.any())
+          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
         val result = SUT.get().apply(request)
@@ -118,7 +124,9 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           "email" -> "test@test.com"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-        when(shortLivedCache.cache[YourDetails](any(),any(),any())(any(),any(), any())).thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
+        when(shortLivedCache.cache[YourDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())
+          (ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -129,8 +137,8 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "store your details in cache" when {
       "the submitted data is valid" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
         val uri = controllers.routes.YourDetailsController.post().url
         val validJson = Json.obj(
@@ -145,7 +153,10 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[YourDetails](any(), any(), any())(any(), any(), any())
+        verify(shortLivedCache).cache[YourDetails](ArgumentMatchers.any(),  ArgumentMatchers.any(), ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+
+
       }
 
     }
@@ -155,7 +166,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
     FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new YourDetailsController()
 
 }

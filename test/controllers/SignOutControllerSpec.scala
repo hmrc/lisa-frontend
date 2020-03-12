@@ -32,6 +32,6 @@ class SignOutControllerSpec extends SpecBase with Injecting {
       status(result) mustBe Status.SEE_OTHER
     }
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new SignOutController()
 }

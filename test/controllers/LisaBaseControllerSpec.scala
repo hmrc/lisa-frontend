@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import config.AppConfig
 import models._
-import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.i18n.MessagesApi
@@ -28,7 +28,6 @@ import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
-import uk.gov.hmrc.auth.core.UnsupportedCredentialRole
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,8 +40,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to login" when {
 
       "a not logged in response is returned from auth" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserNotLoggedIn))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserNotLoggedIn))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -59,8 +58,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to access denied" when {
 
       "a unauthorised response is returned from auth" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserUnauthorised))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserUnauthorised))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -68,8 +67,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
       }
 
       "an assistant role response is returned from auth" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserNotAdmin))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserNotAdmin))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -81,8 +80,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to pending subscription" when {
 
       "an authorised user has a pending subscription" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentPending)))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -95,8 +94,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to rejected subscription" when {
 
       "an authorised user has a errored subscription" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentError)))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentError)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -109,14 +108,15 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to successful subscription" when {
 
       "an authorised user has a successful subscription" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorisedAndEnrolled("", "Z9876")))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorisedAndEnrolled("", "Z9876")))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
 
-        verify(sessionCache).cache(MatcherEquals("lisaManagerReferenceNumber"), MatcherEquals("Z9876"))(any(), any(), any())
+        verify(sessionCache).cache(ArgumentMatchers.eq("lisaManagerReferenceNumber"), ArgumentMatchers.eq("Z9876"))(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
 
       }
 
@@ -125,8 +125,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "avoid redirections" when {
 
       "enrolment state check is disabled for a successful subscription" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", "Z9876")))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", "Z9876")))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
 
@@ -136,8 +136,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
       }
 
       "enrolment state check is disabled for a pending subscription" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentPending)))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
 
@@ -151,8 +151,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "allow access" when {
 
       "an authorised user has no subscriptions in progress" in {
-        when(authorisationService.userStatus(any())).
-          thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentDoesNotExist)))
+        when(authorisationService.userStatus(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentDoesNotExist)))
 
         val result = SUT.testAuthorisation(fakeRequest)
 
@@ -203,7 +203,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
   }
 
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   class TestClass(
     implicit val config: Configuration,
@@ -225,7 +225,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
       authorisedForLisa(handleResult, checkEnrolmentState = false)
     }
 
-    private val handleResult: (String) => Future[Result] = {
+    private val handleResult: String => Future[Result] = {
       case "error-lisa-registration" => throw new RuntimeException("An error occurred")
       case cacheId => Future.successful(Ok(s"Authorised. Cache ID: $cacheId"))
     }

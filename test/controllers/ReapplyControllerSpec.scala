@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models.Reapplication
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
@@ -32,8 +32,9 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
 
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
-      when(shortLivedCache.fetchAndGetEntry[Boolean](any(), org.mockito.Matchers.eq(Reapplication.cacheKey))(any(), any(), any())).
-        thenReturn(Future.successful(Some(true)))
+      when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
+        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(Some(true)))
 
       val result = SUT.get(fakeRequest)
 
@@ -42,7 +43,7 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
       redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
     }
   }
-  implicit val mcc = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new ReapplyController()
 
 }

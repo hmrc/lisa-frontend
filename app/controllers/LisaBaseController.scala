@@ -29,7 +29,8 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
+abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext)
+  extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
   with AuthRedirects with I18nSupport {
 
   val appConfig: AppConfig
@@ -37,7 +38,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
   val shortLivedCache: ShortLivedCache
   val authorisationService: AuthorisationService
 
-  def authorisedForLisa(callback: (String) => Future[Result], checkEnrolmentState: Boolean = true)
+  def authorisedForLisa(callback: String => Future[Result], checkEnrolmentState: Boolean = true)
                        (implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(appConfig.loginCallback))
@@ -54,7 +55,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
   }
 
 
-  private def handleUserAuthorised(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
+  private def handleUserAuthorised(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
                                   (implicit request: Request[AnyContent]): Future[Result] = {
     Logger.debug("User Authorised")
     isReapplication(user) flatMap { isReapplication =>
@@ -80,7 +81,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     }
   }
 
-  private def handleUserAuthorisedAndEnrolled(callback: (String) => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
+  private def handleUserAuthorisedAndEnrolled(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
                                              (implicit request: Request[AnyContent]): Future[Result] = {
     Logger.debug("User Authorised And Enrolled")
 
@@ -94,7 +95,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     }
   }
 
-  def hasAllSubmissionData(cacheId: String)(callback: (LisaRegistration) => Future[Result])
+  def hasAllSubmissionData(cacheId: String)(callback: LisaRegistration => Future[Result])
                           (implicit request: Request[AnyContent]): Future[Result] = {
     shortLivedCache.fetch(cacheId) flatMap {
       case Some(cache) => {

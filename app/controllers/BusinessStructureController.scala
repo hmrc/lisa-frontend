@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import models._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
@@ -40,7 +40,7 @@ class BusinessStructureController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).map {
         case Some(data) => Ok(views.html.registration.business_structure(BusinessStructure.form.fill(data)))
         case None => Ok(views.html.registration.business_structure(BusinessStructure.form))
@@ -49,7 +49,7 @@ class BusinessStructureController @Inject()(
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
       BusinessStructure.form.bindFromRequest.fold(
         formWithErrors => {
           Future.successful(BadRequest(views.html.registration.business_structure(formWithErrors)))
