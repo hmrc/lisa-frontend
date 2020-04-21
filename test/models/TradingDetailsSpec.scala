@@ -25,14 +25,8 @@ class TradingDetailsSpec extends PlaySpec {
 
     "have no errors" when {
 
-      "both fields are correct - lowercase z in isa ref" in {
-        val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "z123456")
-        val res = SUT.bind(test)
-        res.errors mustBe Nil
-      }
-
       "both fields are correct - uppercase z in isa ref" in {
-        val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "Z123456")
+        val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "Z1234")
         val res = SUT.bind(test)
         res.errors mustBe Nil
       }
@@ -56,7 +50,7 @@ class TradingDetailsSpec extends PlaySpec {
     "show fsrRefNumber invalid error" when {
 
       "given a fsrRefNumber thats too long" in {
-        val test = Map[String, String]("fsrRefNumber" -> "12", "isaProviderRefNumber" -> "Z123456")
+        val test = Map[String, String]("fsrRefNumber" -> "12", "isaProviderRefNumber" -> "Z1234")
         val res = SUT.bind(test)
         println(res.errors.toString)
         res.errors.size mustBe 1
@@ -65,7 +59,7 @@ class TradingDetailsSpec extends PlaySpec {
       }
 
       "given a fsrRefNumber with invalid characters" in {
-        val test = Map[String, String]("fsrRefNumber" -> "?", "isaProviderRefNumber" -> "Z123456")
+        val test = Map[String, String]("fsrRefNumber" -> "?", "isaProviderRefNumber" -> "Z1234")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "fsrRefNumber"
@@ -89,6 +83,13 @@ class TradingDetailsSpec extends PlaySpec {
         val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "?")
         val res = SUT.bind(test)
 
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "isaProviderRefNumber"
+        res.errors.head.message mustBe "error.isaProviderRefNumberPattern"
+      }
+      "given a isa provider number with - lowercase z" in {
+        val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "z123456")
+        val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "isaProviderRefNumber"
         res.errors.head.message mustBe "error.isaProviderRefNumberPattern"
