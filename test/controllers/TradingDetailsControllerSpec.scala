@@ -102,18 +102,18 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         content must include ("Enter your 6 number Financial Conduct Authority reference")
         content must include ("Enter your ISA manager reference")
       }
-    }
-
-    "redirect the user to your details" when {
-      "the submitted data is valid - lowercase z" in {
+      "the submitted data is invalid - lowercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonLowercase))
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj( "fsrRefNumber" -> "654321",
+          "isaProviderRefNumber" -> "z1234")))
         when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
           ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
-        status(result) mustBe Status.SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+        status(result) mustBe Status.BAD_REQUEST
       }
+    }
+
+    "redirect the user to your details" when {
       "the submitted data is valid - uppercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
@@ -126,13 +126,6 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     }
 
     "store trading details in cache" when {
-      "the submitted data is valid - lowercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post().url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonLowercase))
-        await(SUT.post(request))
-        verify(shortLivedCache).cache[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
-      }
       "the submitted data is valid - uppercase z" in {
         val uri = controllers.routes.TradingDetailsController.post().url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
@@ -145,11 +138,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
   }
 
   val pageTitle = "<h1>Your company’s reference numbers</h1>"
-  
-  val validJsonLowercase: JsObject = Json.obj(
-    "fsrRefNumber" -> "654321",
-    "isaProviderRefNumber" -> "z1234"
-  )
+
   val validJsonUppercase: JsObject = Json.obj(
     "fsrRefNumber" -> "654321",
     "isaProviderRefNumber" -> "Z1234"
