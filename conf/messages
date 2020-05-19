@@ -80,10 +80,12 @@ applicationsuccessful.text.line3=You can sign back into this service at any time
 
 applicationrejected.heading=Application not successful
 applicationrejected.text.line1=Your application to become an approved Lifetime ISA Manager was not successful.
-applicationrejected.text.line2.pre=If you want more information, email
+applicationrejected.text.line2.pre=For If more information, email
+applicationrejected.text.line2.post=with your application reference.
 applicationrejected.text.line3=You will need to give your application reference.
-applicationrejected.text.line4.pre=Or you can
+applicationrejected.text.line4.pre=You can
 applicationrejected.text.line4.link=apply again
+applicationrejected.text.line4.post=to be an approved Lifetime ISA Manager.
 
 summary.heading=Check your answers
 summary.change=Change
