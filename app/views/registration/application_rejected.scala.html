@@ -27,9 +27,9 @@
 
     <p>@Messages("applicationrejected.text.line1")</p>
 
-    <p>@Messages("applicationrejected.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application not successful:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk</a></p>
+    <p>@Messages("applicationrejected.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application not successful:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk</a> @Messages("applicationrejected.text.line2.post")</p>
 
     <p>@Messages("applicationrejected.text.line3")</p>
 
-    <p>@Messages("applicationrejected.text.line4.pre") <a id="apply-again" href=@routes.ReapplyController.get()>@Messages("applicationrejected.text.line4.link")</a></p>
+    <p>@Messages("applicationrejected.text.line4.pre") <a id="apply-again" href=@routes.ReapplyController.get()>@Messages("applicationrejected.text.line4.link")</a> @Messages("applicationrejected.text.line4.post")</p>
 }
