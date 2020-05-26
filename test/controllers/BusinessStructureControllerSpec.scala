@@ -131,7 +131,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   }
 
-  val pageTitle = ">Select your company structure</h1>"
+  val pageTitle = ">What is your company structure?</h1>"
 
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
     FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
