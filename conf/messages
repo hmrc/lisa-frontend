@@ -30,9 +30,9 @@ org.details.hint.notllp=Corporation Tax, including your CT600 form
 org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’.<a href="https://www.gov.uk/find-lost-utr-number">Find a lost UTR number (opens in a new window or tab)</a>.
 
 tradingdetails.fsrref.label=Financial Conduct Authority reference
-tradingdetails.fsrref.hint=This is 6 numbers.
+tradingdetails.fsrref.hint=This is 6 numbers, like 123456
 tradingdetails.isaref.label=ISA manager reference
-tradingdetails.isaref.hint=This begins with a ‘Z’ and includes 4 numbers.
+tradingdetails.isaref.hint=This is a ‘Z’ then 4 numbers, like Z1234
 
 title.application-pending=Reviewing your application - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.application-rejected=Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK
