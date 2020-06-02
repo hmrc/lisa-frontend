@@ -67,7 +67,7 @@ applicationsubmitted.banner.recruitment.link=Help improve digital services by jo
 applicationsubmitted.banner.recruitment.dismiss=No thanks
 
 applicationpending.heading=We are reviewing your application
-applicationpending.text.line1=The review process can take up to 14 calendar days from the date you submitted your application. We will email you when we have made the decision.
+applicationpending.text.line1=The review process can take up to 14 calendar days from the date you sent your application. We will email you with our decision.
 applicationpending.text.line2.pre=If you need to change your application, email
 
 applicationsuccessful.banner.heading=Application successful
