@@ -99,7 +99,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("Enter your 6 number Financial Conduct Authority reference")
+        content must include ("Enter your company’s Financial Conduct Authority reference")
         content must include ("Enter your ISA manager reference")
       }
       "the submitted data is invalid - lowercase z" in {

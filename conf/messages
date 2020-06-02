@@ -153,12 +153,12 @@ error.ctrNumberPattern=Enter a Corporation Tax UTR that only contains 10 numbers
 error.partnershipUtrRequired=Enter your Self Assessment UTR
 error.partnershipUtrPattern=Enter a Self Assessment UTR that only contains 10 numbers
 
-error.fsrRefNumberRequired=Enter your 6 number Financial Conduct Authority reference
+error.fsrRefNumberRequired=Enter your company’s Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
-error.fsrRefNumberPattern=Enter your Financial Conduct Authority reference in the correct format
+error.fsrRefNumberPattern=Your company’s Financial Conduct Authority reference must only include numbers 0-9
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
-error.isaProviderRefNumberPattern=Enter your ISA manager reference in the correct format
+error.isaProviderRefNumberPattern= Your company’s ISA manager reference must only include the letter z and numbers 0-9
 
 error.firstNameRequired=Enter your first name
 error.firstNameLength=Enter only the first 35 characters of your first name
