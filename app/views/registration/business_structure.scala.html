@@ -16,16 +16,15 @@
 
 @import helper.CSRF
 @import uk.gov.hmrc.play.views.html.helpers._
-@import views.html.error.errorSummaryOrgTemplate
 
 @(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.business-structure")) else Messages("title.business-structure"), bodyClasses = None) {
 
     <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
-
-    @errorSummaryOrgTemplate(form, "Select your company structure")
-
+    @if(form.hasErrors) {
+        @errorSummary(messages("validation.summary.heading"), form)
+    }
     <form method="post">
         @CSRF.formField
 
