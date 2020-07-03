@@ -74,7 +74,7 @@ applicationsuccessful.banner.heading=Application successful
 applicationsuccessful.banner.subheading=Your LISA and ISA manager references are the same:
 applicationsuccessful.heading=What this means for you
 applicationsuccessful.text.line1.pre=You can use your software to connect to the
-applicationsuccessful.text.line1.link=Lifetime ISA API
+applicationsuccessful.text.line1.link=Lifetime ISA API (Opens in a new window or tab)
 applicationsuccessful.text.line2=Use your LISA manager reference when reporting information to HMRC.
 applicationsuccessful.text.line3=You can sign back into this service at any time to see this reference.
 
