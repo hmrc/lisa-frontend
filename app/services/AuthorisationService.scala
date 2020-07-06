@@ -32,7 +32,7 @@ class AuthorisationService @Inject()(val authConnector: AuthConnector,
 
   def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] = {
     authorised(
-      AffinityGroup.Organisation and AuthProviders(GovernmentGateway) and Admin
+      AffinityGroup.Organisation and AuthProviders(GovernmentGateway) and User
     ).retrieve(internalId and groupIdentifier and authorisedEnrolments) {
       case Some(id) ~ Some(groupId) ~ enrolments =>
         statusFromAuth(id, enrolments)

@@ -52,7 +52,8 @@ class RosmServiceSpec extends PlaySpec
 
       "given a valid registration request" in {
         when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty)))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"), org), Duration.Inf)
 
@@ -65,7 +66,8 @@ class RosmServiceSpec extends PlaySpec
 
       "given a business structure of Friendly Society" in {
         when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty)))
 
         val captor = ArgumentCaptor.forClass(classOf[RosmRegistration])
 
@@ -84,7 +86,8 @@ class RosmServiceSpec extends PlaySpec
 
       "it receives a failure response from ROSM" in {
         when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(rosmFailureResponse), headers = Map.empty)))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
 
@@ -93,7 +96,8 @@ class RosmServiceSpec extends PlaySpec
 
       "it receives an invalid response from ROSM" in {
         when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(""), headers = Map.empty)))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"),org), Duration.Inf)
 
@@ -106,9 +110,11 @@ class RosmServiceSpec extends PlaySpec
 
       "given a valid submission request" in {
         when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson(rosmSuccessResponse)))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty)))
         when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson(desSubscribeSuccessResponse)))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(desSubscribeSuccessResponse), headers = Map.empty)))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
 
@@ -121,7 +127,8 @@ class RosmServiceSpec extends PlaySpec
 
       "it receives a failure response from ROSM" in {
         when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson(rosmFailureResponse)))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(rosmFailureResponse), headers = Map.empty)))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
 
@@ -130,7 +137,8 @@ class RosmServiceSpec extends PlaySpec
 
       "it receives an invalid response from ROSM" in {
         when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(HttpResponse(OK, Some(Json.toJson("")))))
+          Future.successful(HttpResponse(
+            status = OK, json = Json.toJson(""), headers = Map.empty)))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)
 

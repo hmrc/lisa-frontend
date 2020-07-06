@@ -23,6 +23,35 @@ import play.api.libs.json.{JsPath, Json, JsonValidationError}
 
 class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats {
 
+  private val testJson: String = """[{
+                                   |    "created": 1498726914908,
+                                   |    "lastModified": 1498726914908,
+                                   |    "serviceName": "HMRC-ORG-LISA",
+                                   |    "identifiers": [
+                                   |        {
+                                   |            "key": "ZREF",
+                                   |            "value": "Z1234"
+                                   |        }
+                                   |    ],
+                                   |    "callback": "callback url",
+                                   |    "etmpId": "bp safe id",
+                                   |    "credId": "X",
+                                   |    "state": "PENDING",
+                                   |    "groupIdentifier": "Z"
+                                   |}]""".stripMargin
+
+  private val testJsonNullIdentifiers: String = """[{
+                                                  |    "created": 1498726914908,
+                                                  |    "lastModified": 1498726914908,
+                                                  |    "serviceName": "HMRC-ORG-LISA",
+                                                  |    "identifiers": null,
+                                                  |    "callback": "callback url",
+                                                  |    "etmpId": "bp safe id",
+                                                  |    "credId": "X",
+                                                  |    "state": "PENDING",
+                                                  |    "groupIdentifier": "Z"
+                                                  |}]""".stripMargin
+
   "Tax Enrolments" must {
 
     "serialize from json" when {
@@ -86,34 +115,5 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
     }
 
   }
-
-  private val testJson: String = """[{
-                           |    "created": 1498726914908,
-                           |    "lastModified": 1498726914908,
-                           |    "serviceName": "HMRC-ORG-LISA",
-                           |    "identifiers": [
-                           |        {
-                           |            "key": "ZREF",
-                           |            "value": "Z1234"
-                           |        }
-                           |    ],
-                           |    "callback": "callback url",
-                           |    "etmpId": "bp safe id",
-                           |    "credId": "X",
-                           |    "state": "PENDING",
-                           |    "groupIdentifier": "Z"
-                           |}]""".stripMargin
-
-  private val testJsonNullIdentifiers: String = """[{
-                                                |    "created": 1498726914908,
-                                                |    "lastModified": 1498726914908,
-                                                |    "serviceName": "HMRC-ORG-LISA",
-                                                |    "identifiers": null,
-                                                |    "callback": "callback url",
-                                                |    "etmpId": "bp safe id",
-                                                |    "credId": "X",
-                                                |    "state": "PENDING",
-                                                |    "groupIdentifier": "Z"
-                                                |}]""".stripMargin
 
 }
