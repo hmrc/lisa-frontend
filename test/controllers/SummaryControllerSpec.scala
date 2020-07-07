@@ -33,16 +33,13 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends SpecBase with Injecting {
 
-  "GET Summary" must {
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  val SUT = new SummaryController()
 
-    val organisationDetailsCacheKey = "organisationDetails"
-    val tradingDetailsCacheKey = "tradingDetails"
-    val businessStructureCacheKey = "businessStructure"
-    val yourDetailsCacheKey = "yourDetails"
+  "GET Summary" must {
 
     "redirect the user to business structure" when {
       "no business structure details are found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
 
         when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
@@ -57,8 +54,6 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to organisation details" when {
       "no organisation details are found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
         when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
@@ -73,7 +68,6 @@ class SummaryControllerSpec extends SpecBase with Injecting {
         redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
       }
       "no safeId is found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
 
@@ -93,11 +87,8 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to trading details" when {
       "no trading details are found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val businessStructureForm = new BusinessStructure("LLP")
-
-
 
         when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
@@ -116,7 +107,6 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to your details" when {
       "no your details are found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
@@ -139,7 +129,6 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
     "show the summary" when {
       "all required details are found in the cache" in {
-        val uri = controllers.routes.SummaryController.get().url
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
         val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
@@ -171,7 +160,6 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     }
 
   }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new SummaryController()
+
 
 }

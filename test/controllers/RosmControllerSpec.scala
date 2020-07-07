@@ -35,12 +35,10 @@ import scala.concurrent.Future
 
 class RosmControllerSpec extends SpecBase with Injecting {
 
-  "GET Rosm Registration" must {
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  val SUT = new RosmController()
 
-    val organisationDetailsCacheKey = "organisationDetails"
-    val tradingDetailsCacheKey = "tradingDetails"
-    val businessStructureCacheKey = "businessStructure"
-    val yourDetailsCacheKey = "yourDetails"
+  "GET Rosm Registration" must {
 
     "redirect the user to business structure" when {
       "no data is found in the cache" in {
@@ -163,17 +161,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
       when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
         .thenReturn(Future.successful(Right("123456789")))
 
-      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
-      val rosmContact = RosmContactDetails()
-      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
-        safeId = "",
-        isEditable = true,
-        isAnAgent = true,
-        isAnIndividual = true,
-        address = rosmAddress,
-        contactDetails = rosmContact
-      )
-
       redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
     }
 
@@ -205,17 +192,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
       when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
         .thenReturn(Future.successful(Right(testSubId)))
 
-      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
-      val rosmContact = RosmContactDetails()
-      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
-        safeId = "",
-        isEditable = true,
-        isAnAgent = true,
-        isAnIndividual = true,
-        address = rosmAddress,
-        contactDetails = rosmContact
-      )
-
       await(SUT.post(fakeRequest))
 
       verify(emailConnector).sendTemplatedEmail(
@@ -231,7 +207,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
     "handle a failed rosm registration" when {
       "the rosm service returns a failure" in {
-        val uri = controllers.routes.RosmController.post().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
@@ -261,7 +236,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
     }
 
     "audit a successful rosm registration" in {
-      val uri = controllers.routes.RosmController.post().url
       val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
       val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
@@ -281,17 +255,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
           TradingDetails.cacheKey -> Json.toJson(tradingForm),
           YourDetails.cacheKey -> Json.toJson(yourForm)
         )))))
-
-      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
-      val rosmContact = RosmContactDetails()
-      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
-        safeId = "",
-        isEditable = true,
-        isAnAgent = true,
-        isAnIndividual = true,
-        address = rosmAddress,
-        contactDetails = rosmContact
-      )
 
       when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
         .thenReturn(Future.successful(Right("123456789012")))
@@ -316,7 +279,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
     "audit a failed rosm registration" when {
       "the ct utr is 0000000000" in {
-        val uri = controllers.routes.RosmController.post().url
         val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
         val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
         val businessStructureForm = new BusinessStructure("LLP")
@@ -361,7 +323,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
     }
 
     "cache subscriptionId and email as part of a successful rosm registration" in {
-      val uri = controllers.routes.RosmController.post().url
       val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
       val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
       val businessStructureForm = new BusinessStructure("LLP")
@@ -382,16 +343,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
           YourDetails.cacheKey -> Json.toJson(yourForm)
         )))))
 
-      val rosmAddress = RosmAddress(addressLine1 = "", countryCode = "")
-      val rosmContact = RosmContactDetails()
-      val rosmSuccessResponse = RosmRegistrationSuccessResponse(
-        safeId = "",
-        isEditable = true,
-        isAnAgent = true,
-        isAnIndividual = true,
-        address = rosmAddress,
-        contactDetails = rosmContact
-      )
       when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
@@ -401,9 +352,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
       verify(sessionCache).cache(ArgumentMatchers.eq(ApplicationSent.cacheKey), ArgumentMatchers.eq(applicationSentVM))(
         ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
     }
-
   }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new RosmController()
+
 
 }

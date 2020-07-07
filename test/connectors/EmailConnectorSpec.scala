@@ -54,13 +54,12 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
         when(mockHttpClient.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
           ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(HttpResponse(202, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(ACCEPTED, "")))
 
         val response = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
         await(response) must be(EmailSent)
 
       }
-
     }
 
     "return other status" when {
@@ -73,13 +72,12 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
         when(mockHttpClient.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
           ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(HttpResponse(404, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
 
         val response = testEmailConnector.sendTemplatedEmail(invalidEmailString, templateId, params)
         await(response) must be(EmailNotSent)
 
       }
-
     }
 
   }

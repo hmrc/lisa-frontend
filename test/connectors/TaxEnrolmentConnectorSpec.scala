@@ -25,6 +25,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
@@ -34,20 +35,6 @@ import scala.concurrent.{Await, Future}
 class TaxEnrolmentConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
-
-
-  "Get Subscriptions by Group ID endpoint" must {
-
-    "return whatever it receives" in {
-      when(mockHttp.GET[HttpResponse](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(HttpResponse(200, Some(Json.toJson(subs)), Map[String,Seq[String]]("test"->Seq("test1","test2")), None)))
-
-      val response = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
-
-      response mustBe subs
-    }
-
-  }
 
   val mockHttp: HttpClient = mock[HttpClient]
   val mockAppConfig: AppConfig = mock[AppConfig]
@@ -68,5 +55,20 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   )
 
   private val subs = List(lisaSuccessSubscription)
+
+  "Get Subscriptions by Group ID endpoint" must {
+    "return whatever it receives" in {
+      when(mockHttp.GET[HttpResponse](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Future.successful(HttpResponse(
+          status = OK,
+          json = Json.toJson(subs),
+          headers = Map[String,Seq[String]]("test"->Seq("test1","test2"))
+        )))
+
+      val response = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
+
+      response mustBe subs
+    }
+  }
 
 }
