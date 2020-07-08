@@ -25,6 +25,10 @@
         "ctr"
     }
 }
+@utrFullName = @{utrName match {
+    case "str" => "Self Assessment"
+    case _ => "Corporation Tax"
+}}
 
 @views.html.main_template(title = Messages("title.summary"), bodyClasses = None) {
 
@@ -50,25 +54,41 @@
                         }
                     }
                 </dd>
-                <dd class="cya-change"></dd>
+                <dd class="cya-change">
+                    <a href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-companyStructure" data-journey-click="link - click:Check your answers:Change your company structure">
+                        <span aria-hidden="true">@Messages("summary.change")</span>
+                        <span class="visuallyhidden">@Messages("summary.companydetails.structure.change")</span>
+                    </a>
+                </dd>
             </div>
             <div>
                 <!-- Org name -->
                 <dt class="cya-question" id="title-companyName">@Messages("summary.companydetails.name")</dt>
                 <dd class="cya-answer" id="value-companyName">@data.organisationDetails.companyName</dd>
-                <dd class="cya-change"></dd>
+                <dd class="cya-change">
+                    <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-companyName" data-journey-click="link - click:Check your answers:Change your registered company name">
+                        <span aria-hidden="true">@Messages("summary.change")</span>
+                        <span class="visuallyhidden">@Messages("summary.companydetails.name.change")</span>
+                    </a>
+                </dd>
             </div>
             <div>
                 <dt class="cya-question" id=@{s"title-${utrName}Number"}>@Messages(s"summary.companydetails.${utrName}")</dt>
                 <dd class="cya-answer" id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber</dd>
-                <dd class="cya-change"></dd>
+                <dd class="cya-change">
+                    <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-@{utrName}Number"
+                    data-journey-click="link - click:Check your answers:summary.companydetails.str.change=Change your @utrFullName Unique Taxpayer Reference">
+                        <span aria-hidden="true">@Messages("summary.change")</span>
+                        <span class="visuallyhidden">@Messages(s"summary.companydetails.$utrName.change")</span>
+                    </a>
+                </dd>
             </div>
             <div>
                 <!-- Org ref numbers -->
                 <dt class="cya-question" id="title-fsrRefNumber">@Messages("summary.companydetails.fsrref")</dt>
                 <dd class="cya-answer" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</dd>
                 <dd class="cya-change">
-                    <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your FCA reference number">
+                    <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your Financial Conduct Authority reference number">
                         <span aria-hidden="true">@Messages("summary.change")</span>
                         <span class="visuallyhidden">@Messages("summary.companydetails.fsrref.change")</span>
                     </a>
@@ -91,7 +111,7 @@
     <section class="subsection summary-subsection">
         <h2 class="h2-heading">@Messages("summary.yourdetails.heading")</h2>
 
-        <dl class="govuk-check-your-answers cya-questions-short">
+        <dl class="govuk-check-your-answers cya-questions-long">
             <div>
                 <dt class="cya-question" id="title-firstName">@Messages("summary.yourdetails.firstname")</dt>
                 <dd class="cya-answer" id="value-firstName">@data.yourDetails.firstName</dd>
