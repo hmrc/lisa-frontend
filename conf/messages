@@ -161,19 +161,19 @@ error.isaProviderRefNumberRequired=Enter your ISA manager reference
 error.isaProviderRefNumberPattern= Your company’s ISA manager reference must only include the letter z and numbers 0-9
 
 error.firstNameRequired=Enter your first name
-error.firstNameLength=Enter only the first 35 characters of your first name
-error.firstNamePattern=First name can only include letters a to z, 0 to 9, ampersands, apostrophes, back slashes, full stops, hyphens and spaces
+error.firstNameLength=First name must be 35 characters or less
+error.firstNamePattern=First name must only include letters a to z, hyphens, spaces and apostrophes
 
 error.lastNameRequired=Enter your last name
-error.lastNameLength=Enter only the first 35 characters of your last name
-error.lastNamePattern=Last name can only include letters a to z, 0 to 9, ampersands, apostrophes, back slashes, full stops, hyphens and spaces
+error.lastNameLength=Last name must be 35 characters or less
+error.lastNamePattern=Last name must only include letters a to z, hyphens, spaces and apostrophes
 
 error.roleRequired=Enter your job title
-error.roleLength=Enter only the first 30 characters of your job title
-error.rolePattern=Job title can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
+error.roleLength=Job title must be 30 characters or less
+error.rolePattern=Job title must only include letters a to z, hyphens, spaces and apostrophes
 
 error.phoneRequired=Enter your phone number
-error.phonePattern=Enter a telephone number, like 01642 123 456 or +33 1 23 45 67 88
+error.phonePattern=Enter a phone number, like 01642 123 456 or +33 1 23 45 67 88
 
 error.emailRequired=Enter your email address
 error.email=Enter an email address with a name, @ symbol and a domain name, like yourname@example.com
