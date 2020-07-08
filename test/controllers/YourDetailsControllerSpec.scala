@@ -33,6 +33,13 @@ import scala.concurrent.Future
 
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  val SUT = new YourDetailsController()
+
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
+  }
+
   "GET Your Details" must {
 
     "return a populated form" when {
@@ -113,6 +120,32 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
       }
     }
 
+    "return validation errors" when {
+      "the submitted data is incorrectly filled" in {
+        val uri = controllers.routes.YourDetailsController.post().url
+        val invalidJson = Json.obj(
+          "firstName" -> "Test0",
+          "lastName" -> "User&",
+          "role" -> "Role.",
+          "phone" -> "0191 123 4567a",
+          "email" -> "test@eldf"
+        )
+        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = invalidJson))
+        val result = SUT.post()(request)
+
+        status(result) mustBe Status.BAD_REQUEST
+
+        val content = contentAsString(result)
+
+        content must include ("<h1>Your name and contact details</h1>")
+        content must include ("First name must only include letters a to z, hyphens, spaces and apostrophes")
+        content must include ("Last name must only include letters a to z, hyphens, spaces and apostrophes")
+        content must include ("Job title must only include letters a to z, hyphens, spaces and apostrophes")
+        content must include ("Enter a phone number, like 01642 123 456 or +33 1 23 45 67 88")
+        content must include ("Enter an email address with a name, @ symbol and a domain name, like yourname@example.com")
+      }
+    }
+
     "redirect the user to your details" when {
       "the submitted data is valid" in {
         val uri = controllers.routes.YourDetailsController.post().url
@@ -162,11 +195,5 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     }
 
   }
-
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
-  }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new YourDetailsController()
 
 }

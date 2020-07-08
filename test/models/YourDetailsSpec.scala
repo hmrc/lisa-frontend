@@ -21,6 +21,8 @@ import play.api.data.{Form, FormError}
 
 class YourDetailsSpec extends PlaySpec {
 
+  val SUT: Form[YourDetails] = YourDetails.form
+
   "Your Details form" must {
 
     "show field required errors" when {
@@ -140,7 +142,5 @@ class YourDetailsSpec extends PlaySpec {
     }
 
   }
-
-  val SUT: Form[YourDetails] = YourDetails.form
 
 }
