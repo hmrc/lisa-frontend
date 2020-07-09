@@ -145,8 +145,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("Enter your company’s name")
-        content must include ("Enter your Self Assessment UTR")
+        content must include ("Enter your registered company name")
+        content must include ("Enter your Self Assessment Unique Taxpayer Reference")
       }
 
       "the company name is invalid" in {
@@ -168,8 +168,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("Company name can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces")
-        content must include ("Enter a Corporation Tax UTR that only contains 10 numbers")
+        content must include ("Registered company name must only include letters a to z, numbers 0 to 9, hyphens, spaces and apostrophes")
+        content must include ("Corporation Tax Unique Taxpayer Reference must be 10 numbers")
       }
 
     }
