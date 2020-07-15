@@ -73,12 +73,36 @@ class OrganisationDetailsSpec extends PlaySpec {
         res.errors.head.message mustBe "error.ctrNumberRequired"
       }
 
-      "given a utr that doesn't match the expected format" in {
-        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "?")
+      "given a utr that doesn't match the expected format with 9 numbers and a special character" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "123456789?")
         val res = SUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "ctrNumber"
         res.errors.head.message mustBe "error.ctrNumberPattern"
+      }
+
+      "given a utr that doesn't match the expected format with 10 character" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "ABCDEABCDE")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.message mustBe "error.ctrNumberPattern"
+      }
+
+      "given a utr that doesn't match the expected length with less than 10 numbers" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "123456789")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.message mustBe "error.ctrNumberLength"
+      }
+
+      "given a utr that doesn't match the expected length with more than 10 numbers" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "ctrNumber" -> "12345678901")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "ctrNumber"
+        res.errors.head.message mustBe "error.ctrNumberLength"
       }
 
     }
@@ -137,12 +161,36 @@ class OrganisationDetailsSpec extends PlaySpec {
         res.errors.head.message mustBe "error.partnershipUtrRequired"
       }
 
-      "given a utr that doesn't match the expected format" in {
-        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "?")
+      "given a utr that doesn't match the expected format with 9 numbers and a special character" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "123456789?")
         val res = PartnershipSUT.bind(test)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "strNumber"
         res.errors.head.message mustBe "error.partnershipUtrPattern"
+      }
+
+      "given a utr that doesn't match the expected format with 10 character" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "ABCDEABCDE")
+        val res = PartnershipSUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "strNumber"
+        res.errors.head.message mustBe "error.partnershipUtrPattern"
+      }
+
+      "given a utr that doesn't match the expected format with less than 10 numbers" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "123")
+        val res = PartnershipSUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "strNumber"
+        res.errors.head.message mustBe "error.partnershipUtrLength"
+      }
+
+      "given a utr that doesn't match the expected format with more than 10 numbers" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "12345678901")
+        val res = PartnershipSUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "strNumber"
+        res.errors.head.message mustBe "error.partnershipUtrLength"
       }
 
     }

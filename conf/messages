@@ -147,15 +147,17 @@ accessdenied.assistant.text.register=register for an administrator account
 
 error.companyStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
-error.companyNameRequired=Enter your company’s name
-error.companyNameLength=Enter only the first 65 characters of your company’s name
-error.companyNamePattern=Company name can only include letters a to z, 0 to 9, ampersands, apostrophes, forward slashes, full stops, hyphens and spaces
+error.companyNameRequired=Enter your registered company name
+error.companyNameLength=Registered company name must be 65 characters or less
+error.companyNamePattern=Registered company name must only include letters a to z, numbers 0 to 9, hyphens, spaces and apostrophes
 
-error.ctrNumberRequired=Enter your Corporation Tax UTR
-error.ctrNumberPattern=Enter a Corporation Tax UTR that only contains 10 numbers
+error.ctrNumberRequired=Enter your Corporation Tax Unique Taxpayer Reference
+error.ctrNumberLength=Corporation Tax Unique Taxpayer Reference must be 10 numbers
+error.ctrNumberPattern=Corporation Tax Unique Taxpayer Reference must only include numbers 0 to 9
 
-error.partnershipUtrRequired=Enter your Self Assessment UTR
-error.partnershipUtrPattern=Enter a Self Assessment UTR that only contains 10 numbers
+error.partnershipUtrRequired=Enter your Self Assessment Unique Taxpayer Reference
+error.partnershipUtrLength=Self Assessment Unique Taxpayer Reference must be 10 numbers
+error.partnershipUtrPattern=Self Assessment Unique Taxpayer Reference must only include numbers 0 to 9
 
 error.fsrRefNumberRequired=Enter your company’s Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers

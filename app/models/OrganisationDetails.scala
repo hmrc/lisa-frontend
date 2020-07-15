@@ -38,7 +38,8 @@ object OrganisationDetails {
         .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
       "ctrNumber" -> optional(text)
         .verifying("error.ctrNumberRequired", _.getOrElse("").matches("^.+$"))
-        .verifying("error.ctrNumberPattern", i => i.isEmpty || i.getOrElse("").matches(UTR_REGEX))
+        .verifying("error.ctrNumberLength", i => i.isEmpty || i.getOrElse("").length == 10)
+        .verifying("error.ctrNumberPattern", i => i.isEmpty || i.getOrElse("").length != 10 || i.getOrElse("").matches(UTR_REGEX))
     )(
       (name, utr) => OrganisationDetails(
         name.getOrElse(""),
@@ -57,7 +58,8 @@ object OrganisationDetails {
         .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
       "strNumber" -> optional(text)
         .verifying("error.partnershipUtrRequired", _.getOrElse("").matches("^.+$"))
-        .verifying("error.partnershipUtrPattern", i => i.isEmpty || i.getOrElse("").matches(UTR_REGEX))
+        .verifying("error.partnershipUtrLength", i => i.isEmpty || i.getOrElse("").length == 10)
+        .verifying("error.partnershipUtrPattern", i => i.isEmpty || i.getOrElse("").length != 10 || i.getOrElse("").matches(UTR_REGEX))
     )(
       (name, utr) => OrganisationDetails(
         name.getOrElse(""),
