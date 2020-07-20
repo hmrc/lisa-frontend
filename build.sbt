@@ -18,7 +18,7 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.12.12"
 
 lazy val lisafrontend = (project in file("."))
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
