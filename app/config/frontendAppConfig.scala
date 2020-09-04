@@ -18,6 +18,7 @@ package config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 @Singleton
@@ -49,6 +50,20 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
   lazy val loginCallback: String = getString("gg-urls.login-callback.url")
 
+  lazy val accessibilityStatementUrl: String = getString("accessibilityStatement.govAccessibilityStatementUrl")
+  lazy val w3StandardsUrl: String = getString("accessibilityStatement.w3StandardsUrl")
+  lazy val abilityNettUrl: String = getString("accessibilityStatement.abilityNetUrl")
+  lazy val equalityAdvisoryServiceUrl: String = getString("accessibilityStatement.equalityAdvisoryServiceUrl")
+  lazy val equalityNIUrl: String = getString("accessibilityStatement.equalityNIUrl")
+  lazy val dealingHmrcAdditionalNeedsUrl: String = getString("accessibilityStatement.dealingHmrcAdditionalNeedsUrl")
+  lazy val dacUrl: String = getString("accessibilityStatement.dacUrl")
+  lazy val accessibilityStatementLastTested: String = getString("accessibilityStatement.lastTested")
+  lazy val accessibilityStatementFirstPublished: String = getString("accessibilityStatement.firstPublished")
+  lazy val accessibilityStatementLastUpdated: String = getString("accessibilityStatement.lastUpdated")
+  lazy val accessibilityStatementEnabled: Boolean = getBoolean("accessibilityStatement.enabled")
+  lazy val contactUrl = s"$contactHost/contact/contact-hmrc?service=$contactFormServiceIdentifier"
+  lazy val host: String = getString("host")
+
   def getSignOutUrl(callbackUrl: String): String = {
     val encodedCallbackUrl = java.net.URLEncoder.encode(callbackUrl, "UTF-8")
 
@@ -57,4 +72,7 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
 
   lazy val displayURBanner: Boolean = getBoolean("display-ur-banner")
 
+  def reportAccessibilityIssueUrl(problemPageUri: String): String = {
+    s"$contactHost/contact/accessibility?service=$contactFormServiceIdentifier&userAction=${SafeRedirectUrl(host + problemPageUri).encodedUrl}"
+  }
 }
