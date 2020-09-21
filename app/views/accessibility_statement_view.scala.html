@@ -28,10 +28,6 @@
 <a href=@appConfig.abilityNettUrl>@messages("accessibilityStatement.usingThisService.paragraph3.linkText")</a>
 }
 
-@howAccessibleThisServiceIsLink = {
-<a href=@appConfig.w3StandardsUrl>@messages("accessibilityStatement.howAccessibleThisServiceIs.paragraph1.linkText")</a>
-}
-
 @reportingAccessibilityProblemsWithThisServiceLink = {
 <a href="@appConfig.reportAccessibilityIssueUrl(problemPageUri)" target="_blank">@messages("accessibilityStatement.reportingAccessibilityProblemsWithThisService.paragraph1.linkText")</a>}
 
@@ -49,6 +45,9 @@
 
 @dacLink = {
 <a href=@appConfig.dacUrl>@messages("accessibilityStatement.howWeTestedThisService.paragraph2.linkText")</a>}
+
+@hmrcExtraSupportLink = {
+<a href=@appConfig.hmrcExtraSupportLink>@messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.linkText")</a>}
 
 @views.html.main_template(title = messages("accessibilityStatement.title", messages("site.service_name")), bodyClasses = None) {
 
@@ -80,19 +79,13 @@
 <div id="how-accessible-this-service-is">
     <h2 class="heading-large">@messages("accessibilityStatement.howAccessibleThisServiceIs.heading")</h2>
     <p>@Html(messages("accessibilityStatement.howAccessibleThisServiceIs.paragraph1",
-        howAccessibleThisServiceIsLink))</p>
-    <p>@messages("accessibilityStatement.howAccessibleThisServiceIs.paragraph2")</p>
+        appConfig.w3StandardsUrl))</p>
 </div>
 
 <div id="what-to-do-if-you-have-difficulty-using-this-service">
     <h2 class="heading-large">
         @messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.heading")</h2>
-    <p>@messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.paragraph1")</p>
-    <ul class="list list-bullet">
-        <li>@messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.listItem1")</li>
-        <li>@messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.listItem2")</li>
-    </ul>
-    <p>@messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.paragraph2")</p>
+    <p>@Html(messages("accessibilityStatement.whatToDoIfYouHaveDifficultyUsingThisService.paragraph1", hmrcExtraSupportLink))</p>
 </div>
 
 <div id="reporting-accessibility-problems-with-this-service">
@@ -125,14 +118,17 @@
     <p>@messages("accessibilityStatement.technicalInformationAboutThisServicesAccessibility.paragraph1")</p>
     <p>@Html(messages("accessibilityStatement.technicalInformationAboutThisServicesAccessibility.compliant",
         technicalInformationLink))</p>
+    <h3>@messages("accessibilityStatement.technicalInformationAboutThisServicesAccessibility.heading2")</h3>
+    <p>@messages("accessibilityStatement.technicalInformationAboutThisServicesAccessibility.paragraph2")</p>
+    <h4>@messages("accessibilityStatement.technicalInformationAboutThisServicesAccessibility.heading3")</h4>
+    <p>@messages("accessibilityStatement.technicalInformationAboutThisServicesAccessibility.paragraph3")</p>
 </div>
 
 <div id="how-we-tested-this-service">
     <h2 class="heading-large">@messages("accessibilityStatement.howWeTestedThisService.heading")</h2>
     <p>@messages("accessibilityStatement.howWeTestedThisService.paragraph1",
         appConfig.accessibilityStatementLastTested)</p>
-    <p>@Html(messages("accessibilityStatement.howWeTestedThisService.paragraph2", dacLink))</p>
-    <p>@messages("accessibilityStatement.howWeTestedThisService.paragraph3",
+    <p>@messages("accessibilityStatement.howWeTestedThisService.paragraph2",
         appConfig.accessibilityStatementFirstPublished, appConfig.accessibilityStatementLastUpdated)</p>
 </div>
 

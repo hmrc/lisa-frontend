@@ -55,7 +55,7 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val abilityNettUrl: String = getString("accessibilityStatement.abilityNetUrl")
   lazy val equalityAdvisoryServiceUrl: String = getString("accessibilityStatement.equalityAdvisoryServiceUrl")
   lazy val equalityNIUrl: String = getString("accessibilityStatement.equalityNIUrl")
-  lazy val dealingHmrcAdditionalNeedsUrl: String = getString("accessibilityStatement.dealingHmrcAdditionalNeedsUrl")
+  lazy val dealingHmrcAdditionalNeedsUrl: String = getString("accessibilityStatement.hmrcExtraSupportLink")
   lazy val dacUrl: String = getString("accessibilityStatement.dacUrl")
   lazy val accessibilityStatementLastTested: String = getString("accessibilityStatement.lastTested")
   lazy val accessibilityStatementFirstPublished: String = getString("accessibilityStatement.firstPublished")
@@ -63,6 +63,7 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val accessibilityStatementEnabled: Boolean = getBoolean("accessibilityStatement.enabled")
   lazy val contactUrl = s"$contactHost/contact/contact-hmrc?service=$contactFormServiceIdentifier"
   lazy val host: String = getString("host")
+  lazy val hmrcExtraSupportLink: String = getString("accessibilityStatement.hmrcExtraSupportLink")
 
   def getSignOutUrl(callbackUrl: String): String = {
     val encodedCallbackUrl = java.net.URLEncoder.encode(callbackUrl, "UTF-8")
