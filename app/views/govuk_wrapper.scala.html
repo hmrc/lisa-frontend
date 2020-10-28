@@ -76,16 +76,7 @@
 }
 
 @footerTop = {}
-@footer_links = {
-Some(controllers.routes.AccessibilityStatementController.onPageLoad.url)
-<ul class="platform-help-links">
-    <li><a href='@Messages("footer.links.cookies.url")' data-sso="false" data-journey-click="footer:Click:Cookies">@Messages("footer.links.cookies.text")</a></li>
-    <li><a href= @controllers.routes.AccessibilityStatementController.onPageLoad(request.uri).url data-sso="false" data-journey-click="footer:Click:Accessibility statement">@Messages("footer.links.accessibility.text")</a></li>
-    <li><a href='@Messages("footer.links.privacy_policy.url")' data-sso="false" data-journey-click="footer:Click:Privacy policy">@Messages("footer.links.privacy_policy.text")</a></li>
-    <li><a href='@Messages("footer.links.terms_and_conditions.url")' data-sso="false" data-journey-click="footer:Click:Terms and conditions">@Messages("footer.links.terms_and_conditions.text")</a></li>
-    <li><a href='@Messages("footer.links.help_page.url")' data-sso="false" data-journey-click="footer:Click:Help">@Messages("footer.links.help_page.text")</a></li>
-</ul>
-}
+@footer_links = {}
 
 @serviceInfo = {
     @uiLayouts.serviceInfo(
@@ -115,4 +106,4 @@ Some(controllers.routes.AccessibilityStatementController.onPageLoad.url)
       sidebar = sidebar)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader.getOrElse(HtmlFormat.empty), footerTop, Some(footer_links), true)(content)
+@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader.getOrElse(HtmlFormat.empty), footerTop, Some(uiLayouts.footer_links()), true)(content)

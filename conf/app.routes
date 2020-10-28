@@ -21,4 +21,3 @@ GET        /application-successful          @controllers.ApplicationSubmittedCon
 GET        /application-unsuccessful        @controllers.ApplicationSubmittedController.rejected
 GET        /signed-out                      @controllers.SignOutController.redirect
 GET        /re-apply                        @controllers.ReapplyController.get
-GET        /accessibility-statement         @controllers.AccessibilityStatementController.onPageLoad(problemPageUri: String)
