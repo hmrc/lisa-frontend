@@ -18,7 +18,6 @@ package config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 @Singleton
@@ -29,7 +28,7 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val lisaServiceUrl: String = baseUrl("lisa")
   lazy val emailServiceUrl: String = baseUrl("email")
 
-  private val caFrontendHost = getString("ca-frontend.host")
+  private val basGatewayHost = getString("bas-gateway.host")
   private val contactHost = getString("contact-frontend.host")
   private val contactFormServiceIdentifier = "LISA"
   private val logoutCallback = getString("gg-urls.logout-callback.url")
@@ -49,11 +48,13 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
   lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
   lazy val loginCallback: String = getString("gg-urls.login-callback.url")
+  lazy val loginURL: String = s"$basGatewayHost/bas-gateway/sign-in"
+
 
   def getSignOutUrl(callbackUrl: String): String = {
     val encodedCallbackUrl = java.net.URLEncoder.encode(callbackUrl, "UTF-8")
 
-    s"$caFrontendHost/gg/sign-out?continue=$encodedCallbackUrl"
+    s"$basGatewayHost/bas-gateway/sign-out-without-state/?continue=$encodedCallbackUrl"
   }
 
   lazy val displayURBanner: Boolean = getBoolean("display-ur-banner")

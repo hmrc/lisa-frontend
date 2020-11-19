@@ -21,6 +21,7 @@ import models._
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Reads
+import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
@@ -47,6 +48,15 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
     }
+  }
+  override def toGGLogin(continueUrl: String): Result = {
+    Redirect(
+      appConfig.loginURL,
+      Map(
+        "continue_url" -> Seq(continueUrl),
+        "origin"   -> Seq("lisa-frontend")
+      )
+    )
   }
 
   private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] = {

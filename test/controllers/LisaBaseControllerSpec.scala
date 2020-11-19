@@ -49,7 +49,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
         val redirectUrl = redirectLocation(result).getOrElse("")
 
-        redirectUrl must startWith("/gg/sign-in")
+        redirectUrl must include("/bas-gateway/sign-in")
         redirectUrl must endWith("lifetime-isa%2Fcompany-structure&origin=lisa-frontend")
       }
 
