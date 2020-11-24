@@ -131,12 +131,12 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   }
 
-  val pageTitle = ">What is your company structure?</h1>"
+  lazy val pageTitle = ">What is your company structure?</h1>"
 
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
     FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
   }
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new BusinessStructureController()
+  lazy val SUT = new BusinessStructureController()
 
 }
