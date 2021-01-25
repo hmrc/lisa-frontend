@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,9 @@
             '_label -> Messages("tradingdetails.fsrref.label"),
             '_inputHint -> Messages("tradingdetails.fsrref.hint"),
             '_inputClass -> "form-control form-control--block",
-            '_type -> "tel"
+            '_type -> "text",
+            '_inputmode -> "numeric",
+            '_pattern -> "[0-9]*"
             )
         </div>
         <div class="form-group">
