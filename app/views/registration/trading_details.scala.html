@@ -27,7 +27,7 @@
     }
     <h1>Your company’s reference numbers</h1>
 
-    <form method="post">
+    <form novalidate="true" method="post">
         @CSRF.formField
         <div class="form-group">
             @input(form("fsrRefNumber"),
