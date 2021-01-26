@@ -21,7 +21,7 @@
 
 @views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.business-structure")) else Messages("title.business-structure"), bodyClasses = None) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
+    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
     @if(form.hasErrors) {
         @errorSummary(messages("validation.summary.heading"), form)
     }
