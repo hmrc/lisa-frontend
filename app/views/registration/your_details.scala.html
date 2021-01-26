@@ -33,22 +33,40 @@
         </p>
     </div>
 
-    <form method="post">
+    <form novalidate="true" method="post">
         @CSRF.formField
         <div class="form-group">
-            @input(form("firstName"), '_label -> Messages("yourdetails.firstname"), '_inputClass -> "form-control form-control--block")
+            @input(form("firstName"),
+            '_label -> Messages("yourdetails.firstname"),
+            '_inputClass -> "form-control form-control--block",
+            '_autoComplete -> "name")
         </div>
         <div class="form-group">
-            @input(form("lastName"), '_label -> Messages("yourdetails.lastname"), '_inputClass -> "form-control form-control--block")
+            @input(form("lastName"),
+            '_label -> Messages("yourdetails.lastname"),
+            '_inputClass -> "form-control form-control--block",
+            '_type -> "text",
+            '_autoComplete -> "name")
         </div>
         <div class="form-group">
-            @input(form("role"), '_label -> Messages("yourdetails.role"), '_inputClass -> "form-control form-control--block")
+            @input(form("role"),
+            '_label -> Messages("yourdetails.role"),
+            '_inputClass -> "form-control form-control--block")
         </div>
         <div class="form-group">
-            @input(form("phone"), '_label -> Messages("yourdetails.phone"), '_inputClass -> "form-control form-control--block")
+            @input(form("phone"),
+            '_label -> Messages("yourdetails.phone"),
+            '_inputClass -> "form-control form-control--block",
+            '_type -> "tel",
+            '_autoComplete -> "tel")
         </div>
         <div class="form-group">
-            @input(form("email"), '_label -> Messages("yourdetails.email"), '_inputClass -> "form-control form-control--block")
+            @input( form("email"),
+            '_label -> Messages("yourdetails.email"),
+            '_inputClass -> "form-control form-control--block",
+            '_type -> "email",
+            '_autoComplete -> "email")
+
         </div>
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your name and contact details:Continue">
@@ -56,4 +74,3 @@
     </form>
 
 }
-
