@@ -29,23 +29,53 @@
 
     <form novalidate="true" method="post">
         @CSRF.formField
-        <div class="form-group">
-            @input(form("fsrRefNumber"),
-            '_label -> Messages("tradingdetails.fsrref.label"),
-            '_inputHint -> Messages("tradingdetails.fsrref.hint"),
-            '_inputClass -> "form-control form-control--block",
-            '_type -> "text",
-            '_inputmode -> "numeric",
-            '_pattern -> "[0-9]*"
-            )
+        <div id="fsrRefNumber-form" class='form-group @if(form("fsrRefNumber").hasErrors) {form-field--error}'>
+            <label for="fsrRefNumber">
+                <span>
+                    @Messages("tradingdetails.fsrref.label")
+                </span>
+            </label>
+            <span class="form-hint">
+                @Messages("tradingdetails.fsrref.hint")
+            </span>
+            @form("fsrRefNumber").errors.map { error =>
+                <span class="error-message"
+                    data-journey="search-page:error:fsrRefNumber">
+                    @Messages(error.messages.head)
+                </span>
+            }
+            <input class="form-control form-control--block"
+                   name="fsrRefNumber"
+                   id="fsrRefNumber"
+                   value='@form("fsrRefNumber").value'
+                   type="text"
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+            />
         </div>
-        <div class="form-group">
-            @input(form("isaProviderRefNumber"),
-            '_label -> Messages("tradingdetails.isaref.label"),
-            '_inputHint -> Messages("tradingdetails.isaref.hint"),
-            '_inputClass -> "form-control form-control--block"
-            )
+
+        <div id="isaProviderRefNumber-form" class='form-group @if(form("isaProviderRefNumber").hasErrors) {form-field--error}'>
+            <label for="isaProviderRefNumber">
+                    <span>
+                        @Messages("tradingdetails.isaref.label")
+                    </span>
+            </label>
+            <span class="form-hint">
+                        @Messages("tradingdetails.isaref.hint")
+                </span>
+            @form("isaProviderRefNumber").errors.map { error =>
+            <span class="error-message"
+                  data-journey="search-page:error:isaProviderRefNumber">
+                    @Messages(error.messages.head)
+                    </span>
+            }
+            <input class="form-control form-control--block"
+                   name="isaProviderRefNumber"
+                   id="isaProviderRefNumber"
+                   value='@form("isaProviderRefNumber").value'
+            />
         </div>
+
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your company’s reference numbers:Continue">
         </div>

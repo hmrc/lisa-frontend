@@ -92,7 +92,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include ("<h1>Your name and contact details</h1>")
-        content must include ("value=\"\"")
+        content must include ("value=\'\'")
       }
 
     }

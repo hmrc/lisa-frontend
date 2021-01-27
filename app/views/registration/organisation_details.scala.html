@@ -55,21 +55,51 @@
     <form method="post">
         @CSRF.formField
 
-            <div class="form-group">
-                @input(form("companyName"),
-                '_label -> Messages("org.details.companyname.label"),
-                '_inputHint -> Messages("org.details.companyname.hint"),
-                '_inputClass -> "form-control form-control--block"
-                )
+            <div id="companyName-form" class='form-group @if(form("companyName").hasErrors) {form-field--error}'>
+                <label for="companyName">
+                    <span>
+                        @Messages("org.details.companyname.label")
+                    </span>
+                </label>
+                <span class="form-hint">
+                        @Messages("org.details.companyname.hint")
+                </span>
+                @form("companyName").errors.map { error =>
+                    <span class="error-message"
+                      data-journey="search-page:error:companyName">
+                    @Messages(error.messages.head)
+                    </span>
+                }
+                <input class="form-control form-control--block"
+                       name="companyName"
+                       id="companyName"
+                       value='@form("companyName").value'
+                />
             </div>
-            <div class="form-group">
-                @input(form(s"${utrName}Number"),
-                '_label -> label,
-                '_inputHint -> hint,
-                '_inputClass -> "form-control form-control--block",
-                '_type -> "tel"
-                )
+
+            <div id="sautr-form" class='form-group @if(form(s"${utrName}Number").hasErrors) {form-field--error}'>
+                <label for='@{s"${utrName}Number"}'>
+                    <span>
+                        @label
+                    </span>
+                </label>
+                <span class="form-hint">
+                        @hint
+                </span>
+                @form(s"${utrName}Number").errors.map { error =>
+                <span class="error-message"
+                      data-journey='search-page:error:@{s"${utrName}Number"}'>
+                    @Messages(error.messages.head)
+                    </span>
+                }
+                <input class="form-control form-control--block"
+                       name='@{s"${utrName}Number"}'
+                       id='@{s"${utrName}Number"}'
+                       value='@{form(s"${utrName}Number").value}'
+                       type="tel"
+                />
             </div>
+
             <div class="form-field form-field--submit">
                 <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your company’s details:Continue">
             </div>
