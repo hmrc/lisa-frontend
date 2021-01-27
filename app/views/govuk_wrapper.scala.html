@@ -103,14 +103,23 @@
 @getHelpForm = @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 
 @content = {
-    @uiLayouts.main_content(
-      article = mainContent,
-      mainClass = mainClass,
-      mainDataAttributes = mainDataAttributes,
-      mainContentHeader = mainContentHeader,
-      serviceInfo = serviceInfo,
-      getHelpForm = getHelpForm,
-      sidebar = sidebar)
+    <main id="wrapper" role="main" @mainDataAttributes>
+        <div class="centered-content">
+            @serviceInfo
+        </div>
+        <div id="content">
+            <div class="content__body">
+                @mainContentHeader
+
+                @mainContent
+
+                @sidebar
+            </div>
+
+            @getHelpForm
+
+        </div>
+    </main>
 }
 
 @hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader.getOrElse(HtmlFormat.empty), footerTop, Some(uiLayouts.footer_links()), true)(content)

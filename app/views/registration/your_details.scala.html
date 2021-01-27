@@ -35,39 +35,104 @@
 
     <form novalidate="true" method="post">
         @CSRF.formField
-        <div class="form-group">
-            @input(form("firstName"),
-            '_label -> Messages("yourdetails.firstname"),
-            '_inputClass -> "form-control form-control--block",
-            '_autoComplete -> "name")
+        <div id="firstName-form" class='form-group @if(form("firstName").hasErrors) {form-field--error}'>
+            <label for="firstName">
+                <span>
+                    @Messages("yourdetails.firstname")
+                </span>
+            </label>
+            @form("firstName").errors.map { error =>
+                <span class="error-message" data-journey="search-page:error:firstName">
+                    @Messages(error.messages.head)
+                </span>
+            }
+            <input class="form-control form-control--block"
+                   name="firstName"
+                   id="firstName"
+                   value='@form("firstName").value'
+                   autocomplete="name"
+                   type="text"
+            />
         </div>
-        <div class="form-group">
-            @input(form("lastName"),
-            '_label -> Messages("yourdetails.lastname"),
-            '_inputClass -> "form-control form-control--block",
-            '_type -> "text",
-            '_autoComplete -> "name")
-        </div>
-        <div class="form-group">
-            @input(form("role"),
-            '_label -> Messages("yourdetails.role"),
-            '_inputClass -> "form-control form-control--block")
-        </div>
-        <div class="form-group">
-            @input(form("phone"),
-            '_label -> Messages("yourdetails.phone"),
-            '_inputClass -> "form-control form-control--block",
-            '_type -> "tel",
-            '_autoComplete -> "tel")
-        </div>
-        <div class="form-group">
-            @input( form("email"),
-            '_label -> Messages("yourdetails.email"),
-            '_inputClass -> "form-control form-control--block",
-            '_type -> "email",
-            '_autoComplete -> "email")
 
+        <div id="lastName-form" class='form-group @if(form("lastName").hasErrors) {form-field--error}'>
+            <label for="lastName">
+                <span>
+                    @Messages("yourdetails.lastname")
+                </span>
+            </label>
+            @form("lastName").errors.map { error =>
+                <span class="error-message" data-journey="search-page:error:lastName">
+                    @Messages(error.messages.head)
+                </span>
+            }
+            <input class="form-control form-control--block"
+                   name="lastName"
+                   id="lastName"
+                   value='@form("lastName").value'
+                   autocomplete="name"
+                   type="text"
+            />
         </div>
+
+        <div id="role-form" class='form-group @if(form("role").hasErrors) {form-field--error}'>
+            <label for="role">
+                <span>
+                    @Messages("yourdetails.role")
+                </span>
+            </label>
+            @form("role").errors.map { error =>
+                <span class="error-message" data-journey="search-page:error:role">
+                    @Messages(error.messages.head)
+                </span>
+            }
+            <input class="form-control form-control--block"
+                   name="role"
+                   id="role"
+                   value='@form("role").value'
+            />
+        </div>
+
+        <div id="phone-form" class='form-group @if(form("phone").hasErrors) {form-field--error}'>
+            <label for="phone">
+                <span>
+                    @Messages("yourdetails.phone")
+                </span>
+            </label>
+            @form("phone").errors.map { error =>
+                <span class="error-message" data-journey="search-page:error:phone">
+                    @Messages(error.messages.head)
+                </span>
+            }
+            <input class="form-control form-control--block"
+                   name="phone"
+                   id="phone"
+                   value='@form("phone").value'
+                   type="tel"
+                   autocomplete="tel"
+            />
+        </div>
+
+        <div id="email-form" class='form-group @if(form("email").hasErrors) {form-field--error}'>
+            <label for="email">
+                <span>
+                    @Messages("yourdetails.email")
+                </span>
+            </label>
+            @form("email").errors.map { error =>
+                <span class="error-message" data-journey="search-page:error:email">
+                    @Messages(error.messages.head)
+                </span>
+            }
+            <input class="form-control form-control--block"
+                   name="email"
+                   id="email"
+                   value='@form("email").value'
+                   type="email"
+                   autocomplete="email"
+            />
+        </div>
+
         <div class="form-field form-field--submit">
             <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your name and contact details:Continue">
         </div>

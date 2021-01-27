@@ -91,7 +91,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("value=\"\"")
+        content must include ("value=\'\'")
       }
 
     }
