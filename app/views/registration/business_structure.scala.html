@@ -27,13 +27,47 @@
     }
     <form method="post">
         @CSRF.formField
+        <div class='form-group @if(form("companyStructure").hasErrors) {form-field--error}'>
+            <fieldset>
+            <legend>
+                <h1 class="heading-xlarge">What is your company structure?</h1>
+            </legend>
 
-        <div class="form-field form-field--submit" id="companyStructure">
-            @input_radio_group(form("companyStructure"), Seq(
-                (Messages("org.details.llp"), Messages("org.details.llp.view")),
-                (Messages("org.details.corpbody"), Messages("org.details.corpbody.view")),
-                (Messages("org.details.friendlysoc"), Messages("org.details.friendlysoc.view"))
-            ), '_labelClass -> "block-label", '_legend -> <h1 class="heading-xlarge">What is your company structure?</h1>)
+            @form("companyStructure").errors.map{error => <span class="error-message">@Messages(error.messages.head)</span>}
+            <div class="multiple-choice">
+                <input
+                        type="radio"
+                        id="companyStructure-llp"
+                        name="companyStructure"
+                        value='@Messages("org.details.llp")'
+                        @form("companyStructure").value.filter( _ == Messages("org.details.llp")).map{_ => checked="checked"}>
+                <label for="companyStructure-llp" class="block-label">
+                    @Messages("org.details.llp.view")
+                </label>
+            </div>
+            <div class="multiple-choice">
+                <input
+                        type="radio"
+                        id="companyStructure-corporate_body"
+                        name="companyStructure"
+                        value='@Messages("org.details.corpbody")'
+                        @form("companyStructure").value.filter( _ == Messages("org.details.corpbody")).map{_ => checked="checked"}>
+                <label for="companyStructure-corporate_body" class="block-label">
+                    @Messages("org.details.corpbody.view")
+                </label>
+            </div>
+            <div class="multiple-choice">
+                <input
+                        type="radio"
+                        id="companyStructure-friendly_society"
+                        name="companyStructure"
+                        value='@Messages("org.details.friendlysoc")'
+                        @form("companyStructure").value.filter( _ == Messages("org.details.friendlysoc")).map{_ => checked="checked"}>
+                <label for="companyStructure-friendly_society" class="block-label">
+                    @Messages("org.details.friendlysoc.view")
+                </label>
+            </div>
+            </fieldset>
         </div>
 
         <div class="form-field form-field--submit">
