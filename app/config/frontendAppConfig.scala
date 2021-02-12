@@ -38,10 +38,6 @@ class AppConfig @Inject()(runModeConfiguration: Configuration, runMode: RunMode)
   lazy val feedbackRedirectUrl: String = loadConfig("external-urls.feedback-frontend.url")
   lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 
-  lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
-  lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
-  lazy val gtmEnabled: Boolean = getBoolean(s"google-tag-manager.enabled")
-  lazy val gtmAppId: String = loadConfig(s"google-tag-manager.id")
   lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
   lazy val signOutUrl: String = getSignOutUrl(logoutCallback)
