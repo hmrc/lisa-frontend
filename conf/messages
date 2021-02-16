@@ -164,7 +164,7 @@ error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
 error.fsrRefNumberPattern=Your company’s Financial Conduct Authority reference must only include numbers 0-9
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
-error.isaProviderRefNumberPattern= Your company’s ISA manager reference must only include the letter z and numbers 0-9
+error.isaProviderRefNumberPattern= ISA manager reference must only include the letter Z and numbers 0 to 9
 
 error.firstNameRequired=Enter your first name
 error.firstNameLength=First name must be 35 characters or less
