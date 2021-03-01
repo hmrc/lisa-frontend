@@ -38,14 +38,15 @@ class OrganisationDetailsController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  organisationDetailsView: views.html.registration.organisation_details
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-        case Some(businessStructure) => {
+        case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
           val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership) {
             OrganisationDetails.partnershipForm
@@ -54,17 +55,16 @@ class OrganisationDetailsController @Inject()(
           }
           shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
             case Some(data) =>
-              Ok(views.html.registration.organisation_details(
+              Ok(organisationDetailsView(
                 orgDetailsForm.fill(data),
                 isPartnership
               ))
             case None =>
-              Ok(views.html.registration.organisation_details(
+              Ok(organisationDetailsView(
                 orgDetailsForm,
                 isPartnership
               ))
           }
-        }
       }
     }
   }
@@ -74,35 +74,32 @@ class OrganisationDetailsController @Inject()(
 
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-        case Some(businessStructure) => {
+        case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
           val form = if (isPartnership) OrganisationDetails.partnershipForm else OrganisationDetails.form
 
           form.bindFromRequest.fold(
             formWithErrors => {
               Future.successful(
-                BadRequest(views.html.registration.organisation_details(formWithErrors, isPartnership))
+                BadRequest(organisationDetailsView(formWithErrors, isPartnership))
               )
             },
             data => {
               shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
                 Logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
-                  case Right(safeId) => {
+                  case Right(safeId) =>
                     Logger.debug("rosmRegister Successful")
                     shortLivedCache.cache[String](cacheId, "safeId", safeId).flatMap { _ =>
                       handleRedirect(routes.TradingDetailsController.get().url)
                     }
-                  }
-                  case Left(error) => {
+                  case Left(error) =>
                     Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
                     handleRedirect(routes.MatchingFailedController.get().url)
-                  }
                 }
               }
             }
           )
-        }
       }
     }
   }

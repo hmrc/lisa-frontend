@@ -15,63 +15,80 @@
  *@
 
 @import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukErrorSummary : GovukErrorSummary,
+        govukButton : GovukButton,
+        govukRadios : GovukRadios,
+        govukBackLink : GovukBackLink
+     )
 
 @(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.business-structure")) else Messages("title.business-structure"), bodyClasses = None) {
+@govukWrapper(title = if(form.hasErrors) messages("error.title", messages("title.business-structure")) else messages("title.business-structure")) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Select your company structure:Back">Back</a></p>
+    @govukBackLink(BackLink(
+        href = "javascript:history.go(-1)",
+        content = Text("Back"),
+        classes = "js-visible",
+        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Select your company structure:Back")
+    ))
+
     @if(form.hasErrors) {
-        @errorSummary(messages("validation.summary.heading"), form)
+        @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
     <form method="post">
         @CSRF.formField
         <div class='form-group @if(form("companyStructure").hasErrors) {form-field--error}'>
-            <fieldset>
-            <legend>
-                <h1 class="heading-xlarge">What is your company structure?</h1>
-            </legend>
-
-            @form("companyStructure").errors.map{error => <span class="error-message">@Messages(error.messages.head)</span>}
-            <div class="multiple-choice">
-                <input
-                        type="radio"
-                        id="companyStructure-llp"
-                        name="companyStructure"
-                        value='@Messages("org.details.llp")'
-                        @form("companyStructure").value.filter( _ == Messages("org.details.llp")).map{_ => checked="checked"}>
-                <label for="companyStructure-llp" class="block-label">
-                    @Messages("org.details.llp.view")
-                </label>
-            </div>
-            <div class="multiple-choice">
-                <input
-                        type="radio"
-                        id="companyStructure-corporate_body"
-                        name="companyStructure"
-                        value='@Messages("org.details.corpbody")'
-                        @form("companyStructure").value.filter( _ == Messages("org.details.corpbody")).map{_ => checked="checked"}>
-                <label for="companyStructure-corporate_body" class="block-label">
-                    @Messages("org.details.corpbody.view")
-                </label>
-            </div>
-            <div class="multiple-choice">
-                <input
-                        type="radio"
-                        id="companyStructure-friendly_society"
-                        name="companyStructure"
-                        value='@Messages("org.details.friendlysoc")'
-                        @form("companyStructure").value.filter( _ == Messages("org.details.friendlysoc")).map{_ => checked="checked"}>
-                <label for="companyStructure-friendly_society" class="block-label">
-                    @Messages("org.details.friendlysoc.view")
-                </label>
-            </div>
-            </fieldset>
+                @govukRadios(Radios(
+                    fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                            content = Text("What is your company structure?"),
+                            classes = "govuk-fieldset__legend--l heading-xlarge",
+                            isPageHeading = true
+                        ))
+                    )),
+                    hint = None,
+                    name = "companyStructure",
+                    errorMessage = if(form("companyStructure").hasErrors){
+                        Some(ErrorMessage(
+                            content = Text(messages(form("companyStructure").errors.head.message))
+                        ))
+                    } else { None },
+                    items = Seq(
+                        RadioItem(
+                            id = Some("companyStructure-llp"),
+                            content = Text(messages("org.details.llp.view")),
+                            value = Some(messages("org.details.llp")),
+                            checked = form("companyStructure").value.contains(messages("org.details.llp"))
+                        ),
+                        RadioItem(
+                            id = Some("companyStructure-corporate_body"),
+                            content = Text(messages("org.details.corpbody.view")),
+                            value = Some(messages("org.details.corpbody")),
+                            checked = form("companyStructure").value.contains(messages("org.details.corpbody"))
+                        ),
+                        RadioItem(
+                            id = Some("companyStructure-friendly_society"),
+                            content = Text(messages("org.details.friendlysoc.view")),
+                            value = Some(messages("org.details.friendlysoc")),
+                            checked = form("companyStructure").value.contains(messages("org.details.friendlysoc"))
+                        )
+                    )
+                ))
         </div>
 
         <div class="form-field form-field--submit">
-            <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Select your company structure:Continue">
+            @govukButton(Button(
+                inputType = Some("submit"),
+                value = Some("Continue"),
+                classes = "button",
+                content = Text("Continue"),
+                attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Select your company structure:Continue")
+            ))
         </div>
     </form>
 

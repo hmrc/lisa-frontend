@@ -14,60 +14,73 @@
  * limitations under the License.
  *@
 
-@import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
-@import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukBackLink : GovukBackLink,
+        govukButton : GovukButton)
 
 @(isPartnership: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = Messages("title.matching-failed"), bodyClasses = None) {
+@govukWrapper(title = messages("title.matching-failed")) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Your company’s details could not be found:Back">Back</a></p>
+    @govukBackLink(BackLink(
+        href = "javascript:history.go(-1)",
+        content = Text("Back"),
+        classes = "js-visible",
+        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Your company’s details could not be found:Back")
+    ))
 
-    <h1>@Messages("matchingfailed.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("matchingfailed.heading")</h1>
 
-    <p>@Messages("matchingfailed.text")</p>
+    <p class="govuk-body">@messages("matchingfailed.text")</p>
 
     <div class="subsection">
-        <h2>@Messages("matchingfailed.subsection1.heading")</h2>
+        <h2 class="govuk-heading-m">@messages("matchingfailed.subsection1.heading")</h2>
 
-        <p>@Messages("matchingfailed.subsection1.text.line1")</p>
+        <p class="govuk-body">@messages("matchingfailed.subsection1.text.line1")</p>
 
-        <p>@Messages("matchingfailed.subsection1.text.line2")</p>
+        <p class="govuk-body">@messages("matchingfailed.subsection1.text.line2")</p>
 
         <div class="gutter-left">
-            <ul class="list list-bullet">
-                <li>@Messages("matchingfailed.subsection1.text.line2.list1")</li>
-                <li>@Messages("matchingfailed.subsection1.text.line2.list2")</li>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("matchingfailed.subsection1.text.line2.list1")</li>
+                <li>@messages("matchingfailed.subsection1.text.line2.list2")</li>
                 @if(isPartnership) {
-                    <li>@Messages("matchingfailed.subsection1.text.line2.list3.llp")</li>
+                    <li>@messages("matchingfailed.subsection1.text.line2.list3.llp")</li>
                 } else {
-                    <li>@Messages("matchingfailed.subsection1.text.line2.list3.notllp")</li>
+                    <li>@messages("matchingfailed.subsection1.text.line2.list3.notllp")</li>
                 }
             </ul>
         </div>
 
-        <p>
-            @Messages("matchingfailed.subsection1.text.line3.pre")
+        <p class="govuk-body">
+            @messages("matchingfailed.subsection1.text.line3.pre")
             @if(isPartnership) {
-            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment" target="_blank" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - self assessment">@Messages("matchingfailed.subsection1.text.line3.link")</a>.
+            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment" target="_blank" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - self assessment">@messages("matchingfailed.subsection1.text.line3.link")</a>.
             } else {
-            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries" target="_blank" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - corporation tax">@Messages("matchingfailed.subsection1.text.line3.link")</a>.
+            <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries" target="_blank" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out the company name - corporation tax">@messages("matchingfailed.subsection1.text.line3.link")</a>.
             }
         </p>
     </div>
 
     <div class="subsection">
-        <h2>@Messages("matchingfailed.subsection2.heading")</h2>
+        <h2 class="govuk-heading-m">@messages("matchingfailed.subsection2.heading")</h2>
 
-        <p>@Messages("matchingfailed.subsection2.text.line1")@if(!isPartnership) { @Messages("matchingfailed.subsection2.text.line1.post.notllp") }</p>
+        <p class="govuk-body">@messages("matchingfailed.subsection2.text.line1")@if(!isPartnership) { @messages("matchingfailed.subsection2.text.line1.post.notllp") }</p>
 
-        <p>@Messages("matchingfailed.subsection2.text.line2")</p>
+        <p class="govuk-body">@messages("matchingfailed.subsection2.text.line2")</p>
 
-        <p>@Messages("matchingfailed.subsection2.text.line3.pre") <a href="https://www.gov.uk/find-lost-utr-number" target="_blank" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out a lost UTR">@Messages("matchingfailed.subsection2.text.line3.link")</a>.</p>
+        <p class="govuk-body">@messages("matchingfailed.subsection2.text.line3.pre") <a href="https://www.gov.uk/find-lost-utr-number" target="_blank" data-journey-click="link - click:Your company’s details could not be found:Contact HMRC to find out a lost UTR">@messages("matchingfailed.subsection2.text.line3.link")</a>.</p>
     </div>
 
     <div class="form-field form-field--submit">
-        <p><a href="@routes.OrganisationDetailsController.get()" class="button" id="continue" data-journey-click="button - click:Your company’s details could not be found:Try again">@Messages("matchingfailed.tryagain")</a></p>
+    @govukButton(Button(
+        value = Some(messages("matchingfailed.tryagain")),
+        href = Some(routes.OrganisationDetailsController.get().url),
+        content = Text(messages("matchingfailed.tryagain")),
+        attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your company’s details could not be found:Try again")
+    ))
     </div>
 }

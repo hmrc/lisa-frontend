@@ -27,6 +27,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class HomePageControllerSpec extends SpecBase with Injecting {
 
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  val SUT = new HomePageController()
+
   "GET /" should {
     "301 redirect the user to the company structure page" in {
       val result = SUT.home(fakeRequest.withCSRFToken)
@@ -34,7 +37,4 @@ class HomePageControllerSpec extends SpecBase with Injecting {
       redirectLocation(result).getOrElse("") mustBe "/lifetime-isa/company-structure"
     }
   }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new HomePageController()
-
 }

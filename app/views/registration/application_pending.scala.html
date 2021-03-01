@@ -14,17 +14,17 @@
  * limitations under the License.
  *@
 
-@import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
 @import config.AppConfig
 
-@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@this(govukWrapper: views.html.govuk_wrapper)
 
-@views.html.main_template(title = Messages("title.application-pending"), bodyClasses = None) {
+@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-    <h1>@Messages("applicationpending.heading")</h1>
+@govukWrapper(title = messages("title.application-pending")) {
 
-    <p>@Messages("applicationpending.text.line1")</p>
+    <h1 class="govuk-heading-l">@messages("applicationpending.heading")</h1>
 
-    <p>@Messages("applicationpending.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application pending:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk</a></p>
+    <p class="govuk-body">@messages("applicationpending.text.line1")</p>
+
+    <p class="govuk-body">@messages("applicationpending.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application pending:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk</a></p>
 }

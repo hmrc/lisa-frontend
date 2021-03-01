@@ -36,14 +36,15 @@ class BusinessStructureController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  businessStructureView: views.html.registration.business_structure
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).map {
-        case Some(data) => Ok(views.html.registration.business_structure(BusinessStructure.form.fill(data)))
-        case None => Ok(views.html.registration.business_structure(BusinessStructure.form))
+        case Some(data) => Ok(businessStructureView(BusinessStructure.form.fill(data)))
+        case None => Ok(businessStructureView(BusinessStructure.form))
       }
     }
   }
@@ -52,7 +53,7 @@ class BusinessStructureController @Inject()(
     authorisedForLisa { cacheId =>
       BusinessStructure.form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.business_structure(formWithErrors)))
+          Future.successful(BadRequest(businessStructureView(formWithErrors)))
         },
         data => {
           shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data).flatMap { _ =>

@@ -24,11 +24,17 @@ import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.test.Injecting
+import views.html.registration.matching_failed
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MatchingFailedControllerSpec extends SpecBase with Injecting {
+
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val matchingFailedView: matching_failed = inject[matching_failed]
+
+  val SUT = new MatchingFailedController()
 
   "GET Matching Failed" must {
 
@@ -47,7 +53,4 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
     }
 
   }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new MatchingFailedController()
-
 }

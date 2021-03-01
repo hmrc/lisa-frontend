@@ -16,14 +16,14 @@
 
 @import play.api.i18n.Messages.Implicits._
 
+@this(govukWrapper: views.html.govuk_wrapper)
+
 @()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @contentHeader = {
-  <h1>@Messages("global.error.InternalServerError500.heading")</h1>
+  <h1 class="govuk-label--l">@messages("global.error.InternalServerError500.heading")</h1>
 }
 
-@mainContent = {
-  <p>@Html(Messages("global.error.InternalServerError500.message"))</p>
+@govukWrapper(title = messages("global.error.InternalServerError500.title"), beforeContentHtml = Some(contentHeader)){
+ <p class="govuk-body">@Html(messages("global.error.InternalServerError500.message"))</p>
 }
-
-@govuk_wrapper(appConfig = appConfig, title = Messages("global.error.InternalServerError500.title"), contentHeader = Some(contentHeader), mainContent = mainContent, showSignOutLink = true)

@@ -35,13 +35,14 @@ class SummaryController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  summaryView: views.html.registration.summary
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
-      hasAllSubmissionData(cacheId) { (data) =>
-        Future.successful(Ok(views.html.registration.summary(data)))
+    authorisedForLisa { cacheId =>
+      hasAllSubmissionData(cacheId) { data =>
+        Future.successful(Ok(summaryView(data)))
       }
     }
   }

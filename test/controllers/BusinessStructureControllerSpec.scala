@@ -23,15 +23,28 @@ import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
-import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import play.api.test.Helpers._
+import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import views.html.registration.business_structure
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BusinessStructureControllerSpec extends SpecBase with Injecting {
+
+  lazy val pageTitle = "What is your company structure?"
+
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+    CSRFTokenHelper.addCSRFToken(request)
+  }
+
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val businessStructureView: business_structure = inject[business_structure]
+  lazy val SUT = new BusinessStructureController()
+
 
   "GET Business Structure" must {
 
@@ -55,7 +68,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("checked=\"checked\"")
+        content must include ("checked")
       }
 
     }
@@ -130,13 +143,4 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     }
 
   }
-
-  lazy val pageTitle = ">What is your company structure?</h1>"
-
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
-  }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  lazy val SUT = new BusinessStructureController()
-
 }

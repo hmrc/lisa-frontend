@@ -14,28 +14,29 @@
  * limitations under the License.
  *@
 
-@import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
 @import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
-@(zref: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukPanel : GovukPanel)
 
-@views.html.main_template(title = Messages("title.application-successful"), bodyClasses = None) {
-    <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">@Messages("applicationsuccessful.banner.heading")</h1>
-        <p class="transaction-banner__subheading">@Messages("applicationsuccessful.banner.subheading")</p>
-        <p>@zref</p>
-    </div>
+@(zref: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-    <h2>@Messages("applicationsuccessful.heading")</h2>
+@govukWrapper(title = messages("title.application-successful")) {
+    @govukPanel(Panel(
+        title = Text(messages("applicationsuccessful.banner.heading")),
+        content = HtmlContent(s"""${messages("applicationsuccessful.banner.subheading")}<br>$zref""")
+    ))
 
-    <p>
-        @Messages("applicationsuccessful.text.line1.pre")
-        <a href="@appConfig.apiUrl" target="_blank" data-journey-click="link - click:Application successful:Link to LISA's section on HMRC's Developer Hub">@Messages("applicationsuccessful.text.line1.link")</a>.
+    <h2 class="govuk-heading-m">@messages("applicationsuccessful.heading")</h2>
+
+    <p class="govuk-body">
+        @messages("applicationsuccessful.text.line1.pre")
+        <a href="@appConfig.apiUrl" target="_blank" data-journey-click="link - click:Application successful:Link to LISA's section on HMRC's Developer Hub">@messages("applicationsuccessful.text.line1.link")</a>.
     </p>
 
-    <p>@Messages("applicationsuccessful.text.line2")</p>
+    <p class="govuk-body">@messages("applicationsuccessful.text.line2")</p>
 
-    <p>@Messages("applicationsuccessful.text.line3")</p>
+    <p class="govuk-body">@messages("applicationsuccessful.text.line3")</p>
 }
 

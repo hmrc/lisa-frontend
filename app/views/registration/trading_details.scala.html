@@ -15,69 +15,86 @@
  *@
 
 @import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukBackLink : GovukBackLink,
+        govukErrorSummary : GovukErrorSummary,
+        govukButton : GovukButton,
+        govukInput : GovukInput)
 
 @(form: Form[TradingDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.trading-details")) else Messages("title.trading-details"), bodyClasses = None) {
+@govukWrapper(title = if(form.hasErrors) messages("error.title", messages("title.trading-details")) else messages("title.trading-details")) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Your company’s reference numbers:Back">Back</a></p>
+    @govukBackLink(BackLink(
+        href = "javascript:history.go(-1)",
+        content = Text("Back"),
+        classes = "js-visible",
+        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Your company’s reference numbers:Back")
+    ))
+
     @if(form.hasErrors) {
-        @errorSummary(messages("validation.summary.heading"), form)
+        @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
-    <h1>Your company’s reference numbers</h1>
+
+    <h1 class="govuk-label--l">Your company’s reference numbers</h1>
 
     <form novalidate="true" method="post">
         @CSRF.formField
-        <div id="fsrRefNumber-form" class='form-group @if(form("fsrRefNumber").hasErrors) {form-field--error}'>
-            <label for="fsrRefNumber">
-                <span>
-                    @Messages("tradingdetails.fsrref.label")
-                </span>
-            </label>
-            <span class="form-hint">
-                @Messages("tradingdetails.fsrref.hint")
-            </span>
-            @form("fsrRefNumber").errors.map { error =>
-                <span class="error-message"
-                    data-journey="search-page:error:fsrRefNumber">
-                    @Messages(error.messages.head)
-                </span>
-            }
-            <input class="form-control form-control--block"
-                   name="fsrRefNumber"
-                   id="fsrRefNumber"
-                   value='@form("fsrRefNumber").value'
-                   type="text"
-                   inputmode="numeric"
-                   pattern="[0-9]*"
-            />
-        </div>
 
-        <div id="isaProviderRefNumber-form" class='form-group @if(form("isaProviderRefNumber").hasErrors) {form-field--error}'>
-            <label for="isaProviderRefNumber">
-                    <span>
-                        @Messages("tradingdetails.isaref.label")
-                    </span>
-            </label>
-            <span class="form-hint">
-                        @Messages("tradingdetails.isaref.hint")
-                </span>
-            @form("isaProviderRefNumber").errors.map { error =>
-            <span class="error-message"
-                  data-journey="search-page:error:isaProviderRefNumber">
-                    @Messages(error.messages.head)
-                    </span>
-            }
-            <input class="form-control form-control--block"
-                   name="isaProviderRefNumber"
-                   id="isaProviderRefNumber"
-                   value='@form("isaProviderRefNumber").value'
-            />
-        </div>
+        @govukInput(Input(
+            id = "fsrRefNumber-form",
+            name = "fsrRefNumber",
+            classes = "govuk-input--width-20",
+            value = form("fsrRefNumber").value,
+            inputmode = Some("numeric"),
+            pattern = Some("[0-9]*"),
+            errorMessage = if(form("fsrRefNumber").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:fsrRefNumber"),
+                    content = Text(messages(form("fsrRefNumber").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("tradingdetails.fsrref.label"))
+            ),
+            hint = Some(Hint(
+                content = Text(messages("tradingdetails.fsrref.hint"))
+            ))
+        ))
+
+        @govukInput(Input(
+            id = "isaProviderRefNumber-form",
+            name = "isaProviderRefNumber",
+            classes = "govuk-input--width-20",
+            value = form("isaProviderRefNumber").value,
+            errorMessage = if(form("isaProviderRefNumber").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:isaProviderRefNumber"),
+                    content = Text(messages(form("isaProviderRefNumber").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("tradingdetails.isaref.label"))
+            ),
+            hint = Some(Hint(
+                content = Text(messages("tradingdetails.isaref.hint"))
+            ))
+        ))
 
         <div class="form-field form-field--submit">
-            <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your company’s reference numbers:Continue">
+        @govukButton(Button(
+            inputType = Some("submit"),
+            value = Some("Continue"),
+            content = Text("Continue"),
+            attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your company’s reference numbers:Continue")
+        ))
         </div>
     </form>
 

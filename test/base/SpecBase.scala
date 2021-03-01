@@ -16,6 +16,8 @@
 
 package base
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import config.AppConfig
 import connectors.EmailConnector
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
@@ -39,6 +41,22 @@ import scala.concurrent.Future
 
 trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter {
 
+  val injector: Injector = app.injector
+  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
+  implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
+  implicit val env: Environment = injector.instanceOf[Environment]
+  implicit val configuration: Configuration = injector.instanceOf[Configuration]
+  implicit val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
+  implicit val sessionCache: SessionCache = mock[SessionCache]
+  implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
+  implicit val rosmService: RosmService = mock[RosmService]
+  implicit val auditService: AuditService = mock[AuditService]
+  implicit val emailConnector: EmailConnector = mock[EmailConnector]
+
   before {
     reset(shortLivedCache)
     reset(sessionCache)
@@ -61,31 +79,4 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
     when(authorisationService.userStatus(ArgumentMatchers.any()))
       .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
-
-  val injector: Injector = app.injector
-
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-
-  implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-
-  implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
-
-  implicit val env: Environment = injector.instanceOf[Environment]
-
-  implicit val configuration: Configuration = injector.instanceOf[Configuration]
-
-  implicit val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
-
-  implicit val sessionCache: SessionCache = mock[SessionCache]
-
-  implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
-
-  implicit val rosmService: RosmService = mock[RosmService]
-
-  implicit val auditService: AuditService = mock[AuditService]
-
-  implicit val emailConnector: EmailConnector = mock[EmailConnector]
-
 }

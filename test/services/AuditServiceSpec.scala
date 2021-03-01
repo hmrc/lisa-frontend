@@ -33,6 +33,12 @@ class AuditServiceSpec extends PlaySpec
   with GuiceOneAppPerSuite
   with BeforeAndAfter {
 
+  implicit val hc:HeaderCarrier = HeaderCarrier()
+  val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  val mockAppConfig: AppConfig = mock[AppConfig]
+
+  object SUT extends AuditService(mockAuditConnector, mockAppConfig)
+
   "AuditService" must {
 
     before {
@@ -62,10 +68,6 @@ class AuditServiceSpec extends PlaySpec
 
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
-  val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  val mockAppConfig: AppConfig = mock[AppConfig]
 
-  object SUT extends AuditService(mockAuditConnector, mockAppConfig)
 
 }

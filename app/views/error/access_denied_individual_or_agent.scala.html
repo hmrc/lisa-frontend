@@ -14,19 +14,21 @@
  * limitations under the License.
  *@
 
+@this(govukWrapper: views.html.govuk_wrapper)
+
 @(ggLoginUrl: String, registerOrgUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = Messages("title.access-denied-individual-or-agent"), bodyClasses = None) {
-    <h1>@Messages("accessdenied.individualoragent.heading")</h1>
+@govukWrapper(title = messages("title.access-denied-individual-or-agent")) {
+    <h1 class="govuk-label--l">@messages("accessdenied.individualoragent.heading")</h1>
 
-    <p id="error-message">@Messages("accessdenied.individualoragent.text.line1")</p>
+    <p class="govuk-body" id="error-message" >@messages("accessdenied.individualoragent.text.line1")</p>
 
-    <p>@Messages("accessdenied.individualoragent.text.line2")</p>
+    <p class="govuk-body">@messages("accessdenied.individualoragent.text.line2")</p>
 
     <div class="gutter-left">
-        <ul class="list list-bullet">
-            <li><a href="@ggLoginUrl" id="sign-in" data-journey-click="link - click:There is a problem:Sign in">@Messages("accessdenied.individualoragent.text.signin")</a></li>
-            <li><a href="@registerOrgUrl" id="register" data-journey-click="link - click:There is a problem:Register">@Messages("accessdenied.individualoragent.text.register")</a></li>
+        <ul class="govuk-list govuk-list--bullet">
+            <li><a href="@ggLoginUrl" id="sign-in" data-journey-click="link - click:There is a problem:Sign in">@messages("accessdenied.individualoragent.text.signin")</a></li>
+            <li><a href="@registerOrgUrl" id="register" data-journey-click="link - click:There is a problem:Register">@messages("accessdenied.individualoragent.text.register")</a></li>
         </ul>
     </div>
 }

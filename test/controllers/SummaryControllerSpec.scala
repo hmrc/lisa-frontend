@@ -27,6 +27,7 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import views.html.registration.summary
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,6 +35,8 @@ import scala.concurrent.Future
 class SummaryControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val summaryView: summary = inject[summary]
+
   val SUT = new SummaryController()
 
   "GET Summary" must {

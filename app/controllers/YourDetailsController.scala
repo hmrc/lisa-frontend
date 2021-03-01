@@ -36,26 +36,27 @@ class YourDetailsController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  yourDetailsView: views.html.registration.your_details
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
 
       shortLivedCache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
-        case Some(data) => Ok(views.html.registration.your_details(YourDetails.form.fill(data)))
-        case None => Ok(views.html.registration.your_details(YourDetails.form))
+        case Some(data) => Ok(yourDetailsView(YourDetails.form.fill(data)))
+        case None => Ok(yourDetailsView(YourDetails.form))
       }
 
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
 
       YourDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.your_details(formWithErrors)))
+          Future.successful(BadRequest(yourDetailsView(formWithErrors)))
         },
         data => {
           shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data).flatMap { _ =>

@@ -22,16 +22,34 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request, RequestHeader}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest, Injecting}
+import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import views.html.registration.trading_details
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class TradingDetailsControllerSpec extends SpecBase with Injecting {
+
+  val pageTitle = "Your company’s reference numbers"
+
+  val validJsonUppercase: JsObject = Json.obj(
+    "fsrRefNumber" -> "654321",
+    "isaProviderRefNumber" -> "Z1234"
+  )
+
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+    CSRFTokenHelper.addCSRFToken(request)
+  }
+
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val tradingDetailsView: trading_details = inject[trading_details]
+  val SUT = new TradingDetailsController()
+
 
   "GET Trading Details" must {
 
@@ -79,7 +97,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("value=\'\'")
+        content must not include ("value=\'\'")
       }
 
     }
@@ -136,18 +154,4 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     }
 
   }
-
-  val pageTitle = "<h1>Your company’s reference numbers</h1>"
-
-  val validJsonUppercase: JsObject = Json.obj(
-    "fsrRefNumber" -> "654321",
-    "isaProviderRefNumber" -> "Z1234"
-  )
-
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
-  }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new TradingDetailsController()
-
 }

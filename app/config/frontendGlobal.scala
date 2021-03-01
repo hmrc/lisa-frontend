@@ -29,14 +29,19 @@ import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 import scala.concurrent.Future
 
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration, implicit val appConfig: AppConfig) extends FrontendErrorHandler {
+class ErrorHandler @Inject()(val messagesApi: MessagesApi,
+                             val configuration: Configuration,
+                             implicit val appConfig: AppConfig,
+                             errorView: views.html.error_template,
+                             notFoundView: views.html.page_not_found_template
+                            ) extends FrontendErrorHandler {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
                                     (implicit request: Request[_]): HtmlFormat.Appendable = {
-    views.html.error_template()
+    errorView()
   }
 
   override def notFoundTemplate(implicit request: Request[_]): Html = {
-    views.html.page_not_found_template()
+    notFoundView()
   }
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {

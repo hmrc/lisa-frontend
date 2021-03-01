@@ -43,14 +43,15 @@ class RosmController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  errorView: views.html.error_template
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with RosmJsonFormats {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
         rosmService.performSubscription(registrationDetails).flatMap {
-          case Right(subscriptionId) => {
+          case Right(subscriptionId) =>
             Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
             auditService.audit(auditType = "applicationReceived",
@@ -76,16 +77,14 @@ class RosmController @Inject()(
 
               Redirect(routes.ApplicationSubmittedController.get())
             }
-          }
-          case Left(error) => {
+          case Left(error) =>
             Logger.info("Audit of Submission -> auditType = applicationNotReceived")
 
             auditService.audit(auditType = "applicationNotReceived",
               path = routes.RosmController.post().url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
-            Future.successful(InternalServerError(views.html.error_template()))
-          }
+            Future.successful(InternalServerError(errorView()))
         }
       }
     }

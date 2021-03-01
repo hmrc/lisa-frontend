@@ -22,11 +22,12 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request, RequestHeader}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest, Injecting}
+import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import views.html.registration.organisation_details
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,6 +36,17 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
   val organisationDetailsCacheKey = "organisationDetails"
   val businessStructureCacheKey = "businessStructure"
+  val pageTitle = "Your company’s details"
+
+  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
+    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+    CSRFTokenHelper.addCSRFToken(request)
+  }
+
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val organisationDetailsView: organisation_details = inject[organisation_details]
+  val SUT = new OrganisationDetailsController()
+
 
   "GET Organisation Details" must {
 
@@ -91,7 +103,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val content = contentAsString(result)
 
         content must include (pageTitle)
-        content must include ("value=\'\'")
+        content must not include ("value=\'\'")
       }
 
     }
@@ -276,14 +288,4 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     }
 
   }
-
-  val pageTitle = "Your company’s details</h1>"
-
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
-  }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new OrganisationDetailsController()
-
-
 }

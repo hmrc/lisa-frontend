@@ -15,11 +15,17 @@
  *@
 
 @import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
+@import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
-@(data: LisaRegistration)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@utrName = @{if(data.businessStructure.businessStructure == Messages("org.details.llp")) {
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukBackLink : GovukBackLink,
+        govukButton : GovukButton)
+
+@(data: LisaRegistration)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@utrName = @{if(data.businessStructure.businessStructure == messages("org.details.llp")) {
         "str"
     } else {
         "ctr"
@@ -30,149 +36,150 @@
     case _ => "Corporation Tax"
 }}
 
-@views.html.main_template(title = Messages("title.summary"), bodyClasses = None) {
+@govukWrapper(title = messages("title.summary")) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Check your answers:Back">Back</a></p>
+    @govukBackLink(BackLink(
+        href = "javascript:history.go(-1)",
+        content = Text("Back"),
+        classes = "js-visible",
+        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Check your answers:Back")
+    ))
 
-    <h1 class="h1-heading">@Messages("summary.heading")</h1>
+        <h1 class="govuk-heading-l">@messages("summary.heading")</h1>
 
-    <section class="subsection summary-subsection">
-        <h2 class="h2-heading">@Messages("summary.companydetails.heading")</h2>
+        <h2 class="govuk-heading-m">@messages("summary.companydetails.heading")</h2>
 
-        <dl class="govuk-check-your-answers cya-questions-long">
-            <div>
-                <!-- Business structure -->
-                <dt class="cya-question" id="title-companyStructure">@Messages("summary.companydetails.structure")</dt>
-                <dd class="cya-answer" id="value-companyStructure">
-                    @if(data.businessStructure.businessStructure == Messages("org.details.llp")) {
-                        @Messages("org.details.llp.view")
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <div class="govuk-summary-list__row">
+                    <!-- Business structure -->
+                <dt class="govuk-summary-list__key" id="title-companyStructure">@messages("summary.companydetails.structure")</dt>
+                <dd class="govuk-summary-list__value" id="value-companyStructure">
+                @if(data.businessStructure.businessStructure == messages("org.details.llp")) {
+                    @messages("org.details.llp.view")
+                } else {
+                    @if(data.businessStructure.businessStructure == messages("org.details.friendlysoc")) {
+                        @messages("org.details.friendlysoc.view")
                     } else {
-                        @if(data.businessStructure.businessStructure == Messages("org.details.friendlysoc")) {
-                            @Messages("org.details.friendlysoc.view")
-                        } else {
-                            @Messages("org.details.corpbody.view")
-                        }
+                        @messages("org.details.corpbody.view")
                     }
+                }
                 </dd>
-                <dd class="cya-change">
-                    <a href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-companyStructure" data-journey-click="link - click:Check your answers:Change your company structure">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.companydetails.structure.change")</span>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="@routes.BusinessStructureController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-companyStructure" data-journey-click="link - click:Check your answers:Change your company structure">
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.companydetails.structure.change")</span>
                     </a>
                 </dd>
             </div>
-            <div>
-                <!-- Org name -->
-                <dt class="cya-question" id="title-companyName">@Messages("summary.companydetails.name")</dt>
-                <dd class="cya-answer" id="value-companyName">@data.organisationDetails.companyName</dd>
-                <dd class="cya-change">
-                    <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-companyName" data-journey-click="link - click:Check your answers:Change your registered company name">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.companydetails.name.change")</span>
+            <div class="govuk-summary-list__row">
+                    <!-- Org name -->
+                <dt class="govuk-summary-list__key" id="title-companyName">@messages("summary.companydetails.name")</dt>
+                <dd class="govuk-summary-list__value" id="value-companyName">@data.organisationDetails.companyName</dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-companyName" data-journey-click="link - click:Check your answers:Change your registered company name">
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.companydetails.name.change")</span>
                     </a>
                 </dd>
             </div>
-            <div>
-                <dt class="cya-question" id=@{s"title-${utrName}Number"}>@Messages(s"summary.companydetails.${utrName}")</dt>
-                <dd class="cya-answer" id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id=@{s"title-${utrName}Number"}>@messages(s"summary.companydetails.${utrName}")</dt>
+                <dd class="govuk-summary-list__value"id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber </dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-@{utrName}Number"
                     data-journey-click="link - click:Check your answers:summary.companydetails.str.change=Change your @utrFullName Unique Taxpayer Reference">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages(s"summary.companydetails.$utrName.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages(s"summary.companydetails.$utrName.change")</span>
                     </a>
                 </dd>
             </div>
-            <div>
-                <!-- Org ref numbers -->
-                <dt class="cya-question" id="title-fsrRefNumber">@Messages("summary.companydetails.fsrref")</dt>
-                <dd class="cya-answer" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                    <!-- Org ref numbers -->
+                <dt class="govuk-summary-list__key" id="title-fsrRefNumber">@messages("summary.companydetails.fsrref")</dt>
+                <dd class="govuk-summary-list__value" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your Financial Conduct Authority reference number">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.companydetails.fsrref.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.companydetails.fsrref.change")</span>
                     </a>
                 </dd>
             </div>
-            <div>
-                <dt class="cya-question" id="title-isaProviderRefNumber">@Messages("summary.companydetails.isaref")</dt>
-                <dd class="cya-answer" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id="title-isaProviderRefNumber">@messages("summary.companydetails.isaref")</dt>
+                <dd class="govuk-summary-list__value" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-isaProviderRefNumber" data-journey-click="link - click:Check your answers:Change your ISA manager reference">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.companydetails.isaref.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.companydetails.isaref.change")</span>
                     </a>
                 </dd>
             </div>
         </dl>
-    </section>
 
-    <!-- Your details -->
-    <section class="subsection summary-subsection">
-        <h2 class="h2-heading">@Messages("summary.yourdetails.heading")</h2>
+            <!-- Your details -->
+        <h2 class="govuk-heading-m">@messages("summary.yourdetails.heading")</h2>
 
-        <dl class="govuk-check-your-answers cya-questions-long">
-            <div>
-                <dt class="cya-question" id="title-firstName">@Messages("summary.yourdetails.firstname")</dt>
-                <dd class="cya-answer" id="value-firstName">@data.yourDetails.firstName</dd>
-                <dd class="cya-change">
+        <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id="title-firstName">@messages("summary.yourdetails.firstname")</dt>
+                <dd class="govuk-summary-list__value" id="value-firstName">@data.yourDetails.firstName</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-firstName" data-journey-click="link - click:Check your answers:Change your first name">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.yourdetails.firstname.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.yourdetails.firstname.change")</span>
                     </a>
                 </dd>
             </div>
-
-            <div>
-                <dt class="cya-question" id="title-lastName">@Messages("summary.yourdetails.lastname")</dt>
-                <dd class="cya-answer" id="value-lastName">@data.yourDetails.lastName</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id="title-lastName">@messages("summary.yourdetails.lastname")</dt>
+                <dd class="govuk-summary-list__value" id="value-lastName">@data.yourDetails.lastName</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-lastName" data-journey-click="link - click:Check your answers:Change your last name">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.yourdetails.lastname.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.yourdetails.lastname.change")</span>
                     </a>
                 </dd>
             </div>
-
-            <div>
-                <dt class="cya-question" id="title-role">@Messages("summary.yourdetails.role")</dt>
-                <dd class="cya-answer" id="value-role">@data.yourDetails.role</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id="title-role">@messages("summary.yourdetails.role")</dt>
+                <dd class="govuk-summary-list__value" id="value-role">@data.yourDetails.role</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-role" data-journey-click="link - click:Check your answers:Change your job title">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.yourdetails.role.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.yourdetails.role.change")</span>
                     </a>
                 </dd>
             </div>
-
-            <div>
-                <dt class="cya-question" id="title-phone">@Messages("summary.yourdetails.phone")</dt>
-                <dd class="cya-answer" id="value-phone">@data.yourDetails.phone</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id="title-phone">@messages("summary.yourdetails.phone")</dt>
+                <dd class="govuk-summary-list__value" id="value-phone">@data.yourDetails.phone</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-phoneNumber" data-journey-click="link - click:Check your answers:Change your phone number">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.yourdetails.phone.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.yourdetails.phone.change")</span>
                     </a>
                 </dd>
             </div>
-
-            <div>
-                <dt class="cya-question" id="title-email">@Messages("summary.yourdetails.email")</dt>
-                <dd class="cya-answer" id="value-email">@data.yourDetails.email</dd>
-                <dd class="cya-change">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key" id="title-email">@messages("summary.yourdetails.email")</dt>
+                <dd class="govuk-summary-list__value" id="value-email">@data.yourDetails.email</dd>
+                <dd class="govuk-summary-list__actions">
                     <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-email" data-journey-click="link - click:Check your answers:Change your email address">
-                        <span aria-hidden="true">@Messages("summary.change")</span>
-                        <span class="visuallyhidden">@Messages("summary.yourdetails.email.change")</span>
+                        <span aria-hidden="true">@messages("summary.change")</span>
+                        <span class="govuk-visually-hidden">@messages("summary.yourdetails.email.change")</span>
                     </a>
                 </dd>
             </div>
         </dl>
-    </section>
 
     <form method="post" action="@routes.RosmController.post">
         @CSRF.formField
         <div class="form-field form-field--submit">
-            <input type="submit" class="button" value="Confirm and send" id="continue" data-journey-click="button - click:Check your answers:Confirm and send">
+        @govukButton(Button(
+            value = Some("Confirm and send"),
+            content = Text("Confirm and send"),
+            attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Check your answers:Confirm and send")
+        ))
         </div>
     </form>
 

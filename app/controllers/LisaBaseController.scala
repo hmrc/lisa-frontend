@@ -21,7 +21,6 @@ import models._
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Reads
-import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
@@ -71,18 +70,15 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     isReapplication(user) flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
-          case TaxEnrolmentPending => {
+          case TaxEnrolmentPending =>
             Logger.debug("Enrollment Pending")
             Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
-          }
-          case TaxEnrolmentError => {
+          case TaxEnrolmentError =>
             Logger.debug("Enrollment Rejected")
             Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
-          }
-          case TaxEnrolmentDoesNotExist => {
+          case TaxEnrolmentDoesNotExist =>
             Logger.debug("Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
-          }
         }
       }
       else {
@@ -108,7 +104,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
   def hasAllSubmissionData(cacheId: String)(callback: LisaRegistration => Future[Result])
                           (implicit request: Request[AnyContent]): Future[Result] = {
     shortLivedCache.fetch(cacheId) flatMap {
-      case Some(cache) => {
+      case Some(cache) =>
         val cacheResult: Either[Result, LisaRegistration] = for {
           bs  <- getOrRedirect[BusinessStructure](cache, BusinessStructure.cacheKey, Redirect(routes.BusinessStructureController.get()))
           od  <- getOrRedirect[OrganisationDetails](cache, OrganisationDetails.cacheKey, Redirect(routes.OrganisationDetailsController.get()))
@@ -117,7 +113,6 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
           yd  <- getOrRedirect[YourDetails](cache, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get()))
         } yield LisaRegistration(od, td, bs, yd, sId)
         cacheResult.fold(redirect => Future.successful(redirect), callback(_))
-      }
       case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
     }
   }
