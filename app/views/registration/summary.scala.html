@@ -86,7 +86,7 @@
                 <dt class="govuk-summary-list__key" id=@{s"title-${utrName}Number"}>@messages(s"summary.companydetails.${utrName}")</dt>
                 <dd class="govuk-summary-list__value"id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber </dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-@{utrName}Number"
+                    <a class="govuk-link" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-@{utrName}Number"
                     data-journey-click="link - click:Check your answers:summary.companydetails.str.change=Change your @utrFullName Unique Taxpayer Reference">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages(s"summary.companydetails.$utrName.change")</span>
@@ -98,7 +98,7 @@
                 <dt class="govuk-summary-list__key" id="title-fsrRefNumber">@messages("summary.companydetails.fsrref")</dt>
                 <dd class="govuk-summary-list__value" id="value-fsrRefNumber">@data.tradingDetails.fsrRefNumber</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your Financial Conduct Authority reference number">
+                    <a class="govuk-link" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-fsrRefNumber" data-journey-click="link - click:Check your answers:Change your Financial Conduct Authority reference number">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.companydetails.fsrref.change")</span>
                     </a>
@@ -108,7 +108,7 @@
                 <dt class="govuk-summary-list__key" id="title-isaProviderRefNumber">@messages("summary.companydetails.isaref")</dt>
                 <dd class="govuk-summary-list__value" id="value-isaProviderRefNumber">@data.tradingDetails.isaProviderRefNumber</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-isaProviderRefNumber" data-journey-click="link - click:Check your answers:Change your ISA manager reference">
+                    <a class="govuk-link" href="@routes.TradingDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-isaProviderRefNumber" data-journey-click="link - click:Check your answers:Change your ISA manager reference">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.companydetails.isaref.change")</span>
                     </a>
@@ -124,7 +124,7 @@
                 <dt class="govuk-summary-list__key" id="title-firstName">@messages("summary.yourdetails.firstname")</dt>
                 <dd class="govuk-summary-list__value" id="value-firstName">@data.yourDetails.firstName</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-firstName" data-journey-click="link - click:Check your answers:Change your first name">
+                    <a class="govuk-link" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-firstName" data-journey-click="link - click:Check your answers:Change your first name">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.yourdetails.firstname.change")</span>
                     </a>
@@ -134,7 +134,7 @@
                 <dt class="govuk-summary-list__key" id="title-lastName">@messages("summary.yourdetails.lastname")</dt>
                 <dd class="govuk-summary-list__value" id="value-lastName">@data.yourDetails.lastName</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-lastName" data-journey-click="link - click:Check your answers:Change your last name">
+                    <a class="govuk-link" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-lastName" data-journey-click="link - click:Check your answers:Change your last name">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.yourdetails.lastname.change")</span>
                     </a>
@@ -144,7 +144,7 @@
                 <dt class="govuk-summary-list__key" id="title-role">@messages("summary.yourdetails.role")</dt>
                 <dd class="govuk-summary-list__value" id="value-role">@data.yourDetails.role</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-role" data-journey-click="link - click:Check your answers:Change your job title">
+                    <a class="govuk-link" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-role" data-journey-click="link - click:Check your answers:Change your job title">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.yourdetails.role.change")</span>
                     </a>
@@ -154,7 +154,7 @@
                 <dt class="govuk-summary-list__key" id="title-phone">@messages("summary.yourdetails.phone")</dt>
                 <dd class="govuk-summary-list__value" id="value-phone">@data.yourDetails.phone</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-phoneNumber" data-journey-click="link - click:Check your answers:Change your phone number">
+                    <a class="govuk-link" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-phoneNumber" data-journey-click="link - click:Check your answers:Change your phone number">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.yourdetails.phone.change")</span>
                     </a>
@@ -164,7 +164,7 @@
                 <dt class="govuk-summary-list__key" id="title-email">@messages("summary.yourdetails.email")</dt>
                 <dd class="govuk-summary-list__value" id="value-email">@data.yourDetails.email</dd>
                 <dd class="govuk-summary-list__actions">
-                    <a href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-email" data-journey-click="link - click:Check your answers:Change your email address">
+                    <a class="govuk-link" href="@routes.YourDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-yourDetails-email" data-journey-click="link - click:Check your answers:Change your email address">
                         <span aria-hidden="true">@messages("summary.change")</span>
                         <span class="govuk-visually-hidden">@messages("summary.yourdetails.email.change")</span>
                     </a>
