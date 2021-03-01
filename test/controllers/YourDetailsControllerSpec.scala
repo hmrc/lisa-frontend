@@ -22,11 +22,12 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request, RequestHeader}
 import play.api.test.Helpers._
-import play.api.test.{FakeHeaders, FakeRequest, Injecting}
+import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import views.html.registration.your_details
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,10 +35,13 @@ import scala.concurrent.Future
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val yourDetailsView: your_details = inject[your_details]
+
   val SUT = new YourDetailsController()
 
   def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    FakeRequest("POST", uri, FakeHeaders(), body).withCSRFToken
+    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+    CSRFTokenHelper.addCSRFToken(request)
   }
 
   "GET Your Details" must {
@@ -67,7 +71,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your name and contact details</h1>")
+        content must include ("Your name and contact details")
         content must include ("test@test.com")
       }
 
@@ -91,8 +95,8 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your name and contact details</h1>")
-        content must include ("value=\'\'")
+        content must include ("Your name and contact details")
+        content must not include ("value=\'\'")
       }
 
     }
@@ -111,7 +115,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your name and contact details</h1>")
+        content must include ("Your name and contact details")
         content must include ("Enter your first name")
         content must include ("Enter your last name")
         content must include ("Enter your job title")
@@ -137,7 +141,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include ("<h1>Your name and contact details</h1>")
+        content must include ("Your name and contact details")
         content must include ("First name must only include letters a to z, hyphens, spaces and apostrophes")
         content must include ("Last name must only include letters a to z, hyphens, spaces and apostrophes")
         content must include ("Job title must only include letters a to z, hyphens, spaces and apostrophes")

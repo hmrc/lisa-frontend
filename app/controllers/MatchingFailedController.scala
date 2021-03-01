@@ -36,18 +36,17 @@ class MatchingFailedController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  matchingFailedView: views.html.registration.matching_failed
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
-        case Some(businessStructure) => {
+        case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
-
-          Future.successful(Ok(views.html.registration.matching_failed(isPartnership)))
-        }
+          Future.successful(Ok(matchingFailedView(isPartnership)))
       }
     }
   }

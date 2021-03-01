@@ -18,7 +18,6 @@ package controllers
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import base.SpecBase
 import models.{BusinessStructure, OrganisationDetails, _}
 import org.mockito.ArgumentMatchers
@@ -29,6 +28,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
+import views.html.error_template
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,6 +36,7 @@ import scala.concurrent.Future
 class RosmControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val errorView: error_template = inject[error_template]
   val SUT = new RosmController()
 
   "GET Rosm Registration" must {

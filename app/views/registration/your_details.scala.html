@@ -15,127 +15,139 @@
  *@
 
 @import helper.CSRF
-@import uk.gov.hmrc.play.views.html.helpers._
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukInsetText : GovukInsetText,
+        govukBackLink : GovukBackLink,
+        govukButton : GovukButton,
+        govukInput : GovukInput,
+        govukErrorSummary : GovukErrorSummary)
 
 @(form: Form[YourDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.your-details")) else Messages("title.your-details"), bodyClasses = None) {
+@govukWrapper(title = if(form.hasErrors) messages("error.title", messages("title.your-details")) else messages("title.your-details")) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Your name and contact details:Back">Back</a></p>
+    @govukBackLink(BackLink(
+        href = "javascript:history.go(-1)",
+        content = Text("Back"),
+        classes = "js-visible",
+        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Your name and contact details:Back")
+    ))
+
     @if(form.hasErrors) {
-        @errorSummary(messages("validation.summary.heading"), form)
+        @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
-    <h1>@Messages("yourdetails.heading")</h1>
+    <h1 class="govuk-label--l">@messages("yourdetails.heading")</h1>
 
-    <div class="subsection">
-        <p class="indent">
-            @Messages("yourdetails.indent")
-        </p>
-    </div>
+    @govukInsetText(InsetText(
+        content = Text(messages("yourdetails.indent"))
+    ))
 
     <form novalidate="true" method="post">
         @CSRF.formField
-        <div id="firstName-form" class='form-group @if(form("firstName").hasErrors) {form-field--error}'>
-            <label for="firstName">
-                <span>
-                    @Messages("yourdetails.firstname")
-                </span>
-            </label>
-            @form("firstName").errors.map { error =>
-                <span class="error-message" data-journey="search-page:error:firstName">
-                    @Messages(error.messages.head)
-                </span>
-            }
-            <input class="form-control form-control--block"
-                   name="firstName"
-                   id="firstName"
-                   value='@form("firstName").value'
-                   autocomplete="name"
-                   type="text"
-            />
-        </div>
 
-        <div id="lastName-form" class='form-group @if(form("lastName").hasErrors) {form-field--error}'>
-            <label for="lastName">
-                <span>
-                    @Messages("yourdetails.lastname")
-                </span>
-            </label>
-            @form("lastName").errors.map { error =>
-                <span class="error-message" data-journey="search-page:error:lastName">
-                    @Messages(error.messages.head)
-                </span>
-            }
-            <input class="form-control form-control--block"
-                   name="lastName"
-                   id="lastName"
-                   value='@form("lastName").value'
-                   autocomplete="name"
-                   type="text"
-            />
-        </div>
+        @govukInput(Input(
+            id = "firstName",
+            name = "firstName",
+            classes = "govuk-input--width-20",
+            value = form("firstName").value,
+            autocomplete = Some("name"),
+            errorMessage = if(form("firstName").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:firstName"),
+                    content = Text(messages(form("firstName").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("yourdetails.firstname"))
+            )
+        ))
 
-        <div id="role-form" class='form-group @if(form("role").hasErrors) {form-field--error}'>
-            <label for="role">
-                <span>
-                    @Messages("yourdetails.role")
-                </span>
-            </label>
-            @form("role").errors.map { error =>
-                <span class="error-message" data-journey="search-page:error:role">
-                    @Messages(error.messages.head)
-                </span>
-            }
-            <input class="form-control form-control--block"
-                   name="role"
-                   id="role"
-                   value='@form("role").value'
-            />
-        </div>
+        @govukInput(Input(
+            id = "lastName",
+            name = "lastName",
+            classes = "govuk-input--width-20",
+            value = form("lastName").value,
+            autocomplete = Some("name"),
+            errorMessage = if(form("lastName").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:lastName"),
+                    content = Text(messages(form("lastName").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("yourdetails.lastname"))
+            )
+        ))
 
-        <div id="phone-form" class='form-group @if(form("phone").hasErrors) {form-field--error}'>
-            <label for="phone">
-                <span>
-                    @Messages("yourdetails.phone")
-                </span>
-            </label>
-            @form("phone").errors.map { error =>
-                <span class="error-message" data-journey="search-page:error:phone">
-                    @Messages(error.messages.head)
-                </span>
-            }
-            <input class="form-control form-control--block"
-                   name="phone"
-                   id="phone"
-                   value='@form("phone").value'
-                   type="tel"
-                   autocomplete="tel"
-            />
-        </div>
+        @govukInput(Input(
+            id = "role",
+            name = "role",
+            classes = "govuk-input--width-20",
+            value = form("role").value,
+            errorMessage = if(form("role").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:role"),
+                    content = Text(messages(form("role").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("yourdetails.role"))
+            )
+        ))
 
-        <div id="email-form" class='form-group @if(form("email").hasErrors) {form-field--error}'>
-            <label for="email">
-                <span>
-                    @Messages("yourdetails.email")
-                </span>
-            </label>
-            @form("email").errors.map { error =>
-                <span class="error-message" data-journey="search-page:error:email">
-                    @Messages(error.messages.head)
-                </span>
-            }
-            <input class="form-control form-control--block"
-                   name="email"
-                   id="email"
-                   value='@form("email").value'
-                   type="email"
-                   autocomplete="email"
-            />
-        </div>
+        @govukInput(Input(
+            id = "phone",
+            name = "phone",
+            classes = "govuk-input--width-20",
+            value = form("phone").value,
+            inputType = "tel",
+            autocomplete = Some("tel"),
+            errorMessage = if(form("phone").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:phone"),
+                    content = Text(messages(form("phone").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("yourdetails.phone"))
+            )
+        ))
+
+        @govukInput(Input(
+            id = "email",
+            name = "email",
+            classes = "govuk-input--width-20",
+            value = form("email").value,
+            inputType = "email",
+            autocomplete = Some("email"),
+            errorMessage = if(form("email").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> "search-page:error:email"),
+                    content = Text(messages(form("email").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("yourdetails.email"))
+            )
+        ))
 
         <div class="form-field form-field--submit">
-            <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your name and contact details:Continue">
+        @govukButton(Button(
+            inputType = Some("submit"),
+            value = Some("Continue"),
+            content = Text("Continue"),
+            attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your name and contact details:Continue")
+        ))
         </div>
     </form>
-
 }

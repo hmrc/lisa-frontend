@@ -16,21 +16,20 @@
 
 @import play.api.i18n.Messages.Implicits._
 
+@this(govukWrapper: views.html.govuk_wrapper)
+
 @()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @anchor(text: String, url: String) = {<a href="mailto:@url">@text</a>}
 
 @contentHeader = {
-  <h1>@Messages("global.page.not.found.error.heading")</h1>
+  <h1 class="govuk-label--l">@messages("global.page.not.found.error.heading")</h1>
 }
 
-@mainContent = {
-  <p>@Messages("global.page.not.found.error.check.web.address.correct")</p>
-  <p>@Messages("global.page.not.found.error.check.web.address.full")</p>
-  <p>@Html(Messages("global.page.not.found.error.contact", anchor(Messages("global.page.not.found.error.contact.email"), Messages("global.page.not.found.error.contact.email"))))</p>
+@govukWrapper(title = messages("global.page.not.found.error.title"), beforeContentHtml = Some(contentHeader)){
+    <p class="govuk-body">@messages("global.page.not.found.error.check.web.address.correct")</p>
+    <p class="govuk-body">@messages("global.page.not.found.error.check.web.address.full")</p>
+    <p class="govuk-body">@Html(messages("global.page.not.found.error.contact", anchor(messages("global.page.not.found.error.contact.email"), messages("global.page.not.found.error.contact.email"))))</p>
+
 }
 
-
-
-
-@govuk_wrapper(appConfig = appConfig, title = Messages("global.page.not.found.error.title"), contentHeader = Some(contentHeader), mainContent = mainContent, showSignOutLink = true)

@@ -26,6 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import play.api.test.CSRFTokenHelper._
+import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,6 +34,18 @@ import scala.concurrent.Future
 class ApplicationSubmittedControllerSpec extends SpecBase
   with BeforeAndAfter
   with Injecting {
+
+  val submittedPageTitle = "Application submitted"
+  val pendingPageTitle = "We are reviewing your application"
+  val successPageTitle = "Application successful"
+  val rejectedPageTitle = "Application not successful"
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val submittedView: application_submitted = inject[application_submitted]
+  implicit val pendingView: application_pending = inject[application_pending]
+  implicit val successfulView: application_successful = inject[application_successful]
+  implicit val rejectedView: application_rejected = inject[application_rejected]
+  val SUT = new ApplicationSubmittedController()
+
 
   "GET Application Submitted" must {
 
@@ -120,12 +133,4 @@ class ApplicationSubmittedControllerSpec extends SpecBase
     }
 
   }
-
-  val submittedPageTitle = ">Application submitted</h1>"
-  val pendingPageTitle = ">We are reviewing your application</h1>"
-  val successPageTitle = ">Application successful</h1>"
-  val rejectedPageTitle = ">Application not successful</h1>"
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new ApplicationSubmittedController()
-
 }

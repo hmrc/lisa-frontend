@@ -14,51 +14,34 @@
  * limitations under the License.
  *@
 
-@import helper.CSRF
-@import java.time.format.DateTimeFormatter
-@import java.time.LocalDate
-@import uk.gov.hmrc.play.views.html.helpers._
 @import config.AppConfig
 
-@(email: String, subscriptionId: String, displayURBanner: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@import java.time.LocalDate
+@import java.time.format.DateTimeFormatter
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
-@urBanner = {
-    @if(displayURBanner) {
-        <div class="notice-banner" id="notice-banner">
-            <div class="centered-content">
-                <div class="notice-banner__wrapper grid-layout">
-                    <div class="grid-layout__column--2-3">
-                        <a class="notice-banner__content" href="https://signup.take-part-in-research.service.gov.uk/?utm_campaign=&utm_source=Other&utm_medium=other&t=HMRC&id=186" id="join-user-panel" data-journey-click="link - click:Application submitted:Join user panel" target="_blank" rel="noopener">
-                            @Messages("applicationsubmitted.banner.recruitment.link")
-                        </a>
-                    </div>
-                    <div class="grid-layout__column--1-3 text--right">
-                        <a id="dismiss-user-panel" class="notice-banner__close notice-banner__content" href="#" data-journey-click="link - click:Application submitted:Dismiss user panel">
-                            @Messages("applicationsubmitted.banner.recruitment.dismiss")
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-}
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukPanel : GovukPanel
+)
 
-@views.html.main_template(title = Messages("title.application-submitted"), bodyClasses = None, afterHeader = Some(urBanner)) {
+@(email: String, subscriptionId: String, displayURBanner: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-    <div class="transaction-banner--complete">
-        <h1 class="transaction-banner__heading">@Messages("applicationsubmitted.banner.heading")</h1>
-        <p>@Messages("applicationsubmitted.banner.line1", subscriptionId)</p>
-    </div>
+@govukWrapper(title = messages("title.application-submitted"), researchBannerUrl = if(displayURBanner) Some("https://signup.take-part-in-research.service.gov.uk/?utm_campaign=&utm_source=Other&utm_medium=other&t=HMRC&id=186") else None) {
 
-    <p>@Messages("applicationsubmitted.text.line1", email)</p>
+    @govukPanel(Panel(
+        title = Text(messages("applicationsubmitted.banner.heading")),
+        content = HtmlContent(messages("applicationsubmitted.banner.line1", subscriptionId))
+    ))
 
-    <p>@Messages("applicationsubmitted.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application submitted:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk.</a></p>
+    <p class="govuk-body">@messages("applicationsubmitted.text.line1", email)</p>
 
-    <h2>@Messages("applicationsubmitted.text.line3")</h2>
+    <p class="govuk-body">@messages("applicationsubmitted.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application submitted:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk.</a></p>
 
-    <p>@Messages("applicationsubmitted.text.line4")</p>
+    <h2 class="govuk-heading-m">@messages("applicationsubmitted.text.line3")</h2>
 
-    <p>@Messages("applicationsubmitted.text.line5", LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")))</p>
+    <p class="govuk-body">@messages("applicationsubmitted.text.line4")</p>
 
-    <p>@Messages("applicationsubmitted.text.line6", email)</p>
+    <p class="govuk-body">@messages("applicationsubmitted.text.line5", LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")))</p>
+
+    <p class="govuk-body">@messages("applicationsubmitted.text.line6", email)</p>
 }

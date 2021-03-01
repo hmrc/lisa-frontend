@@ -1,5 +1,5 @@
 # Add all the application routes to the app.routes file
-->         /lifetime-isa             app.Routes
+->         /lifetime-isa                                        app.Routes
 ->         /                                                    health.Routes
 ->     	   /template                                            template.Routes
 

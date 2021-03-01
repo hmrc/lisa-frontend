@@ -36,37 +36,40 @@ class ApplicationSubmittedController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  applicationSubmittedView: views.html.registration.application_submitted,
+  applicationPendingView: views.html.registration.application_pending,
+  applicationSuccessfulView: views.html.registration.application_successful,
+  applicationRejectedView: views.html.registration.application_rejected
+  ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa((_) => {
+    authorisedForLisa(_ => {
       sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
-        case Some(application) => {
-          Ok(views.html.registration.application_submitted(application.email, application.subscriptionId, appConfig.displayURBanner))
-        }
+        case Some(application) =>
+          Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
       }
     }, checkEnrolmentState = false)
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa((_) => {
-      Future.successful(Ok(views.html.registration.application_pending()))
+    authorisedForLisa(_ => {
+      Future.successful(Ok(applicationPendingView()))
     }, checkEnrolmentState = false)
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa((_) => {
+    authorisedForLisa(_ => {
       sessionCache.fetchAndGetEntry[String]("lisaManagerReferenceNumber").flatMap {
         case Some(lisaManagerReferenceNumber) =>
-          Future.successful(Ok(views.html.registration.application_successful(lisaManagerReferenceNumber)))
+          Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
       }
     }, checkEnrolmentState = false)
   }
 
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa((_) => {
-      Future.successful(Ok(views.html.registration.application_rejected()))
+    authorisedForLisa(_ => {
+      Future.successful(Ok(applicationRejectedView()))
     }, checkEnrolmentState = false)
   }
 }

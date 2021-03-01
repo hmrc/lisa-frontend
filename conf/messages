@@ -1,3 +1,5 @@
+service.name = Apply to be an approved Lifetime ISA Manager
+
 global.error.InternalServerError500.title=Sorry, there is a problem with the service – Apply to be an approved Lifetime ISA Manager – GOV.UK
 global.error.InternalServerError500.heading=Sorry, there is a problem with the service
 global.error.InternalServerError500.message=Try again later.</p><p>Contact <a href="mailto:sdsteam@hmrc.gov.uk">sdsteam@hmrc.gov.uk</a>, if you have an enquiry about your LISA manager application.
@@ -27,7 +29,7 @@ org.details.label.llp=Self Assessment Unique Taxpayer Reference
 org.details.label.notllp=Corporation Tax Unique Taxpayer Reference
 org.details.hint.llp=Self Assessment
 org.details.hint.notllp=Corporation Tax, including your CT600 form
-org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’.<a href="https://www.gov.uk/find-lost-utr-number" target="_blank">Find a lost UTR number (opens in a new window or tab)</a>.
+org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. <a href="https://www.gov.uk/find-lost-utr-number" target="_blank">Find a lost UTR number (opens in a new window or tab)</a>.
 
 tradingdetails.fsrref.label=Financial Conduct Authority reference
 tradingdetails.fsrref.hint=This is 6 numbers, like 123456
@@ -164,7 +166,7 @@ error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
 error.fsrRefNumberPattern=Your company’s Financial Conduct Authority reference must only include numbers 0-9
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
-error.isaProviderRefNumberPattern= Your company’s ISA manager reference must only include the letter z and numbers 0-9
+error.isaProviderRefNumberPattern= ISA manager reference must only include the letter Z and numbers 0 to 9
 
 error.firstNameRequired=Enter your first name
 error.firstNameLength=First name must be 35 characters or less

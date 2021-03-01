@@ -16,8 +16,16 @@
 
 @import helper.CSRF
 @import play.twirl.api.Html
-@import uk.gov.hmrc.play.views.html.helpers._
-@import uk.gov.hmrc.play.views.html._
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
+@this(govukWrapper: views.html.govuk_wrapper,
+        govukErrorSummary : GovukErrorSummary,
+        govukButton : GovukButton,
+        govukBackLink : GovukBackLink,
+        govukInput : GovukInput
+     )
 
 @(form: Form[OrganisationDetails], isPartnership: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
@@ -29,84 +37,90 @@
 }
 
 @label = @{if(isPartnership) {
-        Messages("org.details.label.llp")
+        messages("org.details.label.llp")
     } else {
-        Messages("org.details.label.notllp")
+        messages("org.details.label.notllp")
     }
 }
 
 @hint = @{
     val businessStructureSpecificHelp = if(isPartnership) {
-        Messages("org.details.hint.llp")
+        messages("org.details.hint.llp")
     } else {
-        Messages("org.details.hint.notllp")
+        messages("org.details.hint.notllp")
     }
-    Html(Messages("org.details.hint", businessStructureSpecificHelp))
+    Html(messages("org.details.hint", businessStructureSpecificHelp))
 }
 
-@views.html.main_template(title = if(form.hasErrors) Messages("error.title", Messages("title.organisation-details")) else Messages("title.organisation-details"), bodyClasses = None) {
+@govukWrapper(title = if(form.hasErrors) messages("error.title", messages("title.organisation-details")) else messages("title.organisation-details")) {
 
-    <p><a href="javascript:history.go(-1)" class="link-back js-visible" id="back" data-journey-click="navigation - link:Your company’s details:Back">Back</a></p>
+    @govukBackLink(BackLink(
+        href = "javascript:history.go(-1)",
+        content = Text("Back"),
+        classes = "js-visible",
+        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Your company’s details:Back")
+    ))
+
     @if(form.hasErrors) {
-        @errorSummary(messages("validation.summary.heading"), form)
+        @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
-    <h1>Your company’s details</h1>
+
+    <h1 class="govuk-label--l">Your company’s details</h1>
 
     <form method="post">
         @CSRF.formField
+        @govukInput(Input(
+            id = "companyName",
+            name = "companyName",
+            classes = "govuk-input--width-20",
+            value = form("companyName").value,
+            errorMessage = if(form("companyName").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> s"search-page:error:companyName"),
+                    content = Text(messages(form("companyName").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                classes = "form-control form-control--block",
+                content = Text(messages("org.details.companyname.label"))
+            ),
+            hint = Some(Hint(
+                content = Text(messages("org.details.companyname.hint"))
+            ))
+        ))
 
-            <div id="companyName-form" class='form-group @if(form("companyName").hasErrors) {form-field--error}'>
-                <label for="companyName">
-                    <span>
-                        @Messages("org.details.companyname.label")
-                    </span>
-                </label>
-                <span class="form-hint">
-                        @Messages("org.details.companyname.hint")
-                </span>
-                @form("companyName").errors.map { error =>
-                    <span class="error-message"
-                      data-journey="search-page:error:companyName">
-                    @Messages(error.messages.head)
-                    </span>
-                }
-                <input class="form-control form-control--block"
-                       name="companyName"
-                       id="companyName"
-                       value='@form("companyName").value'
-                />
-            </div>
-
-            <div id="sautr-form" class='form-group @if(form(s"${utrName}Number").hasErrors) {form-field--error}'>
-                <label for='@{s"${utrName}Number"}'>
-                    <span>
-                        @label
-                    </span>
-                </label>
-                <span class="form-hint">
-                        @hint
-                </span>
-                @form(s"${utrName}Number").errors.map { error =>
-                <span class="error-message"
-                      data-journey='search-page:error:@{s"${utrName}Number"}'>
-                    @Messages(error.messages.head)
-                    </span>
-                }
-                <input class="form-control form-control--block"
-                       name='@{s"${utrName}Number"}'
-                       id='@{s"${utrName}Number"}'
-                       value='@{form(s"${utrName}Number").value}'
-                       type="tel"
-                />
-            </div>
+        @govukInput(Input(
+            id = s"${utrName}Number",
+            name = s"${utrName}Number",
+            value = form(s"${utrName}Number").value,
+            inputType = "tel",
+            classes = "govuk-input--width-20",
+            errorMessage = if(form(s"${utrName}Number").hasErrors){
+                Some(ErrorMessage(
+                    attributes = Map("data-journey-click" -> s"search-page:error:${utrName}Number"),
+                    content = Text(messages(form(s"${utrName}Number").errors.head.message))
+                ))
+            } else { None },
+            label = Label(
+                isPageHeading = false,
+                classes = "form-control form-control--block",
+                content = Text(label)
+            ),
+            hint = Some(Hint(
+                content = HtmlContent(hint))
+            ))
+        )
 
             <div class="form-field form-field--submit">
-                <input type="submit" class="button" value="Continue" id="continue" data-journey-click="button - click:Your company’s details:Continue">
+                @govukButton(Button(
+                    inputType = Some("submit"),
+                    value = Some("Continue"),
+                    content = Text("Continue"),
+                    attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your company’s details:Continue")
+                ))
             </div>
-
     </form>
-
-
 }
 
 

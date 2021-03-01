@@ -36,23 +36,24 @@ class TradingDetailsController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  tradingDetailsView: views.html.registration.trading_details
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).map {
-        case Some(data) => Ok(views.html.registration.trading_details(TradingDetails.form.fill(data)))
-        case None => Ok(views.html.registration.trading_details(TradingDetails.form))
+        case Some(data) => Ok(tradingDetailsView(TradingDetails.form.fill(data)))
+        case None => Ok(tradingDetailsView(TradingDetails.form))
       }
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { (cacheId) =>
+    authorisedForLisa { cacheId =>
       TradingDetails.form.bindFromRequest.fold(
         formWithErrors => {
-          Future.successful(BadRequest(views.html.registration.trading_details(formWithErrors)))
+          Future.successful(BadRequest(tradingDetailsView(formWithErrors)))
         },
         data => {
           shortLivedCache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, TradingDetails.uppercaseZ(data)).flatMap { _ =>
