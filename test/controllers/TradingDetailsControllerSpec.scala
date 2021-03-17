@@ -22,7 +22,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
 import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request, RequestHeader}
+import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
