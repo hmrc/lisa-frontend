@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukHeader, GovukLayout}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcReportTechnicalIssueHelper, HmrcScripts, HmrcStandardFooter, HmrcStandardHeader, HmrcTrackingConsentSnippet}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcReportTechnicalIssueHelper, HmrcScripts, HmrcStandardFooter, HmrcStandardHeader}
 
 @this(
         govukLayout: GovukLayout,
@@ -25,14 +25,12 @@
         hmrcStandardHeader: HmrcStandardHeader,
         hmrcStandardFooter: HmrcStandardFooter,
         hmrcScripts: HmrcScripts,
-        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-        hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper
 )
 
 @(title: String, beforeContentHtml: Option[Html] = None, researchBannerUrl: Option[String] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @head ={
-@hmrcTrackingConsentSnippet()
     <meta name="format-detection" content="telephone=no" />
     <link rel="stylesheet" media="all" href='@routes.Assets.versioned("stylesheets/lisa-app.css")' type="text/css"/>
 }
