@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.Inject
 import config.AppConfig
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuditService @Inject()(val connector: AuditConnector, val appConfig: AppConfig) {
+class AuditService @Inject()(val connector: AuditConnector, val appConfig: AppConfig) extends Logging {
 
   def audit(auditType: String, path: String, auditData: Map[String, String])(implicit hc:HeaderCarrier): Future[AuditResult] = {
     val event = DataEvent(
@@ -36,7 +36,7 @@ class AuditService @Inject()(val connector: AuditConnector, val appConfig: AppCo
       tags = hc.toAuditTags(auditType, path),
       detail = hc.toAuditDetails() ++ auditData
     )
-    Logger.info(s"audit Config ${connector.auditingConfig}")
+    logger.info(s"audit Config ${connector.auditingConfig}")
     connector.sendEvent(event)
   }
 

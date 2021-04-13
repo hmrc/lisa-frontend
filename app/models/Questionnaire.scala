@@ -29,7 +29,7 @@ case class Questionnaire(
 object Questionnaire {
   val maxOptionSize = 4
   val maxBooleanOptionSize = 2
-  val form = Form(mapping(
+  val form: Form[Questionnaire] = Form(mapping(
     "easyToUse" -> optional(number(0, maxOptionSize)),
     "satisfactionLevel" -> optional(number(0, maxOptionSize)),
     "whyGiveThisRating" -> optional(text),

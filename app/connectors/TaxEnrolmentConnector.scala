@@ -19,10 +19,9 @@ package connectors
 import com.google.inject.Inject
 import config.AppConfig
 import models._
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -30,13 +29,13 @@ import scala.concurrent.Future
 class TaxEnrolmentConnector @Inject()(
   val httpGet: HttpClient,
   val appConfig: AppConfig
-) extends TaxEnrolmentJsonFormats {
+) extends TaxEnrolmentJsonFormats with Logging {
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
     httpGet.GET[HttpResponse](uri)(implicitly, hc, implicitly) map { res =>
-      Logger.debug(s"Getsubscriptions returned status: ${res.status} ")
+      logger.debug(s"Getsubscriptions returned status: ${res.status} ")
       Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
     }
   }

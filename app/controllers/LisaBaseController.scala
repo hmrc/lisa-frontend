@@ -18,20 +18,20 @@ package controllers
 
 import config.AppConfig
 import models._
-import play.api.Logger
+import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Reads
 import play.api.mvc._
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext)
   extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
-  with AuthRedirects with I18nSupport {
+  with AuthRedirects with I18nSupport with Logging {
 
   val appConfig: AppConfig
   val sessionCache: SessionCache
@@ -66,18 +66,18 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
 
   private def handleUserAuthorised(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
                                   (implicit request: Request[AnyContent]): Future[Result] = {
-    Logger.debug("User Authorised")
+    logger.debug("User Authorised")
     isReapplication(user) flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
           case TaxEnrolmentPending =>
-            Logger.debug("Enrollment Pending")
+            logger.debug("Enrollment Pending")
             Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
           case TaxEnrolmentError =>
-            Logger.debug("Enrollment Rejected")
+            logger.debug("Enrollment Rejected")
             Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
           case TaxEnrolmentDoesNotExist =>
-            Logger.debug("Enrollment Does Not Exist")
+            logger.debug("Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
         }
       }
@@ -89,7 +89,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
 
   private def handleUserAuthorisedAndEnrolled(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
                                              (implicit request: Request[AnyContent]): Future[Result] = {
-    Logger.debug("User Authorised And Enrolled")
+    logger.debug("User Authorised And Enrolled")
 
     if (checkEnrolmentState) {
       sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber).map { _ =>
