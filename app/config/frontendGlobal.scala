@@ -18,17 +18,19 @@ package config
 
 import com.google.inject.Inject
 import play.api.i18n.MessagesApi
+import play.api.libs.json.Reads
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment}
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CryptoWithKeysFromConfig}
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
-import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
+import uk.gov.hmrc.crypto.json.JsonDecryptor
+import uk.gov.hmrc.crypto.{ApplicationCrypto, CryptoWithKeysFromConfig, Protected}
+import uk.gov.hmrc.http.cache.client.{CachingException, SessionCache, ShortLivedCache, ShortLivedHttpCaching}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ErrorHandler @Inject()(val messagesApi: MessagesApi,
                              val configuration: Configuration,
@@ -83,4 +85,17 @@ class LisaShortLivedCache @Inject()(
   override val shortLiveCache: LisaShortLivedHttpCaching) extends ShortLivedCache {
 
   override implicit lazy val crypto: CryptoWithKeysFromConfig = appCrypto.JsonCrypto
+
+  override def fetchAndGetEntry[T](cacheId: String, key: String)
+                                  (implicit hc: HeaderCarrier, rds: Reads[T], executionContext: ExecutionContext): Future[Option[T]] = {
+    try {
+      val decryptionFormat = new JsonDecryptor()
+      val encrypted: Future[Option[Protected[T]]] =
+        shortLiveCache.fetchAndGetEntry(cacheId, key)(hc, decryptionFormat, executionContext)
+      encrypted.map(op => convert(op)).recover { case e: UpstreamErrorResponse if e.statusCode == 404 => None }
+    } catch {
+      case e: SecurityException =>
+        throw CachingException(s"Failed to fetch a decrypted entry by cacheId:$cacheId and key:$key", e)
+    }
+  }
 }
