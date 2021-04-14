@@ -28,11 +28,7 @@ import scala.concurrent.Future
 class RosmConnector @Inject()(
   val httpPost: HttpClient,
   val appConfig: AppConfig
-) extends RosmJsonFormats {
-
-  val httpReads:HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
-    override def read(method: String, url: String, response: HttpResponse): HttpResponse = response
-  }
+) extends RosmJsonFormats with RawResponseReads {
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"

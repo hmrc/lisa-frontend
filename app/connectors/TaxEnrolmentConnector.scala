@@ -29,12 +29,12 @@ import scala.concurrent.Future
 class TaxEnrolmentConnector @Inject()(
   val httpGet: HttpClient,
   val appConfig: AppConfig
-) extends TaxEnrolmentJsonFormats with Logging {
+) extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
-    httpGet.GET[HttpResponse](uri)(implicitly, hc, implicitly) map { res =>
+    httpGet.GET[HttpResponse](uri)(httpReads, hc, implicitly) map { res =>
       logger.debug(s"Getsubscriptions returned status: ${res.status} ")
       Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
     }
