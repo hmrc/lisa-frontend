@@ -20,11 +20,11 @@ import com.google.inject.Inject
 import config.AppConfig
 import metrics.EmailMetrics
 import models.SendEmailRequest
-import play.api.Logger
+import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,7 +38,7 @@ class EmailConnector @Inject()(
   val http: HttpClient,
   appConfig: AppConfig,
   metrics: EmailMetrics
-) extends RawResponseReads {
+) extends RawResponseReads with Logging {
 
   def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit hc: HeaderCarrier): Future[EmailStatus] = {
 
@@ -50,12 +50,12 @@ class EmailConnector @Inject()(
     http.POST(postUrl, jsonData).map { response =>
       response.status match {
         case ACCEPTED => {
-          Logger.info("Email sent successfully.")
+          logger.info("Email sent successfully.")
           metrics.emailSentCounter()
           EmailSent
         }
         case status => {
-          Logger.warn("Email not sent.")
+          logger.warn("Email not sent.")
           metrics.emailNotSentCounter()
           EmailNotSent
         }

@@ -31,7 +31,7 @@ object YourDetails {
 
   val cacheKey = "yourDetails"
 
-  val form = Form(
+  val form: Form[YourDetails] = Form(
     mapping(
       "firstName" -> optional(text)
         .verifying("error.firstNameRequired", _.isDefined)

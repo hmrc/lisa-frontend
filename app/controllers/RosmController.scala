@@ -19,13 +19,13 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.{EmailConnector, RosmJsonFormats}
+
 import java.time.format.DateTimeFormatter
 import java.time.LocalDate
-
 import models.{ApplicationSent, LisaRegistration}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment, Logging}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
@@ -45,14 +45,14 @@ class RosmController @Inject()(
   override implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents,
   errorView: views.html.error_template
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with RosmJsonFormats {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with RosmJsonFormats with Logging {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       hasAllSubmissionData(cacheId) { registrationDetails =>
         rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) =>
-            Logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
+            logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
             auditService.audit(auditType = "applicationReceived",
               path = routes.RosmController.post().url,
@@ -78,7 +78,7 @@ class RosmController @Inject()(
               Redirect(routes.ApplicationSubmittedController.get())
             }
           case Left(error) =>
-            Logger.info("Audit of Submission -> auditType = applicationNotReceived")
+            logger.info("Audit of Submission -> auditType = applicationNotReceived")
 
             auditService.audit(auditType = "applicationNotReceived",
               path = routes.RosmController.post().url,

@@ -19,7 +19,7 @@ package services
 import com.google.inject.Inject
 import connectors.{RosmConnector, RosmJsonFormats}
 import models._
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,15 +27,15 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFormats {
+class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFormats with Logging {
 
   private def handleErrorResponse(rosmType: String, response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
     case failureResponse: JsSuccess[DesFailureResponse] => {
-      Logger.error(s"ROSM $rosmType failure: ${failureResponse.get.code}")
+      logger.error(s"ROSM $rosmType failure: ${failureResponse.get.code}")
       Left(failureResponse.get.code)
     }
     case _: JsError => {
-      Logger.error(s"ROSM $rosmType failure, unexpected error.")
+      logger.error(s"ROSM $rosmType failure, unexpected error.")
       Left("INTERNAL_SERVER_ERROR")
     }
   }
@@ -52,7 +52,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFo
     val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName, getRosmBusinessStructure(businessStructure)))
 
     rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
-      Logger.warn(s"ROSM registration response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")
+      logger.warn(s"ROSM registration response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")
 
       res.json.validate[RosmRegistrationSuccessResponse] match {
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
@@ -60,7 +60,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFo
       }
     }.recover {
       case NonFatal(ex: Throwable) => {
-        Logger.error(s"ROSM registration exception: ${ex.getMessage}")
+        logger.error(s"ROSM registration exception: ${ex.getMessage}")
         Left("INTERNAL_SERVER_ERROR")
       }
     }
@@ -89,7 +89,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFo
         companyName = companyName,
         applicantDetails = applicantDetails)
     ).map(subscribed => {
-        Logger.warn(s"ROSM subscription response for $companyName ($utr): ${subscribed.json.toString()}")
+        logger.warn(s"ROSM subscription response for $companyName ($utr): ${subscribed.json.toString()}")
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
           case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)

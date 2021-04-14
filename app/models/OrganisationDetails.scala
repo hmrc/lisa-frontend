@@ -30,7 +30,7 @@ object OrganisationDetails {
 
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
-  val form = Form(
+  val form: Form[OrganisationDetails] = Form(
     mapping(
       "companyName" -> optional(text)
         .verifying("error.companyNameRequired", _.isDefined)
@@ -50,7 +50,7 @@ object OrganisationDetails {
     )
   )
 
-  val partnershipForm = Form(
+  val partnershipForm: Form[OrganisationDetails] = Form(
     mapping(
       "companyName" -> optional(text)
         .verifying("error.companyNameRequired", _.isDefined)

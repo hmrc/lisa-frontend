@@ -27,7 +27,7 @@ object BusinessStructure {
 
   val cacheKey = "businessStructure"
 
-  val form = Form(
+  val form: Form[BusinessStructure] = Form(
     mapping(
       "companyStructure" -> optional(text).verifying("error.companyStructureRequired", i => i.isDefined)
     )(bs => BusinessStructure(bs.get))(bs => Some(Some(bs.businessStructure)))

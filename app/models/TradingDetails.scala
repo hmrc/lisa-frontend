@@ -29,7 +29,7 @@ object TradingDetails {
 
   implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
 
-  val form = Form(
+  val form: Form[TradingDetails] = Form(
     mapping(
       "fsrRefNumber" -> optional(text)
         .verifying("error.fsrRefNumberRequired", fsr => fsrExists(fsr))

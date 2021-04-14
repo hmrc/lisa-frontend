@@ -22,7 +22,7 @@ import models.{BusinessStructure, OrganisationDetails}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment, Logging}
 import services.{AuthorisationService, RosmService}
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
@@ -40,7 +40,7 @@ class OrganisationDetailsController @Inject()(
   override implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents,
   organisationDetailsView: views.html.registration.organisation_details
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with Logging {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
@@ -86,15 +86,15 @@ class OrganisationDetailsController @Inject()(
             },
             data => {
               shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
-                Logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
+                logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId) =>
-                    Logger.debug("rosmRegister Successful")
+                    logger.debug("rosmRegister Successful")
                     shortLivedCache.cache[String](cacheId, "safeId", safeId).flatMap { _ =>
                       handleRedirect(routes.TradingDetailsController.get().url)
                     }
                   case Left(error) =>
-                    Logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
+                    logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
                     handleRedirect(routes.MatchingFailedController.get().url)
                 }
               }

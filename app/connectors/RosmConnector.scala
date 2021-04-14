@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import models._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -28,11 +28,7 @@ import scala.concurrent.Future
 class RosmConnector @Inject()(
   val httpPost: HttpClient,
   val appConfig: AppConfig
-) extends RosmJsonFormats {
-
-  val httpReads:HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
-    override def read(method: String, url: String, response: HttpResponse): HttpResponse = response
-  }
+) extends RosmJsonFormats with RawResponseReads {
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"
