@@ -21,7 +21,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 scalaVersion := "2.12.12"
 
 lazy val lisafrontend = (project in file("."))
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(scoverageSettings: _*)
   .settings(scalaSettings: _*)
@@ -42,11 +42,8 @@ lazy val lisafrontend = (project in file("."))
     ),
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     routesGenerator := InjectedRoutesGenerator,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
-    resolvers ++= Seq(
-      Resolver.bintrayRepo("hmrc", "releases"),
-      Resolver.jcenterRepo
-    ))
+    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
+  )
 
 // Silence unused import in views and routes
 val silencerVersion = "1.7.1"
