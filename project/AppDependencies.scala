@@ -22,20 +22,19 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-27" % "4.2.0",
-    "uk.gov.hmrc" %% "govuk-template" % "5.65.0-play-27",
-    "uk.gov.hmrc" %% "play-partials" % "8.0.0-play-27",
-    "uk.gov.hmrc" %% "auth-client" % "3.3.0-play-27",
-    "uk.gov.hmrc" %% "http-caching-client" % "9.3.0-play-27",
-    "uk.gov.hmrc" %% "play-frontend-hmrc" % "0.48.0-play-27"
+    "uk.gov.hmrc" %% "bootstrap-frontend-play-27" % "5.3.0",
+    "uk.gov.hmrc" %% "govuk-template" % "5.66.0-play-27",
+    "uk.gov.hmrc" %% "play-partials" % "8.1.0-play-27",
+    "uk.gov.hmrc" %% "http-caching-client" % "9.5.0-play-27",
+    "uk.gov.hmrc" %% "play-frontend-hmrc" % "0.64.0-play-27"
   )
 
   val test: Seq[ModuleID] = Seq(
     "org.pegdown" % "pegdown" % "1.6.0",
     "com.typesafe.play" %% "play-test" % PlayVersion.current,
-    "org.mockito" % "mockito-core" % "3.8.0",
+    "org.mockito" % "mockito-core" % "3.10.0",
     "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3",
-    "org.scalatestplus" %% "mockito-3-4" % "3.2.7.0"
+    "org.scalatestplus" %% "mockito-3-4" % "3.2.9.0"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

@@ -44,7 +44,7 @@ object TradingDetails {
         zref.getOrElse("")
       )
     )(
-      td => Some(Some(td.fsrRefNumber), Some(td.isaProviderRefNumber))
+      td => Some((Some(td.fsrRefNumber), Some(td.isaProviderRefNumber)))
     )
   )
 

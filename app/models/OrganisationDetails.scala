@@ -46,7 +46,7 @@ object OrganisationDetails {
         utr.getOrElse("")
       )
     )(
-      org => Some(Some(org.companyName), Some(org.ctrNumber))
+      org => Some((Some(org.companyName), Some(org.ctrNumber)))
     )
   )
 
@@ -66,7 +66,7 @@ object OrganisationDetails {
         utr.getOrElse("")
       )
     )(
-      org => Some(Some(org.companyName), Some(org.ctrNumber))
+      org => Some((Some(org.companyName), Some(org.ctrNumber)))
     )
   )
 }
