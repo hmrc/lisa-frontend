@@ -64,7 +64,7 @@ object YourDetails {
         email.getOrElse("")
       )
     )(
-      details => Some(Some(details.firstName), Some(details.lastName), Some(details.role), Some(details.phone), Some(details.email))
+      details => Some((Some(details.firstName), Some(details.lastName), Some(details.role), Some(details.phone), Some(details.email)))
     )
   )
 }
