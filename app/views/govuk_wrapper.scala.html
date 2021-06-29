@@ -36,15 +36,13 @@
 }
 
 @content = {
-    <main id="wrapper" role="main">
-        <div id="content">
-            <div class="content__body">
-                @mainContent
+    <div id="content">
+        <div class="content__body">
+            @mainContent
 
-                @hmrcReportTechnicalIssueHelper()
-            </div>
+            @hmrcReportTechnicalIssueHelper()
         </div>
-    </main>
+    </div>
 }
 
 @govukLayout(
