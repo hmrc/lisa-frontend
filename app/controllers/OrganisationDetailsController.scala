@@ -45,7 +45,7 @@ class OrganisationDetailsController @Inject()(
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
           val orgDetailsForm: Form[OrganisationDetails] = if (isPartnership) {
@@ -73,7 +73,7 @@ class OrganisationDetailsController @Inject()(
     authorisedForLisa { cacheId =>
 
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
           val form = if (isPartnership) OrganisationDetails.partnershipForm else OrganisationDetails.form
@@ -91,11 +91,11 @@ class OrganisationDetailsController @Inject()(
                   case Right(safeId) =>
                     logger.debug("rosmRegister Successful")
                     shortLivedCache.cache[String](cacheId, "safeId", safeId).flatMap { _ =>
-                      handleRedirect(routes.TradingDetailsController.get().url)
+                      handleRedirect(routes.TradingDetailsController.get.url)
                     }
                   case Left(error) =>
                     logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
-                    handleRedirect(routes.MatchingFailedController.get().url)
+                    handleRedirect(routes.MatchingFailedController.get.url)
                 }
               }
             }

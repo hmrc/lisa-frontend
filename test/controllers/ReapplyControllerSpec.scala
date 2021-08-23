@@ -40,7 +40,7 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
 
       status(result) mustBe Status.SEE_OTHER
 
-      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
     }
   }
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]

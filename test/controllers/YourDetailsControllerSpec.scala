@@ -107,7 +107,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
-        val uri = controllers.routes.YourDetailsController.post().url
+        val uri = controllers.routes.YourDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
         val result = SUT.post()(request)
 
@@ -126,7 +126,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incorrectly filled" in {
-        val uri = controllers.routes.YourDetailsController.post().url
+        val uri = controllers.routes.YourDetailsController.post.url
         val invalidJson = Json.obj(
           "firstName" -> "Test0",
           "lastName" -> "User&",
@@ -152,7 +152,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to your details" when {
       "the submitted data is valid" in {
-        val uri = controllers.routes.YourDetailsController.post().url
+        val uri = controllers.routes.YourDetailsController.post.url
         val validJson = Json.obj(
           "firstName" -> "Test",
           "lastName" -> "User",
@@ -168,7 +168,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.SummaryController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.SummaryController.get.url)
       }
     }
 
@@ -177,7 +177,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
         when(authorisationService.userStatus(ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-        val uri = controllers.routes.YourDetailsController.post().url
+        val uri = controllers.routes.YourDetailsController.post.url
         val validJson = Json.obj(
           "firstName" -> "Test",
           "lastName" -> "User",

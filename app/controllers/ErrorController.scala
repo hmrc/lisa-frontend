@@ -38,14 +38,14 @@ class ErrorController @Inject()(
 ) extends FrontendController(messagesControllerComponents: MessagesControllerComponents) with AuthRedirects with I18nSupport {
 
   val accessDeniedIndividualOrAgent: Action[AnyContent] = Action.async { implicit request =>
-    val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url
+    val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url
     val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
 
     Future.successful(Forbidden(accessDeniedIndividualOrAgentView(loginUrl, registerUrl)))
   }
 
   val accessDeniedAssistant: Action[AnyContent] = Action.async { implicit request =>
-    val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get().url
+    val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url
     val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
 
     Future.successful(Forbidden(accessDeniedAssistantView(loginUrl, registerUrl)))

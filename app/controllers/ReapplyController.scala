@@ -42,7 +42,7 @@ class ReapplyController @Inject()(
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( cacheId =>{
         shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { _ =>
-         Redirect(routes.BusinessStructureController.get())
+         Redirect(routes.BusinessStructureController.get)
         }
       }, checkEnrolmentState = false
     )

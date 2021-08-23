@@ -57,7 +57,7 @@ class BusinessStructureController @Inject()(
         },
         data => {
           shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data).flatMap { _ =>
-            handleRedirect(routes.OrganisationDetailsController.get().url)
+            handleRedirect(routes.OrganisationDetailsController.get.url)
           }
         }
       )

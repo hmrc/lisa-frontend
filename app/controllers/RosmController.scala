@@ -55,7 +55,7 @@ class RosmController @Inject()(
             logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
 
             auditService.audit(auditType = "applicationReceived",
-              path = routes.RosmController.post().url,
+              path = routes.RosmController.post.url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
             val applicationSentVM = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
@@ -75,13 +75,13 @@ class RosmController @Inject()(
                 )
               )
 
-              Redirect(routes.ApplicationSubmittedController.get())
+              Redirect(routes.ApplicationSubmittedController.get)
             }
           case Left(error) =>
             logger.info("Audit of Submission -> auditType = applicationNotReceived")
 
             auditService.audit(auditType = "applicationNotReceived",
-              path = routes.RosmController.post().url,
+              path = routes.RosmController.post.url,
               auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
 
             Future.successful(InternalServerError(errorView()))
