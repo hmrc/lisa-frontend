@@ -42,8 +42,8 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
                        (implicit request: Request[AnyContent]): Future[Result] = {
     authorisationService.userStatus flatMap {
       case UserNotLoggedIn => Future.successful(toGGLogin(appConfig.loginCallback))
-      case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDeniedIndividualOrAgent()))
-      case UserNotAdmin => Future.successful(Redirect(routes.ErrorController.accessDeniedAssistant()))
+      case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDeniedIndividualOrAgent))
+      case UserNotAdmin => Future.successful(Redirect(routes.ErrorController.accessDeniedAssistant))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
     }
@@ -72,10 +72,10 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
         user.enrolmentState match {
           case TaxEnrolmentPending =>
             logger.debug("Enrollment Pending")
-            Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
+            Future.successful(Redirect(routes.ApplicationSubmittedController.pending))
           case TaxEnrolmentError =>
             logger.debug("Enrollment Rejected")
-            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
+            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected))
           case TaxEnrolmentDoesNotExist =>
             logger.debug("Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
@@ -93,7 +93,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
 
     if (checkEnrolmentState) {
       sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber).map { _ =>
-        Redirect(routes.ApplicationSubmittedController.successful())
+        Redirect(routes.ApplicationSubmittedController.successful)
       }
     }
     else {
@@ -106,14 +106,14 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     shortLivedCache.fetch(cacheId) flatMap {
       case Some(cache) =>
         val cacheResult: Either[Result, LisaRegistration] = for {
-          bs  <- getOrRedirect[BusinessStructure](cache, BusinessStructure.cacheKey, Redirect(routes.BusinessStructureController.get()))
-          od  <- getOrRedirect[OrganisationDetails](cache, OrganisationDetails.cacheKey, Redirect(routes.OrganisationDetailsController.get()))
-          sId <- getOrRedirect[String](cache, "safeId", Redirect(routes.OrganisationDetailsController.get()))
-          td  <- getOrRedirect[TradingDetails](cache, TradingDetails.cacheKey, Redirect(routes.TradingDetailsController.get()))
-          yd  <- getOrRedirect[YourDetails](cache, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get()))
+          bs  <- getOrRedirect[BusinessStructure](cache, BusinessStructure.cacheKey, Redirect(routes.BusinessStructureController.get))
+          od  <- getOrRedirect[OrganisationDetails](cache, OrganisationDetails.cacheKey, Redirect(routes.OrganisationDetailsController.get))
+          sId <- getOrRedirect[String](cache, "safeId", Redirect(routes.OrganisationDetailsController.get))
+          td  <- getOrRedirect[TradingDetails](cache, TradingDetails.cacheKey, Redirect(routes.TradingDetailsController.get))
+          yd  <- getOrRedirect[YourDetails](cache, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get))
         } yield LisaRegistration(od, td, bs, yd, sId)
         cacheResult.fold(redirect => Future.successful(redirect), callback(_))
-      case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+      case None => Future.successful(Redirect(routes.BusinessStructureController.get))
     }
   }
 

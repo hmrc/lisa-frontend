@@ -52,7 +52,7 @@
         serviceName = Some(messages("service.name")),
         signOutUrl = Some(appConfig.signOutUrl),
         userResearchBanner = if(researchBannerUrl.isDefined) Some(UserResearchBanner(url = researchBannerUrl.get)) else None,
-        serviceUrl = Some(controllers.routes.HomePageController.home().url)
+        serviceUrl = Some(controllers.routes.HomePageController.home.url)
     )),
     beforeContentBlock = beforeContentHtml,
     scriptsBlock = Some(hmrcScripts()),

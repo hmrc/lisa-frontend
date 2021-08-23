@@ -39,6 +39,6 @@ class HomePageController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with I18nSupport {
 
   val home: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Redirect(routes.BusinessStructureController.get(), MOVED_PERMANENTLY))
+    Future.successful(Redirect(routes.BusinessStructureController.get, MOVED_PERMANENTLY))
   }
 }

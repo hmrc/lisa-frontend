@@ -78,7 +78,7 @@
     <div class="form-field form-field--submit">
     @govukButton(Button(
         value = Some(messages("matchingfailed.tryagain")),
-        href = Some(routes.OrganisationDetailsController.get().url),
+        href = Some(routes.OrganisationDetailsController.get.url),
         content = Text(messages("matchingfailed.tryagain")),
         attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your company’s details could not be found:Try again")
     ))

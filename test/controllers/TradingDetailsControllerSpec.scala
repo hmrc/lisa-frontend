@@ -108,7 +108,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
-        val uri = controllers.routes.TradingDetailsController.post().url
+        val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
         val result = SUT.post()(request)
 
@@ -121,7 +121,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         content must include ("Enter your ISA manager reference")
       }
       "the submitted data is invalid - lowercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post().url
+        val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj( "fsrRefNumber" -> "654321",
           "isaProviderRefNumber" -> "z1234")))
         when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
@@ -133,19 +133,19 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to your details" when {
       "the submitted data is valid - uppercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post().url
+        val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
           ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
         val result = SUT.post(request)
         status(result) mustBe Status.SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get.url)
       }
     }
 
     "store trading details in cache" when {
       "the submitted data is valid - uppercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post().url
+        val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         await(SUT.post(request))
         verify(shortLivedCache).cache[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())(

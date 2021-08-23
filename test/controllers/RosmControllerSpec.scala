@@ -50,7 +50,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
       }
       "no business structure details are found in the cache" in {
         when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
@@ -60,7 +60,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
       }
     }
 
@@ -77,7 +77,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
       "no safeId details are found in the cache" in {
         val businessStructureForm = new BusinessStructure("LLP")
@@ -93,7 +93,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
     }
 
@@ -113,7 +113,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get.url)
       }
     }
 
@@ -135,7 +135,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get.url)
       }
     }
 
@@ -162,7 +162,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
       when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
         .thenReturn(Future.successful(Right("123456789")))
 
-      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
+      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get.url))
     }
 
     "email the user on a successful rosm registration" in {

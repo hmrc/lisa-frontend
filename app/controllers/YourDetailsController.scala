@@ -60,7 +60,7 @@ class YourDetailsController @Inject()(
         },
         data => {
           shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data).flatMap { _ =>
-            handleRedirect(routes.SummaryController.get().url)
+            handleRedirect(routes.SummaryController.get.url)
           }
         }
       )

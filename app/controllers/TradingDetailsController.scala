@@ -57,7 +57,7 @@ class TradingDetailsController @Inject()(
         },
         data => {
           shortLivedCache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, TradingDetails.uppercaseZ(data)).flatMap { _ =>
-            handleRedirect(routes.YourDetailsController.get().url)
+            handleRedirect(routes.YourDetailsController.get.url)
           }
         }
       )

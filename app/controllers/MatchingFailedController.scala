@@ -43,7 +43,7 @@ class MatchingFailedController @Inject()(
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
-        case None => Future.successful(Redirect(routes.BusinessStructureController.get()))
+        case None => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
           Future.successful(Ok(matchingFailedView(isPartnership)))

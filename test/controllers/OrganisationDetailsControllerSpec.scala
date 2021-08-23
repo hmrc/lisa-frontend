@@ -127,7 +127,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
       }
 
     }
@@ -139,7 +139,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "return validation errors" when {
 
       "the submitted data is incomplete" in {
-        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
 
         when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
@@ -162,7 +162,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
       }
 
       "the company name is invalid" in {
-        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X")))
 
         when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
@@ -189,7 +189,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "redirect the user to trading details" when {
 
       "the submitted data is valid" in {
-        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
         when(shortLivedCache.cache[OrganisationDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
@@ -207,7 +207,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get.url)
       }
 
     }
@@ -216,7 +216,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
       "the ROSM registration fails" in {
 
-        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
 
         when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
@@ -240,7 +240,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "store organisation details in cache" when {
 
       "the submitted data is valid" in {
-        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val uri = controllers.routes.OrganisationDetailsController.post.url
 
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
@@ -263,7 +263,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "store safeId in cache" when {
 
       "the submitted data is valid" in {
-        val uri = controllers.routes.OrganisationDetailsController.post().url
+        val uri = controllers.routes.OrganisationDetailsController.post.url
 
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))

@@ -51,7 +51,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
       }
     }
 
@@ -68,7 +68,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
       "no safeId is found in the cache" in {
         val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
@@ -84,7 +84,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
     }
 
@@ -104,7 +104,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.TradingDetailsController.get.url)
       }
     }
 
@@ -126,7 +126,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get.url)
       }
     }
 

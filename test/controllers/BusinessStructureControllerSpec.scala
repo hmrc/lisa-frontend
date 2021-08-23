@@ -101,7 +101,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
-        val uri = controllers.routes.BusinessStructureController.post().url
+        val uri = controllers.routes.BusinessStructureController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
         val result = SUT.post()(request)
 
@@ -117,7 +117,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to organisation details" when {
       "the submitted data is valid" in {
-        val uri = controllers.routes.BusinessStructureController.post().url
+        val uri = controllers.routes.BusinessStructureController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
         when(shortLivedCache.cache[BusinessStructure](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
           ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
@@ -126,13 +126,13 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
         status(result) mustBe Status.SEE_OTHER
 
-        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
     }
 
     "store business structure details in cache" when {
       "the submitted data is valid" in {
-        val uri = controllers.routes.BusinessStructureController.post().url
+        val uri = controllers.routes.BusinessStructureController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
 
         await(SUT.post(request))
