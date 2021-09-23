@@ -38,7 +38,12 @@
     ))
 
     @if(form.hasErrors) {
-        @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
+        @govukErrorSummary(
+            ErrorSummary(
+                errorList = form.errors.asTextErrorLinks,
+                title = Text(messages("validation.summary.heading"))
+            )
+        )
     }
 
     <h1 class="govuk-label--l">Your company’s reference numbers</h1>
@@ -47,7 +52,7 @@
         @CSRF.formField
 
         @govukInput(Input(
-            id = "fsrRefNumber-form",
+            id = "fsrRefNumber",
             name = "fsrRefNumber",
             classes = "govuk-input--width-20",
             value = form("fsrRefNumber").value,
@@ -69,7 +74,7 @@
         ))
 
         @govukInput(Input(
-            id = "isaProviderRefNumber-form",
+            id = "isaProviderRefNumber",
             name = "isaProviderRefNumber",
             classes = "govuk-input--width-20",
             value = form("isaProviderRefNumber").value,
@@ -97,5 +102,4 @@
         ))
         </div>
     </form>
-
 }

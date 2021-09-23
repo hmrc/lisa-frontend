@@ -30,12 +30,13 @@
 
     @govukPanel(Panel(
         title = Text(messages("applicationsubmitted.banner.heading")),
-        content = HtmlContent(messages("applicationsubmitted.banner.line1", subscriptionId))
+        content = HtmlContent(messages("applicationsubmitted.banner.line1", subscriptionId)),
+        classes = "name-overflow"
     ))
 
     <p class="govuk-body">@messages("applicationsubmitted.text.line1", email)</p>
 
-    <p class="govuk-body">@messages("applicationsubmitted.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" data-journey-click="link - click:Application submitted:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk.</a></p>
+    <p class="govuk-body">@messages("applicationsubmitted.text.line2.pre") <a href="mailto:savings.audit@@hmrc.gov.uk" class="name-overflow" data-journey-click="link - click:Application submitted:Email savings.audit@@hmrc.gov.uk">savings.audit@@hmrc.gov.uk.</a></p>
 
     <h2 class="govuk-heading-m">@messages("applicationsubmitted.text.line3")</h2>
 

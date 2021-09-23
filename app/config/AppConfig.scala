@@ -31,6 +31,7 @@ class AppConfig @Inject()(config: ServicesConfig){
   private val basGatewayHost = config.getString("bas-gateway.host")
   private val contactHost = config.getString("contact-frontend.host")
   private val logoutCallback = config.getString("gg-urls.logout-callback.url")
+  private val timeoutCallback = config.getString("gg-urls.timeout-callback.url")
 
   lazy val appName: String = config.getString("appName")
   lazy val apiUrl: String = loadConfig("external-urls.lisa-api.url")
@@ -38,6 +39,7 @@ class AppConfig @Inject()(config: ServicesConfig){
   lazy val registerOrgUrl: String = loadConfig("gg-urls.registerOrg.url")
 
   lazy val signOutUrl: String = getSignOutUrl(logoutCallback)
+  lazy val timeOutUrl: String = getSignOutUrl(timeoutCallback)
   lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
   lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
   lazy val loginCallback: String = config.getString("gg-urls.login-callback.url")

@@ -36,10 +36,15 @@ class SignOutController @Inject()(
   implicit val appConfig: AppConfig,
   override implicit val messagesApi: MessagesApi,
   override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  timeoutView: views.html.timeout_sign_out
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   def redirect: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Redirect(appConfig.feedbackRedirectUrl).withNewSession)
+  }
+
+  def timeout: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(timeoutView()).withNewSession)
   }
 }

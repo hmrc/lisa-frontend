@@ -1,0 +1,25 @@
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
+
+@this(govukWrapper: views.html.govuk_wrapper,
+        hmrcPageHeading: HmrcPageHeading,
+        govukButton: GovukButton)
+
+@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+
+@govukWrapper(title = messages("title.timeout-sign-out"), timeoutDialogEnabled = false) {
+    @hmrcPageHeading(PageHeading(
+        text = messages("timeout.heading")
+    ))
+
+    <div class="govuk-button-group">
+        @govukButton(Button(
+            content = Text(messages("timeout.sign-in-button")),
+            attributes = Map("id" -> "signInButton"),
+            href = Some(appConfig.loginURL),
+        ))
+    </div>
+}

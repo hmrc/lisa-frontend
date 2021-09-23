@@ -18,20 +18,42 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.Helpers._
 import play.api.test.Injecting
+import views.html.timeout_sign_out
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class SignOutControllerSpec extends SpecBase with Injecting {
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val timeoutView: timeout_sign_out = inject[timeout_sign_out]
+  val SUT = new SignOutController()
 
-  "Calling the SignOutController.redirect" should {
-    "respond with OK" in {
+  "Calling SignOutController.redirect" should {
+    "respond with SEE OTHER" in {
       val result = SUT.redirect(fakeRequest)
       status(result) mustBe Status.SEE_OTHER
     }
   }
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new SignOutController()
+
+  "Calling SignOutController.timeout" should {
+    val result: Future[Result] = SUT.timeout(fakeRequest)
+    "respond with OK" in {
+      status(result) mustBe Status.OK
+    }
+    "render the timeout page" in {
+      def returnMessage(key: String): String = stubMessages(mcc.messagesApi).messages(key)
+
+      val title: String = returnMessage("title.timeout-sign-out")
+      val header: String = returnMessage("timeout.heading")
+      val signInButton: String = returnMessage("timeout.sign-in-button")
+      val pageAsString: String = contentAsString(result)
+
+      pageAsString must include(title)
+      pageAsString must include(header)
+      pageAsString must include(signInButton)
+    }
+  }
 }
