@@ -83,8 +83,8 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" id=@{s"title-${utrName}Number"}>@messages(s"summary.companydetails.${utrName}")</dt>
-                <dd class="govuk-summary-list__value"id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber </dd>
+                <dt class="govuk-summary-list__key" id=@{s"title-${utrName}Number"}>@messages(s"summary.companydetails.$utrName")</dt>
+                <dd class="govuk-summary-list__value" id=@{s"value-${utrName}Number"}>@data.organisationDetails.ctrNumber </dd>
                 <dd class="govuk-summary-list__actions">
                     <a class="govuk-link" href="@routes.OrganisationDetailsController.get?returnUrl=@routes.SummaryController.get" id="change-organisationNumbers-@{utrName}Number"
                     data-journey-click="link - click:Check your answers:summary.companydetails.str.change=Change your @utrFullName Unique Taxpayer Reference">

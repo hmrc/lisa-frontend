@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukHeader, GovukLayout}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcReportTechnicalIssueHelper, HmrcScripts, HmrcStandardFooter, HmrcStandardHeader}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTimeoutDialogHelper
 
 @this(
         govukLayout: GovukLayout,
@@ -25,14 +26,19 @@
         hmrcStandardHeader: HmrcStandardHeader,
         hmrcStandardFooter: HmrcStandardFooter,
         hmrcScripts: HmrcScripts,
-        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
-
-@(title: String, beforeContentHtml: Option[Html] = None, researchBannerUrl: Option[String] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(title: String, beforeContentHtml: Option[Html] = None, researchBannerUrl: Option[String] = None, timeoutDialogEnabled: Boolean = true)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @head ={
     <meta name="format-detection" content="telephone=no" />
     <link rel="stylesheet" media="all" href='@routes.Assets.versioned("stylesheets/lisa-app.css")' type="text/css"/>
+    @if(timeoutDialogEnabled) {
+        @hmrcTimeoutDialogHelper(
+            signOutUrl = appConfig.timeOutUrl
+        )
+    }
 }
 
 @content = {

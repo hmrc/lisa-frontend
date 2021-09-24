@@ -25,15 +25,13 @@ object AppDependencies {
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % "5.14.0",
     "uk.gov.hmrc" %% "play-partials" % "8.2.0-play-28",
     "uk.gov.hmrc" %% "http-caching-client" % "9.5.0-play-28",
-    "uk.gov.hmrc" %% "play-frontend-hmrc" % "1.9.0-play-28"
+    "uk.gov.hmrc" %% "play-frontend-hmrc" % "1.12.0-play-28"
   )
 
   val test: Seq[ModuleID] = Seq(
-    "org.pegdown" % "pegdown" % "1.6.0",
+    "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.14.0",
     "com.typesafe.play" %% "play-test" % PlayVersion.current,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0",
-    "org.scalatestplus" %% "mockito-3-4" % "3.2.9.0",
-    "com.vladsch.flexmark"    %  "flexmark-all"        % "0.36.8"
+    "org.scalatestplus" %% "mockito-3-4" % "3.2.9.0"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

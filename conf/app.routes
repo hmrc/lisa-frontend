@@ -21,4 +21,5 @@ GET        /reviewing-your-application      @controllers.ApplicationSubmittedCon
 GET        /application-successful          @controllers.ApplicationSubmittedController.successful
 GET        /application-unsuccessful        @controllers.ApplicationSubmittedController.rejected
 GET        /signed-out                      @controllers.SignOutController.redirect
+GET        /timed-out                       @controllers.SignOutController.timeout
 GET        /re-apply                        @controllers.ReapplyController.get

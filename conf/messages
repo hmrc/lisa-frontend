@@ -48,6 +48,7 @@ title.your-details=Your name and contact details - Apply to be an approved Lifet
 title.access-denied=There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.access-denied-individual-or-agent=There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.business-structure=What is your company structure? - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.timeout-sign-out=For your security, we signed you out - Apply to be an approved Lifetime ISA Manager - GOV.UK
 
 yourdetails.heading=Your name and contact details
 yourdetails.indent=HMRC might contact you to confirm the details in this application.
@@ -146,6 +147,9 @@ accessdenied.assistant.text.line1=You signed in as an assistant.
 accessdenied.assistant.text.line2=To use the service, you must either:
 accessdenied.assistant.text.signin=sign in with an administrator account
 accessdenied.assistant.text.register=register for an administrator account
+
+timeout.heading=For your security, we signed you out
+timeout.sign-in-button=Sign in
 
 error.companyStructureRequired=Select if your company is a limited liability partnership, limited company or friendly society
 
