@@ -36,7 +36,8 @@
     <link rel="stylesheet" media="all" href='@routes.Assets.versioned("stylesheets/lisa-app.css")' type="text/css"/>
     @if(timeoutDialogEnabled) {
         @hmrcTimeoutDialogHelper(
-            signOutUrl = appConfig.timeOutUrl
+            timeoutUrl = Some(appConfig.timeOutUrl),
+            signOutUrl = appConfig.signOutUrl
         )
     }
 }
