@@ -14,6 +14,7 @@ global.page.not.found.error.contact.email=savings.audit@hmrc.gov.uk
 
 validation.summary.heading=There is a problem
 
+org.details.heading=Enter the company’s details
 org.details.llp.view=Limited liability partnership
 org.details.llp=LLP
 org.details.corpbody.view=Limited company
@@ -31,32 +32,34 @@ org.details.hint.llp=Self Assessment
 org.details.hint.notllp=Corporation Tax, including your CT600 form
 org.details.hint=This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about {0}. It may be called ‘reference’, ‘UTR’ or ‘official use’. <a class="govuk-link" rel="noreferrer noopener" href="https://www.gov.uk/find-lost-utr-number" target="_blank">Find a lost UTR number (opens in a new window or tab)</a>.
 
+tradingdetails.heading=Enter the company’s reference numbers
 tradingdetails.fsrref.label=Financial Conduct Authority reference
 tradingdetails.fsrref.hint=This is 6 numbers, like 123456
 tradingdetails.isaref.label=ISA manager reference
 tradingdetails.isaref.hint=This is a ‘Z’ then 4 numbers, like Z1234
 
-title.application-pending=Reviewing your application - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.application-pending=We are reviewing your application - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.application-rejected=Application not successful - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.application-submitted=Application submitted - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.application-successful=Application successful - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.matching-failed=Your company’s details could not be found - Apply to be an approved Lifetime ISA Manager - GOV.UK
-title.organisation-details=Your company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK
-title.summary=Check your answers - Apply to be an approved Lifetime ISA Manager - GOV.UK
-title.trading-details=Your company’s reference numbers - Apply to be an approved Lifetime ISA Manager - GOV.UK
-title.your-details=Your name and contact details - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.organisation-details=Enter the company’s details - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.summary=Check your answers before sending your application - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.trading-details=Enter the company’s reference numbers - Apply to be an approved Lifetime ISA Manager - GOV.UK
+title.your-details=Enter your name and contact details - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.access-denied=There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.access-denied-individual-or-agent=There is a problem - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.business-structure=What is your company structure? - Apply to be an approved Lifetime ISA Manager - GOV.UK
 title.timeout-sign-out=For your security, we signed you out - Apply to be an approved Lifetime ISA Manager - GOV.UK
 
-yourdetails.heading=Your name and contact details
+yourdetails.heading=Enter your name and contact details
 yourdetails.indent=HMRC might contact you to confirm the details in this application.
 yourdetails.firstname=First name
 yourdetails.lastname=Last name
 yourdetails.role=Job title
 yourdetails.phone=Phone number
 yourdetails.email=Email address
+yourdetails.email.hint=We will send a confirmation and a readiness declaration to this email address.
 
 applicationsubmitted.banner.heading=Application submitted
 applicationsubmitted.banner.line1=Your application reference is {0}
@@ -90,7 +93,7 @@ applicationrejected.text.line4.pre=You can
 applicationrejected.text.line4.link=apply again
 applicationrejected.text.line4.post=to be an approved Lifetime ISA Manager.
 
-summary.heading=Check your answers
+summary.heading=Check your answers before sending your application
 summary.change=Change
 summary.companydetails.heading=Company details
 summary.companydetails.structure=Company structure

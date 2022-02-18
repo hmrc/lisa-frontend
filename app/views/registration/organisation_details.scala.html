@@ -65,7 +65,7 @@
         @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
 
-    <h1 class="govuk-label--l">Your company’s details</h1>
+    <h1 class="govuk-heading-l">@messages("org.details.heading")</h1>
 
     <form method="post">
         @CSRF.formField

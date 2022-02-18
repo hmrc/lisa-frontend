@@ -41,7 +41,7 @@
     @if(form.hasErrors) {
         @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
-    <h1 class="govuk-label--l">@messages("yourdetails.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("yourdetails.heading")</h1>
 
     @govukInsetText(InsetText(
         content = Text(messages("yourdetails.indent"))
@@ -138,7 +138,10 @@
             label = Label(
                 isPageHeading = false,
                 content = Text(messages("yourdetails.email"))
-            )
+            ),
+        hint = Some(Hint(
+        content = Text(messages("yourdetails.email.hint"))
+        ))
         ))
 
         <div class="form-field form-field--submit">
