@@ -22,14 +22,14 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % "5.20.0",
+    "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % "5.24.0",
     "uk.gov.hmrc" %% "play-partials" % "8.2.0-play-28",
     "uk.gov.hmrc" %% "http-caching-client" % "9.5.0-play-28",
     "uk.gov.hmrc" %% "play-frontend-hmrc" % "3.4.0-play-28"
   )
 
   val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.20.0",
+    "uk.gov.hmrc" %% "bootstrap-test-play-28" % "5.24.0",
     "com.typesafe.play" %% "play-test" % PlayVersion.current,
     "org.scalatestplus" %% "mockito-3-4" % "3.2.9.0"
   ).map(_ % Test)
