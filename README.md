@@ -4,7 +4,7 @@ This service provides the ability for ISA managers to apply for approval to beco
 
 ## Requirements
 
-This service is written in [Scala 2.11](http://www.scala-lang.org/) and [Play 2.6](http://playframework.com/), so needs at least a [JRE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) to run.
+This service is written in [Scala 2.13](http://www.scala-lang.org/) and [Play 2.8](http://playframework.com/), and needs at least Java 11 to run.
 
 ## Authentication
 
@@ -15,7 +15,7 @@ This customer logs into this service using [GOV.UK Verify](https://www.gov.uk/go
 1. **[Install Service-Manager](https://github.com/hmrc/service-manager/wiki/Install#install-service-manager)**
 2. `git clone git@github.com:hmrc/lisa-frontend.git`
 3. `sbt "run 8884"`
-4. `sm --start LISA_FRONTEND_ALL -f`
+4. `sm2 --start LISA_FRONTEND_ALL`
 
 The unit tests can be run by running
 ```

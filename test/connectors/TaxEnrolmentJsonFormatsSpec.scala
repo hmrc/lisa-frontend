@@ -102,7 +102,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
         val parsed = Json.parse(invalidStateJson).validate[List[TaxEnrolmentSubscription]]
 
         parsed.fold(
-          (invalid: Seq[(JsPath, Seq[JsonValidationError])]) => {
+          (invalid: scala.collection.Seq[(play.api.libs.json.JsPath, scala.collection.Seq[play.api.libs.json.JsonValidationError])] => {
             invalid.size mustBe 1
             invalid.head._2.size mustBe 1
             invalid.head._2.head mustBe JsonValidationError("error.formatting.state")

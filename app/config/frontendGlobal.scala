@@ -24,7 +24,7 @@ import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment}
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.crypto.json.JsonDecryptor
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CryptoWithKeysFromConfig, Protected}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Encrypter, Decrypter, Protected}
 import uk.gov.hmrc.http.cache.client.{CachingException, SessionCache, ShortLivedCache, ShortLivedHttpCaching}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -84,7 +84,7 @@ class LisaShortLivedCache @Inject()(
   val appCrypto: ApplicationCrypto,
   override val shortLiveCache: LisaShortLivedHttpCaching) extends ShortLivedCache {
 
-  override implicit lazy val crypto: CryptoWithKeysFromConfig = appCrypto.JsonCrypto
+  override implicit lazy val crypto: Encrypter with Decrypter = appCrypto.JsonCrypto
 
   override def fetchAndGetEntry[T](cacheId: String, key: String)
                                   (implicit hc: HeaderCarrier, rds: Reads[T], executionContext: ExecutionContext): Future[Option[T]] = {

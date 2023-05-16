@@ -67,7 +67,4 @@ class AuditServiceSpec extends PlaySpec
     }
 
   }
-
-
-
 }

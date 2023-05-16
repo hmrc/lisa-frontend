@@ -24,6 +24,7 @@ import play.api.mvc.{Action, _}
 import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedAndMultipartFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,7 +39,7 @@ class BusinessStructureController @Inject()(
   override implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents,
   businessStructureView: views.html.registration.business_structure
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with WithUrlEncodedAndMultipartFormBinding {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>

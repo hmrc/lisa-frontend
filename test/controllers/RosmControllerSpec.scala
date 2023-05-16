@@ -354,6 +354,4 @@ class RosmControllerSpec extends SpecBase with Injecting {
         ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
     }
   }
-
-
 }

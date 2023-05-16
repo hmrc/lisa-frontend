@@ -26,13 +26,13 @@ import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.play.bootstrap.controller.WithDefaultFormBinding
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedAndMultipartFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext)
   extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
-  with AuthRedirects with I18nSupport with Logging with WithDefaultFormBinding {
+  with AuthRedirects with I18nSupport with Logging with WithUrlEncodedAndMultipartFormBinding {
 
   val appConfig: AppConfig
   val sessionCache: SessionCache

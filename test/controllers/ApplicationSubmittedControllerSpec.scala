@@ -110,9 +110,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
       content must include (successPageTitle)
       content must include ("Z9999")
-      
+
     }
-    
   }
 
   "GET Application Rejected" must {
@@ -129,8 +128,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       val content = contentAsString(result)
 
       content must include (rejectedPageTitle)
-      
-    }
 
+    }
   }
 }

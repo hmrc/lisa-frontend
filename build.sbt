@@ -18,7 +18,9 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
-scalaVersion := "2.12.12"
+scalaVersion := "2.13.10"
+
+libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
 
 lazy val lisafrontend = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -39,21 +41,14 @@ lazy val lisafrontend = (project in file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     ),
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
+//    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     routesGenerator := InjectedRoutesGenerator,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
   )
 
-// Silence unused import in views and routes
-val silencerVersion = "1.7.1"
-libraryDependencies ++= Seq(
-  compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-  "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-)
+scalacOptions+= "-Wconf:src=routes/.*:s"
+scalacOptions+= "-Wconf:cat=unused-imports&src=html/.*:s"
 
-scalacOptions ++= Seq(
-  "-P:silencer:pathFilters=views;routes"
-)
 
 val ScoverageExclusionPatterns = List(
   "<empty>",
@@ -73,9 +68,11 @@ val ScoverageExclusionPatterns = List(
 lazy val scoverageSettings = {
   Seq(
     ScoverageKeys.coverageExcludedPackages := ScoverageExclusionPatterns.mkString("",";",""),
-    ScoverageKeys.coverageMinimum := 90,
+//    ScoverageKeys.coverageMinimum := 90,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
     parallelExecution in Test := false
   )
 }
+
+addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")
