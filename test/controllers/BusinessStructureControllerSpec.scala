@@ -32,7 +32,7 @@ import views.html.registration.business_structure
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BusinessStructureControllerSpec extends SpecBase with Injecting {
+class BusinessStructureControllerSpec extends SpecBase with Injecting{
 
   lazy val pageTitle = "What is your company structure?"
 
