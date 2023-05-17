@@ -36,6 +36,8 @@ import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
+import scala.concurrent.ExecutionContext
+
 
 import scala.concurrent.Future
 
@@ -56,6 +58,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
   implicit val rosmService: RosmService = mock[RosmService]
   implicit val auditService: AuditService = mock[AuditService]
   implicit val emailConnector: EmailConnector = mock[EmailConnector]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   before {
     reset(shortLivedCache)

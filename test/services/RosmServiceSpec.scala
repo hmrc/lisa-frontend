@@ -16,6 +16,7 @@
 
 package services
 
+import base.SpecBase
 import connectors.{RosmConnector, RosmJsonFormats}
 import models._
 import org.mockito.ArgumentCaptor
@@ -26,6 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
+import play.api.test.Injecting
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -34,7 +36,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 class RosmServiceSpec extends PlaySpec
   with MockitoSugar
   with RosmJsonFormats
-  with BeforeAndAfter {
+  with BeforeAndAfter
+  with SpecBase with Injecting {
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 

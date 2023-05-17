@@ -30,7 +30,6 @@ import play.api.{Configuration, Environment}
 import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class LisaBaseControllerSpec extends SpecBase with Injecting {

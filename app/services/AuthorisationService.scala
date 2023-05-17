@@ -24,11 +24,10 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisationService @Inject()(val authConnector: AuthConnector,
-                                      val taxEnrolmentService: TaxEnrolmentService) extends AuthorisedFunctions {
+                                      val taxEnrolmentService: TaxEnrolmentService) (implicit ec: ExecutionContext) extends AuthorisedFunctions {
 
   def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] = {
     authorised(

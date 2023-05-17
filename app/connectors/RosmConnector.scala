@@ -21,13 +21,12 @@ import config.AppConfig
 import models._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RosmConnector @Inject()(
   val httpPost: HttpClient,
   val appConfig: AppConfig
-) extends RosmJsonFormats with RawResponseReads {
+) (implicit ec: ExecutionContext) extends RosmJsonFormats with RawResponseReads {
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"

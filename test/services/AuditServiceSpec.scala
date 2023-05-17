@@ -16,6 +16,7 @@
 
 package services
 
+import base.SpecBase
 import config.AppConfig
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
@@ -31,7 +32,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite
-  with BeforeAndAfter {
+  with BeforeAndAfter
+  with SpecBase {
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector: AuditConnector = mock[AuditConnector]

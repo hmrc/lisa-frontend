@@ -16,6 +16,7 @@
 
 package connectors
 
+import base.SpecBase
 import config.AppConfig
 import models._
 import org.joda.time.DateTime
@@ -26,6 +27,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
 
@@ -35,7 +37,8 @@ import scala.concurrent.{Await, Future}
 class RosmConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite
-  with RosmJsonFormats {
+  with RosmJsonFormats
+  with SpecBase with Injecting {
 
   val mockHttp: HttpClient = mock[HttpClient]
   val mockAppConfig: AppConfig = mock[AppConfig]
