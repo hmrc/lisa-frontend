@@ -26,7 +26,7 @@ import services.AuthorisationService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.play.bootstrap.controller.{WithUnsafeDefaultFormBinding}
+import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
