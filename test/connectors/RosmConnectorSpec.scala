@@ -16,6 +16,7 @@
 
 package connectors
 
+import base.SpecBase
 import config.AppConfig
 import models._
 import org.joda.time.DateTime
@@ -35,11 +36,12 @@ import scala.concurrent.{Await, Future}
 class RosmConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite
-  with RosmJsonFormats {
+  with RosmJsonFormats
+  with SpecBase {
 
   val mockHttp: HttpClient = mock[HttpClient]
   val mockAppConfig: AppConfig = mock[AppConfig]
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  override implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new RosmConnector(mockHttp, mockAppConfig)
 

@@ -26,8 +26,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpClient
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
 sealed trait EmailStatus
@@ -38,7 +37,7 @@ class EmailConnector @Inject()(
   val http: HttpClient,
   appConfig: AppConfig,
   metrics: EmailMetrics
-) extends RawResponseReads with Logging {
+) (implicit ec: ExecutionContext) extends RawResponseReads with Logging {
 
   def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit hc: HeaderCarrier): Future[EmailStatus] = {
 

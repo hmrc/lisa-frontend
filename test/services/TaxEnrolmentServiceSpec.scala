@@ -26,12 +26,13 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   val mockConnector:TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
 

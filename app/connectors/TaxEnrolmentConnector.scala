@@ -23,13 +23,12 @@ import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentConnector @Inject()(
   val httpGet: HttpClient,
   val appConfig: AppConfig
-) extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
+) (implicit ec: ExecutionContext) extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"

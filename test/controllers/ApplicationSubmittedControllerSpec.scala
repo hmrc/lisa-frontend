@@ -28,7 +28,6 @@ import play.api.test.Injecting
 import play.api.test.CSRFTokenHelper._
 import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase
@@ -110,9 +109,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
       content must include (successPageTitle)
       content must include ("Z9999")
-      
+
     }
-    
   }
 
   "GET Application Rejected" must {
@@ -129,8 +127,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       val content = contentAsString(result)
 
       content must include (rejectedPageTitle)
-      
-    }
 
+    }
   }
 }

@@ -22,12 +22,11 @@ import models._
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class RosmService @Inject()(val rosmConnector: RosmConnector) extends RosmJsonFormats with Logging {
+class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: ExecutionContext) extends RosmJsonFormats with Logging {
 
   private def handleErrorResponse(rosmType: String, response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
     case failureResponse: JsSuccess[DesFailureResponse] => {

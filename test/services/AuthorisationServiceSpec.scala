@@ -28,13 +28,13 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisationServiceSpec extends PlaySpec
   with MockitoSugar with GuiceOneAppPerSuite with ScalaFutures {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   "user status" should {
 
     "return an enrolled user" when {

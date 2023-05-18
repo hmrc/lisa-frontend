@@ -29,7 +29,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
 import views.html.registration.trading_details
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class TradingDetailsControllerSpec extends SpecBase with Injecting {

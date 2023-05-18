@@ -16,6 +16,7 @@
 
 package connectors
 
+import base.SpecBase
 import config.AppConfig
 import models._
 import org.joda.time.DateTime
@@ -28,17 +29,16 @@ import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
-
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class TaxEnrolmentConnectorSpec extends PlaySpec
   with MockitoSugar
-  with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
+  with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
   val mockHttp: HttpClient = mock[HttpClient]
   val mockAppConfig: AppConfig = mock[AppConfig]
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  override implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new TaxEnrolmentConnector(mockHttp, mockAppConfig)
 

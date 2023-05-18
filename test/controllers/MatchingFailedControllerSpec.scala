@@ -26,7 +26,6 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import views.html.registration.matching_failed
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MatchingFailedControllerSpec extends SpecBase with Injecting {

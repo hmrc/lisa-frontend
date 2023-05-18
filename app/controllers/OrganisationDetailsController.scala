@@ -78,7 +78,7 @@ class OrganisationDetailsController @Inject()(
           val isPartnership = businessStructure.businessStructure == "LLP"
           val form = if (isPartnership) OrganisationDetails.partnershipForm else OrganisationDetails.form
 
-          form.bindFromRequest.fold(
+          form.bindFromRequest().fold(
             formWithErrors => {
               Future.successful(
                 BadRequest(organisationDetailsView(formWithErrors, isPartnership))

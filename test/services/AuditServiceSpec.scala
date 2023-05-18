@@ -28,6 +28,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext
+
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite
@@ -36,7 +38,7 @@ class AuditServiceSpec extends PlaySpec
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockAppConfig: AppConfig = mock[AppConfig]
-
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   object SUT extends AuditService(mockAuditConnector, mockAppConfig)
 
   "AuditService" must {
@@ -67,7 +69,4 @@ class AuditServiceSpec extends PlaySpec
     }
 
   }
-
-
-
 }

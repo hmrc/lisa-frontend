@@ -23,8 +23,6 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import play.api.test.CSRFTokenHelper._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class HomePageControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]

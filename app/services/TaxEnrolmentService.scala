@@ -21,11 +21,10 @@ import connectors.TaxEnrolmentConnector
 import models._
 import org.joda.time.DateTime
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class TaxEnrolmentService @Inject()(val connector: TaxEnrolmentConnector) {
+class TaxEnrolmentService @Inject()(val connector: TaxEnrolmentConnector) (implicit ec: ExecutionContext) {
 
   implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
 

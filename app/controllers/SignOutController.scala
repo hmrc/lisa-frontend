@@ -40,7 +40,7 @@ class SignOutController @Inject()(
   timeoutView: views.html.timeout_sign_out
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
-  def redirect: Action[AnyContent] = Action.async { implicit request =>
+  def redirect: Action[AnyContent] = Action.async { _ =>
     Future.successful(Redirect(appConfig.feedbackRedirectUrl).withNewSession)
   }
 

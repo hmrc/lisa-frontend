@@ -54,7 +54,7 @@ class YourDetailsController @Inject()(
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
 
-      YourDetails.form.bindFromRequest.fold(
+      YourDetails.form.bindFromRequest().fold(
         formWithErrors => {
           Future.successful(BadRequest(yourDetailsView(formWithErrors)))
         },

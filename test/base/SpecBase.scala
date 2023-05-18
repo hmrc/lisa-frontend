@@ -17,7 +17,6 @@
 package base
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import config.AppConfig
 import connectors.EmailConnector
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
@@ -36,6 +35,8 @@ import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
+import scala.concurrent.ExecutionContext
+
 
 import scala.concurrent.Future
 
@@ -44,7 +45,6 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
   val injector: Injector = app.injector
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
   implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
   implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
@@ -56,6 +56,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
   implicit val rosmService: RosmService = mock[RosmService]
   implicit val auditService: AuditService = mock[AuditService]
   implicit val emailConnector: EmailConnector = mock[EmailConnector]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   before {
     reset(shortLivedCache)

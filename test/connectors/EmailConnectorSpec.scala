@@ -16,6 +16,7 @@
 
 package connectors
 
+import base.SpecBase
 import config.AppConfig
 import metrics.EmailMetrics
 import org.mockito.ArgumentMatchers
@@ -25,12 +26,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.Future
 
-class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach {
+class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach with SpecBase with Injecting {
 
   val mockHttpClient: HttpClient = mock[HttpClient]
   val mockAppConfig: AppConfig = mock[AppConfig]
@@ -38,7 +40,7 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
   val testEmailConnector = new EmailConnector(mockHttpClient, mockAppConfig, mockMetrics)
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     reset(mockHttpClient)
   }
 
