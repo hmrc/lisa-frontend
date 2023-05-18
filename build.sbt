@@ -40,7 +40,6 @@ lazy val lisafrontend = (project in file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     ),
-    update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     routesGenerator := InjectedRoutesGenerator,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
   )
@@ -67,7 +66,7 @@ val ScoverageExclusionPatterns = List(
 lazy val scoverageSettings = {
   Seq(
     ScoverageKeys.coverageExcludedPackages := ScoverageExclusionPatterns.mkString("",";",""),
-    ScoverageKeys.coverageMinimumStmtTotal,
+    ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
     Test / parallelExecution := false

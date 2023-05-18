@@ -51,7 +51,7 @@ class BusinessStructureController @Inject()(
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
-      BusinessStructure.form.bindFromRequest.fold(
+      BusinessStructure.form.bindFromRequest().fold(
         formWithErrors => {
           Future.successful(BadRequest(businessStructureView(formWithErrors)))
         },

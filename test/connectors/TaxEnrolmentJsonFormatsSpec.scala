@@ -19,7 +19,7 @@ package connectors
 import models._
 import org.joda.time.DateTimeZone
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsPath, Json, JsonValidationError}
+import play.api.libs.json.{Json, JsonValidationError}
 
 class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats {
 

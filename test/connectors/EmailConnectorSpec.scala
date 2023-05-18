@@ -40,7 +40,7 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
   val testEmailConnector = new EmailConnector(mockHttpClient, mockAppConfig, mockMetrics)
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     reset(mockHttpClient)
   }
 

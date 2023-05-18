@@ -17,7 +17,6 @@
 package base
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import config.AppConfig
 import connectors.EmailConnector
 import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
@@ -46,7 +45,6 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
   val injector: Injector = app.injector
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
   implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
   implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
