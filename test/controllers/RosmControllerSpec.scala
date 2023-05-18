@@ -30,7 +30,6 @@ import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
 import views.html.error_template
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class RosmControllerSpec extends SpecBase with Injecting {

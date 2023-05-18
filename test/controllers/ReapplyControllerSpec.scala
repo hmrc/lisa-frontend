@@ -25,7 +25,6 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.{redirectLocation, status, _}
 import play.api.test.Injecting
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ReapplyControllerSpec extends SpecBase with Injecting {

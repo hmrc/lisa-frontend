@@ -23,8 +23,6 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import views.html.error.{access_denied_assistant, access_denied_individual_or_agent}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class ErrorControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]

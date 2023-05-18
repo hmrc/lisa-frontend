@@ -35,7 +35,7 @@ class AuditServiceSpec extends PlaySpec
   with BeforeAndAfter
   with SpecBase {
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  override implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockAppConfig: AppConfig = mock[AppConfig]
 

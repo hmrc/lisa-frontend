@@ -23,7 +23,6 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import views.html.timeout_sign_out
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SignOutControllerSpec extends SpecBase with Injecting {

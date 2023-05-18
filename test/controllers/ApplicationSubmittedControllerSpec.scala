@@ -28,7 +28,6 @@ import play.api.test.Injecting
 import play.api.test.CSRFTokenHelper._
 import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase

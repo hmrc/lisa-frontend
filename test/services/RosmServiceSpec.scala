@@ -27,8 +27,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import play.api.test.Injecting
-
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -37,9 +35,9 @@ class RosmServiceSpec extends PlaySpec
   with MockitoSugar
   with RosmJsonFormats
   with BeforeAndAfter
-  with SpecBase with Injecting {
+  with SpecBase {
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  override implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val mockRosmConnector:RosmConnector = mock[RosmConnector]
 

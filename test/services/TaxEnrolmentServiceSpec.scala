@@ -25,15 +25,15 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-import play.api.test.Injecting
+
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase with Injecting {
+class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase{
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  override implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val mockConnector:TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
 
