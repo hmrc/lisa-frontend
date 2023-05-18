@@ -16,7 +16,6 @@
 
 package services
 
-import base.SpecBase
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
 import models._
 import org.joda.time.DateTime
@@ -26,14 +25,14 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 
-
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase{
+class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
 
-  override implicit val hc:HeaderCarrier = HeaderCarrier()
+  implicit val hc:HeaderCarrier = HeaderCarrier()
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   val mockConnector:TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
 
