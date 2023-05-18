@@ -118,8 +118,8 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     }
   }
 
-  private def getOrRedirect[T](cache: CacheMap, key: String, redirect: Result)(implicit reads: Reads[T]): Either.RightProjection[Result, T] = {
-    cache.getEntry[T](key).toRight(redirect).right
+  private def getOrRedirect[T](cache: CacheMap, key: String, redirect: Result)(implicit reads: Reads[T]): Either[Result, T] = {
+    cache.getEntry[T](key).toRight(redirect)
   }
 
 

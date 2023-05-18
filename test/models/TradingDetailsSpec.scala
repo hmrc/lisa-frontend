@@ -52,7 +52,6 @@ class TradingDetailsSpec extends PlaySpec {
       "given a fsrRefNumber thats too long" in {
         val test = Map[String, String]("fsrRefNumber" -> "12", "isaProviderRefNumber" -> "Z1234")
         val res = SUT.bind(test)
-        println(res.errors.toString)
         res.errors.size mustBe 1
         res.errors.head.key mustBe "fsrRefNumber"
         res.errors.head.message mustBe "error.fsrRefNumberLength"
