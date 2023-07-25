@@ -27,6 +27,11 @@ To run a single unit test
 sbt testOnly SPEC_NAME
 ```
 
+To run all tests
+```
+./run_all_tests.sh
+```
+
 ## User Journeys
 
 See the LISA User Journeys documentation on Confluence for help with these.
