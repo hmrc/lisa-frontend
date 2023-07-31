@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
-scalaVersion := "2.13.10"
+scalaVersion := "2.13.11"
 
 libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
 
 lazy val lisafrontend = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(scoverageSettings: _*)
-  .settings(scalaSettings: _*)
-  .settings(defaultSettings(): _*)
+  .settings(scoverageSettings)
+  .settings(scalaSettings)
+  .settings(defaultSettings())
   .settings(
     name := "lisa-frontend",
     majorVersion := 1,
@@ -67,10 +66,10 @@ lazy val scoverageSettings = {
   Seq(
     ScoverageKeys.coverageExcludedPackages := ScoverageExclusionPatterns.mkString("",";",""),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
-    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     Test / parallelExecution := false
   )
 }
 
-addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")
+addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle")
