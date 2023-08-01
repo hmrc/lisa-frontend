@@ -55,10 +55,10 @@
 @govukWrapper(title = if(form.hasErrors) messages("error.title", messages("title.organisation-details")) else messages("title.organisation-details")) {
 
     @govukBackLink(BackLink(
-        href = "javascript:history.go(-1)",
+        href = "#",
         content = Text("Back"),
-        classes = "js-visible",
-        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Your company’s details:Back")
+        classes = "js-enabled",
+        attributes = Map("id" -> "back", "data-module" -> "hmrc-back-link", "data-journey-click" -> "navigation - link:Your company’s details:Back")
     ))
 
     @if(form.hasErrors) {

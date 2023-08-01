@@ -39,10 +39,10 @@
 @govukWrapper(title = messages("title.summary")) {
 
     @govukBackLink(BackLink(
-        href = "javascript:history.go(-1)",
+        href = "#",
         content = Text("Back"),
-        classes = "js-visible",
-        attributes = Map("id" -> "back", "data-journey-click" -> "navigation - link:Check your answers:Back")
+        classes = "js-enabled",
+        attributes = Map("id" -> "back", "data-module" -> "hmrc-back-link", "data-journey-click" -> "navigation - link:Check your answers:Back")
     ))
 
         <h1 class="govuk-heading-l">@messages("summary.heading")</h1>

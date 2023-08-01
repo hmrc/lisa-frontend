@@ -92,3 +92,10 @@ See: DDCE-2340
     -moz-hyphens: auto;
     hyphens: auto;
 }
+
+.govuk-back-link {
+    display: none;
+}
+.js-enabled .govuk-back-link {
+    display: inline-block;
+}

@@ -14,8 +14,9 @@ This customer logs into this service using [GOV.UK Verify](https://www.gov.uk/go
 
 1. **[Install Service-Manager](https://github.com/hmrc/service-manager/wiki/Install#install-service-manager)**
 2. `git clone git@github.com:hmrc/lisa-frontend.git`
-3. `sbt "run 8884"`
-4. `sm2 --start LISA_FRONTEND_ALL`
+3. `sm2 --start LISA_FRONTEND_ALL`
+4. `sm2 --stop LISA_FRONTEND`
+5. `sbt "run 8884"`
 
 The unit tests can be run by running
 ```
@@ -35,6 +36,14 @@ To run all tests
 ## User Journeys
 
 See the LISA User Journeys documentation on Confluence for help with these.
+
+## UI tests
+
+To run UI automated tests use 
+```
+./run-lisa-authorisation-tests-local.sh 
+```
+from lisa-api-tests repository.
 
 ## URL
 
