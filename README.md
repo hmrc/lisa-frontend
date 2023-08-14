@@ -12,7 +12,7 @@ This customer logs into this service using [GOV.UK Verify](https://www.gov.uk/go
 
 ## Running Locally
 
-1. **[Install Service-Manager](https://github.com/hmrc/service-manager/wiki/Install#install-service-manager)**
+1. **[Install Service-Manager](https://github.com/hmrc/sm2)**
 2. `git clone git@github.com:hmrc/lisa-frontend.git`
 3. `sm2 --start LISA_FRONTEND_ALL`
 4. `sm2 --stop LISA_FRONTEND`
@@ -48,6 +48,16 @@ from lisa-api-tests repository.
 ## URL
 
 `http://localhost:8884/lifetime-isa`
+
+## Testing the Service
+
+This service uses [sbt-scoverage](https://github.com/scoverage/sbt-scoverage) to provide test coverage reports.
+
+Run this script before raising a PR to ensure your code changes pass the Jenkins pipeline. This runs all the unit tests with scalastyle and checks for dependency updates:
+
+```
+./run_all_tests.sh
+```
 
 ## License
 

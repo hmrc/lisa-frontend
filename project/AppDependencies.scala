@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import sbt.*
+import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "7.20.0"
+  val bootstrapVersion = "7.21.0"
 
   val compile: Seq[ModuleID] = Seq(
     play.sbt.PlayImport.ws,
     "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapVersion,
     "uk.gov.hmrc" %% "play-partials"              % "8.4.0-play-28",
     "uk.gov.hmrc" %% "http-caching-client"        % "10.0.0-play-28",
-    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.16.0-play-28"
+    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.17.0-play-28"
   )
 
   val test: Seq[ModuleID] = Seq(

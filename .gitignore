@@ -1,4 +1,3 @@
-!.github
 .bsp
 logs
 project/project
@@ -18,5 +17,6 @@ dist
 /RUNNING_PID
 /.settings
 *.iws
+*.DS_Store
 
     
