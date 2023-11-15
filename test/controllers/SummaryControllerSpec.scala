@@ -16,20 +16,17 @@
 
 package controllers
 
+import akka.util.ByteString
 import base.SpecBase
-import models._
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import helpers.FullCacheTest
+import helpers.FullCacheTestData._
 import play.api.http.Status
-import play.api.libs.json.{JsString, JsValue, Json}
-import play.api.mvc.MessagesControllerComponents
+import play.api.libs.streams.Accumulator
+import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.Helpers._
 import play.api.test.Injecting
-import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
 import views.html.registration.summary
-
-import scala.concurrent.Future
 
 class SummaryControllerSpec extends SpecBase with Injecting {
 
@@ -41,12 +38,9 @@ class SummaryControllerSpec extends SpecBase with Injecting {
   "GET Summary" must {
 
     "redirect the user to business structure" when {
-      "no business structure details are found in the cache" in {
+      "no business structure details are found in the cache" in new FullCacheTest(noBusinessStructureComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
-
-        val result = SUT.get(fakeRequest.withCSRFToken)
+        val result: Accumulator[ByteString, Result] = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -55,31 +49,17 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to organisation details" when {
-      "no organisation details are found in the cache" in {
-        val businessStructureForm = new BusinessStructure("LLP")
+      "no organisation details are found in the cache" in new FullCacheTest(noOrgDetailsComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
-          )))))
-
-        val result = SUT.get(fakeRequest.withCSRFToken)
+        val result: Accumulator[ByteString, Result] = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
         redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
-      "no safeId is found in the cache" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val businessStructureForm = new BusinessStructure("LLP")
+      "no safeId is found in the cache" in new FullCacheTest(noSafeIdComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
-          )))))
-
-        val result = SUT.get(fakeRequest.withCSRFToken)
+        val result: Accumulator[ByteString, Result] = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -88,18 +68,9 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to trading details" when {
-      "no trading details are found in the cache" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val businessStructureForm = new BusinessStructure("LLP")
+      "no trading details are found in the cache" in new FullCacheTest(noTradingDetailsComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString("")
-          )))))
-
-        val result = SUT.get(fakeRequest.withCSRFToken)
+        val result: Accumulator[ByteString, Result] = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -108,20 +79,9 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to your details" when {
-      "no your details are found in the cache" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
+      "no your details are found in the cache" in new FullCacheTest(noFormDetailComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString(""),
-            TradingDetails.cacheKey -> Json.toJson(tradingForm)
-          )))))
-
-        val result = SUT.get(fakeRequest.withCSRFToken)
+        val result: Accumulator[ByteString, Result] = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -130,27 +90,9 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     }
 
     "show the summary" when {
-      "all required details are found in the cache" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
-        val yourForm = new YourDetails(
-          firstName = "Test",
-          lastName = "User",
-          role = "Role",
-          phone = "0191 123 4567",
-          email = "test@test.com")
+      "all required details are found in the cache" in new FullCacheTest(allDataComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString(""),
-            TradingDetails.cacheKey -> Json.toJson(tradingForm),
-            YourDetails.cacheKey -> Json.toJson(yourForm)
-          )))))
-
-        val result = SUT.get(fakeRequest.withCSRFToken)
+        val result: Accumulator[ByteString, Result] = SUT.get(fakeRequest.withCSRFToken)
 
         status(result) mustBe Status.OK
 

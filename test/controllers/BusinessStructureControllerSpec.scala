@@ -21,12 +21,12 @@ import models._
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.CSRFTokenHelper._
 import play.api.test.Helpers._
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.business_structure
 
 import scala.concurrent.Future
@@ -52,12 +52,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting{
       "the cache returns a value" in {
         val form = new BusinessStructure("LLP")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(BusinessStructure.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(form)))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -75,12 +71,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting{
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(BusinessStructure.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -118,9 +110,9 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting{
       "the submitted data is valid" in {
         val uri = controllers.routes.BusinessStructureController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
-        when(shortLivedCache.cache[BusinessStructure](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+        when(lisaCacheRepository.putSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+          .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -136,7 +128,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting{
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[BusinessStructure](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+        verify(lisaCacheRepository).putSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }

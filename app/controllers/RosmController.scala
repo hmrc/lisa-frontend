@@ -26,14 +26,14 @@ import models.{ApplicationSent, LisaRegistration}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment, Logging}
+import repositories.LisaCacheRepository
 import services.{AuditService, AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class RosmController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -49,7 +49,7 @@ class RosmController @Inject()(
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
-      hasAllSubmissionData(cacheId) { registrationDetails =>
+      hasAllSubmissionData() { registrationDetails =>
         rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) =>
             logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
@@ -58,10 +58,10 @@ class RosmController @Inject()(
               path = routes.RosmController.post.url,
               auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
 
-            val applicationSentVM = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
+            val applicationSentVM: ApplicationSent = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
 
-            sessionCache.cache[ApplicationSent](ApplicationSent.cacheKey, applicationSentVM).map { _ =>
-              shortLivedCache.remove(cacheId)
+            sessionCacheRepository.putSession[ApplicationSent](DataKey(ApplicationSent.cacheKey), applicationSentVM).map { _ =>
+              sessionCacheRepository.deleteFromSession(DataKey(cacheId))
 
               emailConnector.sendTemplatedEmail(
                 emailAddress = applicationSentVM.email,

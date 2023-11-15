@@ -17,20 +17,23 @@
 import sbt._
 
 object AppDependencies {
-  val bootstrapVersion = "7.21.0"
+  val bootstrapVersion = "7.23.0"
+  val hmrcMongoPlayVersion = "1.5.0"
 
   val compile: Seq[ModuleID] = Seq(
     play.sbt.PlayImport.ws,
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % bootstrapVersion,
-    "uk.gov.hmrc" %% "play-partials"              % "8.4.0-play-28",
-    "uk.gov.hmrc" %% "http-caching-client"        % "10.0.0-play-28",
-    "uk.gov.hmrc" %% "play-frontend-hmrc"         % "7.17.0-play-28"
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"       % bootstrapVersion,
+    "uk.gov.hmrc"       %% "play-partials"                    % "8.4.0-play-28",
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"               % hmrcMongoPlayVersion,
+    "uk.gov.hmrc"       %% "play-frontend-hmrc"               % "7.29.0-play-28"
   )
 
   val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"           %% "bootstrap-test-play-28" % bootstrapVersion,
-    "org.scalatestplus"     %% "mockito-4-11"           % "3.2.16.0",
-    "com.vladsch.flexmark"  % "flexmark-all"            % "0.64.8"
+    "org.scalatest"         %% "scalatest"                % "3.2.17",
+    "uk.gov.hmrc.mongo"     %% "hmrc-mongo-test-play-28"  % hmrcMongoPlayVersion,
+    "uk.gov.hmrc"           %% "bootstrap-test-play-28"   % bootstrapVersion,
+    "org.scalatestplus"     %% "mockito-4-11"             % "3.2.17.0",
+    "com.vladsch.flexmark"  % "flexmark-all"              % "0.64.8"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

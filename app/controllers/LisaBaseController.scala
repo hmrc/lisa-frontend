@@ -20,10 +20,11 @@ import config.AppConfig
 import models._
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Reads
+import play.api.libs.json.{JsValue, Reads}
 import play.api.mvc._
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
@@ -35,8 +36,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
   with AuthRedirects with I18nSupport with Logging with WithUnsafeDefaultFormBinding {
 
   val appConfig: AppConfig
-  val sessionCache: SessionCache
-  val shortLivedCache: ShortLivedCache
+  val sessionCacheRepository: LisaCacheRepository
   val authorisationService: AuthorisationService
 
   def authorisedForLisa(callback: String => Future[Result], checkEnrolmentState: Boolean = true)
@@ -60,7 +60,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
   }
 
   private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] = {
-    shortLivedCache.fetchAndGetEntry[Boolean](s"${user.internalId}-lisa-registration", Reapplication.cacheKey)
+    sessionCacheRepository.getFromSession[Boolean](DataKey(Reapplication.cacheKey))
       .map(_.getOrElse(false))
   }
 
@@ -93,7 +93,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     logger.debug("User Authorised And Enrolled")
 
     if (checkEnrolmentState) {
-      sessionCache.cache[String]("lisaManagerReferenceNumber", user.lisaManagerReferenceNumber).map { _ =>
+      sessionCacheRepository.putSession[String](DataKey("lisaManagerReferenceNumber"), user.lisaManagerReferenceNumber).map { _ =>
         Redirect(routes.ApplicationSubmittedController.successful)
       }
     }
@@ -102,26 +102,26 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     }
   }
 
-  def hasAllSubmissionData(cacheId: String)(callback: LisaRegistration => Future[Result])
+  def hasAllSubmissionData()(callback: LisaRegistration => Future[Result])
                           (implicit request: Request[AnyContent]): Future[Result] = {
-    shortLivedCache.fetch(cacheId) flatMap {
-      case Some(cache) =>
+    sessionCacheRepository.getFullCache(request) flatMap {
+      case Some(cache: CacheItem) =>
+        val data = cache.data.value
         val cacheResult: Either[Result, LisaRegistration] = for {
-          bs  <- getOrRedirect[BusinessStructure](cache, BusinessStructure.cacheKey, Redirect(routes.BusinessStructureController.get))
-          od  <- getOrRedirect[OrganisationDetails](cache, OrganisationDetails.cacheKey, Redirect(routes.OrganisationDetailsController.get))
-          sId <- getOrRedirect[String](cache, "safeId", Redirect(routes.OrganisationDetailsController.get))
-          td  <- getOrRedirect[TradingDetails](cache, TradingDetails.cacheKey, Redirect(routes.TradingDetailsController.get))
-          yd  <- getOrRedirect[YourDetails](cache, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get))
+          bs <- getOrRedirect[BusinessStructure](data, BusinessStructure.cacheKey, Redirect(routes.BusinessStructureController.get))
+          od <- getOrRedirect[OrganisationDetails](data, OrganisationDetails.cacheKey, Redirect(routes.OrganisationDetailsController.get))
+          sId <- getOrRedirect[String](data, "safeId", Redirect(routes.OrganisationDetailsController.get))
+          td <- getOrRedirect[TradingDetails](data, TradingDetails.cacheKey, Redirect(routes.TradingDetailsController.get))
+          yd <- getOrRedirect[YourDetails](data, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get))
         } yield LisaRegistration(od, td, bs, yd, sId)
         cacheResult.fold(redirect => Future.successful(redirect), callback(_))
       case None => Future.successful(Redirect(routes.BusinessStructureController.get))
     }
   }
 
-  private def getOrRedirect[T](cache: CacheMap, key: String, redirect: Result)(implicit reads: Reads[T]): Either[Result, T] = {
-    cache.getEntry[T](key).toRight(redirect)
+  private def getOrRedirect[T](cache: collection.Map[String, JsValue], key: String, redirect: Result)(implicit reads: Reads[T]): Either[Result, T] = {
+    cache.get(key).map(_.as[T]).toRight(redirect)
   }
-
 
   def handleRedirect(redirectUrl: String)(implicit request: Request[AnyContent]): Future[Result] = {
     val returnUrl: Option[String] = request.getQueryString("returnUrl")

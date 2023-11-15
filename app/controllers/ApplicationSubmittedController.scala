@@ -22,14 +22,14 @@ import models.ApplicationSent
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ApplicationSubmittedController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -45,7 +45,7 @@ class ApplicationSubmittedController @Inject()(
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa(_ => {
-      sessionCache.fetchAndGetEntry[ApplicationSent](ApplicationSent.cacheKey).map {
+      sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
         case Some(application) =>
           Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
       }
@@ -60,7 +60,7 @@ class ApplicationSubmittedController @Inject()(
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa(_ => {
-      sessionCache.fetchAndGetEntry[String]("lisaManagerReferenceNumber").flatMap {
+      sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
         case Some(lisaManagerReferenceNumber) =>
           Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
       }

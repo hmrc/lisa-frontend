@@ -23,14 +23,14 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment, Logging}
+import repositories.LisaCacheRepository
 import services.{AuthorisationService, RosmService}
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class OrganisationDetailsController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -43,8 +43,8 @@ class OrganisationDetailsController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with Logging {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
-      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+    authorisedForLisa { userId =>
+      sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
@@ -53,7 +53,7 @@ class OrganisationDetailsController @Inject()(
           } else {
             OrganisationDetails.form
           }
-          shortLivedCache.fetchAndGetEntry[OrganisationDetails](cacheId, OrganisationDetails.cacheKey).map {
+          sessionCacheRepository.getFromSession[OrganisationDetails](DataKey(OrganisationDetails.cacheKey)).map {
             case Some(data) =>
               Ok(organisationDetailsView(
                 orgDetailsForm.fill(data),
@@ -72,7 +72,7 @@ class OrganisationDetailsController @Inject()(
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
 
-      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).flatMap {
+      sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>
           val isPartnership = businessStructure.businessStructure == "LLP"
@@ -85,12 +85,12 @@ class OrganisationDetailsController @Inject()(
               )
             },
             data => {
-              shortLivedCache.cache[OrganisationDetails](cacheId, OrganisationDetails.cacheKey, data).flatMap { _ =>
+              sessionCacheRepository.putSession[OrganisationDetails](DataKey(OrganisationDetails.cacheKey), data).flatMap { _ =>
                 logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
-                  case Right(safeId) =>
+                  case Right(safeId: String) =>
                     logger.debug("rosmRegister Successful")
-                    shortLivedCache.cache[String](cacheId, "safeId", safeId).flatMap { _ =>
+                    sessionCacheRepository.putSession[String](DataKey("safeId"), safeId).flatMap { _ =>
                       handleRedirect(routes.TradingDetailsController.get.url)
                     }
                   case Left(error) =>

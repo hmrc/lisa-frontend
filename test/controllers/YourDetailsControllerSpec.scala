@@ -19,14 +19,15 @@ package controllers
 import base.SpecBase
 import models._
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
+import play.api.libs.json._
+import play.api.mvc._
 import play.api.test.Helpers._
-import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test._
 import play.api.test.CSRFTokenHelper._
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.your_details
 
 import scala.concurrent.Future
@@ -53,17 +54,13 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           lastName = "User",
           role = "Role",
           phone = "0191 123 4567",
-          email = "test@test.com")
+          email = "test@test.com"
+        )
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))
-          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
-
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(YourDetails.cacheKey))
-          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[YourDetails](DataKey(ArgumentMatchers.eq(YourDetails.cacheKey)))(any(), any()))
           .thenReturn(Future.successful(Some(yourForm)))
 
-        val request = fakeRequest.withCSRFToken
+        val request: RequestHeader = fakeRequest.withCSRFToken
         val result = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
@@ -79,12 +76,8 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))
-          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[YourDetails](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[YourDetails](DataKey(any[String]()))(any(), any()))
           .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
@@ -106,6 +99,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
+
         val uri = controllers.routes.YourDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
         val result = SUT.post()(request)
@@ -125,6 +119,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incorrectly filled" in {
+
         val uri = controllers.routes.YourDetailsController.post.url
         val invalidJson = Json.obj(
           "firstName" -> "Test0",
@@ -151,6 +146,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "redirect the user to your details" when {
       "the submitted data is valid" in {
+
         val uri = controllers.routes.YourDetailsController.post.url
         val validJson = Json.obj(
           "firstName" -> "Test",
@@ -160,9 +156,8 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           "email" -> "test@test.com"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-        when(shortLivedCache.cache[YourDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())
-          (ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(new CacheMap("" , Map[String,JsValue]())))
+        when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any(), any()))
+          .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
@@ -173,8 +168,12 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
     "store your details in cache" when {
       "the submitted data is valid" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+
+        when(authorisationService.userStatus(any()))
           .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
+
+        when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any(), any()))
+          .thenReturn(Future.successful(("", "")))
 
         val uri = controllers.routes.YourDetailsController.post.url
         val validJson = Json.obj(
@@ -189,10 +188,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[YourDetails](ArgumentMatchers.any(),  ArgumentMatchers.any(), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
-
-
+        verify(lisaCacheRepository).putSession[YourDetails](DataKey(any[String]()), any())(any(), any(), any())
       }
 
     }

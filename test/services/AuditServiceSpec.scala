@@ -24,21 +24,37 @@ import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import repositories.LisaCacheRepository
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.test.MongoSupport
 
 import scala.concurrent.ExecutionContext
 
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite
-  with BeforeAndAfter {
+  with BeforeAndAfter
+  with MongoSupport {
+
+  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+    .configure("metrics.enabled" -> "false")
+    .overrides(
+      bind(classOf[MongoComponent]).toInstance(mongoComponent)
+    )
+    .build()
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockAppConfig: AppConfig = mock[AppConfig]
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  implicit val lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
+
   object SUT extends AuditService(mockAuditConnector, mockAppConfig)
 
   "AuditService" must {
@@ -51,7 +67,7 @@ class AuditServiceSpec extends PlaySpec
     "build an audit event with the correct details" in {
       SUT.audit("applicationReceived", "/submit-application", Map("companyName" -> "New Bank", "firstName" -> "John"))
 
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(ArgumentMatchers.any(), ArgumentMatchers.any())
 

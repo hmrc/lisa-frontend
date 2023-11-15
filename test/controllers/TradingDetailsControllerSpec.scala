@@ -21,12 +21,12 @@ import models._
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.trading_details
 
 import scala.concurrent.Future
@@ -57,12 +57,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the cache returns a value" in {
         val tradingForm = new TradingDetails(fsrRefNumber = "validFSRRefNumber", isaProviderRefNumber = "validISARefNumber")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(TradingDetails.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(tradingForm)))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -81,12 +77,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
-
-        when(shortLivedCache.fetchAndGetEntry[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(TradingDetails.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -123,8 +115,9 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj( "fsrRefNumber" -> "654321",
           "isaProviderRefNumber" -> "z1234")))
-        when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(lisaCacheRepository.putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
+          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
         status(result) mustBe Status.BAD_REQUEST
       }
@@ -134,8 +127,9 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid - uppercase z" in {
         val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
-        when(shortLivedCache.cache[TradingDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(Future.successful(new CacheMap("",Map[String,JsValue]())))
+        when(lisaCacheRepository.putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
+          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
         status(result) mustBe Status.SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get.url)
@@ -147,7 +141,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         await(SUT.post(request))
-        verify(shortLivedCache).cache[TradingDetails](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())(
+        verify(lisaCacheRepository).putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }

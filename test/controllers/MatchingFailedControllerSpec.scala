@@ -24,6 +24,7 @@ import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.test.Injecting
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.matching_failed
 
 import scala.concurrent.Future
@@ -38,8 +39,9 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
   "GET Matching Failed" must {
 
     "return a page" in {
-      when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(BusinessStructure.cacheKey))(
-        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+
+      when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+        ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
       val result = SUT.get(fakeRequest)
