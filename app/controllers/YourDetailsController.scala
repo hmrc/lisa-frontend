@@ -20,16 +20,16 @@ import com.google.inject.Inject
 import config.AppConfig
 import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class YourDetailsController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -41,9 +41,8 @@ class YourDetailsController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
-
-      shortLivedCache.fetchAndGetEntry[YourDetails](cacheId, YourDetails.cacheKey).map {
+    authorisedForLisa { _ =>
+      sessionCacheRepository.getFromSession[YourDetails](DataKey(YourDetails.cacheKey)).map {
         case Some(data) => Ok(yourDetailsView(YourDetails.form.fill(data)))
         case None => Ok(yourDetailsView(YourDetails.form))
       }
@@ -59,7 +58,7 @@ class YourDetailsController @Inject()(
           Future.successful(BadRequest(yourDetailsView(formWithErrors)))
         },
         data => {
-          shortLivedCache.cache[YourDetails](cacheId, YourDetails.cacheKey, data).flatMap { _ =>
+          sessionCacheRepository.putSession[YourDetails](DataKey(YourDetails.cacheKey), data).flatMap { _ =>
             handleRedirect(routes.SummaryController.get.url)
           }
         }
@@ -67,5 +66,4 @@ class YourDetailsController @Inject()(
 
     }
   }
-
 }

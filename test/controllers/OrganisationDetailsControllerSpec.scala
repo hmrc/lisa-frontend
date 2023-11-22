@@ -21,12 +21,12 @@ import models._
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
 import play.api.test.Helpers._
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import play.api.test.CSRFTokenHelper._
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.organisation_details
 
 import scala.concurrent.Future
@@ -54,16 +54,12 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
       "the cache returns a value" in {
         val organisationForm = new OrganisationDetails("Test Company Name", "Test Trading Name")
 
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
-
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(organisationForm)))
 
         val request = fakeRequest.withCSRFToken
@@ -82,16 +78,13 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
@@ -110,16 +103,13 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     "redirect the user to business structure" when {
 
       "The business structure details are missing from the cache" in {
-        when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(false)))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(None))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest)
@@ -141,13 +131,13 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
-          thenReturn(Future.successful(None))
+        when(lisaCacheRepository.getFromSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val result = SUT.post()(request)
 
@@ -164,13 +154,13 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
 
-        when(shortLivedCache.fetchAndGetEntry[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(organisationDetailsCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
-          thenReturn(Future.successful(None))
+        when(lisaCacheRepository.getFromSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
         val result = SUT.post(request)
 
@@ -191,12 +181,12 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(shortLivedCache.cache[OrganisationDetails](ArgumentMatchers.any(),ArgumentMatchers.any(),ArgumentMatchers.any())(
+        when(lisaCacheRepository.putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
+          .thenReturn(Future.successful(("", "")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
         when(rosmService.rosmRegister(ArgumentMatchers.any(),ArgumentMatchers.any())(ArgumentMatchers.any()))
@@ -218,9 +208,9 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.OrganisationDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).
-          thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
         when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any())).
           thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
@@ -244,8 +234,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
         when(rosmService.rosmRegister(ArgumentMatchers.any(),ArgumentMatchers.any())(ArgumentMatchers.any()))
@@ -253,7 +243,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq(OrganisationDetails.cacheKey), ArgumentMatchers.any())(
+        verify(lisaCacheRepository).putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
 
@@ -267,12 +257,12 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri,
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
-        when(shortLivedCache.cache[OrganisationDetails](ArgumentMatchers.any(),ArgumentMatchers.eq(organisationDetailsCacheKey),ArgumentMatchers.any())(
+        when(lisaCacheRepository.putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(new CacheMap("",Map[String, JsValue]())))
+          .thenReturn(Future.successful(("", "")))
 
-        when(shortLivedCache.fetchAndGetEntry[BusinessStructure](ArgumentMatchers.any(), ArgumentMatchers.eq(businessStructureCacheKey))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
         when(rosmService.rosmRegister(ArgumentMatchers.any(),ArgumentMatchers.any())(ArgumentMatchers.any()))
@@ -280,7 +270,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
         await(SUT.post(request))
 
-        verify(shortLivedCache).cache[OrganisationDetails](ArgumentMatchers.any(), ArgumentMatchers.eq("safeId"), ArgumentMatchers.any())(
+        verify(lisaCacheRepository).putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
           ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
       }
 

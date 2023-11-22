@@ -24,14 +24,29 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.test.MongoSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisationServiceSpec extends PlaySpec
-  with MockitoSugar with GuiceOneAppPerSuite with ScalaFutures {
+  with MockitoSugar
+  with GuiceOneAppPerSuite
+  with ScalaFutures
+  with MongoSupport {
+
+  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+    .configure("metrics.enabled" -> "false")
+    .overrides(
+      bind(classOf[MongoComponent]).toInstance(mongoComponent)
+    )
+    .build()
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]

@@ -22,14 +22,14 @@ import models.Reapplication
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.ExecutionContext
 
 class ReapplyController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -41,7 +41,7 @@ class ReapplyController @Inject()(
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa ( cacheId =>{
-        shortLivedCache.cache[Boolean](cacheId,Reapplication.cacheKey,true) map { _ =>
+      sessionCacheRepository.putSession[Boolean](DataKey(Reapplication.cacheKey), true) map { _ =>
          Redirect(routes.BusinessStructureController.get)
         }
       }, checkEnrolmentState = false

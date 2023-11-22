@@ -15,14 +15,13 @@
  */
 
 import com.google.inject.AbstractModule
-import config.{LisaSessionCache, LisaShortLivedCache}
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import repositories.LisaCacheRepository
+import uk.gov.hmrc.mongo.cache.SessionCacheRepository
 
 class LisaModule extends AbstractModule {
 
   override def configure(): Unit = {
-    bind(classOf[SessionCache]).to(classOf[LisaSessionCache])
-    bind(classOf[ShortLivedCache]).to(classOf[LisaShortLivedCache])
+    bind(classOf[SessionCacheRepository]).to(classOf[LisaCacheRepository])
   }
 
 }

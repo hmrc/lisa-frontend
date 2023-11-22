@@ -17,13 +17,13 @@
 package controllers
 
 import base.SpecBase
-import models.Reapplication
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers.{redirectLocation, status, _}
+import play.api.test.Helpers._
 import play.api.test.Injecting
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.Future
 
@@ -31,8 +31,8 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
 
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
-      when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), ArgumentMatchers.eq(Reapplication.cacheKey))(
-        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(lisaCacheRepository.getFromSession[Boolean](DataKey(ArgumentMatchers.anyString()))(
+        ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(Future.successful(Some(true)))
 
       val result = SUT.get(fakeRequest)

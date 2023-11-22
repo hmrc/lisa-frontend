@@ -19,16 +19,15 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -40,8 +39,8 @@ class SummaryController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
-      hasAllSubmissionData(cacheId) { data =>
+    authorisedForLisa { _ =>
+      hasAllSubmissionData() { data =>
         Future.successful(Ok(summaryView(data)))
       }
     }

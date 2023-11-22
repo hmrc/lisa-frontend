@@ -26,6 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import play.api.test.CSRFTokenHelper._
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
 
 import scala.concurrent.Future
@@ -53,8 +54,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(authorisationService.userStatus(ArgumentMatchers.any())).
         thenReturn(Future.successful(UserAuthorised("id",TaxEnrolmentPending)))
 
-      when(sessionCache.fetchAndGetEntry[ApplicationSent](ArgumentMatchers.eq(ApplicationSent.cacheKey))(
-        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
+        ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
 
       val result = SUT.get()(fakeRequest.withCSRFToken)
@@ -97,8 +98,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(authorisationService.userStatus(ArgumentMatchers.any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-      when(sessionCache.fetchAndGetEntry[String](ArgumentMatchers.eq("lisaManagerReferenceNumber"))(
-        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
+        ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(Future.successful(Some("Z9999")))
 
       val result = SUT.successful()(fakeRequest.withCSRFToken)

@@ -19,15 +19,18 @@ package controllers
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import base.SpecBase
-import models.{BusinessStructure, OrganisationDetails, _}
+import helpers.FullCacheTest
+import helpers.FullCacheTestData._
+import models._
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.http.Status
-import play.api.libs.json.{JsString, JsValue, Json}
-import play.api.mvc.MessagesControllerComponents
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{MessagesControllerComponents, Result}
 import play.api.test.Helpers._
 import play.api.test.Injecting
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.error_template
 
 import scala.concurrent.Future
@@ -38,24 +41,38 @@ class RosmControllerSpec extends SpecBase with Injecting {
   implicit val errorView: error_template = inject[error_template]
   val SUT = new RosmController()
 
+  val customTestEmail = "success@rosm.subscription"
+  val customYourForm = new YourDetails(
+    firstName = "Test",
+    lastName = "User",
+    role = "Role",
+    phone = "0191 123 4567",
+    email = customTestEmail
+  )
+  val yourFormKeyAndJsonSuccessEmail: (String, JsValue) = YourDetails.cacheKey -> Json.toJson(customYourForm)
+
+  val customDataComponents: Seq[(String, JsValue)] = Seq(
+    organisationFormKeyAndJson,
+    tradingFormKeyAndJson,
+    businessStructureFormKeyAndJson,
+    safeKeyAndJson,
+    yourFormKeyAndJsonSuccessEmail
+  )
+
   "GET Rosm Registration" must {
 
     "redirect the user to business structure" when {
-      "no data is found in the cache" in {
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(None))
+      "no data is found in the cache" in new FullCacheTest(Seq.empty[(String, JsValue)]) {
 
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
         redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
       }
-      "no business structure details are found in the cache" in {
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue]()))))
+      "no business structure details are found in the cache" in new FullCacheTest(noBusinessStructureComponents) {
 
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -64,31 +81,18 @@ class RosmControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to organisation details" when {
-      "no organisation details are found in the cache" in {
-        val businessStructureForm = new BusinessStructure("LLP")
+      "no organisation details are found in the cache" in new FullCacheTest(noOrgDetailsComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
-          )))))
-
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
         redirectLocation(result) mustBe Some(controllers.routes.OrganisationDetailsController.get.url)
       }
-      "no safeId details are found in the cache" in {
-        val businessStructureForm = new BusinessStructure("LLP")
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
-          )))))
+      "no safeId details are found in the cache" in new FullCacheTest(noSafeIdComponents) {
 
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -97,18 +101,9 @@ class RosmControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to trading details" when {
-      "no trading details are found in the cache" in {
-        val businessStructureForm = new BusinessStructure("LLP")
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+      "no trading details are found in the cache" in new FullCacheTest(noTradingDetailsComponents){
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString("")
-          )))))
-
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -117,20 +112,9 @@ class RosmControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to your details" when {
-      "no your details are found in the cache" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
+      "no your details are found in the cache" in new FullCacheTest(noFormDetailComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString(""),
-            TradingDetails.cacheKey -> Json.toJson(tradingForm)
-          )))))
-
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -138,125 +122,51 @@ class RosmControllerSpec extends SpecBase with Injecting {
       }
     }
 
-    "handle a successful rosm registration" in {
-      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-      val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
-      val businessStructureForm = new BusinessStructure("LLP")
-      val yourForm = new YourDetails(
-        firstName = "Test",
-        lastName = "User",
-        role = "Role",
-        phone = "0191 123 4567",
-        email = "test@test.com")
+    "handle a successful rosm registration" in new FullCacheTest(allDataComponents) {
 
-      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-          "safeId" -> JsString(""),
-          TradingDetails.cacheKey -> Json.toJson(tradingForm),
-          YourDetails.cacheKey -> Json.toJson(yourForm)
-        )))))
-
-      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+      when(rosmService.performSubscription(any)(any))
         .thenReturn(Future.successful(Right("123456789")))
 
       redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get.url))
     }
 
-    "email the user on a successful rosm registration" in {
+    "email the user on a successful rosm registration" in new FullCacheTest(customDataComponents) {
       reset(emailConnector)
 
-      val testEmail = "success@rosm.subscription"
       val testSubId = "888777666"
-
-      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-      val tradingForm = new TradingDetails( fsrRefNumber = "123", isaProviderRefNumber = "123")
-      val businessStructureForm = new BusinessStructure("LLP")
-      val yourForm = new YourDetails(
-        firstName = "Test",
-        lastName = "User",
-        role = "Role",
-        phone = "0191 123 4567",
-        email = testEmail)
-
-      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-          "safeId" -> JsString(""),
-          TradingDetails.cacheKey -> Json.toJson(tradingForm),
-          YourDetails.cacheKey -> Json.toJson(yourForm)
-        )))))
-
-      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+      when(rosmService.performSubscription(any)(any))
         .thenReturn(Future.successful(Right(testSubId)))
 
       await(SUT.post(fakeRequest))
 
       verify(emailConnector).sendTemplatedEmail(
-        emailAddress = ArgumentMatchers.eq(testEmail),
+        emailAddress = ArgumentMatchers.eq(customTestEmail),
         templateName = ArgumentMatchers.eq("lisa_application_submit"),
         params = ArgumentMatchers.eq(Map(
           "application_reference" -> testSubId,
-          "email" -> testEmail,
+          "email" -> customTestEmail,
           "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
           "first_name" -> yourForm.firstName,
-          "last_name" -> yourForm.lastName)))(ArgumentMatchers.any())
+          "last_name" -> yourForm.lastName)))(any)
     }
 
     "handle a failed rosm registration" when {
-      "the rosm service returns a failure" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
-        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
-        val yourForm = new YourDetails(
-          firstName = "Test",
-          lastName = "User",
-          role = "Role",
-          phone = "0191 123 4567",
-          email = "test@test.com")
+      "the rosm service returns a failure" in new FullCacheTest(allDataComponents) {
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString(""),
-            TradingDetails.cacheKey -> Json.toJson(tradingForm),
-            YourDetails.cacheKey -> Json.toJson(yourForm)
-          )))))
-
-        when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(rosmService.performSubscription(any)(any))
           .thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
-        val result = SUT.post(fakeRequest)
+        val result: Future[Result] = SUT.post(fakeRequest)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
 
-    "audit a successful rosm registration" in {
-      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-      val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-      val businessStructureForm = new BusinessStructure("LLP")
-      val yourForm = new YourDetails(
-        firstName = "Test",
-        lastName = "User",
-        role = "Role",
-        phone = "0191 123 4567",
-        email = "test@test.com")
-      val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+    "audit a successful rosm registration" in new FullCacheTest(allDataComponents) {
 
-      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-          "safeId" -> JsString(""),
-          TradingDetails.cacheKey -> Json.toJson(tradingForm),
-          YourDetails.cacheKey -> Json.toJson(yourForm)
-        )))))
+      val registrationDetails: LisaRegistration = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+      when(rosmService.performSubscription(any)(any))
         .thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
@@ -274,32 +184,14 @@ class RosmControllerSpec extends SpecBase with Injecting {
           "lastName" -> registrationDetails.yourDetails.lastName,
           "roleInOrganisation" -> registrationDetails.yourDetails.role,
           "phoneNumber" -> registrationDetails.yourDetails.phone,
-          "emailAddress" -> registrationDetails.yourDetails.email)))(ArgumentMatchers.any())
+          "emailAddress" -> registrationDetails.yourDetails.email)))(any)
     }
 
     "audit a failed rosm registration" when {
-      "the ct utr is 0000000000" in {
-        val organisationForm = new OrganisationDetails("Test Company Name", "0000000000")
-        val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-        val businessStructureForm = new BusinessStructure("LLP")
-        val yourForm = new YourDetails(
-          firstName = "Test",
-          lastName = "User",
-          role = "Role",
-          phone = "0191 123 4567",
-          email = "test@test.com")
-        val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+      "the ct utr is 0000000000" in new FullCacheTest(allDataComponents) {
+        val registrationDetails: LisaRegistration = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-        when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-            BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-            OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-            "safeId" -> JsString(""),
-            TradingDetails.cacheKey -> Json.toJson(tradingForm),
-            YourDetails.cacheKey -> Json.toJson(yourForm)
-          )))))
-
-        when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(rosmService.performSubscription(any)(any))
           .thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.post(fakeRequest))
@@ -318,39 +210,24 @@ class RosmControllerSpec extends SpecBase with Injecting {
             "roleInOrganisation" -> registrationDetails.yourDetails.role,
             "phoneNumber" -> registrationDetails.yourDetails.phone,
             "emailAddress" -> registrationDetails.yourDetails.email))
-        )(ArgumentMatchers.any())
+        )(any)
       }
     }
 
-    "cache subscriptionId and email as part of a successful rosm registration" in {
-      val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
-      val tradingForm = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-      val businessStructureForm = new BusinessStructure("LLP")
-      val yourForm = new YourDetails(
-        firstName = "Test",
-        lastName = "User",
-        role = "Role",
-        phone = "0191 123 4567",
-        email = "test@test.com")
-      val registrationDetails = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+    "cache subscriptionId and email as part of a successful rosm registration" in new FullCacheTest(allDataComponents){
 
-      when(shortLivedCache.fetch(ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(Some(CacheMap("", Map[String, JsValue](
-          BusinessStructure.cacheKey -> Json.toJson(businessStructureForm),
-          OrganisationDetails.cacheKey -> Json.toJson(organisationForm),
-          "safeId" -> JsString(""),
-          TradingDetails.cacheKey -> Json.toJson(tradingForm),
-          YourDetails.cacheKey -> Json.toJson(yourForm)
-        )))))
+      val registrationDetails: LisaRegistration = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(rosmService.performSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(Future.successful(Right("123456789012")))
+      when(rosmService.performSubscription(any)(any)).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
 
-      val applicationSentVM = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
+      val applicationSentVM: ApplicationSent = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
 
-      verify(sessionCache).cache(ArgumentMatchers.eq(ApplicationSent.cacheKey), ArgumentMatchers.eq(applicationSentVM))(
-        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+      verify(lisaCacheRepository).putSession(
+        DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)), ArgumentMatchers.eq(applicationSentVM))(
+          any, any, any
+        )
     }
   }
 }

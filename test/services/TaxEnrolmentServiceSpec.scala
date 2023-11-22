@@ -24,12 +24,28 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
+import play.api.Application
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.test.MongoSupport
 
-class TaxEnrolmentServiceSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats {
+class TaxEnrolmentServiceSpec extends PlaySpec
+  with MockitoSugar
+  with GuiceOneAppPerSuite
+  with TaxEnrolmentJsonFormats
+  with MongoSupport {
+
+  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+    .configure("metrics.enabled" -> "false")
+    .overrides(
+      bind(classOf[MongoComponent]).toInstance(mongoComponent)
+    )
+    .build()
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]

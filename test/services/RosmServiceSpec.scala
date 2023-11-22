@@ -25,17 +25,31 @@ import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.test.MongoSupport
 
 class RosmServiceSpec extends PlaySpec
   with MockitoSugar
   with RosmJsonFormats
-  with BeforeAndAfter with GuiceOneAppPerSuite {
+  with BeforeAndAfter
+  with GuiceOneAppPerSuite
+  with MongoSupport {
+
+  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+    .configure("metrics.enabled" -> "false")
+    .overrides(
+      bind(classOf[MongoComponent]).toInstance(mongoComponent)
+    )
+    .build()
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
@@ -71,7 +85,7 @@ class RosmServiceSpec extends PlaySpec
           Future.successful(HttpResponse(
             status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty)))
 
-        val captor = ArgumentCaptor.forClass(classOf[RosmRegistration])
+        val captor: ArgumentCaptor[RosmRegistration] = ArgumentCaptor.forClass(classOf[RosmRegistration])
 
         Await.result(SUT.rosmRegister(BusinessStructure("Friendly Society"), org), Duration.Inf)
 

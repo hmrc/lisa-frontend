@@ -22,14 +22,14 @@ import models.TradingDetails
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class TradingDetailsController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -41,8 +41,8 @@ class TradingDetailsController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
-      shortLivedCache.fetchAndGetEntry[TradingDetails](cacheId, TradingDetails.cacheKey).map {
+    authorisedForLisa { _ =>
+      sessionCacheRepository.getFromSession[TradingDetails](DataKey(TradingDetails.cacheKey)).map {
         case Some(data) => Ok(tradingDetailsView(TradingDetails.form.fill(data)))
         case None => Ok(tradingDetailsView(TradingDetails.form))
       }
@@ -50,13 +50,13 @@ class TradingDetailsController @Inject()(
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
+    authorisedForLisa { _ =>
       TradingDetails.form.bindFromRequest().fold(
         formWithErrors => {
           Future.successful(BadRequest(tradingDetailsView(formWithErrors)))
         },
         data => {
-          shortLivedCache.cache[TradingDetails](cacheId, TradingDetails.cacheKey, TradingDetails.uppercaseZ(data)).flatMap { _ =>
+          sessionCacheRepository.putSession[TradingDetails](DataKey(TradingDetails.cacheKey), TradingDetails.uppercaseZ(data)).flatMap { _ =>
             handleRedirect(routes.YourDetailsController.get.url)
           }
         }

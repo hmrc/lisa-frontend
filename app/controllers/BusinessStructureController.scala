@@ -20,16 +20,16 @@ import com.google.inject.Inject
 import config.AppConfig
 import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessStructureController @Inject()(
-  implicit val sessionCache: SessionCache,
-  implicit val shortLivedCache: ShortLivedCache,
+  implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -41,8 +41,8 @@ class BusinessStructureController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
-      shortLivedCache.fetchAndGetEntry[BusinessStructure](cacheId, BusinessStructure.cacheKey).map {
+    authorisedForLisa { cacheId: String =>
+      sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).map {
         case Some(data) => Ok(businessStructureView(BusinessStructure.form.fill(data)))
         case None => Ok(businessStructureView(BusinessStructure.form))
       }
@@ -55,8 +55,8 @@ class BusinessStructureController @Inject()(
         formWithErrors => {
           Future.successful(BadRequest(businessStructureView(formWithErrors)))
         },
-        data => {
-          shortLivedCache.cache[BusinessStructure](cacheId, BusinessStructure.cacheKey, data).flatMap { _ =>
+        (data: BusinessStructure) => {
+          sessionCacheRepository.putSession[BusinessStructure](DataKey(BusinessStructure.cacheKey), data).flatMap { _ =>
             handleRedirect(routes.OrganisationDetailsController.get.url)
           }
         }

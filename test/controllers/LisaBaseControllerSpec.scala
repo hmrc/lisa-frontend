@@ -27,8 +27,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.AuthorisationService
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache}
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -114,7 +115,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful.url)
 
-        verify(sessionCache).cache(ArgumentMatchers.eq("lisaManagerReferenceNumber"), ArgumentMatchers.eq("Z9876"))(
+        verify(lisaCacheRepository).putSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")), ArgumentMatchers.eq("Z9876"))(
           ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
 
       }
@@ -207,9 +208,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
   class TestClass(
     implicit val config: Configuration,
     implicit val env: Environment,
-    implicit val sessionCache: SessionCache,
+    implicit val sessionCacheRepository: LisaCacheRepository,
     implicit val appConfig: AppConfig,
-    implicit val shortLivedCache: ShortLivedCache,
     implicit val authorisationService: AuthorisationService,
     override implicit val messagesApi: MessagesApi,
     override implicit val ec: ExecutionContext,

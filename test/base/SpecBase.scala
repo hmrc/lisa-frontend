@@ -19,8 +19,8 @@ package base
 import akka.actor.ActorSystem
 import config.AppConfig
 import connectors.EmailConnector
-import models.{Reapplication, TaxEnrolmentDoesNotExist, UserAuthorised}
-import org.mockito.ArgumentMatchers
+import models._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,56 +28,69 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.MessagesApi
 import play.api.inject.Injector
-import play.api.libs.json.JsValue
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.{Configuration, Environment}
 import services.{AuditService, AuthorisationService, RosmService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache, ShortLivedCache}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.test.MongoSupport
+
 import scala.concurrent.ExecutionContext
-
-
 import scala.concurrent.Future
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.bind
+import repositories.LisaCacheRepository
+import uk.gov.hmrc.mongo.cache.DataKey
 
-trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter {
+import java.util.UUID
 
-  val injector: Injector = app.injector
-  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+trait SpecBase
+  extends PlaySpec
+  with MockitoSugar
+  with GuiceOneAppPerSuite
+  with MongoSupport
+  with BeforeAndAfter {
+
+  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+    .configure("metrics.enabled" -> "false")
+    .overrides(
+      bind(classOf[MongoComponent]).toInstance(mongoComponent)
+    )
+    .build()
+
+  val sessionId: SessionId = SessionId(UUID.randomUUID().toString)
+  val fakeRequest = FakeRequest().withSession(("sessionId", sessionId.toString))
+
+  val injector: Injector = fakeApplication.injector
   implicit val system: ActorSystem = ActorSystem()
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
   implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
   implicit val env: Environment = injector.instanceOf[Environment]
   implicit val configuration: Configuration = injector.instanceOf[Configuration]
-  implicit val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
-  implicit val sessionCache: SessionCache = mock[SessionCache]
   implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
   implicit val rosmService: RosmService = mock[RosmService]
   implicit val auditService: AuditService = mock[AuditService]
   implicit val emailConnector: EmailConnector = mock[EmailConnector]
+  implicit val lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
+
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   before {
-    reset(shortLivedCache)
-    reset(sessionCache)
+    reset(lisaCacheRepository)
     reset(authorisationService)
     reset(rosmService)
     reset(auditService)
     reset(emailConnector)
 
-    when(shortLivedCache.fetchAndGetEntry[Boolean](ArgumentMatchers.any(), org.mockito.ArgumentMatchers.eq(Reapplication.cacheKey))
-      (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+    when(lisaCacheRepository.getFromSession[Boolean](DataKey(any[String]()))(any(), any()))
       .thenReturn(Future.successful(Some(false)))
 
-    when(shortLivedCache.cache[Any](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
-      (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-      .thenReturn(Future.successful(new CacheMap("", Map[String, JsValue]())))
+    when(lisaCacheRepository.putSession(DataKey(any[String]()), any())(any(), any(), any()))
+      .thenReturn(Future.successful(("", "")))
 
-    when(sessionCache.cache(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-      .thenReturn(Future.successful(CacheMap("", Map[String, JsValue]())))
-
-    when(authorisationService.userStatus(ArgumentMatchers.any()))
+    when(authorisationService.userStatus(any()))
       .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
 }
