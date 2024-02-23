@@ -23,15 +23,14 @@ import play.api.Configuration
 import play.api.libs.json.{JsNumber, JsObject, JsString}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.SessionId
 import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
 import uk.gov.hmrc.mongo.test.MongoSupport
 
 import java.util.UUID
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 class LisaCacheRepositorySpec
   extends PlaySpec
@@ -76,7 +75,7 @@ class LisaCacheRepositorySpec
           fields = Seq(
             (nameDataKey, JsString(nameToAddToCache)),
             (occupationDataKey, JsString(occupationToAddToCache)),
-            (ageDataKey, JsNumber(ageToAddToCache)),
+            (ageDataKey, JsNumber(ageToAddToCache))
           )
         )
       )
