@@ -18,7 +18,8 @@ package services
 
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
 import models._
-import org.joda.time.DateTime
+
+import java.time.ZonedDateTime
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,6 +34,8 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.test.MongoSupport
+
+import java.time.temporal.ChronoUnit
 
 class TaxEnrolmentServiceSpec extends PlaySpec
   with MockitoSugar
@@ -112,8 +115,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
   }
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(
-    created = new DateTime(),
-    lastModified = new DateTime(),
+    created = ZonedDateTime.now(),
+    lastModified = ZonedDateTime.now(),
     credId = "",
     serviceName = "HMRC-LISA-ORG",
     identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
@@ -124,8 +127,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
   )
 
   private val lisaErrorSubscription = TaxEnrolmentSubscription(
-    created = new DateTime().plusDays(1),
-    lastModified = new DateTime(),
+    created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
+    lastModified = ZonedDateTime.now(),
     credId = "",
     serviceName = "HMRC-LISA-ORG",
     identifiers = Nil,
@@ -136,8 +139,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
   )
 
   private val randomPendingSubscription = TaxEnrolmentSubscription(
-    created = new DateTime().plusDays(2),
-    lastModified = new DateTime(),
+    created = ZonedDateTime.now().plus(2, ChronoUnit.DAYS),
+    lastModified = ZonedDateTime.now(),
     credId = "",
     serviceName = "TEST",
     identifiers = Nil,

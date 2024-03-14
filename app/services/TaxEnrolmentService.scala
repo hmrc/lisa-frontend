@@ -19,14 +19,14 @@ package services
 import com.google.inject.Inject
 import connectors.TaxEnrolmentConnector
 import models._
-import org.joda.time.DateTime
+import java.time.ZonedDateTime
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class TaxEnrolmentService @Inject()(val connector: TaxEnrolmentConnector) (implicit ec: ExecutionContext) {
 
-  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
+  implicit def dateTimeOrdering: Ordering[ZonedDateTime] = Ordering.fromLessThan(_ isBefore _)
 
   def getNewestLisaSubscription(groupId: String)(implicit hc:HeaderCarrier): Future[Option[TaxEnrolmentSubscription]] = {
     val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)(hc)

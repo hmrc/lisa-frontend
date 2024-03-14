@@ -19,7 +19,8 @@ package connectors
 import base.SpecBase
 import config.AppConfig
 import models._
-import org.joda.time.DateTime
+
+import java.time.LocalDate
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -48,7 +49,7 @@ class RosmConnectorSpec extends PlaySpec
   val rosmIndividual = RosmIndividual(
     firstName = "Test",
     lastName = "User",
-    dateOfBirth = Some(new DateTime("1980-01-01"))
+    dateOfBirth = Some(LocalDate.parse("1980-01-01"))
   )
 
   val rosmIndividualNoDob = RosmIndividual(

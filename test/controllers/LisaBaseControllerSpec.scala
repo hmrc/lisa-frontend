@@ -116,7 +116,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful.url)
 
         verify(lisaCacheRepository).putSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")), ArgumentMatchers.eq("Z9876"))(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          ArgumentMatchers.any(), ArgumentMatchers.any())
 
       }
 

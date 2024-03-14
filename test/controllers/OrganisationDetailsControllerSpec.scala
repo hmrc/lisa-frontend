@@ -182,7 +182,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
         when(lisaCacheRepository.putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(("", "")))
 
         when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
@@ -244,7 +244,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         await(SUT.post(request))
 
         verify(lisaCacheRepository).putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          ArgumentMatchers.any(), ArgumentMatchers.any())
       }
 
     }
@@ -258,7 +258,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
           AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890")))
 
         when(lisaCacheRepository.putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(("", "")))
 
         when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
@@ -271,7 +271,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         await(SUT.post(request))
 
         verify(lisaCacheRepository).putSession[OrganisationDetails](DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          ArgumentMatchers.any(), ArgumentMatchers.any())
       }
 
     }

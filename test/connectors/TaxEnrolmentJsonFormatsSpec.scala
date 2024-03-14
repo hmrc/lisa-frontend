@@ -17,9 +17,10 @@
 package connectors
 
 import models._
-import org.joda.time.DateTimeZone
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{Json, JsonValidationError}
+
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 
 class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats {
 
@@ -62,7 +63,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val sub = parsed.head
 
-        sub.created.withZone(DateTimeZone.UTC).toString() mustBe "2017-06-29T09:01:54.908Z"
+        sub.created mustBe ZonedDateTime.of(LocalDateTime.of(2017, 6, 29, 10, 1, 54, 908000000), ZoneId.systemDefault())
         sub.state mustBe TaxEnrolmentPending
       }
       "given valid json with a error status" in {

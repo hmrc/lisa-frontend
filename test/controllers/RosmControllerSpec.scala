@@ -226,7 +226,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
       verify(lisaCacheRepository).putSession(
         DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)), ArgumentMatchers.eq(applicationSentVM))(
-          any, any, any
+          any, any
         )
     }
   }

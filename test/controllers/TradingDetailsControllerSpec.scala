@@ -116,7 +116,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj( "fsrRefNumber" -> "654321",
           "isaProviderRefNumber" -> "z1234")))
         when(lisaCacheRepository.putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
         status(result) mustBe Status.BAD_REQUEST
@@ -128,7 +128,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val uri = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         when(lisaCacheRepository.putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
+          ArgumentMatchers.any(),ArgumentMatchers.any()))
           .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
         status(result) mustBe Status.SEE_OTHER
@@ -142,7 +142,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         await(SUT.post(request))
         verify(lisaCacheRepository).putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
+          ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }
 

@@ -19,7 +19,8 @@ package connectors
 import base.SpecBase
 import config.AppConfig
 import models._
-import org.joda.time.DateTime
+
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +30,7 @@ import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
@@ -41,10 +43,12 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new TaxEnrolmentConnector(mockHttp, mockAppConfig)
+  val instant: Instant = Instant.ofEpochMilli(1498726914908L)
+  val zonedDateTime: ZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(
-    created = new DateTime(),
-    lastModified = new DateTime(),
+    created = zonedDateTime,
+    lastModified = zonedDateTime,
     credId = "",
     serviceName = "HMRC-LISA-ORG",
     identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
@@ -66,7 +70,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
           headers = Map[String,Seq[String]]("test"->Seq("test1","test2"))
         )))
 
-      val response = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
+      val response: Seq[TaxEnrolmentSubscription] = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
 
       response mustBe subs
     }

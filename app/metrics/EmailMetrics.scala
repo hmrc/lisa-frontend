@@ -18,12 +18,8 @@ package metrics
 
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
-import com.kenshoo.play.metrics.Metrics
 
-
-class EmailMetrics @Inject()(val metrics: Metrics) {
-
-  val registry: MetricRegistry = metrics.defaultRegistry
+class EmailMetrics @Inject()(registry: MetricRegistry) {
 
   def emailNotSentCounter(): Unit = registry.counter("emailNotSentCounter").inc()
 

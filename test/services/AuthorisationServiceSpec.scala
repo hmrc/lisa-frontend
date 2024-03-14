@@ -17,7 +17,7 @@
 package services
 
 import models._
-import org.joda.time.DateTime
+import java.time.ZonedDateTime
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -202,8 +202,8 @@ class AuthorisationServiceSpec extends PlaySpec
   }
 
   private val validTaxEnrolmentSubscription = TaxEnrolmentSubscription(
-    created = new DateTime(),
-    lastModified = new DateTime(),
+    created = ZonedDateTime.now(),
+    lastModified = ZonedDateTime.now(),
     credId = "",
     serviceName = "HMRC-LISA-ORG",
     identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z0001")),

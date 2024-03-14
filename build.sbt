@@ -17,9 +17,7 @@
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 
-scalaVersion := "2.13.12"
-
-libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
+scalaVersion := "2.13.13"
 
 lazy val lisafrontend = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -40,9 +38,7 @@ lazy val lisafrontend = (project in file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     ),
     routesGenerator := InjectedRoutesGenerator,
-    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
-    // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
-    libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always,
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
   )
 
 scalacOptions+= "-Wconf:src=routes/.*:s"

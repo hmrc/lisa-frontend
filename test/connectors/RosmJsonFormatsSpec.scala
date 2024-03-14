@@ -17,7 +17,8 @@
 package connectors
 
 import models.RosmIndividual
-import org.joda.time.DateTime
+
+import java.time.{ZonedDateTime, LocalDate, ZoneId}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
@@ -31,10 +32,10 @@ class RosmJsonFormatsSpec extends PlaySpec with RosmJsonFormats {
 
         parsed.dateOfBirth.isEmpty mustBe false
 
-        val dob = parsed.dateOfBirth.get
+        val dob: LocalDate = parsed.dateOfBirth.get
 
         dob.getYear mustBe 2000
-        dob.getMonthOfYear mustBe 1
+        dob.getMonthValue mustBe 1
         dob.getDayOfMonth mustBe 1
       }
       "given valid json without a date of birth" in {
@@ -68,7 +69,7 @@ class RosmJsonFormatsSpec extends PlaySpec with RosmJsonFormats {
     firstName = "Test",
     middleName = Some("A"),
     lastName = "User",
-    dateOfBirth = Some(new DateTime("2000-01-01"))
+    dateOfBirth = Some(LocalDate.parse("2000-01-01"))
   )
 
   private val testIndWithoutDob: RosmIndividual = RosmIndividual(

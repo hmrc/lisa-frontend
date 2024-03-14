@@ -31,7 +31,7 @@ import views.html.registration.business_structure
 
 import scala.concurrent.Future
 
-class BusinessStructureControllerSpec extends SpecBase with Injecting{
+class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   lazy val pageTitle = "What is your company structure?"
 
@@ -111,7 +111,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting{
         val uri = controllers.routes.BusinessStructureController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
         when(lisaCacheRepository.putSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any()))
+          ArgumentMatchers.any(),ArgumentMatchers.any()))
           .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
 
@@ -129,7 +129,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting{
         await(SUT.post(request))
 
         verify(lisaCacheRepository).putSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any())
+          ArgumentMatchers.any(),ArgumentMatchers.any())
       }
     }
 
