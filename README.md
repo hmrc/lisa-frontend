@@ -4,7 +4,7 @@ This service provides the ability for ISA managers to apply for approval to beco
 
 ## Requirements
 
-This service is written in [Scala 2.13](http://www.scala-lang.org/) and [Play 2.8](http://playframework.com/), and needs at least Java 11 to run.
+This service is written in [Scala 2.13](http://www.scala-lang.org/) and [Play 3.0](http://playframework.com/), and needs at least Java 11 to run.
 
 ## Authentication
 
