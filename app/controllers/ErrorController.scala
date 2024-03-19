@@ -21,7 +21,6 @@ import config.AppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +34,7 @@ class ErrorController @Inject()(
   implicit val messagesControllerComponents: MessagesControllerComponents,
   accessDeniedIndividualOrAgentView: views.html.error.access_denied_individual_or_agent,
   accessDeniedAssistantView: views.html.error.access_denied_assistant
-) extends FrontendController(messagesControllerComponents: MessagesControllerComponents) with AuthRedirects with I18nSupport {
+) extends FrontendController(messagesControllerComponents: MessagesControllerComponents) with I18nSupport {
 
   val accessDeniedIndividualOrAgent: Action[AnyContent] = Action.async { implicit request =>
     val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url

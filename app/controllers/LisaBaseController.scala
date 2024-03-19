@@ -25,7 +25,6 @@ import play.api.mvc._
 import repositories.LisaCacheRepository
 import services.AuthorisationService
 import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
@@ -33,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext)
   extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
-  with AuthRedirects with I18nSupport with Logging with WithUnsafeDefaultFormBinding {
+  with I18nSupport with Logging with WithUnsafeDefaultFormBinding {
 
   val appConfig: AppConfig
   val sessionCacheRepository: LisaCacheRepository
@@ -49,7 +48,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
       case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
     }
   }
-  override def toGGLogin(continueUrl: String): Result = {
+  def toGGLogin(continueUrl: String): Result = {
     Redirect(
       appConfig.loginURL,
       Map(

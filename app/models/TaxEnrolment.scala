@@ -16,11 +16,12 @@
 
 package models
 
-import org.joda.time.DateTime
+
+import java.time.ZonedDateTime
 
 case class TaxEnrolmentSubscription(
-                                     created: DateTime,
-                                     lastModified: DateTime,
+                                     created: ZonedDateTime,
+                                     lastModified: ZonedDateTime,
                                      credId: String,
                                      serviceName: String,
                                      identifiers: List[TaxEnrolmentIdentifier],

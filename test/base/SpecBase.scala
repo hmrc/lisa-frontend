@@ -16,7 +16,7 @@
 
 package base
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import config.AppConfig
 import connectors.EmailConnector
 import models._
@@ -87,7 +87,7 @@ trait SpecBase
     when(lisaCacheRepository.getFromSession[Boolean](DataKey(any[String]()))(any(), any()))
       .thenReturn(Future.successful(Some(false)))
 
-    when(lisaCacheRepository.putSession(DataKey(any[String]()), any())(any(), any(), any()))
+    when(lisaCacheRepository.putSession(DataKey(any[String]()), any())(any(), any()))
       .thenReturn(Future.successful(("", "")))
 
     when(authorisationService.userStatus(any()))

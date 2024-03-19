@@ -17,17 +17,31 @@
 package connectors
 
 import models._
-import org.joda.time.DateTime
+
+import java.time.{Instant, ZonedDateTime, ZoneId}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 trait TaxEnrolmentJsonFormats {
 
+  implicit val zonedDateTimeReads: Reads[ZonedDateTime] = Reads[ZonedDateTime] { json =>
+    json.validate[Long].flatMap { timestamp =>
+      try {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val zonedDateTime: ZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+        JsSuccess(zonedDateTime)
+      } catch {
+        case _: Throwable =>
+          JsError(s"Invalid ZonedDateTime format for timestamp: $timestamp")
+      }
+    }
+  }
+
   implicit val taxIdentifierFormats: OFormat[TaxEnrolmentIdentifier] = Json.format[TaxEnrolmentIdentifier]
 
   implicit val subscriptionReads: Reads[TaxEnrolmentSubscription] = (
-    (JsPath \ "created").read[Long].map[DateTime](d => new DateTime(d)) and
-    (JsPath \ "lastModified").read[Long].map[DateTime](d => new DateTime(d)) and
+    (JsPath \ "created").read[ZonedDateTime] and
+    (JsPath \ "lastModified").read[ZonedDateTime] and
     (JsPath \ "credId").read[String] and
     (JsPath \ "serviceName").read[String] and
     (JsPath \ "identifiers").read[List[TaxEnrolmentIdentifier]].orElse(Reads.pure(Nil)) and
@@ -42,8 +56,8 @@ trait TaxEnrolmentJsonFormats {
   )(TaxEnrolmentSubscription.apply _)
 
   implicit val subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
-    (JsPath \ "created").write[Long].contramap[DateTime]{_.getMillis} and
-    (JsPath \ "lastModified").write[Long].contramap[DateTime]{_.getMillis} and
+    (JsPath \ "created").write[Long].contramap[ZonedDateTime]{_.toInstant.toEpochMilli()} and
+    (JsPath \ "lastModified").write[Long].contramap[ZonedDateTime]{_.toInstant.toEpochMilli()} and
     (JsPath \ "credId").write[String] and
     (JsPath \ "serviceName").write[String] and
     (JsPath \ "identifiers").write[List[TaxEnrolmentIdentifier]] and

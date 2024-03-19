@@ -16,8 +16,10 @@
 
 package models
 
-import org.joda.time.DateTime
+import java.time.ZonedDateTime
 import org.scalatestplus.play.PlaySpec
+
+import java.time.temporal.ChronoUnit
 
 class TaxEnrolmentSpec extends PlaySpec {
 
@@ -28,8 +30,8 @@ class TaxEnrolmentSpec extends PlaySpec {
       "there are no identifiers" in {
 
         TaxEnrolmentSubscription(
-          created = new DateTime().plusDays(1),
-          lastModified = new DateTime(),
+          created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
+          lastModified = ZonedDateTime.now(),
           credId = "",
           serviceName = "HMRC-LISA-ORG",
           identifiers = Nil,
@@ -48,8 +50,8 @@ class TaxEnrolmentSpec extends PlaySpec {
       "there is a zref identifier on its own" in {
 
         TaxEnrolmentSubscription(
-          created = new DateTime().plusDays(1),
-          lastModified = new DateTime(),
+          created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
+          lastModified = ZonedDateTime.now(),
           credId = "",
           serviceName = "HMRC-LISA-ORG",
           identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
@@ -64,8 +66,8 @@ class TaxEnrolmentSpec extends PlaySpec {
       "there is a zref identifier amongst other identifiers" in {
 
         TaxEnrolmentSubscription(
-          created = new DateTime().plusDays(1),
-          lastModified = new DateTime(),
+          created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
+          lastModified = ZonedDateTime.now(),
           credId = "",
           serviceName = "HMRC-LISA-ORG",
           identifiers = List(
@@ -88,8 +90,8 @@ class TaxEnrolmentSpec extends PlaySpec {
       "there are multiple zref identifiers" in {
 
         TaxEnrolmentSubscription(
-          created = new DateTime().plusDays(1),
-          lastModified = new DateTime(),
+          created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
+          lastModified = ZonedDateTime.now(),
           credId = "",
           serviceName = "HMRC-LISA-ORG",
           identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z5555"), TaxEnrolmentIdentifier("ZREF", "Z1234")),

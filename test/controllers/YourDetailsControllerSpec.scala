@@ -156,7 +156,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           "email" -> "test@test.com"
         )
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
-        when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any(), any()))
+        when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))
           .thenReturn(Future.successful(("", "")))
         val result = SUT.post(request)
 
@@ -172,7 +172,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
         when(authorisationService.userStatus(any()))
           .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-        when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any(), any()))
+        when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))
           .thenReturn(Future.successful(("", "")))
 
         val uri = controllers.routes.YourDetailsController.post.url
@@ -188,7 +188,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
 
         await(SUT.post(request))
 
-        verify(lisaCacheRepository).putSession[YourDetails](DataKey(any[String]()), any())(any(), any(), any())
+        verify(lisaCacheRepository).putSession[YourDetails](DataKey(any[String]()), any())(any(), any())
       }
 
     }

@@ -16,7 +16,7 @@
 
 package models
 
-import org.joda.time.DateTime
+import java.time.LocalDate
 
 trait RosmRegistrationResponse
 
@@ -36,7 +36,7 @@ case class DesFailureResponse(code: String, reason: String)
 case class RosmIndividual(firstName: String,
                           middleName: Option[String] = None,
                           lastName: String,
-                          dateOfBirth: Option[DateTime] = None)
+                          dateOfBirth: Option[LocalDate] = None)
 
 case class RosmOrganisation(organisationName: String,
                             isAGroup: Option[Boolean] = None,

@@ -17,7 +17,8 @@
 package connectors
 
 import models._
-import org.joda.time.DateTime
+
+import java.time.LocalDate
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
@@ -28,7 +29,7 @@ trait RosmJsonFormats {
     (JsPath \ "middleName").readNullable[String] and
     (JsPath \ "lastName").read[String] and
     (JsPath \ "dateOfBirth").readNullable[String].map {
-      case Some(date) => Some(new DateTime(date))
+      case Some(date) => Some(LocalDate.parse(date))
       case _ => None
     }
   )(RosmIndividual.apply _)
@@ -37,8 +38,8 @@ trait RosmJsonFormats {
     (JsPath \ "firstName").write[String] and
     (JsPath \ "middleName").writeNullable[String] and
     (JsPath \ "lastName").write[String] and
-    (JsPath \ "dateOfBirth").writeNullable[String].contramap[Option[DateTime]] {
-      case Some(date) => Some(date.toString("yyyy-MM-dd"))
+    (JsPath \ "dateOfBirth").writeNullable[String].contramap[Option[LocalDate]] {
+      case Some(date) => Some(date.toString)
       case _ => None
     }
   )(unlift(RosmIndividual.unapply))
