@@ -20,7 +20,7 @@ import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{Json, JsonValidationError}
 
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{Instant, LocalDateTime, ZoneId, ZonedDateTime}
 
 class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats {
 
@@ -63,7 +63,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val sub = parsed.head
 
-        sub.created mustBe ZonedDateTime.of(LocalDateTime.of(2017, 6, 29, 10, 1, 54, 908000000), ZoneId.systemDefault())
+        sub.created mustBe Instant.ofEpochMilli(1498726914908L).atZone(ZoneId.systemDefault())
         sub.state mustBe TaxEnrolmentPending
       }
       "given valid json with a error status" in {
