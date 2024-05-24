@@ -23,7 +23,8 @@
         govukErrorSummary : GovukErrorSummary,
         govukButton : GovukButton,
         govukRadios : GovukRadios,
-        govukBackLink : GovukBackLink
+        govukBackLink : GovukBackLink,
+        formHelper: FormWithCSRF
      )
 
 @(form: Form[BusinessStructure])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
@@ -40,8 +41,8 @@
     @if(form.hasErrors) {
         @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
-    <form method="post">
-        @CSRF.formField
+
+    @formHelper(action = controllers.routes.BusinessStructureController.post) {
         <div class='form-group @if(form("companyStructure").hasErrors) {form-field--error}'>
                 @govukRadios(Radios(
                     fieldset = Some(Fieldset(
@@ -90,6 +91,5 @@
                 attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Select your company structure:Continue")
             ))
         </div>
-    </form>
-
+    }
 }

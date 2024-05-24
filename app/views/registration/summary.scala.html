@@ -21,7 +21,9 @@
 
 @this(govukWrapper: views.html.govuk_wrapper,
         govukBackLink : GovukBackLink,
-        govukButton : GovukButton)
+        govukButton : GovukButton,
+        formHelper: FormWithCSRF
+        )
 
 @(data: LisaRegistration)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
@@ -172,8 +174,7 @@
             </div>
         </dl>
 
-    <form method="post" action="@routes.RosmController.post">
-        @CSRF.formField
+    @formHelper(action = controllers.routes.RosmController.post) {
         <div class="form-field form-field--submit">
         @govukButton(Button(
             value = Some("Confirm and send"),
@@ -181,6 +182,6 @@
             attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Check your answers:Confirm and send")
         ))
         </div>
-    </form>
+    }
 
 }

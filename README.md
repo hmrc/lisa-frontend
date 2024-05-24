@@ -33,6 +33,12 @@ To run all tests
 ./run_all_tests.sh
 ```
 
+#### Running Accessibility Tests
+
+The [Accessibility Linter](https://github.com/hmrc/sbt-accessibility-linter) has been added to SBT for this project.
+
+To run the tests, execute `sbt clean A11y/test` from the command line.
+
 ## User Journeys
 
 See the LISA User Journeys documentation on Confluence for help with these.

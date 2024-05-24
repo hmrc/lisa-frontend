@@ -24,7 +24,8 @@
         govukErrorSummary : GovukErrorSummary,
         govukButton : GovukButton,
         govukBackLink : GovukBackLink,
-        govukInput : GovukInput
+        govukInput : GovukInput,
+        formHelper: FormWithCSRF
      )
 
 @(form: Form[OrganisationDetails], isPartnership: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
@@ -65,10 +66,9 @@
         @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
     }
 
-    <h1 class="govuk-heading-l">@messages("org.details.heading")</h1>
+    @formHelper(action = controllers.routes.OrganisationDetailsController.post) {
 
-    <form method="post">
-        @CSRF.formField
+        <h1 class="govuk-heading-l">@messages("org.details.heading")</h1>
         @govukInput(Input(
             id = "companyName",
             name = "companyName",
@@ -120,7 +120,7 @@
                     attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your company’s details:Continue")
                 ))
             </div>
-    </form>
+    }
 }
 
 

@@ -24,7 +24,9 @@
         govukBackLink : GovukBackLink,
         govukErrorSummary : GovukErrorSummary,
         govukButton : GovukButton,
-        govukInput : GovukInput)
+        govukInput : GovukInput,
+        formHelper: FormWithCSRF
+        )
 
 @(form: Form[TradingDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
@@ -46,11 +48,9 @@
         )
     }
 
-    <h1 class="govuk-heading-l">@messages("tradingdetails.heading")</h1>
+    @formHelper(action = controllers.routes.TradingDetailsController.post) {
 
-    <form novalidate="true" method="post">
-        @CSRF.formField
-
+        <h1 class="govuk-heading-l">@messages("tradingdetails.heading")</h1>
         @govukInput(Input(
             id = "fsrRefNumber",
             name = "fsrRefNumber",
@@ -101,5 +101,5 @@
             attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your company’s reference numbers:Continue")
         ))
         </div>
-    </form>
+    }
 }

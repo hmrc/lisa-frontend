@@ -20,7 +20,7 @@ import models._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{Json, JsonValidationError}
 
-import java.time.{Instant, LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{Instant, ZoneId}
 
 class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats {
 

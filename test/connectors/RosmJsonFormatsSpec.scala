@@ -18,7 +18,7 @@ package connectors
 
 import models.RosmIndividual
 
-import java.time.{ZonedDateTime, LocalDate, ZoneId}
+import java.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
