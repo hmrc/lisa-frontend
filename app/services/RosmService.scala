@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,12 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
 
   def rosmRegister(businessStructure:BusinessStructure, orgDetails: OrganisationDetails)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
   {
-    val rosmRegistration = RosmRegistration("LISA",true,false,Organisation(orgDetails.companyName, getRosmBusinessStructure(businessStructure)))
+    val rosmRegistration = RosmRegistration(
+      "LISA",
+      requiresNameMatch = true,
+      isAnAgent = false,
+      organisation = Organisation(orgDetails.companyName, getRosmBusinessStructure(businessStructure))
+    )
 
     rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
       logger.warn(s"ROSM registration response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")

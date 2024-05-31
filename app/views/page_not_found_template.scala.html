@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,8 @@
 
 @anchor(text: String, url: String) = {<a href="mailto:@url">@text</a>}
 
-@contentHeader = {
-  <h1 class="govuk-label--l">@messages("global.page.not.found.error.heading")</h1>
-}
-
-@govukWrapper(title = messages("global.page.not.found.error.title"), beforeContentHtml = Some(contentHeader)){
+@govukWrapper(title = messages("global.page.not.found.error.title")){
+    <h1 class="govuk-label--l">@messages("global.page.not.found.error.heading")</h1>
     <p class="govuk-body">@messages("global.page.not.found.error.check.web.address.correct")</p>
     <p class="govuk-body">@messages("global.page.not.found.error.check.web.address.full")</p>
     <p class="govuk-body">@Html(messages("global.page.not.found.error.contact", anchor(messages("global.page.not.found.error.contact.email"), messages("global.page.not.found.error.contact.email"))))</p>

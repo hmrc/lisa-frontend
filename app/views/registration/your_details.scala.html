@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@
         govukBackLink : GovukBackLink,
         govukButton : GovukButton,
         govukInput : GovukInput,
-        govukErrorSummary : GovukErrorSummary)
+        govukErrorSummary : GovukErrorSummary,
+        formHelper: FormWithCSRF
+        )
 
 @(form: Form[YourDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
@@ -47,8 +49,7 @@
         content = Text(messages("yourdetails.indent"))
     ))
 
-    <form novalidate="true" method="post">
-        @CSRF.formField
+    @formHelper(action = controllers.routes.YourDetailsController.post) {
 
         @govukInput(Input(
             id = "firstName",
@@ -152,5 +153,5 @@
             attributes = Map("id" -> "continue", "data-journey-click" -> "button - click:Your name and contact details:Continue")
         ))
         </div>
-    </form>
+    }
 }

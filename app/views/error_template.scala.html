@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@
 
 @()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@contentHeader = {
-  <h1 class="govuk-label--l">@messages("global.error.InternalServerError500.heading")</h1>
-}
-
-@govukWrapper(title = messages("global.error.InternalServerError500.title"), beforeContentHtml = Some(contentHeader)){
+@govukWrapper(title = messages("global.error.InternalServerError500.title")){
+ <h1 class="govuk-label--l">@messages("global.error.InternalServerError500.heading")</h1>
  <p class="govuk-body">@Html(messages("global.error.InternalServerError500.message"))</p>
 }

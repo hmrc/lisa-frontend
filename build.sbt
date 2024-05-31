@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 
-scalaVersion := "2.13.13"
+ThisBuild / scalaVersion := "2.13.13"
+ThisBuild / majorVersion := 1
 
 lazy val lisafrontend = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -27,7 +28,6 @@ lazy val lisafrontend = (project in file("."))
   .settings(defaultSettings())
   .settings(
     name := "lisa-frontend",
-    majorVersion := 1,
     PlayKeys.playDefaultPort := 8884,
     libraryDependencies ++= AppDependencies(),
     dependencyOverrides += "commons-codec" % "commons-codec" % "1.12",
