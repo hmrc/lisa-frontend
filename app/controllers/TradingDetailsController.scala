@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.TradingDetails
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, MessagesRequest}
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService
@@ -43,8 +43,8 @@ class TradingDetailsController @Inject()(
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[TradingDetails](DataKey(TradingDetails.cacheKey)).map {
-        case Some(data) => Ok(tradingDetailsView(TradingDetails.form.fill(data)))
-        case None => Ok(tradingDetailsView(TradingDetails.form))
+        case Some(data) => Ok(tradingDetailsView(createPostCall, TradingDetails.form.fill(data)))
+        case None => Ok(tradingDetailsView(createPostCall, TradingDetails.form))
       }
     }
   }
@@ -53,7 +53,7 @@ class TradingDetailsController @Inject()(
     authorisedForLisa { _ =>
       TradingDetails.form.bindFromRequest().fold(
         formWithErrors => {
-          Future.successful(BadRequest(tradingDetailsView(formWithErrors)))
+          Future.successful(BadRequest(tradingDetailsView(createPostCall, formWithErrors)))
         },
         data => {
           sessionCacheRepository.putSession[TradingDetails](DataKey(TradingDetails.cacheKey), TradingDetails.uppercaseZ(data)).flatMap { _ =>

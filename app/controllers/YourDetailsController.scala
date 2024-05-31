@@ -43,8 +43,8 @@ class YourDetailsController @Inject()(
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[YourDetails](DataKey(YourDetails.cacheKey)).map {
-        case Some(data) => Ok(yourDetailsView(YourDetails.form.fill(data)))
-        case None => Ok(yourDetailsView(YourDetails.form))
+        case Some(data) => Ok(yourDetailsView(createPostCall, YourDetails.form.fill(data)))
+        case None => Ok(yourDetailsView(createPostCall, YourDetails.form))
       }
 
     }
@@ -55,7 +55,7 @@ class YourDetailsController @Inject()(
 
       YourDetails.form.bindFromRequest().fold(
         formWithErrors => {
-          Future.successful(BadRequest(yourDetailsView(formWithErrors)))
+          Future.successful(BadRequest(yourDetailsView(createPostCall, formWithErrors)))
         },
         data => {
           sessionCacheRepository.putSession[YourDetails](DataKey(YourDetails.cacheKey), data).flatMap { _ =>

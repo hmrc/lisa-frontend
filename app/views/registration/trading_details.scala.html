@@ -28,7 +28,7 @@
         formHelper: FormWithCSRF
         )
 
-@(form: Form[TradingDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(call: Call, form: Form[TradingDetails])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @govukWrapper(title = if(form.hasErrors) messages("error.title", messages("title.trading-details")) else messages("title.trading-details")) {
 
@@ -48,7 +48,7 @@
         )
     }
 
-    @formHelper(action = controllers.routes.TradingDetailsController.post) {
+    @formHelper(action = call) {
 
         <h1 class="govuk-heading-l">@messages("tradingdetails.heading")</h1>
         @govukInput(Input(
