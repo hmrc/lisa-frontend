@@ -122,6 +122,10 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     cache.get(key).map(_.as[T]).toRight(redirect)
   }
 
+  def createPostCall(implicit request: MessagesRequest[AnyContent]): Call = {
+    Call("POST", request.uri)
+  }
+
   def handleRedirect(redirectUrl: String)(implicit request: Request[AnyContent]): Future[Result] = {
     val returnUrl: Option[String] = request.getQueryString("returnUrl")
 

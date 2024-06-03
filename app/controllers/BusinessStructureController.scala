@@ -43,8 +43,8 @@ class BusinessStructureController @Inject()(
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId: String =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).map {
-        case Some(data) => Ok(businessStructureView(BusinessStructure.form.fill(data)))
-        case None => Ok(businessStructureView(BusinessStructure.form))
+        case Some(data) => Ok(businessStructureView(createPostCall, BusinessStructure.form.fill(data)))
+        case None => Ok(businessStructureView(createPostCall, BusinessStructure.form))
       }
     }
   }
@@ -53,7 +53,7 @@ class BusinessStructureController @Inject()(
     authorisedForLisa { cacheId =>
       BusinessStructure.form.bindFromRequest().fold(
         formWithErrors => {
-          Future.successful(BadRequest(businessStructureView(formWithErrors)))
+          Future.successful(BadRequest(businessStructureView(createPostCall, formWithErrors)))
         },
         (data: BusinessStructure) => {
           sessionCacheRepository.putSession[BusinessStructure](DataKey(BusinessStructure.cacheKey), data).flatMap { _ =>
