@@ -16,7 +16,7 @@
 
 @this(govukWrapper: views.html.govuk_wrapper)
 
-@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@()(implicit request: RequestHeader, messages: Messages, appConfig: config.AppConfig)
 
 @govukWrapper(title = messages("global.error.InternalServerError500.title")){
  <h1 class="govuk-label--l">@messages("global.error.InternalServerError500.heading")</h1>

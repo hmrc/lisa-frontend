@@ -30,6 +30,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -40,7 +41,7 @@ class RosmConnectorSpec extends PlaySpec
   with RosmJsonFormats
   with SpecBase {
 
-  val mockHttp: HttpClient = mock[HttpClient]
+  val mockHttp: HttpClientV2 = mock[HttpClientV2]
   val mockAppConfig: AppConfig = mock[AppConfig]
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 

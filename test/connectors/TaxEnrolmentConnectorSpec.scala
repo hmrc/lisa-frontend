@@ -22,6 +22,7 @@ import models._
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -29,7 +30,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -38,7 +39,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
-  val mockHttp: HttpClient = mock[HttpClient]
+  val mockHttp: HttpClientV2 = mock[HttpClientV2]
   val mockAppConfig: AppConfig = mock[AppConfig]
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -62,8 +63,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   "Get Subscriptions by Group ID endpoint" must {
     "return whatever it receives" in {
-      when(mockHttp.GET[HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
-        (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(mockHttp.get(any())(any()).execute[HttpResponse](any(), any()))
         .thenReturn(Future.successful(HttpResponse(
           status = OK,
           json = Json.toJson(subs),

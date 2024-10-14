@@ -20,21 +20,22 @@ import base.SpecBase
 import config.AppConfig
 import metrics.EmailMetrics
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.Future
 
 class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach with SpecBase with Injecting {
 
-  val mockHttpClient: HttpClient = mock[HttpClient]
+  val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
   val mockAppConfig: AppConfig = mock[AppConfig]
   val mockMetrics: EmailMetrics = mock[EmailMetrics]
 
@@ -53,11 +54,7 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
         val emailString = "test@mail.com"
         val templateId = "lisa_application_submit"
         val params = Map("testParam" -> "testParam")
-
-        when(mockHttpClient.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
-          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(HttpResponse(ACCEPTED, "")))
-
+        when(mockHttpClient.post(any())(any()).execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(ACCEPTED, "")))
         val response = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
         await(response) must be(EmailSent)
 
@@ -72,8 +69,7 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
         val templateId = "lisa_application_submit"
         val params = Map("testParam" -> "testParam")
 
-        when(mockHttpClient.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
-          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(mockHttpClient.post(any())(any()).execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
 
         val response = testEmailConnector.sendTemplatedEmail(invalidEmailString, templateId, params)
