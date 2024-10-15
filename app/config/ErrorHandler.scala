@@ -21,7 +21,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.Results._
 import play.api.mvc._
 import play.api.Configuration
-import play.twirl.api.{Html, HtmlFormat}
+import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,12 +42,24 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi,
     notFoundView()
   }
 
-  override def onClientError(implicit request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =  {
     statusCode match {
-      case play.mvc.Http.Status.FORBIDDEN => Future.successful {
-        Forbidden(internalServerErrorTemplate(Request(request, "")))
-      }
+      //      case play.mvc.Http.Status.FORBIDDEN => Future.successful {
+      //        Forbidden(internalServerErrorTemplate(Request(request, "")))
+      //      }
+
+      case play.mvc.Http.Status.FORBIDDEN => internalServerErrorTemplate(Request(request, "")).map(html=> Forbidden(html))
+
       case _                              => super.onClientError(request, statusCode, message)
     }
   }
+
+//  override def onClientError(implicit request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+//    statusCode match {
+//      case play.mvc.Http.Status.FORBIDDEN => Future.successful {
+//        Forbidden(internalServerErrorTemplate(Request(request, "")))
+//      }
+//      case _                              => super.onClientError(request, statusCode, message)
+//    }
+//  }
 }

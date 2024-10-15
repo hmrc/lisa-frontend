@@ -21,7 +21,6 @@ import config.AppConfig
 import models._
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -39,11 +38,12 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
-  val mockHttp: HttpClientV2 = mock[HttpClientV2]
+  val mockHttpClientV2: HttpClientV2 = mock[HttpClientV2]
   val mockAppConfig: AppConfig = mock[AppConfig]
+  when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val SUT = new TaxEnrolmentConnector(mockHttp, mockAppConfig)
+  val SUT = new TaxEnrolmentConnector(mockHttpClientV2, mockAppConfig)
   val instant: Instant = Instant.ofEpochMilli(1498726914908L)
   val zonedDateTime: ZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 
@@ -63,7 +63,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   "Get Subscriptions by Group ID endpoint" must {
     "return whatever it receives" in {
-      when(mockHttp.get(any())(any()).execute[HttpResponse](any(), any()))
+      when(mockHttpClientV2.get(any())(any()).execute[HttpResponse](any(), any()))
         .thenReturn(Future.successful(HttpResponse(
           status = OK,
           json = Json.toJson(subs),
