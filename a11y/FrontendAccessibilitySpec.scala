@@ -20,13 +20,13 @@ import play.twirl.api.Html
 import uk.gov.hmrc.scalatestaccessibilitylinter.views.AutomaticAccessibilitySpec
 import views.html._
 import config.AppConfig
-import play.api.mvc.Request
+import play.api.mvc.{Request, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.CSRFTokenHelper._
 
 class FrontendAccessibilitySpec extends AutomaticAccessibilitySpec {
 
-  implicit val arbitraryRequest: Arbitrary[Request[AnyRef]] = fixed(FakeRequest().withCSRFToken)
+  implicit val arbitraryRequest: Arbitrary[RequestHeader] = fixed(FakeRequest().withCSRFToken)
   implicit val arbitraryConfig: Arbitrary[AppConfig] = fixed(app.injector.instanceOf[AppConfig])
   implicit val arbitraryBusinessStructure: Arbitrary[Form[models.BusinessStructure]] = fixed(models.BusinessStructure.form)
   implicit val arbitraryOrganisationDetails: Arbitrary[Form[models.OrganisationDetails]] = fixed(models.OrganisationDetails.form)
@@ -54,5 +54,5 @@ class FrontendAccessibilitySpec extends AutomaticAccessibilitySpec {
     case timeout_sign_out: timeout_sign_out                                         => render(timeout_sign_out)
   }
 
-    runAccessibilityTests()
+  runAccessibilityTests()
 }

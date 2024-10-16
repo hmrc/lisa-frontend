@@ -19,23 +19,25 @@ package connectors
 import com.google.inject.Inject
 import config.AppConfig
 import models._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class RosmConnector @Inject()(
-  val httpPost: HttpClient,
+  val httpClientV2: HttpClientV2,
   val appConfig: AppConfig
 ) (implicit ec: ExecutionContext) extends RosmJsonFormats with RawResponseReads {
 
   def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"
-    httpPost.POST[RosmRegistration, HttpResponse](uri, request)(implicitly, httpReads, implicitly, implicitly)
+    httpClientV2.post(url"$uri").withBody(Json.toJson(request)).execute[HttpResponse]
   }
 
   def subscribe(lisaManagerRef: String, lisaSubscribe:LisaSubscription)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
-      httpPost.POST[LisaSubscription, HttpResponse](uri, lisaSubscribe)(implicitly, httpReads, implicitly, implicitly)
+    httpClientV2.post(url"$uri").withBody(Json.toJson(lisaSubscribe)).execute[HttpResponse]
   }
 
 }

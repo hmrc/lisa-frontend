@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.TradingDetails
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, MessagesRequest}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService
