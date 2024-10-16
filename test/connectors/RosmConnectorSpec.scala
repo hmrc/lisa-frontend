@@ -29,7 +29,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -42,6 +42,13 @@ class RosmConnectorSpec extends PlaySpec
 
   val mockHttpClientV2: HttpClientV2 = mock[HttpClientV2]
   val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+  when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
+  when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockHttpClientV2.post(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+  when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
+
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new RosmConnector(mockHttpClientV2, mockAppConfig)
@@ -103,7 +110,7 @@ class RosmConnectorSpec extends PlaySpec
 
     "return success" when {
       "rosm returns a success message" in {
-        when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(Future.successful(HttpResponse(
             status = CREATED,
             json = Json.toJson(rosmSuccessResponse),

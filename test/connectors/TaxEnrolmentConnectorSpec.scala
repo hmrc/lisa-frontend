@@ -29,7 +29,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -38,10 +38,17 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   with MockitoSugar
   with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
   val mockHttpClientV2: HttpClientV2 = mock[HttpClientV2]
   val mockAppConfig: AppConfig = mock[AppConfig]
-  when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   override implicit val hc: HeaderCarrier = HeaderCarrier()
+
+  when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
+
+  when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockHttpClientV2.post(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+  when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
 
   val SUT = new TaxEnrolmentConnector(mockHttpClientV2, mockAppConfig)
   val instant: Instant = Instant.ofEpochMilli(1498726914908L)
@@ -63,7 +70,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   "Get Subscriptions by Group ID endpoint" must {
     "return whatever it receives" in {
-      when(mockHttpClientV2.get(any())(any()).execute[HttpResponse](any(), any()))
+      when(mockRequestBuilder.execute[HttpResponse](any(),any()))
         .thenReturn(Future.successful(HttpResponse(
           status = OK,
           json = Json.toJson(subs),

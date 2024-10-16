@@ -47,7 +47,7 @@ class EmailConnector @Inject()(
     val jsonData = Json.toJson(sendEmailReq)
 
     httpClientV2.post(url"$postUrl")
-      .withBody(Json.toJson(jsonData))
+      .withBody(jsonData)
       .execute[HttpResponse]
       .map {
       response =>
