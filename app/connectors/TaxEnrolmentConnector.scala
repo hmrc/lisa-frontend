@@ -35,7 +35,6 @@ class TaxEnrolmentConnector @Inject()(
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
     httpClientV2.get(url"$uri")
-      .withBody(Json.toJson(groupId))
       .execute[HttpResponse]
       .map {
       res =>

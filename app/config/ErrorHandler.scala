@@ -44,22 +44,10 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi,
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =  {
     statusCode match {
-      //      case play.mvc.Http.Status.FORBIDDEN => Future.successful {
-      //        Forbidden(internalServerErrorTemplate(Request(request, "")))
-      //      }
 
       case play.mvc.Http.Status.FORBIDDEN => internalServerErrorTemplate(Request(request, "")).map(html=> Forbidden(html))
 
       case _                              => super.onClientError(request, statusCode, message)
     }
   }
-
-//  override def onClientError(implicit request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
-//    statusCode match {
-//      case play.mvc.Http.Status.FORBIDDEN => Future.successful {
-//        Forbidden(internalServerErrorTemplate(Request(request, "")))
-//      }
-//      case _                              => super.onClientError(request, statusCode, message)
-//    }
-//  }
 }
