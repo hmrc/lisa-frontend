@@ -44,9 +44,7 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
   when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
-
   when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockHttpClientV2.post(any())(any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
 
