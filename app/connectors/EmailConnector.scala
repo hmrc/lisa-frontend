@@ -23,8 +23,8 @@ import models.SendEmailRequest
 import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,7 +34,7 @@ case object EmailSent extends EmailStatus
 case object EmailNotSent extends EmailStatus
 
 class EmailConnector @Inject()(
-  val http: HttpClient,
+  val httpClientV2: HttpClientV2,
   appConfig: AppConfig,
   metrics: EmailMetrics
 ) (implicit ec: ExecutionContext) extends RawResponseReads with Logging {
@@ -46,19 +46,23 @@ class EmailConnector @Inject()(
     val postUrl = s"${appConfig.emailServiceUrl}/hmrc/email"
     val jsonData = Json.toJson(sendEmailReq)
 
-    http.POST(postUrl, jsonData).map { response =>
-      response.status match {
-        case ACCEPTED => {
-          logger.info("Email sent successfully.")
-          metrics.emailSentCounter()
-          EmailSent
+    httpClientV2.post(url"$postUrl")
+      .withBody(jsonData)
+      .execute[HttpResponse]
+      .map {
+      response =>
+        response.status match {
+          case ACCEPTED => {
+            logger.info("Email sent successfully.")
+            metrics.emailSentCounter()
+            EmailSent
+          }
+          case status => {
+            logger.warn("Email not sent.")
+            metrics.emailNotSentCounter()
+            EmailNotSent
+          }
         }
-        case status => {
-          logger.warn("Email not sent.")
-          metrics.emailNotSentCounter()
-          EmailNotSent
-        }
-      }
     }
   }
 }

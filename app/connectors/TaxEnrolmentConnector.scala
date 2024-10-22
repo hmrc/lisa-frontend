@@ -21,21 +21,25 @@ import config.AppConfig
 import models._
 import play.api.Logging
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentConnector @Inject()(
-  val httpGet: HttpClient,
-  val appConfig: AppConfig
+                                       val httpClientV2: HttpClientV2,
+                                       val appConfig: AppConfig
 ) (implicit ec: ExecutionContext) extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
-    httpGet.GET[HttpResponse](uri)(httpReads, hc, implicitly) map { res =>
-      logger.debug(s"Getsubscriptions returned status: ${res.status} ")
-      Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
+    httpClientV2.get(url"$uri")
+      .execute[HttpResponse]
+      .map {
+      res =>
+        logger.debug(s"Getsubscriptions returned status: ${res.status} ")
+        Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
     }
   }
 }
