@@ -29,16 +29,16 @@ import uk.gov.hmrc.mongo.cache.DataKey
 import scala.concurrent.{ExecutionContext, Future}
 
 class TradingDetailsController @Inject()(
-  implicit val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  override implicit val messagesApi: MessagesApi,
-  override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
-  tradingDetailsView: views.html.registration.trading_details
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+                                          implicit val sessionCacheRepository: LisaCacheRepository,
+                                          implicit val env: Environment,
+                                          implicit val config: Configuration,
+                                          implicit val authorisationService: AuthorisationService,
+                                          implicit val appConfig: AppConfig,
+                                          override implicit val messagesApi: MessagesApi,
+                                          override implicit val ec: ExecutionContext,
+                                          implicit val messagesControllerComponents: MessagesControllerComponents,
+                                          tradingDetailsView: views.html.registration.trading_details
+                                        ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>
@@ -56,6 +56,7 @@ class TradingDetailsController @Inject()(
           Future.successful(BadRequest(tradingDetailsView(createPostCall, formWithErrors)))
         },
         data => {
+          logger.debug("[TradingDetailsController][POST] Successful")
           sessionCacheRepository.putSession[TradingDetails](DataKey(TradingDetails.cacheKey), TradingDetails.uppercaseZ(data)).flatMap { _ =>
             handleRedirect(routes.YourDetailsController.get.url)
           }

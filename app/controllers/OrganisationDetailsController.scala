@@ -24,23 +24,24 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Environment, Logging}
 import repositories.LisaCacheRepository
-import services.{AuthorisationService, RosmService}
+import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class OrganisationDetailsController @Inject()(
-  implicit val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val rosmService: RosmService,
-  implicit val appConfig: AppConfig,
-  override implicit val messagesApi: MessagesApi,
-  override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
-  organisationDetailsView: views.html.registration.organisation_details
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with Logging {
+                                               implicit val sessionCacheRepository: LisaCacheRepository,
+                                               implicit val env: Environment,
+                                               implicit val config: Configuration,
+                                               implicit val authorisationService: AuthorisationService,
+                                               implicit val rosmService: RosmService,
+                                               implicit val auditService: AuditService,
+                                               implicit val appConfig: AppConfig,
+                                               override implicit val messagesApi: MessagesApi,
+                                               override implicit val ec: ExecutionContext,
+                                               implicit val messagesControllerComponents: MessagesControllerComponents,
+                                               organisationDetailsView: views.html.registration.organisation_details
+                                             ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with Logging {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { userId =>
@@ -91,12 +92,24 @@ class OrganisationDetailsController @Inject()(
                 logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId: String) =>
+                    auditService.audit(auditType = "BusinessStructureSuccess",
+                      path = routes.OrganisationDetailsController.post.url,
+                      auditData = Map("companyName" -> data.companyName,
+                        "ctrNumber" -> data.ctrNumber,
+                        "businessStructure" -> businessStructure.businessStructure
+                      )
+                    )
+
                     logger.debug("rosmRegister Successful")
                     sessionCacheRepository.putSession[String](DataKey("safeId"), safeId).flatMap { _ =>
                       handleRedirect(routes.TradingDetailsController.get.url)
                     }
                   case Left(error) =>
                     logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
+                    auditService.audit(auditType = "BusinessStructureFailed",
+                      path = routes.OrganisationDetailsController.post.url,
+                      auditData = Map("error" -> error)
+                    )
                     handleRedirect(routes.MatchingFailedController.get.url)
                 }
               }

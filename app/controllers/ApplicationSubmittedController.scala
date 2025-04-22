@@ -44,6 +44,7 @@ class ApplicationSubmittedController @Inject()(
   ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
+    logger.debug("[ApplicationSubmittedController][get]")
     authorisedForLisa(_ => {
       sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
         case Some(application) =>
@@ -53,12 +54,14 @@ class ApplicationSubmittedController @Inject()(
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
+    logger.debug("[ApplicationSubmittedController][pending]")
     authorisedForLisa(_ => {
       Future.successful(Ok(applicationPendingView()))
     }, checkEnrolmentState = false)
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
+    logger.debug("[ApplicationSubmittedController][successful]")
     authorisedForLisa(_ => {
       sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
         case Some(lisaManagerReferenceNumber) =>
@@ -68,6 +71,7 @@ class ApplicationSubmittedController @Inject()(
   }
 
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
+    logger.debug("[ApplicationSubmittedController][rejected]")
     authorisedForLisa(_ => {
       Future.successful(Ok(applicationRejectedView()))
     }, checkEnrolmentState = false)

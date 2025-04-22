@@ -29,16 +29,16 @@ import uk.gov.hmrc.mongo.cache.DataKey
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessStructureController @Inject()(
-  implicit val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  override implicit val messagesApi: MessagesApi,
-  override implicit val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
-  businessStructureView: views.html.registration.business_structure
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+                                             implicit val sessionCacheRepository: LisaCacheRepository,
+                                             implicit val env: Environment,
+                                             implicit val config: Configuration,
+                                             implicit val authorisationService: AuthorisationService,
+                                             implicit val appConfig: AppConfig,
+                                             override implicit val messagesApi: MessagesApi,
+                                             override implicit val ec: ExecutionContext,
+                                             implicit val messagesControllerComponents: MessagesControllerComponents,
+                                             businessStructureView: views.html.registration.business_structure
+                                           ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId: String =>
@@ -56,6 +56,7 @@ class BusinessStructureController @Inject()(
           Future.successful(BadRequest(businessStructureView(createPostCall, formWithErrors)))
         },
         (data: BusinessStructure) => {
+          logger.debug("[BusinessStructureController][POST] Successful")
           sessionCacheRepository.putSession[BusinessStructure](DataKey(BusinessStructure.cacheKey), data).flatMap { _ =>
             handleRedirect(routes.OrganisationDetailsController.get.url)
           }
