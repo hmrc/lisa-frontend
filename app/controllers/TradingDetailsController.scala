@@ -53,10 +53,11 @@ class TradingDetailsController @Inject()(
     authorisedForLisa { _ =>
       TradingDetails.form.bindFromRequest().fold(
         formWithErrors => {
+          logger.info("[TradingDetailsController][POST] form errors")
           Future.successful(BadRequest(tradingDetailsView(createPostCall, formWithErrors)))
         },
         data => {
-          logger.debug("[TradingDetailsController][POST] Successful")
+          logger.info("[TradingDetailsController][POST] Successful")
           sessionCacheRepository.putSession[TradingDetails](DataKey(TradingDetails.cacheKey), TradingDetails.uppercaseZ(data)).flatMap { _ =>
             handleRedirect(routes.YourDetailsController.get.url)
           }

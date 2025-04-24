@@ -56,7 +56,7 @@ class BusinessStructureController @Inject()(
           Future.successful(BadRequest(businessStructureView(createPostCall, formWithErrors)))
         },
         (data: BusinessStructure) => {
-          logger.debug("[BusinessStructureController][POST] Successful")
+          logger.info("[BusinessStructureController][POST] Successful")
           sessionCacheRepository.putSession[BusinessStructure](DataKey(BusinessStructure.cacheKey), data).flatMap { _ =>
             handleRedirect(routes.OrganisationDetailsController.get.url)
           }

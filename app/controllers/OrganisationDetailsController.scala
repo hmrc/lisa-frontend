@@ -83,13 +83,14 @@ class OrganisationDetailsController @Inject()(
 
           form.bindFromRequest().fold(
             formWithErrors => {
+              logger.info("[OrganisationDetailsController][Post] form errors")
               Future.successful(
                 BadRequest(organisationDetailsView(createPostCall, formWithErrors, isPartnership))
               )
             },
             data => {
               sessionCacheRepository.putSession[OrganisationDetails](DataKey(OrganisationDetails.cacheKey), data).flatMap { _ =>
-                logger.debug(s"BusinessStructure retrieved: ${businessStructure.businessStructure}")
+                logger.info(s"[OrganisationDetailsController][Post] BusinessStructure retrieved: ${businessStructure.businessStructure}")
                 rosmService.rosmRegister(businessStructure, data).flatMap {
                   case Right(safeId: String) =>
                     auditService.audit(auditType = "BusinessStructureSuccess",
@@ -100,12 +101,12 @@ class OrganisationDetailsController @Inject()(
                       )
                     )
 
-                    logger.debug("rosmRegister Successful")
+                    logger.info("[OrganisationDetailsController][Post] rosmRegister Successful")
                     sessionCacheRepository.putSession[String](DataKey("safeId"), safeId).flatMap { _ =>
                       handleRedirect(routes.TradingDetailsController.get.url)
                     }
                   case Left(error) =>
-                    logger.error(s"OrganisationDetailsController: rosmRegister Failure due to $error")
+                    logger.error(s"[OrganisationDetailsController][Post] Failure due to $error")
                     auditService.audit(auditType = "BusinessStructureFailed",
                       path = routes.OrganisationDetailsController.post.url,
                       auditData = Map("error" -> error)

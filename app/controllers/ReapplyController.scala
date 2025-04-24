@@ -40,6 +40,7 @@ class ReapplyController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
+    logger.info("[ReapplyController][GET]")
     authorisedForLisa ( cacheId =>{
       sessionCacheRepository.putSession[Boolean](DataKey(Reapplication.cacheKey), true) map { _ =>
          Redirect(routes.BusinessStructureController.get)

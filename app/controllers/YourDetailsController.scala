@@ -55,10 +55,11 @@ class YourDetailsController @Inject()(
 
       YourDetails.form.bindFromRequest().fold(
         formWithErrors => {
+          logger.info("[YourDetailsController][POST] form errors")
           Future.successful(BadRequest(yourDetailsView(createPostCall, formWithErrors)))
         },
         data => {
-          logger.debug("[YourDetailsController][POST] Successful")
+          logger.info("[YourDetailsController][POST] Successful")
           sessionCacheRepository.putSession[YourDetails](DataKey(YourDetails.cacheKey), data).flatMap { _ =>
             handleRedirect(routes.SummaryController.get.url)
           }
