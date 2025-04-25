@@ -41,6 +41,7 @@ class MatchingFailedController @Inject()(
 ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
+    logger.info("[MatchingFailedController][GET]")
     authorisedForLisa { cacheId =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).flatMap {
         case None => Future.successful(Redirect(routes.BusinessStructureController.get))

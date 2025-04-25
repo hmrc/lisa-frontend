@@ -30,11 +30,11 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
 
   private def handleErrorResponse(rosmType: String, response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
     case failureResponse: JsSuccess[DesFailureResponse] => {
-      logger.error(s"ROSM $rosmType failure: ${failureResponse.get.code}")
+      logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.get.code}")
       Left(failureResponse.get.code)
     }
     case _: JsError => {
-      logger.error(s"ROSM $rosmType failure, unexpected error.")
+      logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure, unexpected error.")
       Left("INTERNAL_SERVER_ERROR")
     }
   }
@@ -56,7 +56,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
     )
 
     rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
-      logger.warn(s"ROSM registration response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")
+      logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")
 
       res.json.validate[RosmRegistrationSuccessResponse] match {
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
@@ -64,7 +64,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
       }
     }.recover {
       case NonFatal(ex: Throwable) => {
-        logger.error(s"ROSM registration exception: ${ex.getMessage}")
+        logger.error(s"[RosmService][rosmRegister] exception: ${ex.getMessage}")
         Left("INTERNAL_SERVER_ERROR")
       }
     }
@@ -93,7 +93,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
         companyName = companyName,
         applicantDetails = applicantDetails)
     ).map(subscribed => {
-        logger.warn(s"ROSM subscription response for $companyName ($utr): ${subscribed.json.toString()}")
+        logger.warn(s"[RosmService][performSubscription] response for $companyName ($utr): ${subscribed.json.toString()}")
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
           case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)

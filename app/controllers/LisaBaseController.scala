@@ -66,18 +66,18 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
 
   private def handleUserAuthorised(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
                                   (implicit request: Request[AnyContent]): Future[Result] = {
-    logger.debug("User Authorised")
+    logger.info("[LisaBaseController][handleUserAuthorised] User Authorised")
     isReapplication(user) flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
           case TaxEnrolmentPending =>
-            logger.debug("Enrollment Pending")
+            logger.info("[LisaBaseController][handleUserAuthorised] Enrollment Pending")
             Future.successful(Redirect(routes.ApplicationSubmittedController.pending))
           case TaxEnrolmentError =>
-            logger.debug("Enrollment Rejected")
+            logger.error("[LisaBaseController][handleUserAuthorised] Enrollment Rejected")
             Future.successful(Redirect(routes.ApplicationSubmittedController.rejected))
           case TaxEnrolmentDoesNotExist =>
-            logger.debug("Enrollment Does Not Exist")
+            logger.warn("[LisaBaseController][handleUserAuthorised] Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
         }
       }
@@ -89,7 +89,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
 
   private def handleUserAuthorisedAndEnrolled(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
                                              (implicit request: Request[AnyContent]): Future[Result] = {
-    logger.debug("User Authorised And Enrolled")
+    logger.info(s"[LisaBaseController][handleUserAuthorisedAndEnrolled] User Authorised And Enrolled $checkEnrolmentState")
 
     if (checkEnrolmentState) {
       sessionCacheRepository.putSession[String](DataKey("lisaManagerReferenceNumber"), user.lisaManagerReferenceNumber).map { _ =>

@@ -52,7 +52,7 @@ class RosmController @Inject()(
       hasAllSubmissionData() { registrationDetails =>
         rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) =>
-            logger.info("Audit of Submission -> auditType = applicationReceived" + subscriptionId)
+            logger.info(s"[RosmController][POST] Audit of Submission -> auditType = applicationReceived subscriptionId: $subscriptionId" )
 
             auditService.audit(auditType = "applicationReceived",
               path = routes.RosmController.post.url,
@@ -78,7 +78,7 @@ class RosmController @Inject()(
               Redirect(routes.ApplicationSubmittedController.get)
             }
           case Left(error) =>
-            logger.info("Audit of Submission -> auditType = applicationNotReceived")
+            logger.error("[RosmController][POST] Audit of Submission -> auditType = applicationNotReceived")
 
             auditService.audit(auditType = "applicationNotReceived",
               path = routes.RosmController.post.url,

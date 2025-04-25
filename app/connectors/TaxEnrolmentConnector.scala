@@ -38,7 +38,7 @@ class TaxEnrolmentConnector @Inject()(
       .execute[HttpResponse]
       .map {
       res =>
-        logger.debug(s"Getsubscriptions returned status: ${res.status} ")
+        logger.info(s"[TaxEnrolmentConnector] [getSubscriptionsByGroupId] returned status: ${res.status} ")
         Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
     }
   }

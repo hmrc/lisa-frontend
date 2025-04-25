@@ -53,12 +53,12 @@ class EmailConnector @Inject()(
       response =>
         response.status match {
           case ACCEPTED => {
-            logger.info("Email sent successfully.")
+            logger.info("[EmailConnector][sendTemplatedEmail] Email sent successfully.")
             metrics.emailSentCounter()
             EmailSent
           }
           case status => {
-            logger.warn("Email not sent.")
+            logger.warn("[EmailConnector][sendTemplatedEmail] Email not sent.")
             metrics.emailNotSentCounter()
             EmailNotSent
           }
