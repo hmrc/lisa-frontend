@@ -43,7 +43,7 @@
     }
 
     @formHelper(action = call) {
-        <div class='form-group @if(form("companyStructure").hasErrors) {form-field--error}'>
+        <div class='form-group @if(form("companyStructure-llp").hasErrors) {form-field--error}'>
                 @govukRadios(Radios(
                     fieldset = Some(Fieldset(
                         legend = Some(Legend(
@@ -54,9 +54,9 @@
                     )),
                     hint = None,
                     name = "companyStructure",
-                    errorMessage = if(form("companyStructure").hasErrors){
+                    errorMessage = if(form("companyStructure-llp").hasErrors){
                         Some(ErrorMessage(
-                            content = Text(messages(form("companyStructure").errors.head.message))
+                            content = Text(messages(form("companyStructure-llp").errors.head.message))
                         ))
                     } else { None },
                     items = Seq(
