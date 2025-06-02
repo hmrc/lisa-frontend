@@ -29,7 +29,7 @@ object BusinessStructure {
 
   val form: Form[BusinessStructure] = Form(
     mapping(
-      "companyStructure-llp" -> optional(text).verifying("error.companyStructureRequired", i => i.isDefined)
+      "companyStructure" -> optional(text).verifying("error.companyStructureRequired", i => i.isDefined)
     )(bs => BusinessStructure(bs.get))(bs => Some(Some(bs.businessStructure)))
   )
 }

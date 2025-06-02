@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 
+
 @this(govukWrapper: views.html.govuk_wrapper,
         govukErrorSummary : GovukErrorSummary,
         govukButton : GovukButton,
@@ -38,12 +39,31 @@
         attributes = Map("id" -> "back", "data-module" -> "hmrc-back-link", "data-journey-click" -> "navigation - link:Select your company structure:Back")
     ))
 
+
+    @defining(
+        form.errors.map { error =>
+        val key = error.key
+        val href = if (key == "companyStructure") "#companyStructure-llp" else s"#$key"
+
+        ErrorLink(
+            href = Some(href),
+            content = Text(messages(error.message, error.args: _*))
+        )
+        }
+    ) { errorLinks =>
+
     @if(form.hasErrors) {
-        @govukErrorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("validation.summary.heading"))))
+        @govukErrorSummary(
+            ErrorSummary(
+                errorList = errorLinks,
+                title = Text(messages("validation.summary.heading"))
+                )
+            )
+        }
     }
 
     @formHelper(action = call) {
-        <div class='form-group @if(form("companyStructure-llp").hasErrors) {form-field--error}'>
+        <div class='form-group @if(form("companyStructure").hasErrors) {form-field--error}'>
                 @govukRadios(Radios(
                     fieldset = Some(Fieldset(
                         legend = Some(Legend(
@@ -54,9 +74,9 @@
                     )),
                     hint = None,
                     name = "companyStructure",
-                    errorMessage = if(form("companyStructure-llp").hasErrors){
+                    errorMessage = if(form("companyStructure").hasErrors){
                         Some(ErrorMessage(
-                            content = Text(messages(form("companyStructure-llp").errors.head.message))
+                            content = Text(messages(form("companyStructure").errors.head.message))
                         ))
                     } else { None },
                     items = Seq(
