@@ -20,7 +20,7 @@ import play.twirl.api.Html
 import uk.gov.hmrc.scalatestaccessibilitylinter.views.AutomaticAccessibilitySpec
 import views.html._
 import config.AppConfig
-import play.api.mvc.{Request, RequestHeader}
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.CSRFTokenHelper._
 

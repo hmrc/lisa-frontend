@@ -169,7 +169,7 @@ error.partnershipUtrPattern=Self Assessment Unique Taxpayer Reference must only 
 
 error.fsrRefNumberRequired=Enter your company’s Financial Conduct Authority reference
 error.fsrRefNumberLength=Financial Conduct Authority reference must be 6 numbers
-error.fsrRefNumberPattern=Your company’s Financial Conduct Authority reference must only include numbers 0-9
+error.fsrRefNumberPattern=Your company’s Financial Conduct Authority reference must only include numbers 0 to 9
 
 error.isaProviderRefNumberRequired=Enter your ISA manager reference
 error.isaProviderRefNumberPattern= ISA manager reference must only include the letter Z and numbers 0 to 9
