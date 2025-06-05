@@ -17,6 +17,7 @@
 import sbt.*
 
 object AppDependencies {
+
   val bootstrapVersion = "9.13.0"
   val hmrcMongoPlayVersion = "2.6.0"
 
