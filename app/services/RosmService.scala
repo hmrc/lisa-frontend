@@ -56,7 +56,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
     )
 
     rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
-      logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber}): ${res.json.toString()}")
+      logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber})")
 
       res.json.validate[RosmRegistrationSuccessResponse] match {
         case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
@@ -93,7 +93,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
         companyName = companyName,
         applicantDetails = applicantDetails)
     ).map(subscribed => {
-        logger.warn(s"[RosmService][performSubscription] response for $companyName ($utr): ${subscribed.json.toString()}")
+        logger.warn(s"[RosmService][performSubscription] response for $companyName ($utr)")
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
           case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
