@@ -78,7 +78,7 @@ class RosmController @Inject()(
               Redirect(routes.ApplicationSubmittedController.get)
             }
           case Left(error) =>
-            logger.error("[RosmController][POST] Audit of Submission -> auditType = applicationNotReceived")
+            logger.error(s"[RosmController][POST] Audit of Submission -> auditType = applicationNotReceived failed with $error")
 
             auditService.audit(auditType = "applicationNotReceived",
               path = routes.RosmController.post.url,

@@ -64,7 +64,7 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
       }
     }.recover {
       case NonFatal(ex: Throwable) => {
-        logger.error(s"[RosmService][rosmRegister] exception: ${ex.getMessage}")
+        logger.error(s"[RosmService][rosmRegister] exception: ${ex.getMessage} for ${orgDetails.companyName}")
         Left("INTERNAL_SERVER_ERROR")
       }
     }
