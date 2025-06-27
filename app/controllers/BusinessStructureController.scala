@@ -53,6 +53,7 @@ class BusinessStructureController @Inject()(
     authorisedForLisa { cacheId =>
       BusinessStructure.form.bindFromRequest().fold(
         formWithErrors => {
+          logger.warn("[BusinessStructureController][POST] Returning bad request due to form errors")
           Future.successful(BadRequest(businessStructureView(createPostCall, formWithErrors)))
         },
         (data: BusinessStructure) => {
