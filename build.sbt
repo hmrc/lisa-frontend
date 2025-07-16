@@ -70,4 +70,3 @@ lazy val scoverageSettings = {
   )
 }
 
-addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle")
