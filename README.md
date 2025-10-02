@@ -33,12 +33,6 @@ To run all tests
 ./run_all_tests.sh
 ```
 
-#### Running Accessibility Tests
-
-The [Accessibility Linter](https://github.com/hmrc/sbt-accessibility-linter) has been added to SBT for this project.
-
-To run the tests, execute `sbt clean A11y/test` from the command line.
-
 ## User Journeys
 
 See the LISA User Journeys documentation on Confluence for help with these.
@@ -59,7 +53,7 @@ from lisa-api-tests repository.
 
 This service uses [sbt-scoverage](https://github.com/scoverage/sbt-scoverage) to provide test coverage reports.
 
-Run this script before raising a PR to ensure your code changes pass the Jenkins pipeline. This runs all the unit tests with scalastyle and checks for dependency updates:
+Run this script before raising a PR to ensure your code changes pass the Jenkins pipeline. This runs all the unit tests with checks for dependency updates:
 
 ```
 ./run_all_tests.sh
