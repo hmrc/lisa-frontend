@@ -1,4 +1,7 @@
 digital-service: Lifetime ISA
+description: This is the frontend for Lifetime ISA service.
 repoVisibility: public_0C3F0CE3E6E6448FAD341E7BFA50FCD333E06A20CFF05FCACE61154DDBBADF71
+type: Service
+service-type: Frontend
 test-repositories:
   - lisa-api-tests
