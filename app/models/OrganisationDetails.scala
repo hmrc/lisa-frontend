@@ -33,7 +33,7 @@ object OrganisationDetails {
   val form: Form[OrganisationDetails] = Form(
     mapping(
       "companyName" -> optional(text)
-        .verifying("error.companyNameRequired", _.isDefined)
+        .verifying("error.companyNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
         .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
       "ctrNumber" -> optional(text)
@@ -53,7 +53,7 @@ object OrganisationDetails {
   val partnershipForm: Form[OrganisationDetails] = Form(
     mapping(
       "companyName" -> optional(text)
-        .verifying("error.companyNameRequired", _.isDefined)
+        .verifying("error.companyNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
         .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
       "strNumber" -> optional(text)

@@ -34,22 +34,22 @@ object YourDetails {
   val form: Form[YourDetails] = Form(
     mapping(
       "firstName" -> optional(text)
-        .verifying("error.firstNameRequired", _.isDefined)
+        .verifying("error.firstNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.firstNameLength", i => i.isEmpty || i.getOrElse("").length <= 35)
         .verifying("error.firstNamePattern", i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z \-']{1,35}$""")),
 
       "lastName" -> optional(text)
-        .verifying("error.lastNameRequired", _.isDefined)
+        .verifying("error.lastNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.lastNameLength", i => i.isEmpty || i.getOrElse("").length <= 35)
         .verifying("error.lastNamePattern", i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z \-']{1,35}$""")),
 
       "role" -> optional(text)
-        .verifying("error.roleRequired", _.isDefined)
+        .verifying("error.roleRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.roleLength", i => i.isEmpty || i.getOrElse("").length <= 30)
         .verifying("error.rolePattern", i => i.isEmpty || i.getOrElse("").length > 30 || i.getOrElse("").matches("""^[A-Za-z \-']{1,30}$""")),
 
       "phone" -> optional(text)
-        .verifying("error.phoneRequired", _.isDefined)
+        .verifying("error.phoneRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.phonePattern", i => i.isEmpty || i.getOrElse("").matches("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""")),
 
       "email" -> optional(text)
