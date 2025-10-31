@@ -141,6 +141,19 @@ class YourDetailsSpec extends PlaySpec {
 
     }
 
+    "shows invalid errors" when {
+
+      "giving only space for first name, last name, role and phone number" in {
+        val test = Map[String, String]("firstName"->" ", "lastName"->" ", "role"->" ", "phone"->" ", "email"->"me@test.com")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 4
+
+        res.errors.map(_.key) mustBe Seq("firstName", "lastName", "role", "phone")
+        res.errors.map(_.message) mustBe Seq("error.firstNameRequired", "error.lastNameRequired", "error.roleRequired", "error.phoneRequired")
+      }
+
+    }
+
   }
 
 }
