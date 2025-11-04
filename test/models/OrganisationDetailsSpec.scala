@@ -61,6 +61,14 @@ class OrganisationDetailsSpec extends PlaySpec {
         res.errors.head.message mustBe "error.companyNamePattern"
       }
 
+      "given only space the input as company name" in {
+        val test = Map[String, String]("companyName" -> " ", "ctrNumber" -> "0123456789")
+        val res = SUT.bind(test)
+        res.errors.size mustBe 1
+        res.errors.head.key mustBe "companyName"
+        res.errors.head.message mustBe "error.companyNameRequired"
+      }
+
     }
 
     "show utr invalid error" when {
