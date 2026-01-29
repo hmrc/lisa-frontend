@@ -28,41 +28,43 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessStructureController @Inject()(
-                                             implicit val sessionCacheRepository: LisaCacheRepository,
-                                             implicit val env: Environment,
-                                             implicit val config: Configuration,
-                                             implicit val authorisationService: AuthorisationService,
-                                             implicit val appConfig: AppConfig,
-                                             override implicit val messagesApi: MessagesApi,
-                                             override implicit val ec: ExecutionContext,
-                                             implicit val messagesControllerComponents: MessagesControllerComponents,
-                                             businessStructureView: views.html.registration.business_structure
-                                           ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+class BusinessStructureController @Inject() (implicit
+  val sessionCacheRepository: LisaCacheRepository,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit override val messagesApi: MessagesApi,
+  implicit override val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  businessStructureView: views.html.registration.business_structure
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId: String =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).map {
         case Some(data) => Ok(businessStructureView(createPostCall, BusinessStructure.form.fill(data)))
-        case None => Ok(businessStructureView(createPostCall, BusinessStructure.form))
+        case None       => Ok(businessStructureView(createPostCall, BusinessStructure.form))
       }
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
-      BusinessStructure.form.bindFromRequest().fold(
-        formWithErrors => {
-          logger.warn("[BusinessStructureController][POST] Returning bad request due to form errors")
-          Future.successful(BadRequest(businessStructureView(createPostCall, formWithErrors)))
-        },
-        (data: BusinessStructure) => {
-          logger.info("[BusinessStructureController][POST] Successful")
-          sessionCacheRepository.putSession[BusinessStructure](DataKey(BusinessStructure.cacheKey), data).flatMap { _ =>
-            handleRedirect(routes.OrganisationDetailsController.get.url)
+      BusinessStructure.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            logger.warn("[BusinessStructureController][POST] Returning bad request due to form errors")
+            Future.successful(BadRequest(businessStructureView(createPostCall, formWithErrors)))
+          },
+          (data: BusinessStructure) => {
+            logger.info("[BusinessStructureController][POST] Successful")
+            sessionCacheRepository.putSession[BusinessStructure](DataKey(BusinessStructure.cacheKey), data).flatMap { _ =>
+              handleRedirect(routes.OrganisationDetailsController.get.url)
+            }
           }
-        }
-      )
+        )
     }
   }
 

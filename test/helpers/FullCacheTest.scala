@@ -30,14 +30,15 @@ class FullCacheTest(dataComponents: Seq[(String, JsValue)])(implicit val lisaCac
   def generateMaybeCacheItem(data: Seq[(String, JsValue)]): Option[CacheItem] =
     data match {
       case Nil => None
-      case _ => Some(
-        CacheItem(
-          id = "",
-          data = JsObject(data),
-          createdAt = LocalDate.parse("2013-11-13").atStartOfDay().toInstant(ZoneOffset.UTC),
-          modifiedAt = LocalDate.parse("2013-11-13").atStartOfDay().toInstant(ZoneOffset.UTC)
+      case _   =>
+        Some(
+          CacheItem(
+            id = "",
+            data = JsObject(data),
+            createdAt = LocalDate.parse("2013-11-13").atStartOfDay().toInstant(ZoneOffset.UTC),
+            modifiedAt = LocalDate.parse("2013-11-13").atStartOfDay().toInstant(ZoneOffset.UTC)
+          )
         )
-      )
     }
 
   when(lisaCacheRepository.getFullCache(any()))

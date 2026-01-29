@@ -35,11 +35,8 @@ import uk.gov.hmrc.mongo.test.MongoSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisationServiceSpec extends PlaySpec
-  with MockitoSugar
-  with GuiceOneAppPerSuite
-  with ScalaFutures
-  with MongoSupport {
+class AuthorisationServiceSpec
+    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with ScalaFutures with MongoSupport {
 
   override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
@@ -48,34 +45,44 @@ class AuthorisationServiceSpec extends PlaySpec
     )
     .build()
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+
   "user status" should {
 
     "return an enrolled user" when {
 
       "an enrolment is in auth" in {
         val enrolmentIdentifier = EnrolmentIdentifier("ZREF", "Z123456")
-        val validEnrolment = new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated")
+        val validEnrolment      =
+          new Enrolment(key = "HMRC-LISA-ORG", identifiers = List(enrolmentIdentifier), state = "Activated")
 
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set(validEnrolment)))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserAuthorisedAndEnrolled("1234", "Z123456")
         }
       }
 
       "a successful enrolment is in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
         when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(validTaxEnrolmentSubscription)))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserAuthorisedAndEnrolled("1234", "Z0001")
         }
       }
@@ -85,42 +92,56 @@ class AuthorisationServiceSpec extends PlaySpec
     "return an authorised user when no enrolment is in auth and" when {
 
       "a pending state enrolment is in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
         when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Some(
-            validTaxEnrolmentSubscription.copy(state = TaxEnrolmentPending, identifiers = Nil))))
+          .thenReturn(
+            Future.successful(Some(validTaxEnrolmentSubscription.copy(state = TaxEnrolmentPending, identifiers = Nil)))
+          )
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserAuthorised("1234", TaxEnrolmentPending)
         }
       }
 
       "an error state enrolment is in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).
-          thenReturn(Future.successful(Some(
-            validTaxEnrolmentSubscription.copy(state = TaxEnrolmentError, identifiers = Nil))))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(
+            Future.successful(Some(validTaxEnrolmentSubscription.copy(state = TaxEnrolmentError, identifiers = Nil)))
+          )
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserAuthorised("1234", TaxEnrolmentError)
         }
       }
 
       "an enrolment is not in tax enrolments" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any())).
-          thenReturn(Future.successful(None))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(None))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserAuthorised("1234", TaxEnrolmentDoesNotExist)
         }
       }
@@ -130,11 +151,15 @@ class AuthorisationServiceSpec extends PlaySpec
     "return user not logged in" when {
 
       "a NoActiveSession exception is returned from auth" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[Option[String], Option[String]]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.failed(BearerTokenExpired()))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserNotLoggedIn
         }
       }
@@ -144,11 +169,15 @@ class AuthorisationServiceSpec extends PlaySpec
     "return user not admin" when {
 
       "a UnsupportedCredentialRole exception is returned from auth" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[Option[String], Option[String]]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.failed(UnsupportedCredentialRole()))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserNotAdmin
         }
       }
@@ -158,31 +187,43 @@ class AuthorisationServiceSpec extends PlaySpec
     "return user unauthorised" when {
 
       "an AuthorisationException exception is returned from auth" in {
-        when(mockAuthConnector.authorise[~[Option[String], Option[String]]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[Option[String], Option[String]]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.failed(InsufficientEnrolments()))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserUnauthorised
         }
       }
 
       "internalId retrieval from auth fails" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(None, Some("/"), Set()))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserUnauthorised
         }
       }
 
       "groupId retrieval from auth fails" in {
-        when(mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](ArgumentMatchers.any(), ArgumentMatchers.any())
-          (ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(buildRetrieval(Some("1234"), None, Set()))
 
-        whenReady(SUT.userStatus){
+        whenReady(SUT.userStatus) {
           _ mustBe UserUnauthorised
         }
       }
@@ -191,15 +232,17 @@ class AuthorisationServiceSpec extends PlaySpec
 
   }
 
-
-  private val mockAuthConnector = mock[AuthConnector]
+  private val mockAuthConnector       = mock[AuthConnector]
   private val mockTaxEnrolmentService = mock[TaxEnrolmentService]
 
   object SUT extends AuthorisationService(mockAuthConnector, mockTaxEnrolmentService)
 
-  private def buildRetrieval(id: Option[String], groupId: Option[String], enrolments: Set[Enrolment]): Future[Option[String] ~ Option[String] ~ Enrolments] = {
+  private def buildRetrieval(
+    id: Option[String],
+    groupId: Option[String],
+    enrolments: Set[Enrolment]
+  ): Future[Option[String] ~ Option[String] ~ Enrolments] =
     Future.successful(new ~(new ~(id, groupId), Enrolments(enrolments)))
-  }
 
   private val validTaxEnrolmentSubscription = TaxEnrolmentSubscription(
     created = ZonedDateTime.now(),

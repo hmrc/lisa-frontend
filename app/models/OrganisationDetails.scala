@@ -24,9 +24,9 @@ case class OrganisationDetails(companyName: String, ctrNumber: String)
 
 object OrganisationDetails {
 
-  val cacheKey: String = "organisationDetails"
+  val cacheKey: String   = "organisationDetails"
   val COMPANY_NAME_REGEX = """^[A-Za-z0-9 \-,.&'\/]{1,65}$"""
-  val UTR_REGEX = "^[0-9]{10}$"
+  val UTR_REGEX          = "^[0-9]{10}$"
 
   implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
@@ -35,19 +35,23 @@ object OrganisationDetails {
       "companyName" -> optional(text)
         .verifying("error.companyNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
-        .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
-      "ctrNumber" -> optional(text)
+        .verifying(
+          "error.companyNamePattern",
+          i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)
+        ),
+      "ctrNumber"   -> optional(text)
         .verifying("error.ctrNumberRequired", _.getOrElse("").matches("^.+$"))
         .verifying("error.ctrNumberLength", i => i.isEmpty || i.getOrElse("").length == 10)
-        .verifying("error.ctrNumberPattern", i => i.isEmpty || i.getOrElse("").length != 10 || i.getOrElse("").matches(UTR_REGEX))
-    )(
-      (name, utr) => OrganisationDetails(
+        .verifying(
+          "error.ctrNumberPattern",
+          i => i.isEmpty || i.getOrElse("").length != 10 || i.getOrElse("").matches(UTR_REGEX)
+        )
+    )((name, utr) =>
+      OrganisationDetails(
         name.getOrElse(""),
         utr.getOrElse("")
       )
-    )(
-      org => Some((Some(org.companyName), Some(org.ctrNumber)))
-    )
+    )(org => Some((Some(org.companyName), Some(org.ctrNumber))))
   )
 
   val partnershipForm: Form[OrganisationDetails] = Form(
@@ -55,18 +59,23 @@ object OrganisationDetails {
       "companyName" -> optional(text)
         .verifying("error.companyNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.companyNameLength", i => i.isEmpty || i.getOrElse("").length <= 65)
-        .verifying("error.companyNamePattern", i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)),
-      "strNumber" -> optional(text)
+        .verifying(
+          "error.companyNamePattern",
+          i => i.isEmpty || i.getOrElse("").length > 65 || i.getOrElse("").matches(COMPANY_NAME_REGEX)
+        ),
+      "strNumber"   -> optional(text)
         .verifying("error.partnershipUtrRequired", _.getOrElse("").matches("^.+$"))
         .verifying("error.partnershipUtrLength", i => i.isEmpty || i.getOrElse("").length == 10)
-        .verifying("error.partnershipUtrPattern", i => i.isEmpty || i.getOrElse("").length != 10 || i.getOrElse("").matches(UTR_REGEX))
-    )(
-      (name, utr) => OrganisationDetails(
+        .verifying(
+          "error.partnershipUtrPattern",
+          i => i.isEmpty || i.getOrElse("").length != 10 || i.getOrElse("").matches(UTR_REGEX)
+        )
+    )((name, utr) =>
+      OrganisationDetails(
         name.getOrElse(""),
         utr.getOrElse("")
       )
-    )(
-      org => Some((Some(org.companyName), Some(org.ctrNumber)))
-    )
+    )(org => Some((Some(org.companyName), Some(org.ctrNumber))))
   )
+
 }

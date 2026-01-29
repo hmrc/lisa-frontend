@@ -26,15 +26,18 @@ import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 
+class ErrorHandler @Inject() (
+  val messagesApi: MessagesApi,
+  val configuration: Configuration,
+  implicit val appConfig: AppConfig,
+  errorView: views.html.error_template,
+  notFoundView: views.html.page_not_found_template
+)(implicit val ec: ExecutionContext)
+    extends FrontendErrorHandler {
 
-class ErrorHandler @Inject()(val messagesApi: MessagesApi,
-                             val configuration: Configuration,
-                             implicit val appConfig: AppConfig,
-                             errorView: views.html.error_template,
-                             notFoundView: views.html.page_not_found_template
-                            ) (implicit val ec: ExecutionContext) extends FrontendErrorHandler {
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
-                                    (implicit request: RequestHeader): Future[Html] = Future.successful {
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+    request: RequestHeader
+  ): Future[Html] = Future.successful {
     errorView()
   }
 
@@ -42,12 +45,13 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi,
     notFoundView()
   }
 
-  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =  {
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =
     statusCode match {
 
-      case play.mvc.Http.Status.FORBIDDEN => internalServerErrorTemplate(Request(request, "")).map(html=> Forbidden(html))
+      case play.mvc.Http.Status.FORBIDDEN =>
+        internalServerErrorTemplate(Request(request, "")).map(html => Forbidden(html))
 
-      case _                              => super.onClientError(request, statusCode, message)
+      case _ => super.onClientError(request, statusCode, message)
     }
-  }
+
 }

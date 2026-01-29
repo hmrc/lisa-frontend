@@ -16,22 +16,23 @@
 
 package models
 
-
 import java.time.ZonedDateTime
 
 case class TaxEnrolmentSubscription(
-                                     created: ZonedDateTime,
-                                     lastModified: ZonedDateTime,
-                                     credId: String,
-                                     serviceName: String,
-                                     identifiers: List[TaxEnrolmentIdentifier],
-                                     callback: String,
-                                     state: TaxEnrolmentState,
-                                     etmpId: String,
-                                     groupIdentifier: String) {
-  val zref: Option[String] = {
+  created: ZonedDateTime,
+  lastModified: ZonedDateTime,
+  credId: String,
+  serviceName: String,
+  identifiers: List[TaxEnrolmentIdentifier],
+  callback: String,
+  state: TaxEnrolmentState,
+  etmpId: String,
+  groupIdentifier: String
+) {
+
+  val zref: Option[String] =
     identifiers.filter(i => i.key == "ZREF").map(_.value).headOption
-  }
+
 }
 
 trait TaxEnrolmentState

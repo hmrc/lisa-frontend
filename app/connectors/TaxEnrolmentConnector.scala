@@ -26,20 +26,22 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentConnector @Inject()(
-                                       val httpClientV2: HttpClientV2,
-                                       val appConfig: AppConfig
-) (implicit ec: ExecutionContext) extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
+class TaxEnrolmentConnector @Inject() (
+  val httpClientV2: HttpClientV2,
+  val appConfig: AppConfig
+)(implicit ec: ExecutionContext)
+    extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
-    httpClientV2.get(url"$uri")
+    httpClientV2
+      .get(url"$uri")
       .execute[HttpResponse]
-      .map {
-      res =>
+      .map { res =>
         logger.info(s"[TaxEnrolmentConnector] [getSubscriptionsByGroupId] returned status: ${res.status} ")
         Json.parse(res.body).as[List[TaxEnrolmentSubscription]]
-    }
+      }
   }
+
 }

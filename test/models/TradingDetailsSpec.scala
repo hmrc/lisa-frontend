@@ -27,7 +27,7 @@ class TradingDetailsSpec extends PlaySpec {
 
       "both fields are correct - uppercase z in isa ref" in {
         val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "Z1234")
-        val res = SUT.bind(test)
+        val res  = SUT.bind(test)
         res.errors mustBe Nil
       }
 
@@ -37,7 +37,7 @@ class TradingDetailsSpec extends PlaySpec {
 
       "given no data" in {
         val test = Map[String, String]()
-        val res = SUT.bind(test)
+        val res  = SUT.bind(test)
 
         res.errors mustBe Seq[FormError](
           FormError("fsrRefNumber", "error.fsrRefNumberRequired"),
@@ -51,17 +51,17 @@ class TradingDetailsSpec extends PlaySpec {
 
       "given a fsrRefNumber thats too long" in {
         val test = Map[String, String]("fsrRefNumber" -> "12", "isaProviderRefNumber" -> "Z1234")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "fsrRefNumber"
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "fsrRefNumber"
         res.errors.head.message mustBe "error.fsrRefNumberLength"
       }
 
       "given a fsrRefNumber with invalid characters" in {
         val test = Map[String, String]("fsrRefNumber" -> "?", "isaProviderRefNumber" -> "Z1234")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "fsrRefNumber"
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "fsrRefNumber"
         res.errors.head.message mustBe "error.fsrRefNumberPattern"
       }
 
@@ -71,26 +71,26 @@ class TradingDetailsSpec extends PlaySpec {
 
       "given a isa provider number thats too long" in {
         val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "Z1234567890")
-        val res = SUT.bind(test)
+        val res  = SUT.bind(test)
 
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "isaProviderRefNumber"
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "isaProviderRefNumber"
         res.errors.head.message mustBe "error.isaProviderRefNumberPattern"
       }
 
       "given a isa provider number with invalid characters" in {
         val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "?")
-        val res = SUT.bind(test)
+        val res  = SUT.bind(test)
 
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "isaProviderRefNumber"
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "isaProviderRefNumber"
         res.errors.head.message mustBe "error.isaProviderRefNumberPattern"
       }
       "given a isa provider number with - lowercase z" in {
         val test = Map[String, String]("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "z123456")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "isaProviderRefNumber"
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "isaProviderRefNumber"
         res.errors.head.message mustBe "error.isaProviderRefNumberPattern"
       }
 

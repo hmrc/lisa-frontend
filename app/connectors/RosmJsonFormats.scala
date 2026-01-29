@@ -26,30 +26,31 @@ trait RosmJsonFormats {
 
   implicit val indReads: Reads[RosmIndividual] = (
     (JsPath \ "firstName").read[String] and
-    (JsPath \ "middleName").readNullable[String] and
-    (JsPath \ "lastName").read[String] and
-    (JsPath \ "dateOfBirth").readNullable[String].map {
-      case Some(date) => Some(LocalDate.parse(date))
-      case _ => None
-    }
+      (JsPath \ "middleName").readNullable[String] and
+      (JsPath \ "lastName").read[String] and
+      (JsPath \ "dateOfBirth").readNullable[String].map {
+        case Some(date) => Some(LocalDate.parse(date))
+        case _          => None
+      }
   )(RosmIndividual.apply _)
 
   implicit val indWrites: Writes[RosmIndividual] = (
     (JsPath \ "firstName").write[String] and
-    (JsPath \ "middleName").writeNullable[String] and
-    (JsPath \ "lastName").write[String] and
-    (JsPath \ "dateOfBirth").writeNullable[String].contramap[Option[LocalDate]] {
-      case Some(date) => Some(date.toString)
-      case _ => None
-    }
+      (JsPath \ "middleName").writeNullable[String] and
+      (JsPath \ "lastName").write[String] and
+      (JsPath \ "dateOfBirth").writeNullable[String].contramap[Option[LocalDate]] {
+        case Some(date) => Some(date.toString)
+        case _          => None
+      }
   )(unlift(RosmIndividual.unapply))
 
-  implicit val orgFormats: OFormat[RosmOrganisation] = Json.format[RosmOrganisation]
-  implicit val addrFormats: OFormat[RosmAddress] = Json.format[RosmAddress]
-  implicit val contFormats: OFormat[RosmContactDetails] = Json.format[RosmContactDetails]
-  implicit val succFormats: OFormat[RosmRegistrationSuccessResponse] = Json.format[RosmRegistrationSuccessResponse]
-  implicit val failFormats: OFormat[DesFailureResponse] = Json.format[DesFailureResponse]
-  implicit val desSubscribeFormats: OFormat[DesSubscriptionSuccessResponse] = Json.format[DesSubscriptionSuccessResponse]
+  implicit val orgFormats: OFormat[RosmOrganisation]                        = Json.format[RosmOrganisation]
+  implicit val addrFormats: OFormat[RosmAddress]                            = Json.format[RosmAddress]
+  implicit val contFormats: OFormat[RosmContactDetails]                     = Json.format[RosmContactDetails]
+  implicit val succFormats: OFormat[RosmRegistrationSuccessResponse]        = Json.format[RosmRegistrationSuccessResponse]
+  implicit val failFormats: OFormat[DesFailureResponse]                     = Json.format[DesFailureResponse]
 
+  implicit val desSubscribeFormats: OFormat[DesSubscriptionSuccessResponse] =
+    Json.format[DesSubscriptionSuccessResponse]
 
 }

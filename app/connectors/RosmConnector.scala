@@ -25,17 +25,20 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RosmConnector @Inject()(
+class RosmConnector @Inject() (
   val httpClientV2: HttpClientV2,
   val appConfig: AppConfig
-) (implicit ec: ExecutionContext) extends RosmJsonFormats with RawResponseReads {
+)(implicit ec: ExecutionContext)
+    extends RosmJsonFormats with RawResponseReads {
 
-  def registerOnce(utr: String, request:RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def registerOnce(utr: String, request: RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"
     httpClientV2.post(url"$uri").withBody(Json.toJson(request)).execute[HttpResponse]
   }
 
-  def subscribe(lisaManagerRef: String, lisaSubscribe:LisaSubscription)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def subscribe(lisaManagerRef: String, lisaSubscribe: LisaSubscription)(implicit
+    hc: HeaderCarrier
+  ): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"
     httpClientV2.post(url"$uri").withBody(Json.toJson(lisaSubscribe)).execute[HttpResponse]
   }

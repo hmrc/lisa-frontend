@@ -26,28 +26,28 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: ExecutionContext) extends RosmJsonFormats with Logging {
+class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: ExecutionContext)
+    extends RosmJsonFormats with Logging {
 
-  private def handleErrorResponse(rosmType: String, response:HttpResponse)  =  response.json.validate[DesFailureResponse] match {
-    case failureResponse: JsSuccess[DesFailureResponse] => {
-      logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.get.code}")
-      Left(failureResponse.get.code)
+  private def handleErrorResponse(rosmType: String, response: HttpResponse) =
+    response.json.validate[DesFailureResponse] match {
+      case failureResponse: JsSuccess[DesFailureResponse] =>
+        logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.get.code}")
+        Left(failureResponse.get.code)
+      case _: JsError                                     =>
+        logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure, unexpected error.")
+        Left("INTERNAL_SERVER_ERROR")
     }
-    case _: JsError => {
-      logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure, unexpected error.")
-      Left("INTERNAL_SERVER_ERROR")
-    }
-  }
 
-  private def getRosmBusinessStructure(input: BusinessStructure): String = {
+  private def getRosmBusinessStructure(input: BusinessStructure): String =
     if (input.businessStructure == "Friendly Society")
       "Corporate Body"
     else
       input.businessStructure
-  }
 
-  def rosmRegister(businessStructure:BusinessStructure, orgDetails: OrganisationDetails)(implicit hc:HeaderCarrier): Future[Either[String,String]] =
-  {
+  def rosmRegister(businessStructure: BusinessStructure, orgDetails: OrganisationDetails)(implicit
+    hc: HeaderCarrier
+  ): Future[Either[String, String]] = {
     val rosmRegistration = RosmRegistration(
       "LISA",
       requiresNameMatch = true,
@@ -55,53 +55,57 @@ class RosmService @Inject()(val rosmConnector: RosmConnector) (implicit ec: Exec
       organisation = Organisation(orgDetails.companyName, getRosmBusinessStructure(businessStructure))
     )
 
-    rosmConnector.registerOnce(orgDetails.ctrNumber, rosmRegistration).map { res =>
-      logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber})")
+    rosmConnector
+      .registerOnce(orgDetails.ctrNumber, rosmRegistration)
+      .map { res =>
+        logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber})")
 
-      res.json.validate[RosmRegistrationSuccessResponse] match {
-        case successResponse: JsSuccess[RosmRegistrationSuccessResponse] =>  Right(successResponse.get.safeId)
-        case _ : JsError => handleErrorResponse("registration", res)
+        res.json.validate[RosmRegistrationSuccessResponse] match {
+          case successResponse: JsSuccess[RosmRegistrationSuccessResponse] => Right(successResponse.get.safeId)
+          case _: JsError                                                  => handleErrorResponse("registration", res)
+        }
       }
-    }.recover {
-      case NonFatal(ex: Throwable) => {
+      .recover { case NonFatal(ex: Throwable) =>
         logger.error(s"[RosmService][rosmRegister] exception: ${ex.getMessage} for ${orgDetails.companyName}")
         Left("INTERNAL_SERVER_ERROR")
       }
-    }
   }
 
+  def performSubscription(
+    registration: LisaRegistration
+  )(implicit hc: HeaderCarrier): Future[Either[String, String]] = {
 
-  def performSubscription(registration: LisaRegistration)(implicit hc:HeaderCarrier) : Future[Either[String,String]] = {
-
-    val utr = registration.organisationDetails.ctrNumber
-    val companyName = registration.organisationDetails.companyName
-    val safeId = registration.safeId
+    val utr              = registration.organisationDetails.ctrNumber
+    val companyName      = registration.organisationDetails.companyName
+    val safeId           = registration.safeId
     val applicantDetails = ApplicantDetails(
       name = registration.yourDetails.firstName,
       surname = registration.yourDetails.lastName,
       position = registration.yourDetails.role,
-      contactDetails = ContactDetails(
-        phoneNumber = registration.yourDetails.phone,
-        emailAddress = registration.yourDetails.email))
+      contactDetails =
+        ContactDetails(phoneNumber = registration.yourDetails.phone, emailAddress = registration.yourDetails.email)
+    )
 
-    rosmConnector.subscribe(
-      lisaManagerRef = registration.tradingDetails.isaProviderRefNumber,
-      lisaSubscribe = LisaSubscription(
-        utr = utr,
-        safeId = safeId,
-        approvalNumber = registration.tradingDetails.fsrRefNumber,
-        companyName = companyName,
-        applicantDetails = applicantDetails)
-    ).map(subscribed => {
+    rosmConnector
+      .subscribe(
+        lisaManagerRef = registration.tradingDetails.isaProviderRefNumber,
+        lisaSubscribe = LisaSubscription(
+          utr = utr,
+          safeId = safeId,
+          approvalNumber = registration.tradingDetails.fsrRefNumber,
+          companyName = companyName,
+          applicantDetails = applicantDetails
+        )
+      )
+      .map { subscribed =>
         logger.warn(s"[RosmService][performSubscription] response for $companyName ($utr)")
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
           case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
-          case _: JsError => handleErrorResponse("submission", subscribed)
+          case _: JsError                                                 => handleErrorResponse("submission", subscribed)
         }
-    })
+      }
 
   }
-
 
 }

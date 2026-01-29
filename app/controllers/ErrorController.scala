@@ -25,10 +25,10 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ErrorController @Inject()(
-  implicit val config: Configuration,
+class ErrorController @Inject() (implicit
+  val config: Configuration,
   implicit val env: Environment,
-  override implicit val messagesApi: MessagesApi,
+  implicit override val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
   implicit val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents,
@@ -37,14 +37,14 @@ class ErrorController @Inject()(
 ) extends FrontendController(messagesControllerComponents: MessagesControllerComponents) with I18nSupport {
 
   val accessDeniedIndividualOrAgent: Action[AnyContent] = Action.async { implicit request =>
-    val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url
+    val loginUrl    = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url
     val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
 
     Future.successful(Forbidden(accessDeniedIndividualOrAgentView(loginUrl, registerUrl)))
   }
 
   val accessDeniedAssistant: Action[AnyContent] = Action.async { implicit request =>
-    val loginUrl = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url
+    val loginUrl    = appConfig.loginURL + "?origin=lisa-api&continue=" + routes.OrganisationDetailsController.get.url
     val registerUrl = appConfig.getSignOutUrl(appConfig.registerOrgUrl)
 
     Future.successful(Forbidden(accessDeniedAssistantView(loginUrl, registerUrl)))

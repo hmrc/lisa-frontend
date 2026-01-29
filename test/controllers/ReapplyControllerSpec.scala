@@ -31,8 +31,12 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
 
   "The reapplication controller" should {
     "redirect to the BusinessStructure controller endpoint" in {
-      when(lisaCacheRepository.getFromSession[Boolean](DataKey(ArgumentMatchers.anyString()))(
-        ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(
+        lisaCacheRepository.getFromSession[Boolean](DataKey(ArgumentMatchers.anyString()))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
         .thenReturn(Future.successful(Some(true)))
 
       val result = SUT.get(fakeRequest)
@@ -42,6 +46,7 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
       redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
     }
   }
+
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   val SUT = new ReapplyController()
 

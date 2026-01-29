@@ -35,15 +35,14 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   lazy val pageTitle = "What is your company structure?"
 
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
+    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents         = inject[MessagesControllerComponents]
   implicit val businessStructureView: business_structure = inject[business_structure]
-  lazy val SUT = new BusinessStructureController()
-
+  lazy val SUT                                           = new BusinessStructureController()
 
   "GET Business Structure" must {
 
@@ -52,8 +51,11 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
       "the cache returns a value" in {
         val form = new BusinessStructure("LLP")
 
-        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
-          ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          lisaCacheRepository.getFromSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.successful(Some(form)))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -62,8 +64,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include (pageTitle)
-        content must include ("checked")
+        content must include(pageTitle)
+        content must include("checked")
       }
 
     }
@@ -71,8 +73,11 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
-          ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          lisaCacheRepository.getFromSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -80,8 +85,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
         status(result) mustBe Status.OK
 
         val content = contentAsString(result)
-        content must include (pageTitle)
-        content must not include ("checked=\"checked\"")
+        content must include(pageTitle)
+        content must not include "checked=\"checked\""
       }
 
     }
@@ -92,28 +97,35 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
-        val uri = controllers.routes.BusinessStructureController.post.url
+        val uri     = controllers.routes.BusinessStructureController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
-        val result = SUT.post()(request)
+        val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)
 
-        content must include (pageTitle)
-        content must include ("form-field--error") // css class indicating a form field error
-        content must include ("Select if your company is a limited liability partnership, limited company or friendly society") // error msg we expect
+        content must include(pageTitle)
+        content must include("form-field--error") // css class indicating a form field error
+        content must include(
+          "Select if your company is a limited liability partnership, limited company or friendly society"
+        ) // error msg we expect
       }
     }
 
     "redirect the user to organisation details" when {
       "the submitted data is valid" in {
-        val uri = controllers.routes.BusinessStructureController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
-        when(lisaCacheRepository.putSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any()))
+        val uri     = controllers.routes.BusinessStructureController.post.url
+        val request =
+          createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
+        when(
+          lisaCacheRepository.putSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.successful(("", "")))
-        val result = SUT.post(request)
+        val result  = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -123,15 +135,19 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
     "store business structure details in cache" when {
       "the submitted data is valid" in {
-        val uri = controllers.routes.BusinessStructureController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
+        val uri     = controllers.routes.BusinessStructureController.post.url
+        val request =
+          createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
 
         await(SUT.post(request))
 
-        verify(lisaCacheRepository).putSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any())
+        verify(lisaCacheRepository).putSession[BusinessStructure](
+          DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)),
+          ArgumentMatchers.any()
+        )(ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }
 
   }
+
 }

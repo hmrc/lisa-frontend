@@ -38,17 +38,19 @@ import scala.concurrent.Future
 class RosmControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val errorView: error_template = inject[error_template]
-  val SUT = new RosmController()
+  implicit val errorView: error_template         = inject[error_template]
+  val SUT                                        = new RosmController()
 
-  val customTestEmail = "success@rosm.subscription"
-  val customYourForm = new YourDetails(
+  val customTestEmail                                   = "success@rosm.subscription"
+
+  val customYourForm                                    = new YourDetails(
     firstName = "Test",
     lastName = "User",
     role = "Role",
     phone = "0191 123 4567",
     email = customTestEmail
   )
+
   val yourFormKeyAndJsonSuccessEmail: (String, JsValue) = YourDetails.cacheKey -> Json.toJson(customYourForm)
 
   val customDataComponents: Seq[(String, JsValue)] = Seq(
@@ -101,7 +103,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
     }
 
     "redirect the user to trading details" when {
-      "no trading details are found in the cache" in new FullCacheTest(noTradingDetailsComponents){
+      "no trading details are found in the cache" in new FullCacheTest(noTradingDetailsComponents) {
 
         val result: Future[Result] = SUT.post(fakeRequest)
 
@@ -142,12 +144,16 @@ class RosmControllerSpec extends SpecBase with Injecting {
       verify(emailConnector).sendTemplatedEmail(
         emailAddress = ArgumentMatchers.eq(customTestEmail),
         templateName = ArgumentMatchers.eq("lisa_application_submit"),
-        params = ArgumentMatchers.eq(Map(
-          "application_reference" -> testSubId,
-          "email" -> customTestEmail,
-          "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
-          "first_name" -> yourForm.firstName,
-          "last_name" -> yourForm.lastName)))(any)
+        params = ArgumentMatchers.eq(
+          Map(
+            "application_reference" -> testSubId,
+            "email"                 -> customTestEmail,
+            "review_date"           -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
+            "first_name"            -> yourForm.firstName,
+            "last_name"             -> yourForm.lastName
+          )
+        )
+      )(any)
     }
 
     "handle a failed rosm registration" when {
@@ -164,7 +170,8 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
     "audit a successful rosm registration" in new FullCacheTest(allDataComponents) {
 
-      val registrationDetails: LisaRegistration = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+      val registrationDetails: LisaRegistration =
+        LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
       when(rosmService.performSubscription(any)(any))
         .thenReturn(Future.successful(Right("123456789012")))
@@ -174,22 +181,27 @@ class RosmControllerSpec extends SpecBase with Injecting {
       verify(auditService).audit(
         auditType = ArgumentMatchers.eq("applicationReceived"),
         path = ArgumentMatchers.eq("/lifetime-isa/submit-registration"),
-        auditData = ArgumentMatchers.eq(Map(
-          "subscriptionId" -> "123456789012",
-          "companyName" -> registrationDetails.organisationDetails.companyName,
-          "utr" -> registrationDetails.organisationDetails.ctrNumber,
-          "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
-          "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
-          "firstName" -> registrationDetails.yourDetails.firstName,
-          "lastName" -> registrationDetails.yourDetails.lastName,
-          "roleInOrganisation" -> registrationDetails.yourDetails.role,
-          "phoneNumber" -> registrationDetails.yourDetails.phone,
-          "emailAddress" -> registrationDetails.yourDetails.email)))(any)
+        auditData = ArgumentMatchers.eq(
+          Map(
+            "subscriptionId"                           -> "123456789012",
+            "companyName"                              -> registrationDetails.organisationDetails.companyName,
+            "utr"                                      -> registrationDetails.organisationDetails.ctrNumber,
+            "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
+            "isaProviderReferenceNumber"               -> registrationDetails.tradingDetails.isaProviderRefNumber,
+            "firstName"                                -> registrationDetails.yourDetails.firstName,
+            "lastName"                                 -> registrationDetails.yourDetails.lastName,
+            "roleInOrganisation"                       -> registrationDetails.yourDetails.role,
+            "phoneNumber"                              -> registrationDetails.yourDetails.phone,
+            "emailAddress"                             -> registrationDetails.yourDetails.email
+          )
+        )
+      )(any)
     }
 
     "audit a failed rosm registration" when {
       "the ct utr is 0000000000" in new FullCacheTest(allDataComponents) {
-        val registrationDetails: LisaRegistration = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+        val registrationDetails: LisaRegistration =
+          LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
         when(rosmService.performSubscription(any)(any))
           .thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
@@ -199,35 +211,44 @@ class RosmControllerSpec extends SpecBase with Injecting {
         verify(auditService).audit(
           auditType = ArgumentMatchers.eq("applicationNotReceived"),
           path = ArgumentMatchers.eq("/lifetime-isa/submit-registration"),
-          auditData = ArgumentMatchers.eq(Map(
-            "reasonNotReceived" -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
-            "companyName" -> registrationDetails.organisationDetails.companyName,
-            "utr" -> registrationDetails.organisationDetails.ctrNumber,
-            "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
-            "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
-            "firstName" -> registrationDetails.yourDetails.firstName,
-            "lastName" -> registrationDetails.yourDetails.lastName,
-            "roleInOrganisation" -> registrationDetails.yourDetails.role,
-            "phoneNumber" -> registrationDetails.yourDetails.phone,
-            "emailAddress" -> registrationDetails.yourDetails.email))
+          auditData = ArgumentMatchers.eq(
+            Map(
+              "reasonNotReceived"                        -> "INVALID_LISA_MANAGER_REFERENCE_NUMBER",
+              "companyName"                              -> registrationDetails.organisationDetails.companyName,
+              "utr"                                      -> registrationDetails.organisationDetails.ctrNumber,
+              "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
+              "isaProviderReferenceNumber"               -> registrationDetails.tradingDetails.isaProviderRefNumber,
+              "firstName"                                -> registrationDetails.yourDetails.firstName,
+              "lastName"                                 -> registrationDetails.yourDetails.lastName,
+              "roleInOrganisation"                       -> registrationDetails.yourDetails.role,
+              "phoneNumber"                              -> registrationDetails.yourDetails.phone,
+              "emailAddress"                             -> registrationDetails.yourDetails.email
+            )
+          )
         )(any)
       }
     }
 
-    "cache subscriptionId and email as part of a successful rosm registration" in new FullCacheTest(allDataComponents){
+    "cache subscriptionId and email as part of a successful rosm registration" in new FullCacheTest(allDataComponents) {
 
-      val registrationDetails: LisaRegistration = LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
+      val registrationDetails: LisaRegistration =
+        LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
       when(rosmService.performSubscription(any)(any)).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
 
-      val applicationSentVM: ApplicationSent = ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
+      val applicationSentVM: ApplicationSent =
+        ApplicationSent(subscriptionId = "123456789012", email = registrationDetails.yourDetails.email)
 
       verify(lisaCacheRepository).putSession(
-        DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)), ArgumentMatchers.eq(applicationSentVM))(
-          any, any
-        )
+        DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)),
+        ArgumentMatchers.eq(applicationSentVM)
+      )(
+        any,
+        any
+      )
     }
   }
+
 }

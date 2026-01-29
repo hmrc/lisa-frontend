@@ -20,8 +20,7 @@ import uk.gov.hmrc.mongo.cache.SessionCacheRepository
 
 class LisaModule extends AbstractModule {
 
-  override def configure(): Unit = {
+  override def configure(): Unit =
     bind(classOf[SessionCacheRepository]).to(classOf[LisaCacheRepository])
-  }
 
 }

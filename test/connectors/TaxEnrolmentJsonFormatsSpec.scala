@@ -64,7 +64,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
         val sub = parsed.head
 
         sub.created mustBe Instant.ofEpochMilli(1498726914908L).atZone(ZoneId.systemDefault())
-        sub.state mustBe TaxEnrolmentPending
+        sub.state   mustBe TaxEnrolmentPending
       }
       "given valid json with a error status" in {
         val parsed = Json.parse(testJson.replace("PENDING", "ERROR")).as[List[TaxEnrolmentSubscription]]
@@ -91,7 +91,7 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val sub = parsed.head
 
-        sub.state mustBe TaxEnrolmentPending
+        sub.state       mustBe TaxEnrolmentPending
         sub.identifiers mustBe Nil
       }
     }
@@ -102,14 +102,13 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
 
         val parsed = Json.parse(invalidStateJson).validate[List[TaxEnrolmentSubscription]]
 
-        parsed.fold(invalid => {
-          invalid.size mustBe 1
-          invalid.head._2.size mustBe 1
-          invalid.head._2.head mustBe JsonValidationError("error.formatting.state")
-        },
-          _ => {
-            fail("passed validation")
-          }
+        parsed.fold(
+          invalid => {
+            invalid.size         mustBe 1
+            invalid.head._2.size mustBe 1
+            invalid.head._2.head mustBe JsonValidationError("error.formatting.state")
+          },
+          _ => fail("passed validation")
         )
       }
     }

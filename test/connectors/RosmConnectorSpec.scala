@@ -34,14 +34,10 @@ import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class RosmConnectorSpec extends PlaySpec
-  with MockitoSugar
-  with GuiceOneAppPerSuite
-  with RosmJsonFormats
-  with SpecBase {
+class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with RosmJsonFormats with SpecBase {
 
-  val mockHttpClientV2: HttpClientV2 = mock[HttpClientV2]
-  val mockAppConfig: AppConfig = mock[AppConfig]
+  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
+  val mockAppConfig: AppConfig           = mock[AppConfig]
   val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
   when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
@@ -49,7 +45,7 @@ class RosmConnectorSpec extends PlaySpec
   when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
 
-  override implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit override val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new RosmConnector(mockHttpClientV2, mockAppConfig)
 
@@ -110,12 +106,16 @@ class RosmConnectorSpec extends PlaySpec
 
     "return success" when {
       "rosm returns a success message" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
-          .thenReturn(Future.successful(HttpResponse(
-            status = CREATED,
-            json = Json.toJson(rosmSuccessResponse),
-            headers = Map.empty
-          )))
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                status = CREATED,
+                json = Json.toJson(rosmSuccessResponse),
+                headers = Map.empty
+              )
+            )
+          )
 
         doRegistrationRequest { response =>
           response.json.validate[RosmRegistrationSuccessResponse].get mustBe rosmSuccessResponse
@@ -126,11 +126,15 @@ class RosmConnectorSpec extends PlaySpec
     "return failure" when {
       "rosm returns a success status but a failure response" in {
         when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(
-            status = CREATED,
-            json = Json.toJson(rosmFailureResponse),
-            headers = Map.empty
-          )))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                status = CREATED,
+                json = Json.toJson(rosmFailureResponse),
+                headers = Map.empty
+              )
+            )
+          )
 
         doRegistrationRequest { response =>
           response.json.validate[DesFailureResponse].get mustBe rosmFailureResponse
@@ -139,10 +143,7 @@ class RosmConnectorSpec extends PlaySpec
 
       "rosm returns a success status and an unexpected json response" in {
         when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(
-            status = CREATED,
-            json = Json.parse("{}"),
-            headers = Map.empty)))
+          .thenReturn(Future.successful(HttpResponse(status = CREATED, json = Json.parse("{}"), headers = Map.empty)))
 
         doRegistrationRequest { response =>
           response.body mustBe "{ }"
@@ -155,11 +156,15 @@ class RosmConnectorSpec extends PlaySpec
     "return success" when {
       "rosm returns a valid payload with utr" in {
         when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(
-            status = CREATED,
-            json = Json.toJson(desSubscribeSuccessResponse),
-            headers = Map.empty
-          )))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                status = CREATED,
+                json = Json.toJson(desSubscribeSuccessResponse),
+                headers = Map.empty
+              )
+            )
+          )
 
         doSubscribe { response =>
           response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
@@ -169,16 +174,25 @@ class RosmConnectorSpec extends PlaySpec
   }
 
   private def doRegistrationRequest(callback: HttpResponse => Unit): Unit = {
-    val request = RosmRegistration(regime = "LISA", requiresNameMatch = false, isAnAgent = false,
-      Organisation(organisationName ="CompName",organisationType="LLP"))
+    val request  = RosmRegistration(
+      regime = "LISA",
+      requiresNameMatch = false,
+      isAnAgent = false,
+      Organisation(organisationName = "CompName", organisationType = "LLP")
+    )
     val response = Await.result(SUT.registerOnce("1234567890", request), Duration.Inf)
 
     callback(response)
   }
 
   private def doSubscribe(callback: HttpResponse => Unit): Unit = {
-    val payload =  LisaSubscription("4567890123","SAFEID0124",
-      "FCA1234", "compName", ApplicantDetails("name","lastname","role",ContactDetails("7234545","email@email.com")))
+    val payload  = LisaSubscription(
+      "4567890123",
+      "SAFEID0124",
+      "FCA1234",
+      "compName",
+      ApplicantDetails("name", "lastname", "role", ContactDetails("7234545", "email@email.com"))
+    )
     val response = Await.result(SUT.subscribe("Z1234", payload), Duration.Inf)
 
     callback(response)

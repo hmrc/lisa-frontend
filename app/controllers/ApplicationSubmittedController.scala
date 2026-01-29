@@ -28,52 +28,53 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationSubmittedController @Inject()(
-  implicit val sessionCacheRepository: LisaCacheRepository,
+class ApplicationSubmittedController @Inject() (implicit
+  val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  override implicit val messagesApi: MessagesApi,
-  override implicit val ec: ExecutionContext,
+  implicit override val messagesApi: MessagesApi,
+  implicit override val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents,
   applicationSubmittedView: views.html.registration.application_submitted,
   applicationPendingView: views.html.registration.application_pending,
   applicationSuccessfulView: views.html.registration.application_successful,
   applicationRejectedView: views.html.registration.application_rejected
-  ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ApplicationSubmittedController][get]")
-    authorisedForLisa(_ => {
-      sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
-        case Some(application) =>
-          Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
-      }
-    }, checkEnrolmentState = false)
+    authorisedForLisa(
+      _ =>
+        sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
+          case Some(application) =>
+            Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
+        },
+      checkEnrolmentState = false
+    )
   }
 
   def pending(): Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ApplicationSubmittedController][pending]")
-    authorisedForLisa(_ => {
-      Future.successful(Ok(applicationPendingView()))
-    }, checkEnrolmentState = false)
+    authorisedForLisa(_ => Future.successful(Ok(applicationPendingView())), checkEnrolmentState = false)
   }
 
   def successful(): Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ApplicationSubmittedController][successful]")
-    authorisedForLisa(_ => {
-      sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
-        case Some(lisaManagerReferenceNumber) =>
-          Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
-      }
-    }, checkEnrolmentState = false)
+    authorisedForLisa(
+      _ =>
+        sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
+          case Some(lisaManagerReferenceNumber) =>
+            Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
+        },
+      checkEnrolmentState = false
+    )
   }
 
   def rejected(): Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ApplicationSubmittedController][rejected]")
-    authorisedForLisa(_ => {
-      Future.successful(Ok(applicationRejectedView()))
-    }, checkEnrolmentState = false)
+    authorisedForLisa(_ => Future.successful(Ok(applicationRejectedView())), checkEnrolmentState = false)
   }
+
 }

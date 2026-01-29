@@ -45,12 +45,7 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import java.util.UUID
 
-trait SpecBase
-  extends PlaySpec
-  with MockitoSugar
-  with GuiceOneAppPerSuite
-  with MongoSupport
-  with BeforeAndAfter {
+trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with MongoSupport with BeforeAndAfter {
 
   override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
@@ -60,20 +55,20 @@ trait SpecBase
     .build()
 
   val sessionId: SessionId = SessionId(UUID.randomUUID().toString)
-  val fakeRequest = FakeRequest().withSession(("sessionId", sessionId.toString))
+  val fakeRequest          = FakeRequest().withSession(("sessionId", sessionId.toString))
 
-  val injector: Injector = fakeApplication.injector
-  implicit val system: ActorSystem = ActorSystem()
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-  implicit val appConfig: AppConfig = injector.instanceOf[AppConfig]
-  implicit val env: Environment = injector.instanceOf[Environment]
-  implicit val configuration: Configuration = injector.instanceOf[Configuration]
+  val injector: Injector                                  = fakeApplication.injector
+  implicit val system: ActorSystem                        = ActorSystem()
+  implicit val hc: HeaderCarrier                          = HeaderCarrier()
+  implicit val messagesApi: MessagesApi                   = injector.instanceOf[MessagesApi]
+  implicit val appConfig: AppConfig                       = injector.instanceOf[AppConfig]
+  implicit val env: Environment                           = injector.instanceOf[Environment]
+  implicit val configuration: Configuration               = injector.instanceOf[Configuration]
   implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
-  implicit val rosmService: RosmService = mock[RosmService]
-  implicit val auditService: AuditService = mock[AuditService]
-  implicit val emailConnector: EmailConnector = mock[EmailConnector]
-  implicit val lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
+  implicit val rosmService: RosmService                   = mock[RosmService]
+  implicit val auditService: AuditService                 = mock[AuditService]
+  implicit val emailConnector: EmailConnector             = mock[EmailConnector]
+  implicit val lisaCacheRepository: LisaCacheRepository   = mock[LisaCacheRepository]
 
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
@@ -93,4 +88,5 @@ trait SpecBase
     when(authorisationService.userStatus(any()))
       .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
+
 }

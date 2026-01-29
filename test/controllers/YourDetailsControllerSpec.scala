@@ -35,12 +35,12 @@ import scala.concurrent.Future
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val yourDetailsView: your_details = inject[your_details]
+  implicit val yourDetailsView: your_details     = inject[your_details]
 
   val SUT = new YourDetailsController()
 
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
+    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
     CSRFTokenHelper.addCSRFToken(request)
   }
 
@@ -57,18 +57,21 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           email = "test@test.com"
         )
 
-        when(lisaCacheRepository.getFromSession[YourDetails](DataKey(ArgumentMatchers.eq(YourDetails.cacheKey)))(any(), any()))
+        when(
+          lisaCacheRepository
+            .getFromSession[YourDetails](DataKey(ArgumentMatchers.eq(YourDetails.cacheKey)))(any(), any())
+        )
           .thenReturn(Future.successful(Some(yourForm)))
 
         val request: RequestHeader = fakeRequest.withCSRFToken
-        val result = SUT.get().apply(request)
+        val result                 = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
         val content = contentAsString(result)
 
-        content must include ("Your name and contact details")
-        content must include ("test@test.com")
+        content must include("Your name and contact details")
+        content must include("test@test.com")
       }
 
     }
@@ -81,14 +84,14 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
-        val result = SUT.get().apply(request)
+        val result  = SUT.get().apply(request)
 
         status(result) mustBe Status.OK
 
         val content = contentAsString(result)
 
-        content must include ("Your name and contact details")
-        content must not include ("value=\'\'")
+        content must include("Your name and contact details")
+        content must not include "value=\'\'"
       }
 
     }
@@ -100,65 +103,67 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "return validation errors" when {
       "the submitted data is incomplete" in {
 
-        val uri = controllers.routes.YourDetailsController.post.url
+        val uri     = controllers.routes.YourDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
-        val result = SUT.post()(request)
+        val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)
 
-        content must include ("Your name and contact details")
-        content must include ("Enter your first name")
-        content must include ("Enter your last name")
-        content must include ("Enter your job title")
-        content must include ("Enter your phone number")
-        content must include ("Enter your email address")
+        content must include("Your name and contact details")
+        content must include("Enter your first name")
+        content must include("Enter your last name")
+        content must include("Enter your job title")
+        content must include("Enter your phone number")
+        content must include("Enter your email address")
       }
     }
 
     "return validation errors" when {
       "the submitted data is incorrectly filled" in {
 
-        val uri = controllers.routes.YourDetailsController.post.url
+        val uri         = controllers.routes.YourDetailsController.post.url
         val invalidJson = Json.obj(
           "firstName" -> "Test0",
-          "lastName" -> "User&",
-          "role" -> "Role.",
-          "phone" -> "0191 123 4567a",
-          "email" -> "test@eldf"
+          "lastName"  -> "User&",
+          "role"      -> "Role.",
+          "phone"     -> "0191 123 4567a",
+          "email"     -> "test@eldf"
         )
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = invalidJson))
-        val result = SUT.post()(request)
+        val request     = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = invalidJson))
+        val result      = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)
 
-        content must include ("Your name and contact details")
-        content must include ("First name must only include letters a to z, hyphens, spaces and apostrophes")
-        content must include ("Last name must only include letters a to z, hyphens, spaces and apostrophes")
-        content must include ("Job title must only include letters a to z, hyphens, spaces and apostrophes")
-        content must include ("Enter a phone number, like 01642 123 456 or +33 1 23 45 67 88")
-        content must include ("Enter an email address with a name, @ symbol and a domain name, like yourname@example.com")
+        content must include("Your name and contact details")
+        content must include("First name must only include letters a to z, hyphens, spaces and apostrophes")
+        content must include("Last name must only include letters a to z, hyphens, spaces and apostrophes")
+        content must include("Job title must only include letters a to z, hyphens, spaces and apostrophes")
+        content must include("Enter a phone number, like 01642 123 456 or +33 1 23 45 67 88")
+        content must include(
+          "Enter an email address with a name, @ symbol and a domain name, like yourname@example.com"
+        )
       }
     }
 
     "redirect the user to your details" when {
       "the submitted data is valid" in {
 
-        val uri = controllers.routes.YourDetailsController.post.url
+        val uri       = controllers.routes.YourDetailsController.post.url
         val validJson = Json.obj(
           "firstName" -> "Test",
-          "lastName" -> "User",
-          "role" -> "Role",
-          "phone" -> "0191 123 4567",
-          "email" -> "test@test.com"
+          "lastName"  -> "User",
+          "role"      -> "Role",
+          "phone"     -> "0191 123 4567",
+          "email"     -> "test@test.com"
         )
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
+        val request   = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
         when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))
           .thenReturn(Future.successful(("", "")))
-        val result = SUT.post(request)
+        val result    = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -175,13 +180,13 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
         when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))
           .thenReturn(Future.successful(("", "")))
 
-        val uri = controllers.routes.YourDetailsController.post.url
+        val uri       = controllers.routes.YourDetailsController.post.url
         val validJson = Json.obj(
           "firstName" -> "Test",
-          "lastName" -> "User",
-          "role" -> "Role",
-          "phone" -> "0191 123 4567",
-          "email" -> "test@test.com"
+          "lastName"  -> "User",
+          "role"      -> "Role",
+          "phone"     -> "0191 123 4567",
+          "email"     -> "test@test.com"
         )
 
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))

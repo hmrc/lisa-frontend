@@ -36,29 +36,33 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
   val pageTitle = "Your company’s reference numbers"
 
   val validJsonUppercase: JsObject = Json.obj(
-    "fsrRefNumber" -> "654321",
+    "fsrRefNumber"         -> "654321",
     "isaProviderRefNumber" -> "Z1234"
   )
 
-  def createFakePostRequest[T](uri: String, body:T): Request[T] = {
-    val request:Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
+  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
+    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
   implicit val tradingDetailsView: trading_details = inject[trading_details]
-  val SUT = new TradingDetailsController()
-
+  val SUT                                          = new TradingDetailsController()
 
   "GET Trading Details" must {
 
     "return a populated form" when {
 
       "the cache returns a value" in {
-        val tradingForm = new TradingDetails(fsrRefNumber = "validFSRRefNumber", isaProviderRefNumber = "validISARefNumber")
+        val tradingForm =
+          new TradingDetails(fsrRefNumber = "validFSRRefNumber", isaProviderRefNumber = "validISARefNumber")
 
-        when(lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
-          ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )
+        )
           .thenReturn(Future.successful(Some(tradingForm)))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -67,9 +71,9 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include (pageTitle)
-        content must include (tradingForm.fsrRefNumber)
-        content must include (tradingForm.isaProviderRefNumber)
+        content must include(pageTitle)
+        content must include(tradingForm.fsrRefNumber)
+        content must include(tradingForm.isaProviderRefNumber)
       }
 
     }
@@ -77,8 +81,12 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     "return a blank form" when {
 
       "the cache does not return a value" in {
-        when(lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
-          ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(
+          lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
+            ArgumentMatchers.any(),
+            ArgumentMatchers.any()
+          )
+        )
           .thenReturn(Future.successful(None))
 
         val result = SUT.get(fakeRequest.withCSRFToken)
@@ -87,8 +95,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
         val content = contentAsString(result)
 
-        content must include (pageTitle)
-        content must not include ("value=\'\'")
+        content must include(pageTitle)
+        content must not include "value=\'\'"
       }
 
     }
@@ -99,52 +107,65 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
     "return validation errors" when {
       "the submitted data is incomplete" in {
-        val uri = controllers.routes.TradingDetailsController.post.url
+        val uri     = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
-        val result = SUT.post()(request)
+        val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
 
         val content = contentAsString(result)
 
-        content must include (pageTitle)
-        content must include ("Enter your company’s Financial Conduct Authority reference")
-        content must include ("Enter your ISA manager reference")
+        content must include(pageTitle)
+        content must include("Enter your company’s Financial Conduct Authority reference")
+        content must include("Enter your ISA manager reference")
       }
       "the submitted data is invalid - lowercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj( "fsrRefNumber" -> "654321",
-          "isaProviderRefNumber" -> "z1234")))
-        when(lisaCacheRepository.putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any()))
+        val uri     = controllers.routes.TradingDetailsController.post.url
+        val request = createFakePostRequest[AnyContentAsJson](
+          uri,
+          AnyContentAsJson(json = Json.obj("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "z1234"))
+        )
+        when(
+          lisaCacheRepository.putSession[TradingDetails](
+            DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.successful(("", "")))
-        val result = SUT.post(request)
+        val result  = SUT.post(request)
         status(result) mustBe Status.BAD_REQUEST
       }
     }
 
     "redirect the user to your details" when {
       "the submitted data is valid - uppercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post.url
+        val uri     = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
-        when(lisaCacheRepository.putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(),ArgumentMatchers.any()))
+        when(
+          lisaCacheRepository.putSession[TradingDetails](
+            DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
+            ArgumentMatchers.any()
+          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+        )
           .thenReturn(Future.successful(("", "")))
-        val result = SUT.post(request)
-        status(result) mustBe Status.SEE_OTHER
+        val result  = SUT.post(request)
+        status(result)           mustBe Status.SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.YourDetailsController.get.url)
       }
     }
 
     "store trading details in cache" when {
       "the submitted data is valid - uppercase z" in {
-        val uri = controllers.routes.TradingDetailsController.post.url
+        val uri     = controllers.routes.TradingDetailsController.post.url
         val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
         await(SUT.post(request))
-        verify(lisaCacheRepository).putSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)), ArgumentMatchers.any())(
-          ArgumentMatchers.any(), ArgumentMatchers.any())
+        verify(lisaCacheRepository).putSession[TradingDetails](
+          DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
+          ArgumentMatchers.any()
+        )(ArgumentMatchers.any(), ArgumentMatchers.any())
       }
     }
 
   }
+
 }

@@ -32,4 +32,5 @@ object BusinessStructure {
       "companyStructure" -> optional(text).verifying("error.companyStructureRequired", i => i.isDefined)
     )(bs => BusinessStructure(bs.get))(bs => Some(Some(bs.businessStructure)))
   )
+
 }

@@ -20,8 +20,7 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.{Json, OFormat}
 
-case class TradingDetails(fsrRefNumber: String,
-                          isaProviderRefNumber: String)
+case class TradingDetails(fsrRefNumber: String, isaProviderRefNumber: String)
 
 object TradingDetails {
 
@@ -31,44 +30,37 @@ object TradingDetails {
 
   val form: Form[TradingDetails] = Form(
     mapping(
-      "fsrRefNumber" -> optional(text)
+      "fsrRefNumber"         -> optional(text)
         .verifying("error.fsrRefNumberRequired", fsr => fsrExists(fsr))
         .verifying("error.fsrRefNumberPattern", fsr => !fsrExists(fsr) || fsrIsNumeric(fsr))
         .verifying("error.fsrRefNumberLength", fsr => !fsrExists(fsr) || !fsrIsNumeric(fsr) || fsrIsSixCharacters(fsr)),
       "isaProviderRefNumber" -> optional(text)
         .verifying("error.isaProviderRefNumberRequired", zref => zrefExists(zref))
         .verifying("error.isaProviderRefNumberPattern", zref => !zrefExists(zref) || zrefIsCorrectPattern(zref))
-    )(
-      (fsr, zref) => TradingDetails(
+    )((fsr, zref) =>
+      TradingDetails(
         fsr.getOrElse(""),
         zref.getOrElse("")
       )
-    )(
-      td => Some((Some(td.fsrRefNumber), Some(td.isaProviderRefNumber)))
-    )
+    )(td => Some((Some(td.fsrRefNumber), Some(td.isaProviderRefNumber))))
   )
 
-  private def fsrExists(fsr: Option[String]) = {
+  private def fsrExists(fsr: Option[String]) =
     fsr.isDefined
-  }
 
-  private def fsrIsNumeric(fsr: Option[String]) = {
+  private def fsrIsNumeric(fsr: Option[String]) =
     fsr.getOrElse("").matches("^[0-9]+$")
-  }
 
-  private def fsrIsSixCharacters(fsr: Option[String]) = {
+  private def fsrIsSixCharacters(fsr: Option[String]) =
     fsr.getOrElse("").matches("^[0-9]{6}$")
-  }
 
-  private def zrefExists(fsr: Option[String]) = {
+  private def zrefExists(fsr: Option[String]) =
     fsr.isDefined
-  }
 
-  private def zrefIsCorrectPattern(fsr: Option[String]) = {
-    fsr.getOrElse ("").matches ("^Z([0-9]{4})$")
-  }
+  private def zrefIsCorrectPattern(fsr: Option[String]) =
+    fsr.getOrElse("").matches("^Z([0-9]{4})$")
 
-  def uppercaseZ(tradingDetails: TradingDetails): TradingDetails = {
+  def uppercaseZ(tradingDetails: TradingDetails): TradingDetails =
     TradingDetails(tradingDetails.fsrRefNumber, tradingDetails.isaProviderRefNumber.replace("z", "Z"))
-  }
+
 }

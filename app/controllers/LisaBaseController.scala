@@ -30,108 +30,128 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents, implicit val ec: ExecutionContext)
-  extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
-  with I18nSupport with Logging with WithUnsafeDefaultFormBinding {
+abstract class LisaBaseController(
+  messagesControllerComponents: MessagesControllerComponents,
+  implicit val ec: ExecutionContext
+) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
+    with I18nSupport
+    with Logging
+    with WithUnsafeDefaultFormBinding {
 
   val appConfig: AppConfig
   val sessionCacheRepository: LisaCacheRepository
   val authorisationService: AuthorisationService
 
-  def authorisedForLisa(callback: String => Future[Result], checkEnrolmentState: Boolean = true)
-                       (implicit request: Request[AnyContent]): Future[Result] = {
+  def authorisedForLisa(callback: String => Future[Result], checkEnrolmentState: Boolean = true)(implicit
+    request: Request[AnyContent]
+  ): Future[Result] =
     authorisationService.userStatus flatMap {
-      case UserNotLoggedIn => Future.successful(toGGLogin(appConfig.loginCallback))
-      case UserUnauthorised => Future.successful(Redirect(routes.ErrorController.accessDeniedIndividualOrAgent))
-      case UserNotAdmin => Future.successful(Redirect(routes.ErrorController.accessDeniedAssistant))
+      case UserNotLoggedIn                 => Future.successful(toGGLogin(appConfig.loginCallback))
+      case UserUnauthorised                => Future.successful(Redirect(routes.ErrorController.accessDeniedIndividualOrAgent))
+      case UserNotAdmin                    => Future.successful(Redirect(routes.ErrorController.accessDeniedAssistant))
       case user: UserAuthorisedAndEnrolled => handleUserAuthorisedAndEnrolled(callback, checkEnrolmentState, user)
-      case user: UserAuthorised => handleUserAuthorised(callback, checkEnrolmentState, user)
+      case user: UserAuthorised            => handleUserAuthorised(callback, checkEnrolmentState, user)
     }
-  }
-  def toGGLogin(continueUrl: String): Result = {
+
+  def toGGLogin(continueUrl: String): Result =
     Redirect(
       appConfig.loginURL,
       Map(
         "continue_url" -> Seq(continueUrl),
-        "origin"   -> Seq("lisa-frontend")
+        "origin"       -> Seq("lisa-frontend")
       )
     )
-  }
 
-  private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] = {
-    sessionCacheRepository.getFromSession[Boolean](DataKey(Reapplication.cacheKey))
+  private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] =
+    sessionCacheRepository
+      .getFromSession[Boolean](DataKey(Reapplication.cacheKey))
       .map(_.getOrElse(false))
-  }
 
-
-  private def handleUserAuthorised(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorised)
-                                  (implicit request: Request[AnyContent]): Future[Result] = {
+  private def handleUserAuthorised(
+    callback: String => Future[Result],
+    checkEnrolmentState: Boolean,
+    user: UserAuthorised
+  )(implicit request: Request[AnyContent]): Future[Result] = {
     logger.info("[LisaBaseController][handleUserAuthorised] User Authorised")
     isReapplication(user) flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
-          case TaxEnrolmentPending =>
+          case TaxEnrolmentPending      =>
             logger.info("[LisaBaseController][handleUserAuthorised] Enrollment Pending")
             Future.successful(Redirect(routes.ApplicationSubmittedController.pending))
-          case TaxEnrolmentError =>
+          case TaxEnrolmentError        =>
             logger.error("[LisaBaseController][handleUserAuthorised] Enrollment Rejected")
             Future.successful(Redirect(routes.ApplicationSubmittedController.rejected))
           case TaxEnrolmentDoesNotExist =>
             logger.warn("[LisaBaseController][handleUserAuthorised] Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
         }
-      }
-      else {
+      } else {
         callback(s"${user.internalId}-lisa-registration")
       }
     }
   }
 
-  private def handleUserAuthorisedAndEnrolled(callback: String => Future[Result], checkEnrolmentState: Boolean, user: UserAuthorisedAndEnrolled)
-                                             (implicit request: Request[AnyContent]): Future[Result] = {
-    logger.info(s"[LisaBaseController][handleUserAuthorisedAndEnrolled] User Authorised And Enrolled $checkEnrolmentState")
+  private def handleUserAuthorisedAndEnrolled(
+    callback: String => Future[Result],
+    checkEnrolmentState: Boolean,
+    user: UserAuthorisedAndEnrolled
+  )(implicit request: Request[AnyContent]): Future[Result] = {
+    logger.info(
+      s"[LisaBaseController][handleUserAuthorisedAndEnrolled] User Authorised And Enrolled $checkEnrolmentState"
+    )
 
     if (checkEnrolmentState) {
-      sessionCacheRepository.putSession[String](DataKey("lisaManagerReferenceNumber"), user.lisaManagerReferenceNumber).map { _ =>
-        Redirect(routes.ApplicationSubmittedController.successful)
-      }
-    }
-    else {
+      sessionCacheRepository
+        .putSession[String](DataKey("lisaManagerReferenceNumber"), user.lisaManagerReferenceNumber)
+        .map { _ =>
+          Redirect(routes.ApplicationSubmittedController.successful)
+        }
+    } else {
       callback(s"${user.internalId}-lisa-registration")
     }
   }
 
-  def hasAllSubmissionData()(callback: LisaRegistration => Future[Result])
-                          (implicit request: Request[AnyContent]): Future[Result] = {
+  def hasAllSubmissionData()(
+    callback: LisaRegistration => Future[Result]
+  )(implicit request: Request[AnyContent]): Future[Result] =
     sessionCacheRepository.getFullCache(request) flatMap {
       case Some(cache: CacheItem) =>
-        val data = cache.data.value
+        val data                                          = cache.data.value
         val cacheResult: Either[Result, LisaRegistration] = for {
-          bs <- getOrRedirect[BusinessStructure](data, BusinessStructure.cacheKey, Redirect(routes.BusinessStructureController.get))
-          od <- getOrRedirect[OrganisationDetails](data, OrganisationDetails.cacheKey, Redirect(routes.OrganisationDetailsController.get))
+          bs  <- getOrRedirect[BusinessStructure](
+                   data,
+                   BusinessStructure.cacheKey,
+                   Redirect(routes.BusinessStructureController.get)
+                 )
+          od  <- getOrRedirect[OrganisationDetails](
+                   data,
+                   OrganisationDetails.cacheKey,
+                   Redirect(routes.OrganisationDetailsController.get)
+                 )
           sId <- getOrRedirect[String](data, "safeId", Redirect(routes.OrganisationDetailsController.get))
-          td <- getOrRedirect[TradingDetails](data, TradingDetails.cacheKey, Redirect(routes.TradingDetailsController.get))
-          yd <- getOrRedirect[YourDetails](data, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get))
+          td  <-
+            getOrRedirect[TradingDetails](data, TradingDetails.cacheKey, Redirect(routes.TradingDetailsController.get))
+          yd  <- getOrRedirect[YourDetails](data, YourDetails.cacheKey, Redirect(routes.YourDetailsController.get))
         } yield LisaRegistration(od, td, bs, yd, sId)
         cacheResult.fold(redirect => Future.successful(redirect), callback(_))
-      case None => Future.successful(Redirect(routes.BusinessStructureController.get))
+      case None                   => Future.successful(Redirect(routes.BusinessStructureController.get))
     }
-  }
 
-  private def getOrRedirect[T](cache: collection.Map[String, JsValue], key: String, redirect: Result)(implicit reads: Reads[T]): Either[Result, T] = {
+  private def getOrRedirect[T](cache: collection.Map[String, JsValue], key: String, redirect: Result)(implicit
+    reads: Reads[T]
+  ): Either[Result, T] =
     cache.get(key).map(_.as[T]).toRight(redirect)
-  }
 
-  def createPostCall(implicit request: MessagesRequest[AnyContent]): Call = {
+  def createPostCall(implicit request: MessagesRequest[AnyContent]): Call =
     Call("POST", request.uri)
-  }
 
   def handleRedirect(redirectUrl: String)(implicit request: Request[AnyContent]): Future[Result] = {
     val returnUrl: Option[String] = request.getQueryString("returnUrl")
 
     returnUrl match {
       case Some(url) if url.matches("^\\/lifetime\\-isa\\/.*$") => Future.successful(Redirect(url))
-      case _ => Future.successful(Redirect(redirectUrl))
+      case _                                                    => Future.successful(Redirect(redirectUrl))
     }
   }
 

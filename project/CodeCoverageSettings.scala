@@ -9,15 +9,13 @@ object CodeCoverageSettings {
     ".*Routes.*"
   )
 
-  private val settings: Seq[Setting[?]] = {
+  private val settings: Seq[Setting[?]] =
     Seq(
       ScoverageKeys.coverageExcludedPackages := patterns.mkString("", ";", ""),
       ScoverageKeys.coverageMinimumStmtTotal := 90,
       ScoverageKeys.coverageFailOnMinimum := true,
       ScoverageKeys.coverageHighlighting := true
     )
-  }
-
 
   def apply(): Seq[Setting[?]] = settings
 

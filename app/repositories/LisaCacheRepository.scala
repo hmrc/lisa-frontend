@@ -28,17 +28,19 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-case class LisaCacheRepository @Inject()(
-                                   mongoComponent: MongoComponent,
-                                   configuration: Configuration
-                                 )(implicit ec: ExecutionContext)
-  extends SessionCacheRepository (
-    mongoComponent   = mongoComponent,
-    collectionName   = "sessions",
-    ttl              = Duration(configuration.get[Int]("mongodb.timeToLiveInSeconds"), TimeUnit.SECONDS),
-    timestampSupport = new CurrentTimestampSupport(),
-    sessionIdKey = SessionKeys.sessionId
-){
-    def getFullCache(request: Request[AnyContent]): Future[Option[CacheItem]] =
-        cacheRepo.findById(request)
+case class LisaCacheRepository @Inject() (
+  mongoComponent: MongoComponent,
+  configuration: Configuration
+)(implicit ec: ExecutionContext)
+    extends SessionCacheRepository(
+      mongoComponent = mongoComponent,
+      collectionName = "sessions",
+      ttl = Duration(configuration.get[Int]("mongodb.timeToLiveInSeconds"), TimeUnit.SECONDS),
+      timestampSupport = new CurrentTimestampSupport(),
+      sessionIdKey = SessionKeys.sessionId
+    ) {
+
+  def getFullCache(request: Request[AnyContent]): Future[Option[CacheItem]] =
+    cacheRepo.findById(request)
+
 }
