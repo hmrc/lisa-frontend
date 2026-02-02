@@ -18,3 +18,5 @@ lazy val microservice = Project("lisa-frontend", file("."))
     scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:cat=unused-imports&src=html/.*:s", "-feature")
   )
   .settings(CodeCoverageSettings())
+
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt")

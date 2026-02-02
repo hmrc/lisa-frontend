@@ -20,11 +20,7 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.{Json, OFormat}
 
-case class YourDetails(firstName: String,
-                       lastName: String,
-                       role: String,
-                       phone: String,
-                       email: String)
+case class YourDetails(firstName: String, lastName: String, role: String, phone: String, email: String)
 
 object YourDetails {
   implicit val formats: OFormat[YourDetails] = Json.format[YourDetails]
@@ -36,35 +32,54 @@ object YourDetails {
       "firstName" -> optional(text)
         .verifying("error.firstNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.firstNameLength", i => i.isEmpty || i.getOrElse("").length <= 35)
-        .verifying("error.firstNamePattern", i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z \-']{1,35}$""")),
-
-      "lastName" -> optional(text)
+        .verifying(
+          "error.firstNamePattern",
+          i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z \-']{1,35}$""")
+        ),
+      "lastName"  -> optional(text)
         .verifying("error.lastNameRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.lastNameLength", i => i.isEmpty || i.getOrElse("").length <= 35)
-        .verifying("error.lastNamePattern", i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z \-']{1,35}$""")),
-
-      "role" -> optional(text)
+        .verifying(
+          "error.lastNamePattern",
+          i => i.isEmpty || i.getOrElse("").length > 35 || i.getOrElse("").matches("""^[A-Za-z \-']{1,35}$""")
+        ),
+      "role"      -> optional(text)
         .verifying("error.roleRequired", _.exists(_.trim.nonEmpty))
         .verifying("error.roleLength", i => i.isEmpty || i.getOrElse("").length <= 30)
-        .verifying("error.rolePattern", i => i.isEmpty || i.getOrElse("").length > 30 || i.getOrElse("").matches("""^[A-Za-z \-']{1,30}$""")),
-
-      "phone" -> optional(text)
+        .verifying(
+          "error.rolePattern",
+          i => i.isEmpty || i.getOrElse("").length > 30 || i.getOrElse("").matches("""^[A-Za-z \-']{1,30}$""")
+        ),
+      "phone"     -> optional(text)
         .verifying("error.phoneRequired", _.exists(_.trim.nonEmpty))
-        .verifying("error.phonePattern", i => i.isEmpty || i.getOrElse("").matches("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""")),
-
-      "email" -> optional(text)
+        .verifying(
+          "error.phonePattern",
+          i => i.isEmpty || i.getOrElse("").matches("""^[A-Z0-9 \)\/\(\*\#\-\+]{1,24}$""")
+        ),
+      "email"     -> optional(text)
         .verifying("error.emailRequired", _.isDefined)
-        .verifying("error.email", i => i.isEmpty || i.getOrElse("").matches("""(?:[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[A-Za-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""))
-    )(
-      (firstName, lastName, role, phone, email) => YourDetails(
+        .verifying(
+          "error.email",
+          i =>
+            i.isEmpty || i
+              .getOrElse("")
+              .matches(
+                """(?:[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[A-Za-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
+              )
+        )
+    )((firstName, lastName, role, phone, email) =>
+      YourDetails(
         firstName.getOrElse(""),
         lastName.getOrElse(""),
         role.getOrElse(""),
         phone.getOrElse(""),
         email.getOrElse("")
       )
-    )(
-      details => Some((Some(details.firstName), Some(details.lastName), Some(details.role), Some(details.phone), Some(details.email)))
+    )(details =>
+      Some(
+        (Some(details.firstName), Some(details.lastName), Some(details.role), Some(details.phone), Some(details.email))
+      )
     )
   )
+
 }

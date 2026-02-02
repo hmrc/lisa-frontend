@@ -36,11 +36,8 @@ import uk.gov.hmrc.mongo.test.MongoSupport
 
 import scala.concurrent.ExecutionContext
 
-class AuditServiceSpec extends PlaySpec
-  with MockitoSugar
-  with GuiceOneAppPerSuite
-  with BeforeAndAfter
-  with MongoSupport {
+class AuditServiceSpec
+    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter with MongoSupport {
 
   override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
@@ -49,10 +46,10 @@ class AuditServiceSpec extends PlaySpec
     )
     .build()
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
-  val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  implicit val hc: HeaderCarrier                        = HeaderCarrier()
+  val mockAuditConnector: AuditConnector                = mock[AuditConnector]
+  val mockAppConfig: AppConfig                          = mock[AppConfig]
+  implicit val ec: ExecutionContext                     = app.injector.instanceOf[ExecutionContext]
   implicit val lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
 
   object SUT extends AuditService(mockAuditConnector, mockAppConfig)
@@ -74,15 +71,16 @@ class AuditServiceSpec extends PlaySpec
       val event = captor.getValue
 
       event.auditSource mustBe "lisa-frontend"
-      event.auditType mustBe "applicationReceived"
+      event.auditType   mustBe "applicationReceived"
 
-      event.tags must contain ("path" -> "/submit-application")
-      event.tags must contain ("transactionName" -> "applicationReceived")
+      event.tags must contain("path" -> "/submit-application")
+      event.tags must contain("transactionName" -> "applicationReceived")
       event.tags must contain key "clientIP"
 
-      event.detail must contain ("companyName" -> "New Bank")
-      event.detail must contain ("firstName" -> "John")
+      event.detail must contain("companyName" -> "New Bank")
+      event.detail must contain("firstName" -> "John")
     }
 
   }
+
 }

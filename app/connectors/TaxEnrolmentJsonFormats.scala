@@ -18,7 +18,7 @@ package connectors
 
 import models._
 
-import java.time.{Instant, ZonedDateTime, ZoneId}
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
@@ -27,7 +27,7 @@ trait TaxEnrolmentJsonFormats {
   implicit val zonedDateTimeReads: Reads[ZonedDateTime] = Reads[ZonedDateTime] { json =>
     json.validate[Long].flatMap { timestamp =>
       try {
-        val instant = Instant.ofEpochMilli(timestamp)
+        val instant                      = Instant.ofEpochMilli(timestamp)
         val zonedDateTime: ZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
         JsSuccess(zonedDateTime)
       } catch {
@@ -41,34 +41,36 @@ trait TaxEnrolmentJsonFormats {
 
   implicit val subscriptionReads: Reads[TaxEnrolmentSubscription] = (
     (JsPath \ "created").read[ZonedDateTime] and
-    (JsPath \ "lastModified").read[ZonedDateTime] and
-    (JsPath \ "credId").read[String] and
-    (JsPath \ "serviceName").read[String] and
-    (JsPath \ "identifiers").read[List[TaxEnrolmentIdentifier]].orElse(Reads.pure(Nil)) and
-    (JsPath \ "callback").read[String] and
-    (JsPath \ "state").read[String](Reads.pattern("^(ERROR|SUCCEEDED|PENDING)$".r, "error.formatting.state")).map[TaxEnrolmentState] {
-      case "ERROR" => TaxEnrolmentError
-      case "SUCCEEDED" => TaxEnrolmentSuccess
-      case "PENDING" => TaxEnrolmentPending
-    } and
-    (JsPath \ "etmpId").read[String] and
-    (JsPath \ "groupIdentifier").read[String]
+      (JsPath \ "lastModified").read[ZonedDateTime] and
+      (JsPath \ "credId").read[String] and
+      (JsPath \ "serviceName").read[String] and
+      (JsPath \ "identifiers").read[List[TaxEnrolmentIdentifier]].orElse(Reads.pure(Nil)) and
+      (JsPath \ "callback").read[String] and
+      (JsPath \ "state")
+        .read[String](Reads.pattern("^(ERROR|SUCCEEDED|PENDING)$".r, "error.formatting.state"))
+        .map[TaxEnrolmentState] {
+          case "ERROR"     => TaxEnrolmentError
+          case "SUCCEEDED" => TaxEnrolmentSuccess
+          case "PENDING"   => TaxEnrolmentPending
+        } and
+      (JsPath \ "etmpId").read[String] and
+      (JsPath \ "groupIdentifier").read[String]
   )(TaxEnrolmentSubscription.apply _)
 
   implicit val subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
-    (JsPath \ "created").write[Long].contramap[ZonedDateTime]{_.toInstant.toEpochMilli()} and
-    (JsPath \ "lastModified").write[Long].contramap[ZonedDateTime]{_.toInstant.toEpochMilli()} and
-    (JsPath \ "credId").write[String] and
-    (JsPath \ "serviceName").write[String] and
-    (JsPath \ "identifiers").write[List[TaxEnrolmentIdentifier]] and
-    (JsPath \ "callback").write[String] and
-    (JsPath \ "state").write[String].contramap[TaxEnrolmentState] {
-      case TaxEnrolmentError => "ERROR"
-      case TaxEnrolmentSuccess => "SUCCEEDED"
-      case TaxEnrolmentPending => "PENDING"
-    } and
-    (JsPath \ "etmpId").write[String] and
-    (JsPath \ "groupIdentifier").write[String]
+    (JsPath \ "created").write[Long].contramap[ZonedDateTime](_.toInstant.toEpochMilli()) and
+      (JsPath \ "lastModified").write[Long].contramap[ZonedDateTime](_.toInstant.toEpochMilli()) and
+      (JsPath \ "credId").write[String] and
+      (JsPath \ "serviceName").write[String] and
+      (JsPath \ "identifiers").write[List[TaxEnrolmentIdentifier]] and
+      (JsPath \ "callback").write[String] and
+      (JsPath \ "state").write[String].contramap[TaxEnrolmentState] {
+        case TaxEnrolmentError   => "ERROR"
+        case TaxEnrolmentSuccess => "SUCCEEDED"
+        case TaxEnrolmentPending => "PENDING"
+      } and
+      (JsPath \ "etmpId").write[String] and
+      (JsPath \ "groupIdentifier").write[String]
   )(unlift(TaxEnrolmentSubscription.unapply))
 
 }

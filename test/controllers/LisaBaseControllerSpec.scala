@@ -115,8 +115,10 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
         redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful.url)
 
-        verify(lisaCacheRepository).putSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")), ArgumentMatchers.eq("Z9876"))(
-          ArgumentMatchers.any(), ArgumentMatchers.any())
+        verify(lisaCacheRepository).putSession[String](
+          DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")),
+          ArgumentMatchers.eq("Z9876")
+        )(ArgumentMatchers.any(), ArgumentMatchers.any())
 
       }
 
@@ -172,28 +174,28 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
       }
 
       "there return url is a valid lisa url" in {
-        val req = FakeRequest("GET", s"/?returnUrl=${routes.SummaryController.get.url}")
+        val req    = FakeRequest("GET", s"/?returnUrl=${routes.SummaryController.get.url}")
         val result = SUT.handleRedirect(routes.TradingDetailsController.get.url)(req)
 
         redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
       }
 
       "the return url is an external url" in {
-        val req = FakeRequest("GET", "/?returnUrl=http://news.ycombinator.com")
+        val req    = FakeRequest("GET", "/?returnUrl=http://news.ycombinator.com")
         val result = SUT.handleRedirect(routes.TradingDetailsController.get.url)(req)
 
         redirectLocation(result) mustBe Some(routes.TradingDetailsController.get.url)
       }
 
       "the return url is a protocol-relative external url" in {
-        val req = FakeRequest("GET", "/?returnUrl=//news.ycombinator.com")
+        val req    = FakeRequest("GET", "/?returnUrl=//news.ycombinator.com")
         val result = SUT.handleRedirect(routes.TradingDetailsController.get.url)(req)
 
         redirectLocation(result) mustBe Some(routes.TradingDetailsController.get.url)
       }
 
       "the return url is a relative url for a non-lisa service" in {
-        val req = FakeRequest("GET", "/?returnUrl=/test")
+        val req    = FakeRequest("GET", "/?returnUrl=/test")
         val result = SUT.handleRedirect(routes.TradingDetailsController.get.url)(req)
 
         redirectLocation(result) mustBe Some(routes.TradingDetailsController.get.url)
@@ -211,8 +213,8 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     implicit val sessionCacheRepository: LisaCacheRepository,
     implicit val appConfig: AppConfig,
     implicit val authorisationService: AuthorisationService,
-    override implicit val messagesApi: MessagesApi,
-    override implicit val ec: ExecutionContext,
+    implicit override val messagesApi: MessagesApi,
+    implicit override val ec: ExecutionContext,
     implicit val messagesControllerComponents: MessagesControllerComponents
   ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
@@ -226,8 +228,9 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
     private val handleResult: String => Future[Result] = {
       case "error-lisa-registration" => throw new RuntimeException("An error occurred")
-      case cacheId => Future.successful(Ok(s"Authorised. Cache ID: $cacheId"))
+      case cacheId                   => Future.successful(Ok(s"Authorised. Cache ID: $cacheId"))
     }
+
   }
 
   val SUT = new TestClass()

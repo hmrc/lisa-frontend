@@ -28,41 +28,45 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TradingDetailsController @Inject()(
-                                          implicit val sessionCacheRepository: LisaCacheRepository,
-                                          implicit val env: Environment,
-                                          implicit val config: Configuration,
-                                          implicit val authorisationService: AuthorisationService,
-                                          implicit val appConfig: AppConfig,
-                                          override implicit val messagesApi: MessagesApi,
-                                          override implicit val ec: ExecutionContext,
-                                          implicit val messagesControllerComponents: MessagesControllerComponents,
-                                          tradingDetailsView: views.html.registration.trading_details
-                                        ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+class TradingDetailsController @Inject() (implicit
+  val sessionCacheRepository: LisaCacheRepository,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit override val messagesApi: MessagesApi,
+  implicit override val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  tradingDetailsView: views.html.registration.trading_details
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[TradingDetails](DataKey(TradingDetails.cacheKey)).map {
         case Some(data) => Ok(tradingDetailsView(createPostCall, TradingDetails.form.fill(data)))
-        case None => Ok(tradingDetailsView(createPostCall, TradingDetails.form))
+        case None       => Ok(tradingDetailsView(createPostCall, TradingDetails.form))
       }
     }
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>
-      TradingDetails.form.bindFromRequest().fold(
-        formWithErrors => {
-          logger.info("[TradingDetailsController][POST] form errors")
-          Future.successful(BadRequest(tradingDetailsView(createPostCall, formWithErrors)))
-        },
-        data => {
-          logger.info("[TradingDetailsController][POST] Successful")
-          sessionCacheRepository.putSession[TradingDetails](DataKey(TradingDetails.cacheKey), TradingDetails.uppercaseZ(data)).flatMap { _ =>
-            handleRedirect(routes.YourDetailsController.get.url)
+      TradingDetails.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            logger.info("[TradingDetailsController][POST] form errors")
+            Future.successful(BadRequest(tradingDetailsView(createPostCall, formWithErrors)))
+          },
+          data => {
+            logger.info("[TradingDetailsController][POST] Successful")
+            sessionCacheRepository
+              .putSession[TradingDetails](DataKey(TradingDetails.cacheKey), TradingDetails.uppercaseZ(data))
+              .flatMap { _ =>
+                handleRedirect(routes.YourDetailsController.get.url)
+              }
           }
-        }
-      )
+        )
     }
   }
 

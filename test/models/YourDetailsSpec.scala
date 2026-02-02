@@ -29,7 +29,7 @@ class YourDetailsSpec extends PlaySpec {
 
       "given no data" in {
         val test = Map[String, String]()
-        val res = SUT.bind(test)
+        val res  = SUT.bind(test)
 
         res.errors mustBe Seq[FormError](
           FormError("firstName", "error.firstNameRequired"),
@@ -46,10 +46,16 @@ class YourDetailsSpec extends PlaySpec {
 
       "given a first name with too many characters" in {
         val tooLong = "!23456789012345678901234567890123456"
-        val test = Map[String, String]("firstName"->tooLong, "lastName"->"B", "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "firstName"
+        val test    = Map[String, String](
+          "firstName" -> tooLong,
+          "lastName"  -> "B",
+          "role"      -> "Manager",
+          "phone"     -> "01234",
+          "email"     -> "me@test.com"
+        )
+        val res     = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "firstName"
         res.errors.head.message mustBe "error.firstNameLength"
       }
 
@@ -58,10 +64,16 @@ class YourDetailsSpec extends PlaySpec {
     "show first name invalid error" when {
 
       "given a first name with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "?", "lastName"->"B", "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "firstName"
+        val test = Map[String, String](
+          "firstName" -> "?",
+          "lastName"  -> "B",
+          "role"      -> "Manager",
+          "phone"     -> "01234",
+          "email"     -> "me@test.com"
+        )
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "firstName"
         res.errors.head.message mustBe "error.firstNamePattern"
       }
 
@@ -71,10 +83,16 @@ class YourDetailsSpec extends PlaySpec {
 
       "given a last name with too many characters" in {
         val tooLong = "!23456789012345678901234567890123456"
-        val test = Map[String, String]("firstName"->"A", "lastName"->tooLong, "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "lastName"
+        val test    = Map[String, String](
+          "firstName" -> "A",
+          "lastName"  -> tooLong,
+          "role"      -> "Manager",
+          "phone"     -> "01234",
+          "email"     -> "me@test.com"
+        )
+        val res     = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "lastName"
         res.errors.head.message mustBe "error.lastNameLength"
       }
 
@@ -83,10 +101,16 @@ class YourDetailsSpec extends PlaySpec {
     "show last name invalid error" when {
 
       "given a last name with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A", "lastName"->"?", "role"->"Manager", "phone"->"01234", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "lastName"
+        val test = Map[String, String](
+          "firstName" -> "A",
+          "lastName"  -> "?",
+          "role"      -> "Manager",
+          "phone"     -> "01234",
+          "email"     -> "me@test.com"
+        )
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "lastName"
         res.errors.head.message mustBe "error.lastNamePattern"
       }
 
@@ -96,10 +120,16 @@ class YourDetailsSpec extends PlaySpec {
 
       "given a role with too many characters" in {
         val tooLong = "!234567890123456789012345678901"
-        val test = Map[String, String]("firstName"->"A", "lastName"->"B", "role"->tooLong, "phone"->"01234", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "role"
+        val test    = Map[String, String](
+          "firstName" -> "A",
+          "lastName"  -> "B",
+          "role"      -> tooLong,
+          "phone"     -> "01234",
+          "email"     -> "me@test.com"
+        )
+        val res     = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "role"
         res.errors.head.message mustBe "error.roleLength"
       }
 
@@ -108,10 +138,16 @@ class YourDetailsSpec extends PlaySpec {
     "show role invalid error" when {
 
       "given a role with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A", "lastName"->"B", "role"->"?", "phone"->"01234", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "role"
+        val test = Map[String, String](
+          "firstName" -> "A",
+          "lastName"  -> "B",
+          "role"      -> "?",
+          "phone"     -> "01234",
+          "email"     -> "me@test.com"
+        )
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "role"
         res.errors.head.message mustBe "error.rolePattern"
       }
 
@@ -120,10 +156,16 @@ class YourDetailsSpec extends PlaySpec {
     "show phone invalid error" when {
 
       "given a phone with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A", "lastName"->"B", "role"->"Manager", "phone"->"?", "email"->"me@test.com")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "phone"
+        val test = Map[String, String](
+          "firstName" -> "A",
+          "lastName"  -> "B",
+          "role"      -> "Manager",
+          "phone"     -> "?",
+          "email"     -> "me@test.com"
+        )
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "phone"
         res.errors.head.message mustBe "error.phonePattern"
       }
 
@@ -132,10 +174,16 @@ class YourDetailsSpec extends PlaySpec {
     "show email invalid error" when {
 
       "given a email with invalid characters" in {
-        val test = Map[String, String]("firstName" -> "A", "lastName"->"B", "role"->"Manager", "phone"->"01234", "email"->"?")
-        val res = SUT.bind(test)
-        res.errors.size mustBe 1
-        res.errors.head.key mustBe "email"
+        val test = Map[String, String](
+          "firstName" -> "A",
+          "lastName"  -> "B",
+          "role"      -> "Manager",
+          "phone"     -> "01234",
+          "email"     -> "?"
+        )
+        val res  = SUT.bind(test)
+        res.errors.size         mustBe 1
+        res.errors.head.key     mustBe "email"
         res.errors.head.message mustBe "error.email"
       }
 
@@ -144,12 +192,23 @@ class YourDetailsSpec extends PlaySpec {
     "shows invalid errors" when {
 
       "giving only space for first name, last name, role and phone number" in {
-        val test = Map[String, String]("firstName"->" ", "lastName"->" ", "role"->" ", "phone"->" ", "email"->"me@test.com")
-        val res = SUT.bind(test)
+        val test = Map[String, String](
+          "firstName" -> " ",
+          "lastName"  -> " ",
+          "role"      -> " ",
+          "phone"     -> " ",
+          "email"     -> "me@test.com"
+        )
+        val res  = SUT.bind(test)
         res.errors.size mustBe 4
 
-        res.errors.map(_.key) mustBe Seq("firstName", "lastName", "role", "phone")
-        res.errors.map(_.message) mustBe Seq("error.firstNameRequired", "error.lastNameRequired", "error.roleRequired", "error.phoneRequired")
+        res.errors.map(_.key)     mustBe Seq("firstName", "lastName", "role", "phone")
+        res.errors.map(_.message) mustBe Seq(
+          "error.firstNameRequired",
+          "error.lastNameRequired",
+          "error.roleRequired",
+          "error.phoneRequired"
+        )
       }
 
     }

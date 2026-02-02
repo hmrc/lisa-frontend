@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
   implicit val matchingFailedView: matching_failed = inject[matching_failed]
 
   val SUT = new MatchingFailedController()
@@ -40,8 +40,12 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
     "return a page" in {
 
-      when(lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
-        ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(
+        lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
         .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
       val result = SUT.get(fakeRequest)
@@ -50,8 +54,9 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
       val content = contentAsString(result)
 
-      content must include ("Your company’s details could not be found</h1>")
+      content must include("Your company’s details could not be found</h1>")
     }
 
   }
+
 }

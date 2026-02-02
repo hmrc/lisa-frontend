@@ -26,13 +26,14 @@ import play.api.test.CSRFTokenHelper._
 class HomePageControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT = new HomePageController()
+  val SUT                                        = new HomePageController()
 
   "GET /" should {
     "301 redirect the user to the company structure page" in {
       val result = SUT.home(fakeRequest.withCSRFToken)
-      status(result) mustBe Status.MOVED_PERMANENTLY
+      status(result)                         mustBe Status.MOVED_PERMANENTLY
       redirectLocation(result).getOrElse("") mustBe "/lifetime-isa/company-structure"
     }
   }
+
 }

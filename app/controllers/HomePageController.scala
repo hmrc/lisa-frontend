@@ -26,18 +26,20 @@ import services.AuthorisationService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class HomePageController @Inject()(
+class HomePageController @Inject() (
   implicit val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
   implicit val appConfig: AppConfig,
-  override implicit val messagesApi: MessagesApi,
-  override implicit val ec: ExecutionContext,
+  implicit override val messagesApi: MessagesApi,
+  implicit override val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with I18nSupport {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext)
+    with I18nSupport {
 
   val home: Action[AnyContent] = Action.async { _ =>
     Future.successful(Redirect(routes.BusinessStructureController.get, MOVED_PERMANENTLY))
   }
+
 }

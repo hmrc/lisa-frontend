@@ -28,41 +28,42 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 sealed trait EmailStatus
 case object EmailSent extends EmailStatus
 case object EmailNotSent extends EmailStatus
 
-class EmailConnector @Inject()(
+class EmailConnector @Inject() (
   val httpClientV2: HttpClientV2,
   appConfig: AppConfig,
   metrics: EmailMetrics
-) (implicit ec: ExecutionContext) extends RawResponseReads with Logging {
+)(implicit ec: ExecutionContext)
+    extends RawResponseReads with Logging {
 
-  def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit hc: HeaderCarrier): Future[EmailStatus] = {
+  def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit
+    hc: HeaderCarrier
+  ): Future[EmailStatus] = {
 
     val sendEmailReq = SendEmailRequest(List(emailAddress), templateName, params, force = true)
 
-    val postUrl = s"${appConfig.emailServiceUrl}/hmrc/email"
+    val postUrl  = s"${appConfig.emailServiceUrl}/hmrc/email"
     val jsonData = Json.toJson(sendEmailReq)
 
-    httpClientV2.post(url"$postUrl")
+    httpClientV2
+      .post(url"$postUrl")
       .withBody(jsonData)
       .execute[HttpResponse]
-      .map {
-      response =>
+      .map { response =>
         response.status match {
-          case ACCEPTED => {
+          case ACCEPTED =>
             logger.info("[EmailConnector][sendTemplatedEmail] Email sent successfully.")
             metrics.emailSentCounter()
             EmailSent
-          }
-          case status => {
+          case status   =>
             logger.warn("[EmailConnector][sendTemplatedEmail] Email not sent.")
             metrics.emailNotSentCounter()
             EmailNotSent
-          }
         }
-    }
+      }
   }
+
 }

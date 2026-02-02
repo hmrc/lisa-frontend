@@ -34,7 +34,7 @@ class RosmJsonFormatsSpec extends PlaySpec with RosmJsonFormats {
 
         val dob: LocalDate = parsed.dateOfBirth.get
 
-        dob.getYear mustBe 2000
+        dob.getYear       mustBe 2000
         dob.getMonthValue mustBe 1
         dob.getDayOfMonth mustBe 1
       }

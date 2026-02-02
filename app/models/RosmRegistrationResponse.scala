@@ -20,39 +20,48 @@ import java.time.LocalDate
 
 trait RosmRegistrationResponse
 
-case class RosmRegistrationSuccessResponse(safeId: String,
-                                           agentReferenceNumber: Option[String] = None,
-                                           isEditable: Boolean,
-                                           isAnAgent: Boolean,
-                                           isAnASAgent: Option[Boolean] = None,
-                                           isAnIndividual: Boolean,
-                                           individual: Option[RosmIndividual] = None,
-                                           organisation: Option[RosmOrganisation] = None,
-                                           address: RosmAddress,
-                                           contactDetails: RosmContactDetails) extends RosmRegistrationResponse
+case class RosmRegistrationSuccessResponse(
+  safeId: String,
+  agentReferenceNumber: Option[String] = None,
+  isEditable: Boolean,
+  isAnAgent: Boolean,
+  isAnASAgent: Option[Boolean] = None,
+  isAnIndividual: Boolean,
+  individual: Option[RosmIndividual] = None,
+  organisation: Option[RosmOrganisation] = None,
+  address: RosmAddress,
+  contactDetails: RosmContactDetails
+) extends RosmRegistrationResponse
 
 case class DesFailureResponse(code: String, reason: String)
 
-case class RosmIndividual(firstName: String,
-                          middleName: Option[String] = None,
-                          lastName: String,
-                          dateOfBirth: Option[LocalDate] = None)
+case class RosmIndividual(
+  firstName: String,
+  middleName: Option[String] = None,
+  lastName: String,
+  dateOfBirth: Option[LocalDate] = None
+)
 
-case class RosmOrganisation(organisationName: String,
-                            isAGroup: Option[Boolean] = None,
-                            organisationType: Option[String] = None)
+case class RosmOrganisation(
+  organisationName: String,
+  isAGroup: Option[Boolean] = None,
+  organisationType: Option[String] = None
+)
 
-case class RosmAddress(addressLine1: String,
-                       addressLine2: Option[String] = None,
-                       addressLine3: Option[String] = None,
-                       addressLine4: Option[String] = None,
-                       countryCode: String,
-                       postalCode: Option[String] = None)
+case class RosmAddress(
+  addressLine1: String,
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  countryCode: String,
+  postalCode: Option[String] = None
+)
 
-case class RosmContactDetails(primaryPhoneNumber: Option[String] = None,
-                              secondaryPhoneNumber: Option[String] = None,
-                              faxNumber: Option[String] = None,
-                              emailAddress: Option[String] = None)
+case class RosmContactDetails(
+  primaryPhoneNumber: Option[String] = None,
+  secondaryPhoneNumber: Option[String] = None,
+  faxNumber: Option[String] = None,
+  emailAddress: Option[String] = None
+)
 
-
-case class DesSubscriptionSuccessResponse(subscriptionId:String)
+case class DesSubscriptionSuccessResponse(subscriptionId: String)

@@ -32,8 +32,8 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RosmController @Inject()(
-  implicit val sessionCacheRepository: LisaCacheRepository,
+class RosmController @Inject() (implicit
+  val sessionCacheRepository: LisaCacheRepository,
   implicit val env: Environment,
   implicit val config: Configuration,
   implicit val authorisationService: AuthorisationService,
@@ -41,48 +41,61 @@ class RosmController @Inject()(
   implicit val rosmService: RosmService,
   implicit val emailConnector: EmailConnector,
   implicit val appConfig: AppConfig,
-  override implicit val messagesApi: MessagesApi,
-  override implicit val ec: ExecutionContext,
+  implicit override val messagesApi: MessagesApi,
+  implicit override val ec: ExecutionContext,
   implicit val messagesControllerComponents: MessagesControllerComponents,
   errorView: views.html.error_template
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) with RosmJsonFormats with Logging {
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext)
+    with RosmJsonFormats
+    with Logging {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
       hasAllSubmissionData() { registrationDetails =>
         rosmService.performSubscription(registrationDetails).flatMap {
           case Right(subscriptionId) =>
-            logger.info(s"[RosmController][POST] Audit of Submission -> auditType = applicationReceived subscriptionId: $subscriptionId" )
+            logger.info(
+              s"[RosmController][POST] Audit of Submission -> auditType = applicationReceived subscriptionId: $subscriptionId"
+            )
 
-            auditService.audit(auditType = "applicationReceived",
+            auditService.audit(
+              auditType = "applicationReceived",
               path = routes.RosmController.post.url,
-              auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId))
+              auditData = createAuditDetails(registrationDetails) ++ Map("subscriptionId" -> subscriptionId)
+            )
 
-            val applicationSentVM: ApplicationSent = ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
+            val applicationSentVM: ApplicationSent =
+              ApplicationSent(subscriptionId = subscriptionId, email = registrationDetails.yourDetails.email)
 
-            sessionCacheRepository.putSession[ApplicationSent](DataKey(ApplicationSent.cacheKey), applicationSentVM).map { _ =>
-              sessionCacheRepository.deleteFromSession(DataKey(cacheId))
+            sessionCacheRepository
+              .putSession[ApplicationSent](DataKey(ApplicationSent.cacheKey), applicationSentVM)
+              .map { _ =>
+                sessionCacheRepository.deleteFromSession(DataKey(cacheId))
 
-              emailConnector.sendTemplatedEmail(
-                emailAddress = applicationSentVM.email,
-                templateName = "lisa_application_submit",
-                params = Map(
-                  "application_reference" -> applicationSentVM.subscriptionId,
-                  "email" -> applicationSentVM.email,
-                  "review_date" -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
-                  "first_name" -> registrationDetails.yourDetails.firstName,
-                  "last_name" -> registrationDetails.yourDetails.lastName
+                emailConnector.sendTemplatedEmail(
+                  emailAddress = applicationSentVM.email,
+                  templateName = "lisa_application_submit",
+                  params = Map(
+                    "application_reference" -> applicationSentVM.subscriptionId,
+                    "email"                 -> applicationSentVM.email,
+                    "review_date"           -> LocalDate.now().plusDays(14).format(DateTimeFormatter.ofPattern("d MMMM y")),
+                    "first_name"            -> registrationDetails.yourDetails.firstName,
+                    "last_name"             -> registrationDetails.yourDetails.lastName
+                  )
                 )
-              )
 
-              Redirect(routes.ApplicationSubmittedController.get)
-            }
-          case Left(error) =>
-            logger.error(s"[RosmController][POST] Audit of Submission -> auditType = applicationNotReceived failed with $error")
+                Redirect(routes.ApplicationSubmittedController.get)
+              }
+          case Left(error)           =>
+            logger.error(
+              s"[RosmController][POST] Audit of Submission -> auditType = applicationNotReceived failed with $error"
+            )
 
-            auditService.audit(auditType = "applicationNotReceived",
+            auditService.audit(
+              auditType = "applicationNotReceived",
               path = routes.RosmController.post.url,
-              auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error))
+              auditData = createAuditDetails(registrationDetails) ++ Map("reasonNotReceived" -> error)
+            )
 
             Future.successful(InternalServerError(errorView()))
         }
@@ -90,18 +103,17 @@ class RosmController @Inject()(
     }
   }
 
-  private def createAuditDetails(registrationDetails: LisaRegistration) = {
+  private def createAuditDetails(registrationDetails: LisaRegistration) =
     Map(
-      "companyName" -> registrationDetails.organisationDetails.companyName,
-      "utr" -> registrationDetails.organisationDetails.ctrNumber,
+      "companyName"                              -> registrationDetails.organisationDetails.companyName,
+      "utr"                                      -> registrationDetails.organisationDetails.ctrNumber,
       "financialServicesRegisterReferenceNumber" -> registrationDetails.tradingDetails.fsrRefNumber,
-      "isaProviderReferenceNumber" -> registrationDetails.tradingDetails.isaProviderRefNumber,
-      "firstName" -> registrationDetails.yourDetails.firstName,
-      "lastName" -> registrationDetails.yourDetails.lastName,
-      "roleInOrganisation" -> registrationDetails.yourDetails.role,
-      "phoneNumber" -> registrationDetails.yourDetails.phone,
-      "emailAddress" -> registrationDetails.yourDetails.email
+      "isaProviderReferenceNumber"               -> registrationDetails.tradingDetails.isaProviderRefNumber,
+      "firstName"                                -> registrationDetails.yourDetails.firstName,
+      "lastName"                                 -> registrationDetails.yourDetails.lastName,
+      "roleInOrganisation"                       -> registrationDetails.yourDetails.role,
+      "phoneNumber"                              -> registrationDetails.yourDetails.phone,
+      "emailAddress"                             -> registrationDetails.yourDetails.email
     )
-  }
 
 }

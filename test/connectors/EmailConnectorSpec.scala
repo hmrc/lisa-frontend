@@ -34,11 +34,11 @@ import scala.concurrent.Future
 
 class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach with SpecBase with Injecting {
 
-  val mockHttpClientV2: HttpClientV2 = mock[HttpClientV2]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  val mockMetrics: EmailMetrics = mock[EmailMetrics]
+  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
+  val mockAppConfig: AppConfig           = mock[AppConfig]
+  val mockMetrics: EmailMetrics          = mock[EmailMetrics]
   val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  val testEmailConnector = new EmailConnector(mockHttpClientV2, mockAppConfig, mockMetrics)
+  val testEmailConnector                 = new EmailConnector(mockHttpClientV2, mockAppConfig, mockMetrics)
 
   override def beforeEach(): Unit = {
     reset(mockHttpClientV2)
@@ -53,12 +53,12 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
       "correct emailId Id is passed" in {
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val emailString = "test@mail.com"
-        val templateId = "lisa_application_submit"
-        val params = Map("testParam" -> "testParam")
+        val emailString                = "test@mail.com"
+        val templateId                 = "lisa_application_submit"
+        val params                     = Map("testParam" -> "testParam")
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(ACCEPTED, "")))
-        val response = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
+        val response                   = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
         await(response) must be(EmailSent)
 
       }
@@ -68,9 +68,9 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
 
       "incorrect email Id are passed" in {
         implicit val hc: HeaderCarrier = HeaderCarrier()
-        val invalidEmailString = "test@test1.com"
-        val templateId = "lisa_application_submit"
-        val params = Map("testParam" -> "testParam")
+        val invalidEmailString         = "test@test1.com"
+        val templateId                 = "lisa_application_submit"
+        val params                     = Map("testParam" -> "testParam")
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
@@ -82,4 +82,5 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
     }
 
   }
+
 }

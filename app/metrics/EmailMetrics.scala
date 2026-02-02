@@ -19,7 +19,7 @@ package metrics
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 
-class EmailMetrics @Inject()(registry: MetricRegistry) {
+class EmailMetrics @Inject() (registry: MetricRegistry) {
 
   def emailNotSentCounter(): Unit = registry.counter("emailNotSentCounter").inc()
 

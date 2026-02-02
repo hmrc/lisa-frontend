@@ -27,35 +27,38 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import play.api.test.CSRFTokenHelper._
 import uk.gov.hmrc.mongo.cache.DataKey
-import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
+import views.html.registration.{
+  application_pending, application_rejected, application_submitted, application_successful
+}
 
 import scala.concurrent.Future
 
-class ApplicationSubmittedControllerSpec extends SpecBase
-  with BeforeAndAfter
-  with Injecting {
+class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter with Injecting {
 
-  val submittedPageTitle = "Application submitted"
-  val pendingPageTitle = "We are reviewing your application"
-  val successPageTitle = "Application successful"
-  val rejectedPageTitle = "Application not successful"
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val submittedView: application_submitted = inject[application_submitted]
-  implicit val pendingView: application_pending = inject[application_pending]
+  val submittedPageTitle                              = "Application submitted"
+  val pendingPageTitle                                = "We are reviewing your application"
+  val successPageTitle                                = "Application successful"
+  val rejectedPageTitle                               = "Application not successful"
+  implicit val mcc: MessagesControllerComponents      = inject[MessagesControllerComponents]
+  implicit val submittedView: application_submitted   = inject[application_submitted]
+  implicit val pendingView: application_pending       = inject[application_pending]
   implicit val successfulView: application_successful = inject[application_successful]
-  implicit val rejectedView: application_rejected = inject[application_rejected]
-  val SUT = new ApplicationSubmittedController()
-
+  implicit val rejectedView: application_rejected     = inject[application_rejected]
+  val SUT                                             = new ApplicationSubmittedController()
 
   "GET Application Submitted" must {
 
     "return the submitted page with correct email address" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any())).
-        thenReturn(Future.successful(UserAuthorised("id",TaxEnrolmentPending)))
+      when(authorisationService.userStatus(ArgumentMatchers.any()))
+        .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentPending)))
 
-      when(lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
-        ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(
+        lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
         .thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
 
       val result = SUT.get()(fakeRequest.withCSRFToken)
@@ -64,9 +67,9 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
       val content = contentAsString(result)
 
-      content must include (submittedPageTitle)
-      content must include ("test@user.com")
-      content must include ("123456789")
+      content must include(submittedPageTitle)
+      content must include("test@user.com")
+      content must include("123456789")
 
     }
 
@@ -85,7 +88,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
       val content = contentAsString(result)
 
-      content must include (pendingPageTitle)
+      content must include(pendingPageTitle)
 
     }
 
@@ -98,8 +101,12 @@ class ApplicationSubmittedControllerSpec extends SpecBase
       when(authorisationService.userStatus(ArgumentMatchers.any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
-      when(lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
-        ArgumentMatchers.any(), ArgumentMatchers.any()))
+      when(
+        lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
         .thenReturn(Future.successful(Some("Z9999")))
 
       val result = SUT.successful()(fakeRequest.withCSRFToken)
@@ -108,8 +115,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
       val content = contentAsString(result)
 
-      content must include (successPageTitle)
-      content must include ("Z9999")
+      content must include(successPageTitle)
+      content must include("Z9999")
 
     }
   }
@@ -127,8 +134,9 @@ class ApplicationSubmittedControllerSpec extends SpecBase
 
       val content = contentAsString(result)
 
-      content must include (rejectedPageTitle)
+      content must include(rejectedPageTitle)
 
     }
   }
+
 }

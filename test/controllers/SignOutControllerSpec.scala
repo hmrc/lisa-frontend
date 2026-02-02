@@ -27,8 +27,8 @@ import scala.concurrent.Future
 
 class SignOutControllerSpec extends SpecBase with Injecting {
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val timeoutView: timeout_sign_out = inject[timeout_sign_out]
-  val SUT = new SignOutController()
+  implicit val timeoutView: timeout_sign_out     = inject[timeout_sign_out]
+  val SUT                                        = new SignOutController()
 
   "Calling SignOutController.redirect" should {
     "respond with SEE OTHER" in {
@@ -45,8 +45,8 @@ class SignOutControllerSpec extends SpecBase with Injecting {
     "render the timeout page" in {
       def returnMessage(key: String): String = stubMessages(mcc.messagesApi).messages(key)
 
-      val title: String = returnMessage("title.timeout-sign-out")
-      val header: String = returnMessage("timeout.heading")
+      val title: String        = returnMessage("title.timeout-sign-out")
+      val header: String       = returnMessage("timeout.heading")
       val signInButton: String = returnMessage("timeout.sign-in-button")
       val pageAsString: String = contentAsString(result)
 
@@ -55,4 +55,5 @@ class SignOutControllerSpec extends SpecBase with Injecting {
       pageAsString must include(signInButton)
     }
   }
+
 }

@@ -26,10 +26,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthorisationService @Inject()(val authConnector: AuthConnector,
-                                      val taxEnrolmentService: TaxEnrolmentService) (implicit ec: ExecutionContext) extends AuthorisedFunctions {
+class AuthorisationService @Inject() (val authConnector: AuthConnector, val taxEnrolmentService: TaxEnrolmentService)(
+  implicit ec: ExecutionContext
+) extends AuthorisedFunctions {
 
-  def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] = {
+  def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] =
     authorised(
       AffinityGroup.Organisation and AuthProviders(GovernmentGateway) and User
     ).retrieve(internalId and groupIdentifier and authorisedEnrolments) {
@@ -38,33 +39,29 @@ class AuthorisationService @Inject()(val authConnector: AuthConnector,
           .map(a => Future.successful(Some(a)))
           .getOrElse(statusFromTaxEnrolments(id, groupId))
           .map(_.getOrElse(UserAuthorised(id, TaxEnrolmentDoesNotExist)))
-      case _ => Future.successful(UserUnauthorised)
+      case _                                     => Future.successful(UserUnauthorised)
     } recover {
       case _: UnsupportedCredentialRole => UserNotAdmin
-      case _: NoActiveSession => UserNotLoggedIn
-      case _: AuthorisationException => UserUnauthorised
+      case _: NoActiveSession           => UserNotLoggedIn
+      case _: AuthorisationException    => UserUnauthorised
     }
-  }
 
-  def statusFromAuth(id: String, enrolments: Enrolments): Option[UserStatus] = {
+  def statusFromAuth(id: String, enrolments: Enrolments): Option[UserStatus] =
     for {
       enrolment <- enrolments.getEnrolment("HMRC-LISA-ORG")
-      zref <- enrolment.getIdentifier("ZREF") if enrolment.isActivated
+      zref      <- enrolment.getIdentifier("ZREF") if enrolment.isActivated
     } yield UserAuthorisedAndEnrolled(id, zref.value)
-  }
 
-  def statusFromTaxEnrolments(id: String, groupId: String)(implicit hc: HeaderCarrier): Future[Option[UserStatus]] = {
+  def statusFromTaxEnrolments(id: String, groupId: String)(implicit hc: HeaderCarrier): Future[Option[UserStatus]] =
     taxEnrolmentService.getNewestLisaSubscription(groupId)(hc).map {
-      _.flatMap {
-        subscription =>
-          subscription.state match {
-            case TaxEnrolmentSuccess =>
-              subscription.zref.map(UserAuthorisedAndEnrolled(id, _))
-            case state: TaxEnrolmentState =>
-              Some(UserAuthorised(id, state))
-          }
+      _.flatMap { subscription =>
+        subscription.state match {
+          case TaxEnrolmentSuccess      =>
+            subscription.zref.map(UserAuthorisedAndEnrolled(id, _))
+          case state: TaxEnrolmentState =>
+            Some(UserAuthorised(id, state))
+        }
       }
     }
-  }
 
 }

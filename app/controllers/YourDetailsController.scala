@@ -28,23 +28,23 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class YourDetailsController @Inject()(
-                                       implicit val sessionCacheRepository: LisaCacheRepository,
-                                       implicit val env: Environment,
-                                       implicit val config: Configuration,
-                                       implicit val authorisationService: AuthorisationService,
-                                       implicit val appConfig: AppConfig,
-                                       override implicit val messagesApi: MessagesApi,
-                                       override implicit val ec: ExecutionContext,
-                                       implicit val messagesControllerComponents: MessagesControllerComponents,
-                                       yourDetailsView: views.html.registration.your_details
-                                     ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+class YourDetailsController @Inject() (implicit
+  val sessionCacheRepository: LisaCacheRepository,
+  implicit val env: Environment,
+  implicit val config: Configuration,
+  implicit val authorisationService: AuthorisationService,
+  implicit val appConfig: AppConfig,
+  implicit override val messagesApi: MessagesApi,
+  implicit override val ec: ExecutionContext,
+  implicit val messagesControllerComponents: MessagesControllerComponents,
+  yourDetailsView: views.html.registration.your_details
+) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[YourDetails](DataKey(YourDetails.cacheKey)).map {
         case Some(data) => Ok(yourDetailsView(createPostCall, YourDetails.form.fill(data)))
-        case None => Ok(yourDetailsView(createPostCall, YourDetails.form))
+        case None       => Ok(yourDetailsView(createPostCall, YourDetails.form))
       }
 
     }
@@ -52,20 +52,22 @@ class YourDetailsController @Inject()(
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
-
-      YourDetails.form.bindFromRequest().fold(
-        formWithErrors => {
-          logger.info("[YourDetailsController][POST] form errors")
-          Future.successful(BadRequest(yourDetailsView(createPostCall, formWithErrors)))
-        },
-        data => {
-          logger.info("[YourDetailsController][POST] Successful")
-          sessionCacheRepository.putSession[YourDetails](DataKey(YourDetails.cacheKey), data).flatMap { _ =>
-            handleRedirect(routes.SummaryController.get.url)
+      YourDetails.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            logger.info("[YourDetailsController][POST] form errors")
+            Future.successful(BadRequest(yourDetailsView(createPostCall, formWithErrors)))
+          },
+          data => {
+            logger.info("[YourDetailsController][POST] Successful")
+            sessionCacheRepository.putSession[YourDetails](DataKey(YourDetails.cacheKey), data).flatMap { _ =>
+              handleRedirect(routes.SummaryController.get.url)
+            }
           }
-        }
-      )
+        )
 
     }
   }
+
 }

@@ -34,22 +34,21 @@ import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class TaxEnrolmentConnectorSpec extends PlaySpec
-  with MockitoSugar
-  with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
+class TaxEnrolmentConnectorSpec
+    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
-  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  val mockHttpClientV2: HttpClientV2 = mock[HttpClientV2]
-  val mockAppConfig: AppConfig = mock[AppConfig]
-  override implicit val hc: HeaderCarrier = HeaderCarrier()
+  val mockRequestBuilder: RequestBuilder  = mock[RequestBuilder]
+  val mockHttpClientV2: HttpClientV2      = mock[HttpClientV2]
+  val mockAppConfig: AppConfig            = mock[AppConfig]
+  implicit override val hc: HeaderCarrier = HeaderCarrier()
 
   when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
 
-  val SUT = new TaxEnrolmentConnector(mockHttpClientV2, mockAppConfig)
-  val instant: Instant = Instant.ofEpochMilli(1498726914908L)
+  val SUT                          = new TaxEnrolmentConnector(mockHttpClientV2, mockAppConfig)
+  val instant: Instant             = Instant.ofEpochMilli(1498726914908L)
   val zonedDateTime: ZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 
   private val lisaSuccessSubscription = TaxEnrolmentSubscription(
@@ -68,14 +67,19 @@ class TaxEnrolmentConnectorSpec extends PlaySpec
 
   "Get Subscriptions by Group ID endpoint" must {
     "return whatever it receives" in {
-      when(mockRequestBuilder.execute[HttpResponse](any(),any()))
-        .thenReturn(Future.successful(HttpResponse(
-          status = OK,
-          json = Json.toJson(subs),
-          headers = Map[String,Seq[String]]("test"->Seq("test1","test2"))
-        )))
+      when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              status = OK,
+              json = Json.toJson(subs),
+              headers = Map[String, Seq[String]]("test" -> Seq("test1", "test2"))
+            )
+          )
+        )
 
-      val response: Seq[TaxEnrolmentSubscription] = Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
+      val response: Seq[TaxEnrolmentSubscription] =
+        Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
 
       response mustBe subs
     }

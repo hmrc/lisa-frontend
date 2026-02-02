@@ -37,11 +37,8 @@ import uk.gov.hmrc.mongo.test.MongoSupport
 
 import java.time.temporal.ChronoUnit
 
-class TaxEnrolmentServiceSpec extends PlaySpec
-  with MockitoSugar
-  with GuiceOneAppPerSuite
-  with TaxEnrolmentJsonFormats
-  with MongoSupport {
+class TaxEnrolmentServiceSpec
+    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with MongoSupport {
 
   override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
@@ -50,10 +47,10 @@ class TaxEnrolmentServiceSpec extends PlaySpec
     )
     .build()
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-  val mockConnector:TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
+  val mockConnector: TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
 
   val SUT = new TaxEnrolmentService(mockConnector)
 
@@ -62,8 +59,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
     "return the appropriate state" when {
 
       "given a single lisa subscription in the connector response" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(List(lisaSuccessSubscription)))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(List(lisaSuccessSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
@@ -71,8 +68,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
       }
 
       "given two lisa subscriptions in the connector response - newest first" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(List(lisaErrorSubscription, lisaSuccessSubscription)))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(List(lisaErrorSubscription, lisaSuccessSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
@@ -80,8 +77,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
       }
 
       "given two lisa subscriptions in the connector response - oldest first" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription)))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
@@ -90,7 +87,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
 
       "given multiple different subscriptions in the connector response" in {
         when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription, randomPendingSubscription)))
+          Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription, randomPendingSubscription))
+        )
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
@@ -102,8 +100,8 @@ class TaxEnrolmentServiceSpec extends PlaySpec
     "return a does not exist state" when {
 
       "there are no lisa subscriptions" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
-          Future.successful(List()))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(List()))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
 
