@@ -25,13 +25,13 @@ import views.html.error.{access_denied_assistant, access_denied_individual_or_ag
 
 class ErrorControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents                                    = inject[MessagesControllerComponents]
+  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   implicit val accessDeniedIndividualOrAgentView: access_denied_individual_or_agent =
     inject[access_denied_individual_or_agent]
 
-  implicit val accessDeniedAssistantView: access_denied_assistant                   = inject[access_denied_assistant]
-  lazy val SUT                                                                      = new ErrorController()
+  implicit val accessDeniedAssistantView: access_denied_assistant = inject[access_denied_assistant]
+  lazy val SUT                                                    = new ErrorController()
 
   "Individual or Agent endpoint" should {
     "return a forbidden status page with correct messaging" in {

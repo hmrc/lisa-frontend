@@ -41,9 +41,9 @@ class RosmControllerSpec extends SpecBase with Injecting {
   implicit val errorView: error_template         = inject[error_template]
   val SUT                                        = new RosmController()
 
-  val customTestEmail                                   = "success@rosm.subscription"
+  val customTestEmail = "success@rosm.subscription"
 
-  val customYourForm                                    = new YourDetails(
+  val customYourForm = new YourDetails(
     firstName = "Test",
     lastName = "User",
     role = "Role",

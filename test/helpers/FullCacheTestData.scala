@@ -21,18 +21,18 @@ import play.api.libs.json.{JsString, JsValue, Json}
 
 object FullCacheTestData {
 
-  val organisationForm                                   = new OrganisationDetails("Test Company Name", "1234567890")
-  val organisationFormKeyAndJson: (String, JsValue)      = OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
-  val tradingForm                                        = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
-  val tradingFormKeyAndJson: (String, JsValue)           = TradingDetails.cacheKey      -> Json.toJson(tradingForm)
-  val businessStructureForm                              = new BusinessStructure("LLP")
+  val organisationForm                              = new OrganisationDetails("Test Company Name", "1234567890")
+  val organisationFormKeyAndJson: (String, JsValue) = OrganisationDetails.cacheKey -> Json.toJson(organisationForm)
+  val tradingForm                                   = new TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123")
+  val tradingFormKeyAndJson: (String, JsValue)      = TradingDetails.cacheKey      -> Json.toJson(tradingForm)
+  val businessStructureForm                         = new BusinessStructure("LLP")
 
   val businessStructureFormKeyAndJson: (String, JsValue) =
     BusinessStructure.cacheKey -> Json.toJson(businessStructureForm)
 
-  val safeKeyAndJson: (String, JsString)    = "safeId"             -> JsString("")
+  val safeKeyAndJson: (String, JsString) = "safeId" -> JsString("")
 
-  val yourForm                              = new YourDetails(
+  val yourForm = new YourDetails(
     firstName = "Test",
     lastName = "User",
     role = "Role",
