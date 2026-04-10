@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.http.Status
 import play.api.mvc.{MessagesControllerComponents, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import views.html.timeout_sign_out
 

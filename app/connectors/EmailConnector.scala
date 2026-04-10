@@ -37,7 +37,7 @@ class EmailConnector @Inject() (
   val httpClientV2: HttpClientV2,
   appConfig: AppConfig,
   metrics: EmailMetrics
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends RawResponseReads with Logging {
 
   def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit

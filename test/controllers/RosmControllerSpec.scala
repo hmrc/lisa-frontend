@@ -20,15 +20,15 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import base.SpecBase
 import helpers.FullCacheTest
-import helpers.FullCacheTestData._
-import models._
+import helpers.FullCacheTestData.*
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{MessagesControllerComponents, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.error_template
@@ -166,7 +166,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
             "last_name"             -> yourForm.lastName
           )
         )
-      )(any)
+      )(any())
     }
 
     "handle a failed rosm registration" when {

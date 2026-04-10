@@ -17,15 +17,15 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.organisation_details
 

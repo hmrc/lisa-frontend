@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.data.Forms._
-import play.api.data._
+import play.api.data.Forms.*
+import play.api.data.*
 import play.api.libs.json.{Json, OFormat}
 
 case class YourDetails(firstName: String, lastName: String, role: String, phone: String, email: String)

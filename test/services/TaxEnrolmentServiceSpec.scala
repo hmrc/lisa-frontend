@@ -17,11 +17,11 @@
 package services
 
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
-import models._
+import models.*
 
 import java.time.ZonedDateTime
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec

@@ -19,13 +19,13 @@ package controllers
 import org.apache.pekko.util.ByteString
 import base.SpecBase
 import helpers.FullCacheTest
-import helpers.FullCacheTestData._
+import helpers.FullCacheTestData.*
 import play.api.http.Status
 import play.api.libs.streams.Accumulator
 import play.api.mvc.{MessagesControllerComponents, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.Injecting
-import play.api.test.CSRFTokenHelper._
+import play.api.test.CSRFTokenHelper.*
 import views.html.registration.summary
 
 class SummaryControllerSpec extends SpecBase with Injecting {

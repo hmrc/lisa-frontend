@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import config.AppConfig
-import models._
+import models.*
 
 import java.time.LocalDate
 import org.mockito.ArgumentMatchers.any
@@ -27,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 

@@ -18,8 +18,8 @@ package config
 
 import com.google.inject.Inject
 import play.api.i18n.MessagesApi
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.mvc.Results.*
+import play.api.mvc.*
 import play.api.Configuration
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
@@ -32,16 +32,16 @@ class ErrorHandler @Inject() (
   implicit val appConfig: AppConfig,
   errorView: views.html.error_template,
   notFoundView: views.html.page_not_found_template
-)(implicit val ec: ExecutionContext)
+)(using val ec: ExecutionContext)
     extends FrontendErrorHandler {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(using
     request: RequestHeader
   ): Future[Html] = Future.successful {
     errorView()
   }
 
-  override def notFoundTemplate(implicit request: RequestHeader): Future[Html] = Future.successful {
+  override def notFoundTemplate(using request: RequestHeader): Future[Html] = Future.successful {
     notFoundView()
   }
 

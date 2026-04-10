@@ -16,7 +16,7 @@
 
 package connectors
 
-import models._
+import models.*
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{Json, JsonValidationError}
 

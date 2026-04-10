@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
-import models._
+import models.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RosmConnector @Inject() (
   val httpClientV2: HttpClientV2,
   val appConfig: AppConfig
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends RosmJsonFormats with RawResponseReads {
 
   def registerOnce(utr: String, request: RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {

@@ -18,14 +18,14 @@ package controllers
 
 import base.SpecBase
 import config.AppConfig
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import play.api.test.{FakeRequest, Injecting}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService

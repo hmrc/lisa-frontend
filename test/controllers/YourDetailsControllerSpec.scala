@@ -17,16 +17,16 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.libs.json._
-import play.api.mvc._
-import play.api.test.Helpers._
-import play.api.test._
-import play.api.test.CSRFTokenHelper._
+import play.api.libs.json.*
+import play.api.mvc.*
+import play.api.test.Helpers.*
+import play.api.test.*
+import play.api.test.CSRFTokenHelper.*
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.your_details
 
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
 //  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val yourDetailsView: your_details = inject[your_details]
+  given yourDetailsView: your_details = inject[your_details]
 
   val SUT = new YourDetailsController(
     sessionCacheRepository = lisaCacheRepository,

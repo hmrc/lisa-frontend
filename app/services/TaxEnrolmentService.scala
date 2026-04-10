@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.Inject
 import connectors.TaxEnrolmentConnector
-import models._
+import models.*
 import java.time.ZonedDateTime
 
 import scala.concurrent.{ExecutionContext, Future}

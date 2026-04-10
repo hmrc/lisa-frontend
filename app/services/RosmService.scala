@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.Inject
 import connectors.{RosmConnector, RosmJsonFormats}
-import models._
+import models.*
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess}
 

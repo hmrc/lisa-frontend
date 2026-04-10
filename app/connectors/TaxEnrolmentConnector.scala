@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
-import models._
+import models.*
 import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxEnrolmentConnector @Inject() (
   val httpClientV2: HttpClientV2,
   val appConfig: AppConfig
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
 
   def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {

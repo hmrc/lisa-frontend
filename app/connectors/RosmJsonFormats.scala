@@ -16,11 +16,11 @@
 
 package connectors
 
-import models._
+import models.*
 
 import java.time.LocalDate
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 trait RosmJsonFormats {
 
