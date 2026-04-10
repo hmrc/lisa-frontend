@@ -45,7 +45,7 @@ class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSu
   when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
 
-  implicit override val hc: HeaderCarrier = HeaderCarrier()
+//  implicit override val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new RosmConnector(mockHttpClientV2, mockAppConfig)
 

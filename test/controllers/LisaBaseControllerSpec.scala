@@ -205,7 +205,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
   }
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   class TestClass(
     val config: Configuration,
@@ -239,7 +239,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     appConfig = appConfig,
     authorisationService = authorisationService,
     messagesApi = messagesApi,
-    messagesControllerComponents = stubMessagesControllerComponents()
+    mcc
   )
 
 }

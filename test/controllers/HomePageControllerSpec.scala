@@ -25,7 +25,7 @@ import play.api.test.CSRFTokenHelper._
 
 class HomePageControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   val SUT = new HomePageController(
     sessionCacheRepository = lisaCacheRepository,
@@ -34,7 +34,7 @@ class HomePageControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents()
+    mcc
   )
 
   "GET /" should {

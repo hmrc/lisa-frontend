@@ -37,10 +37,10 @@ import scala.concurrent.{Await, Future}
 class TaxEnrolmentConnectorSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
-  val mockRequestBuilder: RequestBuilder  = mock[RequestBuilder]
-  val mockHttpClientV2: HttpClientV2      = mock[HttpClientV2]
-  val mockAppConfig: AppConfig            = mock[AppConfig]
-  implicit override val hc: HeaderCarrier = HeaderCarrier()
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
+  val mockAppConfig: AppConfig           = mock[AppConfig]
+//  implicit override val hc: HeaderCarrier = HeaderCarrier()
 
   when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)

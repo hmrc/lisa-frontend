@@ -42,7 +42,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-  implicit val mcc: MessagesControllerComponents             = inject[MessagesControllerComponents]
+//  implicit val mcc: MessagesControllerComponents             = inject[MessagesControllerComponents]
   implicit val organisationDetailsView: organisation_details = inject[organisation_details]
 
   val SUT = new OrganisationDetailsController(
@@ -54,7 +54,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     auditService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     organisationDetailsView
   )
 

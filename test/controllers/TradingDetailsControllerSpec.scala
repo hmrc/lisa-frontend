@@ -45,7 +45,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
+//  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
   implicit val tradingDetailsView: trading_details = inject[trading_details]
 
   val SUT = new TradingDetailsController(
@@ -55,7 +55,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     tradingDetailsView
   )
 

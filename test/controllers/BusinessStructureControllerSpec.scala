@@ -40,7 +40,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-  implicit val mcc: MessagesControllerComponents         = inject[MessagesControllerComponents]
+//  implicit val mcc: MessagesControllerComponents         = inject[MessagesControllerComponents]
   implicit val businessStructureView: business_structure = inject[business_structure]
 
   lazy val SUT = new BusinessStructureController(
@@ -50,7 +50,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     businessStructureView
   )
 

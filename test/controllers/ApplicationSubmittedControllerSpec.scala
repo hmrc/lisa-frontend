@@ -35,15 +35,14 @@ import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter with Injecting {
 
-  val submittedPageTitle                              = "Application submitted"
-  val pendingPageTitle                                = "We are reviewing your application"
-  val successPageTitle                                = "Application successful"
-  val rejectedPageTitle                               = "Application not successful"
-  implicit val mcc: MessagesControllerComponents      = inject[MessagesControllerComponents]
-  implicit val submittedView: application_submitted   = inject[application_submitted]
-  implicit val pendingView: application_pending       = inject[application_pending]
-  implicit val successfulView: application_successful = inject[application_successful]
-  implicit val rejectedView: application_rejected     = inject[application_rejected]
+  val submittedPageTitle                       = "Application submitted"
+  val pendingPageTitle                         = "We are reviewing your application"
+  val successPageTitle                         = "Application successful"
+  val rejectedPageTitle                        = "Application not successful"
+  given submittedView: application_submitted   = inject[application_submitted]
+  given pendingView: application_pending       = inject[application_pending]
+  given successfulView: application_successful = inject[application_successful]
+  given rejectedView: application_rejected     = inject[application_rejected]
 
   val SUT = new ApplicationSubmittedController(
     sessionCacheRepository = lisaCacheRepository,
@@ -52,7 +51,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     applicationSubmittedView = submittedView,
     applicationPendingView = pendingView,
     applicationSuccessfulView = successfulView,

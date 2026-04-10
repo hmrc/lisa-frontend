@@ -37,8 +37,8 @@ import scala.concurrent.Future
 
 class RosmControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val errorView: error_template         = inject[error_template]
+//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val errorView: error_template = inject[error_template]
 
   val SUT = new RosmController(
     sessionCacheRepository = lisaCacheRepository,
@@ -50,7 +50,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
     emailConnector,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     errorView
   )
 

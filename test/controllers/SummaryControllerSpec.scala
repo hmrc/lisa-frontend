@@ -30,8 +30,8 @@ import views.html.registration.summary
 
 class SummaryControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val summaryView: summary              = inject[summary]
+//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val summaryView: summary = inject[summary]
 
   val SUT = new SummaryController(
     sessionCacheRepository = lisaCacheRepository,
@@ -40,7 +40,7 @@ class SummaryControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     summaryView
   )
 

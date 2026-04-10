@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
+//  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
   implicit val matchingFailedView: matching_failed = inject[matching_failed]
 
   val SUT = new MatchingFailedController(
@@ -41,7 +41,7 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     matchingFailedView
   )
 

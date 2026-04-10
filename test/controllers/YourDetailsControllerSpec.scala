@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val yourDetailsView: your_details     = inject[your_details]
+//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit val yourDetailsView: your_details = inject[your_details]
 
   val SUT = new YourDetailsController(
     sessionCacheRepository = lisaCacheRepository,
@@ -44,7 +44,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     messagesApi = messagesApi,
     appConfig = appConfig,
-    messagesControllerComponents = stubMessagesControllerComponents(),
+    mcc,
     yourDetailsView
   )
 
