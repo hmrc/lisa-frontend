@@ -38,15 +38,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthorisationServiceSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with ScalaFutures with MongoSupport {
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
     .overrides(
       bind(classOf[MongoComponent]).toInstance(mongoComponent)
     )
     .build()
 
-  implicit val hc: HeaderCarrier    = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  given hc: HeaderCarrier    = HeaderCarrier()
+  given ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   "user status" should {
 

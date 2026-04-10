@@ -29,20 +29,20 @@ import uk.gov.hmrc.mongo.cache.DataKey
 import scala.concurrent.ExecutionContext
 
 class ReapplyController @Inject() (
-  implicit val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
+  val sessionCacheRepository: LisaCacheRepository,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+  val messagesControllerComponents: MessagesControllerComponents
+)(using ec: ExecutionContext)
+    extends LisaBaseController(messagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ReapplyController][GET]")
     authorisedForLisa(
-      cacheId =>
+      _ =>
         sessionCacheRepository.putSession[Boolean](DataKey(Reapplication.cacheKey), true) map { _ =>
           Redirect(routes.BusinessStructureController.get)
         },

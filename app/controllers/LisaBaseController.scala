@@ -30,9 +30,8 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class LisaBaseController(
-  messagesControllerComponents: MessagesControllerComponents,
-  implicit val ec: ExecutionContext
+abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents)(using
+  ec: ExecutionContext
 ) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
     with I18nSupport
     with Logging
@@ -62,7 +61,7 @@ abstract class LisaBaseController(
       )
     )
 
-  private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] =
+  private def isReapplication()(implicit request: Request[AnyContent]): Future[Boolean] =
     sessionCacheRepository
       .getFromSession[Boolean](DataKey(Reapplication.cacheKey))
       .map(_.getOrElse(false))
@@ -73,15 +72,15 @@ abstract class LisaBaseController(
     user: UserAuthorised
   )(implicit request: Request[AnyContent]): Future[Result] = {
     logger.info("[LisaBaseController][handleUserAuthorised] User Authorised")
-    isReapplication(user) flatMap { isReapplication =>
+    isReapplication() flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
           case TaxEnrolmentPending      =>
             logger.info("[LisaBaseController][handleUserAuthorised] Enrollment Pending")
-            Future.successful(Redirect(routes.ApplicationSubmittedController.pending))
+            Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
           case TaxEnrolmentError        =>
             logger.error("[LisaBaseController][handleUserAuthorised] Enrollment Rejected")
-            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected))
+            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
           case TaxEnrolmentDoesNotExist =>
             logger.warn("[LisaBaseController][handleUserAuthorised] Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
@@ -105,7 +104,7 @@ abstract class LisaBaseController(
       sessionCacheRepository
         .putSession[String](DataKey("lisaManagerReferenceNumber"), user.lisaManagerReferenceNumber)
         .map { _ =>
-          Redirect(routes.ApplicationSubmittedController.successful)
+          Redirect(routes.ApplicationSubmittedController.successful())
         }
     } else {
       callback(s"${user.internalId}-lisa-registration")

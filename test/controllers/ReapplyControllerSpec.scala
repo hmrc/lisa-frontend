@@ -48,6 +48,15 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
   }
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT                                        = new ReapplyController()
+
+  val SUT = new ReapplyController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents()
+  )
 
 }

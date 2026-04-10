@@ -28,20 +28,20 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationSubmittedController @Inject() (implicit
+class ApplicationSubmittedController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val messagesControllerComponents: MessagesControllerComponents,
   applicationSubmittedView: views.html.registration.application_submitted,
   applicationPendingView: views.html.registration.application_pending,
   applicationSuccessfulView: views.html.registration.application_successful,
   applicationRejectedView: views.html.registration.application_rejected
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+)(using ec: ExecutionContext)
+    extends LisaBaseController(messagesControllerComponents) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ApplicationSubmittedController][get]")

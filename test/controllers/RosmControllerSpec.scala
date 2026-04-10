@@ -39,7 +39,20 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   implicit val errorView: error_template         = inject[error_template]
-  val SUT                                        = new RosmController()
+
+  val SUT = new RosmController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    auditService,
+    rosmService,
+    emailConnector,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    errorView
+  )
 
   val customTestEmail = "success@rosm.subscription"
 
@@ -129,7 +142,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
       when(rosmService.performSubscription(any)(any))
         .thenReturn(Future.successful(Right("123456789")))
 
-      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get.url))
+      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
     }
 
     "email the user on a successful rosm registration" in new FullCacheTest(customDataComponents) {

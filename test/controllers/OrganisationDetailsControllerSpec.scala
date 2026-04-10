@@ -44,7 +44,19 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents             = inject[MessagesControllerComponents]
   implicit val organisationDetailsView: organisation_details = inject[organisation_details]
-  val SUT                                                    = new OrganisationDetailsController()
+
+  val SUT = new OrganisationDetailsController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    rosmService,
+    auditService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    organisationDetailsView
+  )
 
   "GET Organisation Details" must {
 
@@ -68,7 +80,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
           .thenReturn(Future.successful(Some(organisationForm)))
 
         val request = fakeRequest.withCSRFToken
-        val result  = SUT.get().apply(request)
+        val result  = SUT.get.apply(request)
 
         status(result) mustBe Status.OK
 
@@ -99,7 +111,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
           .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
-        val result  = SUT.get().apply(request)
+        val result  = SUT.get.apply(request)
 
         status(result) mustBe Status.OK
 

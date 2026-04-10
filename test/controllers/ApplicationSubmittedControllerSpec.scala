@@ -44,7 +44,20 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
   implicit val pendingView: application_pending       = inject[application_pending]
   implicit val successfulView: application_successful = inject[application_successful]
   implicit val rejectedView: application_rejected     = inject[application_rejected]
-  val SUT                                             = new ApplicationSubmittedController()
+
+  val SUT = new ApplicationSubmittedController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    applicationSubmittedView = submittedView,
+    applicationPendingView = pendingView,
+    applicationSuccessfulView = successfulView,
+    applicationRejectedView = rejectedView
+  )
 
   "GET Application Submitted" must {
 

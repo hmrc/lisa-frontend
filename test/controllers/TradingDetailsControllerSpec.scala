@@ -47,7 +47,17 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
   implicit val tradingDetailsView: trading_details = inject[trading_details]
-  val SUT                                          = new TradingDetailsController()
+
+  val SUT = new TradingDetailsController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    tradingDetailsView
+  )
 
   "GET Trading Details" must {
 

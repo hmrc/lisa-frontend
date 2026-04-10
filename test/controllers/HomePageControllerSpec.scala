@@ -26,7 +26,16 @@ import play.api.test.CSRFTokenHelper._
 class HomePageControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT                                        = new HomePageController()
+
+  val SUT = new HomePageController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents()
+  )
 
   "GET /" should {
     "301 redirect the user to the company structure page" in {

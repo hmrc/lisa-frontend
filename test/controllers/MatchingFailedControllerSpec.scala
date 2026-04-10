@@ -34,7 +34,16 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
   implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
   implicit val matchingFailedView: matching_failed = inject[matching_failed]
 
-  val SUT = new MatchingFailedController()
+  val SUT = new MatchingFailedController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    matchingFailedView
+  )
 
   "GET Matching Failed" must {
 

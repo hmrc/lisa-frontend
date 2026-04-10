@@ -28,17 +28,17 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TradingDetailsController @Inject() (implicit
+class TradingDetailsController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val messagesControllerComponents: MessagesControllerComponents,
   tradingDetailsView: views.html.registration.trading_details
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+)(using ec: ExecutionContext)
+    extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>

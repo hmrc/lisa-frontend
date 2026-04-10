@@ -85,7 +85,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.pending.url)
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.pending().url)
 
       }
 
@@ -99,7 +99,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.rejected.url)
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.rejected().url)
 
       }
 
@@ -113,7 +113,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
         val result = SUT.testAuthorisation(fakeRequest)
 
-        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful.url)
+        redirectLocation(result) mustBe Some(routes.ApplicationSubmittedController.successful().url)
 
         verify(lisaCacheRepository).putSession[String](
           DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")),
@@ -208,15 +208,14 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   class TestClass(
-    implicit val config: Configuration,
-    implicit val env: Environment,
-    implicit val sessionCacheRepository: LisaCacheRepository,
-    implicit val appConfig: AppConfig,
-    implicit val authorisationService: AuthorisationService,
-    implicit override val messagesApi: MessagesApi,
-    implicit override val ec: ExecutionContext,
-    implicit val messagesControllerComponents: MessagesControllerComponents
-  ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+    val config: Configuration,
+    val env: Environment,
+    val sessionCacheRepository: LisaCacheRepository,
+    val appConfig: AppConfig,
+    val authorisationService: AuthorisationService,
+    override val messagesApi: MessagesApi,
+    messagesControllerComponents: MessagesControllerComponents
+  ) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
     val testAuthorisation: Action[AnyContent] = Action.async { implicit request =>
       authorisedForLisa(handleResult)
@@ -233,6 +232,14 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
 
   }
 
-  val SUT = new TestClass()
+  val SUT = new TestClass(
+    config = configuration,
+    env = env,
+    sessionCacheRepository = lisaCacheRepository,
+    appConfig = appConfig,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    messagesControllerComponents = stubMessagesControllerComponents()
+  )
 
 }

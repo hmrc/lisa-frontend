@@ -39,18 +39,18 @@ import scala.concurrent.ExecutionContext
 class AuditServiceSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter with MongoSupport {
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
     .overrides(
       bind(classOf[MongoComponent]).toInstance(mongoComponent)
     )
     .build()
 
-  implicit val hc: HeaderCarrier                        = HeaderCarrier()
-  val mockAuditConnector: AuditConnector                = mock[AuditConnector]
-  val mockAppConfig: AppConfig                          = mock[AppConfig]
-  implicit val ec: ExecutionContext                     = app.injector.instanceOf[ExecutionContext]
-  implicit val lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
+  given hc: HeaderCarrier                        = HeaderCarrier()
+  val mockAuditConnector: AuditConnector         = mock[AuditConnector]
+  val mockAppConfig: AppConfig                   = mock[AppConfig]
+  given ec: ExecutionContext                     = app.injector.instanceOf[ExecutionContext]
+  given lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
 
   object SUT extends AuditService(mockAuditConnector, mockAppConfig)
 

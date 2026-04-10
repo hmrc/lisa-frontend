@@ -18,8 +18,8 @@ package controllers
 
 import com.google.inject.Inject
 import config.AppConfig
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.i18n.MessagesApi
+import play.api.mvc.*
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService
@@ -27,16 +27,15 @@ import services.AuthorisationService
 import scala.concurrent.{ExecutionContext, Future}
 
 class HomePageController @Inject() (
-  implicit val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext)
-    with I18nSupport {
+  val sessionCacheRepository: LisaCacheRepository,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  val appConfig: AppConfig,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents
+)(using ec: ExecutionContext)
+    extends LisaBaseController(messagesControllerComponents) {
 
   val home: Action[AnyContent] = Action.async { _ =>
     Future.successful(Redirect(routes.BusinessStructureController.get, MOVED_PERMANENTLY))

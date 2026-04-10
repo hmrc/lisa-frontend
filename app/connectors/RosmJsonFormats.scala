@@ -42,7 +42,7 @@ trait RosmJsonFormats {
         case Some(date) => Some(date.toString)
         case _          => None
       }
-  )(unlift(RosmIndividual.unapply))
+  )(o => Tuple.fromProductTyped(o))
 
   implicit val orgFormats: OFormat[RosmOrganisation]                 = Json.format[RosmOrganisation]
   implicit val addrFormats: OFormat[RosmAddress]                     = Json.format[RosmAddress]

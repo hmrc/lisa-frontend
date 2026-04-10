@@ -21,8 +21,9 @@ import config.AppConfig
 import metrics.EmailMetrics
 import models.SendEmailRequest
 import play.api.Logging
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -58,7 +59,7 @@ class EmailConnector @Inject() (
             logger.info("[EmailConnector][sendTemplatedEmail] Email sent successfully.")
             metrics.emailSentCounter()
             EmailSent
-          case status   =>
+          case _        =>
             logger.warn("[EmailConnector][sendTemplatedEmail] Email not sent.")
             metrics.emailNotSentCounter()
             EmailNotSent

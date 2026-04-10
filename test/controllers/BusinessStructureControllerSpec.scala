@@ -42,7 +42,17 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   implicit val mcc: MessagesControllerComponents         = inject[MessagesControllerComponents]
   implicit val businessStructureView: business_structure = inject[business_structure]
-  lazy val SUT                                           = new BusinessStructureController()
+
+  lazy val SUT = new BusinessStructureController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    businessStructureView
+  )
 
   "GET Business Structure" must {
 

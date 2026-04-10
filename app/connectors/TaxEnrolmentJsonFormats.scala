@@ -71,6 +71,6 @@ trait TaxEnrolmentJsonFormats {
       } and
       (JsPath \ "etmpId").write[String] and
       (JsPath \ "groupIdentifier").write[String]
-  )(unlift(TaxEnrolmentSubscription.unapply))
+  )(o => Tuple.fromProductTyped(o))
 
 }

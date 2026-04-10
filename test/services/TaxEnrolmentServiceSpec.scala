@@ -40,7 +40,7 @@ import java.time.temporal.ChronoUnit
 class TaxEnrolmentServiceSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with MongoSupport {
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
     .overrides(
       bind(classOf[MongoComponent]).toInstance(mongoComponent)

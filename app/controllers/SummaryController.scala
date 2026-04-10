@@ -26,17 +26,17 @@ import services.AuthorisationService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SummaryController @Inject() (implicit
+class SummaryController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
   implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val messagesControllerComponents: MessagesControllerComponents,
   summaryView: views.html.registration.summary
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+)(using ec: ExecutionContext)
+    extends LisaBaseController(messagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { _ =>

@@ -33,7 +33,16 @@ class SummaryControllerSpec extends SpecBase with Injecting {
   implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   implicit val summaryView: summary              = inject[summary]
 
-  val SUT = new SummaryController()
+  val SUT = new SummaryController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    appConfig = appConfig,
+    messagesControllerComponents = stubMessagesControllerComponents(),
+    summaryView
+  )
 
   "GET Summary" must {
 

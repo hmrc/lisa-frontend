@@ -47,7 +47,7 @@ import java.util.UUID
 
 trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with MongoSupport with BeforeAndAfter {
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
     .overrides(
       bind(classOf[MongoComponent]).toInstance(mongoComponent)
@@ -57,7 +57,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
   val sessionId: SessionId = SessionId(UUID.randomUUID().toString)
   val fakeRequest          = FakeRequest().withSession(("sessionId", sessionId.toString))
 
-  val injector: Injector                                  = fakeApplication.injector
+  val injector: Injector                                  = fakeApplication().injector
   implicit val system: ActorSystem                        = ActorSystem()
   implicit val hc: HeaderCarrier                          = HeaderCarrier()
   implicit val messagesApi: MessagesApi                   = injector.instanceOf[MessagesApi]

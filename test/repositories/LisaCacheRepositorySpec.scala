@@ -16,7 +16,6 @@
 
 package repositories
 
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
@@ -67,7 +66,7 @@ class LisaCacheRepositorySpec extends PlaySpec with MongoSupport with MockitoSug
       val cacheData: Option[JsObject]    = fullCache.map(_.data)
       val cacheSessionId: Option[String] = fullCache.map(_.id)
 
-      cacheData shouldBe Some(
+      cacheData mustBe Some(
         JsObject(
           fields = Seq(
             (nameDataKey, JsString(nameToAddToCache)),
@@ -77,7 +76,7 @@ class LisaCacheRepositorySpec extends PlaySpec with MongoSupport with MockitoSug
         )
       )
 
-      cacheSessionId shouldBe Some(sessionId.toString)
+      cacheSessionId mustBe Some(sessionId.toString)
     }
 
     "return None when there is no data in the cache for the session" in {
@@ -87,7 +86,7 @@ class LisaCacheRepositorySpec extends PlaySpec with MongoSupport with MockitoSug
 
       val fullCache: Option[CacheItem] = Await.result(lisaCacheRepository.getFullCache(fakeRequest), Duration.Inf)
 
-      fullCache shouldBe None
+      fullCache mustBe None
     }
   }
 
