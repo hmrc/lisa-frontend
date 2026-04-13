@@ -16,8 +16,6 @@
 
 package controllers
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import base.SpecBase
 import helpers.FullCacheTest
 import helpers.FullCacheTestData.*
@@ -33,11 +31,13 @@ import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.error_template
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.Future
 
 class RosmControllerSpec extends SpecBase with Injecting {
 
-  implicit val errorView: error_template = inject[error_template]
+  val errorView: error_template = inject[error_template]
 
   val SUT = new RosmController(
     sessionCacheRepository = lisaCacheRepository,

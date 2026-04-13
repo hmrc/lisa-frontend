@@ -27,8 +27,8 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.JsObject
 import play.api.test.Helpers.*
 import play.api.test.Injecting
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.Future
 

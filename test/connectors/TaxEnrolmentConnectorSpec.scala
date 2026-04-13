@@ -19,8 +19,6 @@ package connectors
 import base.SpecBase
 import config.AppConfig
 import models.*
-
-import java.time.{Instant, ZoneId, ZonedDateTime}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,9 +26,10 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.*
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 

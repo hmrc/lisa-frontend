@@ -22,7 +22,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContentAsJson, Request}
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
@@ -40,8 +40,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-//  implicit val mcc: MessagesControllerComponents         = inject[MessagesControllerComponents]
-  implicit val businessStructureView: business_structure = inject[business_structure]
+  val businessStructureView: business_structure = inject[business_structure]
 
   lazy val SUT = new BusinessStructureController(
     sessionCacheRepository = lisaCacheRepository,

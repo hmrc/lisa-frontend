@@ -26,8 +26,8 @@ import views.html.timeout_sign_out
 import scala.concurrent.Future
 
 class SignOutControllerSpec extends SpecBase with Injecting {
-//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val timeoutView: timeout_sign_out = inject[timeout_sign_out]
+
+  val timeoutView: timeout_sign_out = inject[timeout_sign_out]
 
   val SUT = new SignOutController(
     sessionCacheRepository = lisaCacheRepository,
@@ -54,7 +54,6 @@ class SignOutControllerSpec extends SpecBase with Injecting {
       status(result) mustBe Status.OK
     }
     "render the timeout page" in {
-      def returnMessage(key: String): String = stubMessages(mcc.messagesApi).messages(key)
 
       val title: String        = returnMessage("title.timeout-sign-out")
       val header: String       = returnMessage("timeout.heading")

@@ -19,13 +19,11 @@ package controllers
 import base.SpecBase
 import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.Injecting
-import play.api.test.CSRFTokenHelper.*
 
 class HomePageControllerSpec extends SpecBase with Injecting {
-
-//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   val SUT = new HomePageController(
     sessionCacheRepository = lisaCacheRepository,

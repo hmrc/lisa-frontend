@@ -22,10 +22,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
+import play.api.mvc.{AnyContentAsJson, Request}
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import play.api.test.CSRFTokenHelper.*
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.organisation_details
 
@@ -42,8 +42,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-//  implicit val mcc: MessagesControllerComponents             = inject[MessagesControllerComponents]
-  implicit val organisationDetailsView: organisation_details = inject[organisation_details]
+  val organisationDetailsView: organisation_details = inject[organisation_details]
 
   val SUT = new OrganisationDetailsController(
     sessionCacheRepository = lisaCacheRepository,

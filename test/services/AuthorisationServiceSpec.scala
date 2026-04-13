@@ -17,7 +17,6 @@
 package services
 
 import models.*
-import java.time.ZonedDateTime
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.test.MongoSupport
 
+import java.time.ZonedDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisationServiceSpec

@@ -16,10 +16,10 @@
 
 package base
 
-import org.apache.pekko.actor.ActorSystem
 import config.AppConfig
 import connectors.EmailConnector
 import models.*
+import org.apache.pekko.actor.ActorSystem
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
@@ -27,24 +27,21 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.MessagesApi
-import play.api.inject.Injector
+import play.api.inject.{Injector, bind}
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{AnyContentAsEmpty, MessagesControllerComponents}
 import play.api.test.FakeRequest
-import play.api.{Configuration, Environment}
+import play.api.test.Helpers.stubMessages
+import play.api.{Application, Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.cache.DataKey
 import uk.gov.hmrc.mongo.test.MongoSupport
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.bind
-import play.api.mvc.{AnyContentAsEmpty, MessagesControllerComponents}
-import repositories.LisaCacheRepository
-import uk.gov.hmrc.mongo.cache.DataKey
-
 import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with MongoSupport with BeforeAndAfter {
 
@@ -91,5 +88,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
     when(authorisationService.userStatus(using any()))
       .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
+
+  def returnMessage(key: String): String = stubMessages(mcc.messagesApi).messages(key)
 
 }

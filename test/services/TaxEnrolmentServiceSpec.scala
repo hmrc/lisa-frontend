@@ -18,24 +18,22 @@ package services
 
 import connectors.{TaxEnrolmentConnector, TaxEnrolmentJsonFormats}
 import models.*
-
-import java.time.ZonedDateTime
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.test.MongoSupport
 
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class TaxEnrolmentServiceSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with MongoSupport {

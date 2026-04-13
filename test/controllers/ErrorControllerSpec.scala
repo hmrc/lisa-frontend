@@ -18,17 +18,16 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Injecting}
 import views.html.error.{access_denied_assistant, access_denied_individual_or_agent}
 
 class ErrorControllerSpec extends SpecBase with Injecting {
 
-  implicit val accessDeniedIndividualOrAgentView: access_denied_individual_or_agent =
+  val accessDeniedIndividualOrAgentView: access_denied_individual_or_agent =
     inject[access_denied_individual_or_agent]
 
-  implicit val accessDeniedAssistantView: access_denied_assistant = inject[access_denied_assistant]
+  val accessDeniedAssistantView: access_denied_assistant = inject[access_denied_assistant]
 
   lazy val SUT = new ErrorController(
     config = configuration,

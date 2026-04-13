@@ -24,9 +24,9 @@ import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.*
 import play.api.mvc.*
-import play.api.test.Helpers.*
 import play.api.test.*
 import play.api.test.CSRFTokenHelper.*
+import play.api.test.Helpers.*
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.your_details
 
@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
-  given yourDetailsView: your_details = inject[your_details]
+  val yourDetailsView: your_details = inject[your_details]
 
   val SUT = new YourDetailsController(
     sessionCacheRepository = lisaCacheRepository,

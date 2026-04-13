@@ -20,7 +20,6 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
@@ -46,8 +45,6 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
       redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
     }
   }
-
-//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   val SUT = new ReapplyController(
     sessionCacheRepository = lisaCacheRepository,

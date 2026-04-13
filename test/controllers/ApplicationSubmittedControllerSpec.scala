@@ -22,27 +22,24 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
+import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.Injecting
-import play.api.test.CSRFTokenHelper.*
 import uk.gov.hmrc.mongo.cache.DataKey
-import views.html.registration.{
-  application_pending, application_rejected, application_submitted, application_successful
-}
+import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
 
 import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter with Injecting {
 
-  val submittedPageTitle                       = "Application submitted"
-  val pendingPageTitle                         = "We are reviewing your application"
-  val successPageTitle                         = "Application successful"
-  val rejectedPageTitle                        = "Application not successful"
-  given submittedView: application_submitted   = inject[application_submitted]
-  given pendingView: application_pending       = inject[application_pending]
-  given successfulView: application_successful = inject[application_successful]
-  given rejectedView: application_rejected     = inject[application_rejected]
+  val submittedPageTitle                     = "Application submitted"
+  val pendingPageTitle                       = "We are reviewing your application"
+  val successPageTitle                       = "Application successful"
+  val rejectedPageTitle                      = "Application not successful"
+  val submittedView: application_submitted   = inject[application_submitted]
+  val pendingView: application_pending       = inject[application_pending]
+  val successfulView: application_successful = inject[application_successful]
+  val rejectedView: application_rejected     = inject[application_rejected]
 
   val SUT = new ApplicationSubmittedController(
     sessionCacheRepository = lisaCacheRepository,

@@ -17,10 +17,10 @@
 package connectors
 
 import models.RosmIndividual
-
-import java.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+
+import java.time.LocalDate
 
 class RosmJsonFormatsSpec extends PlaySpec with RosmJsonFormats {
 

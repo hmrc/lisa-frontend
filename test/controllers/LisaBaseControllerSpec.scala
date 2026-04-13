@@ -24,14 +24,14 @@ import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers.*
+import play.api.test.{FakeRequest, Injecting}
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService
 import uk.gov.hmrc.mongo.cache.DataKey
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class LisaBaseControllerSpec extends SpecBase with Injecting {
 
