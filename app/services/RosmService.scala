@@ -34,7 +34,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: Executi
       case JsSuccess(failureResponse, _) =>
         logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.code}")
         Left(failureResponse.code)
-      case _: JsError                                     =>
+      case _: JsError                    =>
         logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure, unexpected error.")
         Left("INTERNAL_SERVER_ERROR")
     }
@@ -62,7 +62,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: Executi
 
         res.json.validate[RosmRegistrationSuccessResponse] match {
           case JsSuccess(successResponse, _) => Right(successResponse.safeId)
-          case _: JsError                                                  => handleErrorResponse("registration", res)
+          case _: JsError                    => handleErrorResponse("registration", res)
         }
       }
       .recover { case NonFatal(ex: Throwable) =>
@@ -102,7 +102,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: Executi
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
           case JsSuccess(successResponse, _) => Right(successResponse.subscriptionId)
-          case _: JsError                                                 => handleErrorResponse("submission", subscribed)
+          case _: JsError                    => handleErrorResponse("submission", subscribed)
         }
       }
 

@@ -84,6 +84,24 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     }
 
+    "redirect the user to business structure when no session found" in {
+
+      when(
+        lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
+        .thenReturn(Future.successful(None))
+
+      val result = SUT.get()(fakeRequest.withCSRFToken)
+
+      status(result) mustBe SEE_OTHER
+
+      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
+
+    }
+
   }
 
   "GET Application Pending" must {
@@ -128,6 +146,24 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
       content must include(successPageTitle)
       content must include("Z9999")
+
+    }
+
+    "redirect the user to business structure when no session found for Application Successful" in {
+
+      when(
+        lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
+        .thenReturn(Future.successful(None))
+
+      val result = SUT.successful()(fakeRequest.withCSRFToken)
+
+      status(result) mustBe SEE_OTHER
+
+      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
 
     }
   }

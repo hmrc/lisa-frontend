@@ -65,6 +65,24 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
       content must include("Your company’s details could not be found</h1>")
     }
 
+    "redirect the user to business structure when no session found" in {
+
+      when(
+        lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          ArgumentMatchers.any(),
+          ArgumentMatchers.any()
+        )
+      )
+        .thenReturn(Future.successful(None))
+
+      val result = SUT.get(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+
+      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
+
+    }
+
   }
 
 }
