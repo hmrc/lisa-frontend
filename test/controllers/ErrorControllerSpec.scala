@@ -51,7 +51,7 @@ class ErrorControllerSpec extends SpecBase with Injecting {
 
   "Assistant endpoint" should {
     "return a forbidden status page with correct messaging" in {
-      val result = SUT.accessDeniedAssistant.apply(FakeRequest())
+      val result = SUT.accessDeniedAssistant.apply(fakeRequest)
       status(result) mustBe Status.FORBIDDEN
       val content = contentAsString(result)
 
