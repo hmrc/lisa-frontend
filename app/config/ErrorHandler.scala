@@ -32,7 +32,7 @@ class ErrorHandler @Inject() (
   implicit val appConfig: AppConfig,
   errorView: views.html.error_template,
   notFoundView: views.html.page_not_found_template
-)(using val ec: ExecutionContext)
+)(implicit val ec: ExecutionContext)
     extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(using

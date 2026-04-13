@@ -40,7 +40,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to login" when {
 
       "a not logged in response is returned from auth" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserNotLoggedIn))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -58,7 +58,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to access denied" when {
 
       "a unauthorised response is returned from auth" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserUnauthorised))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -67,7 +67,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
       }
 
       "an assistant role response is returned from auth" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserNotAdmin))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -80,7 +80,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to pending subscription" when {
 
       "an authorised user has a pending subscription" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -94,7 +94,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to rejected subscription" when {
 
       "an authorised user has a errored subscription" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentError)))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -108,7 +108,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "redirect to successful subscription" when {
 
       "an authorised user has a successful subscription" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorisedAndEnrolled("", "Z9876")))
 
         val result = SUT.testAuthorisation(fakeRequest)
@@ -127,7 +127,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "avoid redirections" when {
 
       "enrolment state check is disabled for a successful subscription" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorisedAndEnrolled("12345", "Z9876")))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
@@ -138,7 +138,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
       }
 
       "enrolment state check is disabled for a pending subscription" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentPending)))
 
         val result = SUT.testAuthorisationNoCheck(fakeRequest)
@@ -153,7 +153,7 @@ class LisaBaseControllerSpec extends SpecBase with Injecting {
     "allow access" when {
 
       "an authorised user has no subscriptions in progress" in {
-        when(authorisationService.userStatus(ArgumentMatchers.any()))
+        when(authorisationService.userStatus(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(UserAuthorised("12345", TaxEnrolmentDoesNotExist)))
 
         val result = SUT.testAuthorisation(fakeRequest)

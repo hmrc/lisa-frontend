@@ -79,7 +79,7 @@ class AuthorisationServiceSpec
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(Some(validTaxEnrolmentSubscription)))
 
         whenReady(SUT.userStatus) {
@@ -100,7 +100,7 @@ class AuthorisationServiceSpec
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(
             Future.successful(Some(validTaxEnrolmentSubscription.copy(state = TaxEnrolmentPending, identifiers = Nil)))
           )
@@ -119,7 +119,7 @@ class AuthorisationServiceSpec
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(
             Future.successful(Some(validTaxEnrolmentSubscription.copy(state = TaxEnrolmentError, identifiers = Nil)))
           )
@@ -138,7 +138,7 @@ class AuthorisationServiceSpec
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(None))
 
         whenReady(SUT.userStatus) {

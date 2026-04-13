@@ -68,7 +68,9 @@ class RosmServiceSpec
     "register with ROSM" when {
 
       "given a valid registration request" in {
-        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(
+          mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any())
+        )
           .thenReturn(
             Future.successful(HttpResponse(status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty))
           )
@@ -83,7 +85,9 @@ class RosmServiceSpec
     "register a business structure of Corporate Body" when {
 
       "given a business structure of Friendly Society" in {
-        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(
+          mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any())
+        )
           .thenReturn(
             Future.successful(HttpResponse(status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty))
           )
@@ -92,7 +96,7 @@ class RosmServiceSpec
 
         Await.result(SUT.rosmRegister(BusinessStructure("Friendly Society"), org), Duration.Inf)
 
-        verify(mockRosmConnector).registerOnce(ArgumentMatchers.any(), captor.capture())(ArgumentMatchers.any())
+        verify(mockRosmConnector).registerOnce(ArgumentMatchers.any(), captor.capture())(using ArgumentMatchers.any())
 
         val submitted = captor.getValue
 
@@ -104,7 +108,9 @@ class RosmServiceSpec
     "return an error from registration" when {
 
       "it receives a failure response from ROSM" in {
-        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(
+          mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any())
+        )
           .thenReturn(
             Future.successful(HttpResponse(status = OK, json = Json.toJson(rosmFailureResponse), headers = Map.empty))
           )
@@ -115,7 +121,9 @@ class RosmServiceSpec
       }
 
       "it receives an invalid response from ROSM" in {
-        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(
+          mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any())
+        )
           .thenReturn(Future.successful(HttpResponse(status = OK, json = Json.toJson(""), headers = Map.empty)))
 
         val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"), org), Duration.Inf)
@@ -128,11 +136,13 @@ class RosmServiceSpec
     "subscribe with ROSM" when {
 
       "given a valid submission request" in {
-        when(mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(
+          mockRosmConnector.registerOnce(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any())
+        )
           .thenReturn(
             Future.successful(HttpResponse(status = OK, json = Json.toJson(rosmSuccessResponse), headers = Map.empty))
           )
-        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(
             Future.successful(
               HttpResponse(status = OK, json = Json.toJson(desSubscribeSuccessResponse), headers = Map.empty)
@@ -149,7 +159,7 @@ class RosmServiceSpec
     "return an error from submission" when {
 
       "it receives a failure response from ROSM" in {
-        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(
             Future.successful(HttpResponse(status = OK, json = Json.toJson(rosmFailureResponse), headers = Map.empty))
           )
@@ -160,7 +170,7 @@ class RosmServiceSpec
       }
 
       "it receives an invalid response from ROSM" in {
-        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockRosmConnector.subscribe(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(HttpResponse(status = OK, json = Json.toJson(""), headers = Map.empty)))
 
         val res = Await.result(SUT.performSubscription(registration), Duration.Inf)

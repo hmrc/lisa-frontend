@@ -24,7 +24,7 @@ import play.api.libs.json.*
 
 trait TaxEnrolmentJsonFormats {
 
-  implicit val zonedDateTimeReads: Reads[ZonedDateTime] = Reads[ZonedDateTime] { json =>
+  given zonedDateTimeReads: Reads[ZonedDateTime] = Reads[ZonedDateTime] { json =>
     json.validate[Long].flatMap { timestamp =>
       try {
         val instant                      = Instant.ofEpochMilli(timestamp)
@@ -37,9 +37,9 @@ trait TaxEnrolmentJsonFormats {
     }
   }
 
-  implicit val taxIdentifierFormats: OFormat[TaxEnrolmentIdentifier] = Json.format[TaxEnrolmentIdentifier]
+  given taxIdentifierFormats: OFormat[TaxEnrolmentIdentifier] = Json.format[TaxEnrolmentIdentifier]
 
-  implicit val subscriptionReads: Reads[TaxEnrolmentSubscription] = (
+  given subscriptionReads: Reads[TaxEnrolmentSubscription] = (
     (JsPath \ "created").read[ZonedDateTime] and
       (JsPath \ "lastModified").read[ZonedDateTime] and
       (JsPath \ "credId").read[String] and
@@ -57,7 +57,7 @@ trait TaxEnrolmentJsonFormats {
       (JsPath \ "groupIdentifier").read[String]
   )(TaxEnrolmentSubscription.apply _)
 
-  implicit val subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
+  given subscriptionWrites: Writes[TaxEnrolmentSubscription] = (
     (JsPath \ "created").write[Long].contramap[ZonedDateTime](_.toInstant.toEpochMilli()) and
       (JsPath \ "lastModified").write[Long].contramap[ZonedDateTime](_.toInstant.toEpochMilli()) and
       (JsPath \ "credId").write[String] and

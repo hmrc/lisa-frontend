@@ -40,7 +40,7 @@ class EmailConnector @Inject() (
 )(using ec: ExecutionContext)
     extends RawResponseReads with Logging {
 
-  def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(implicit
+  def sendTemplatedEmail(emailAddress: String, templateName: String, params: Map[String, String])(using
     hc: HeaderCarrier
   ): Future[EmailStatus] = {
 

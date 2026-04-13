@@ -23,7 +23,7 @@ import play.api.libs.json.{Json, OFormat}
 case class YourDetails(firstName: String, lastName: String, role: String, phone: String, email: String)
 
 object YourDetails {
-  implicit val formats: OFormat[YourDetails] = Json.format[YourDetails]
+  given formats: OFormat[YourDetails] = Json.format[YourDetails]
 
   val cacheKey = "yourDetails"
 

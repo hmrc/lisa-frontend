@@ -32,7 +32,7 @@ class TaxEnrolmentConnector @Inject() (
 )(using ec: ExecutionContext)
     extends TaxEnrolmentJsonFormats with Logging with RawResponseReads {
 
-  def getSubscriptionsByGroupId(groupId: String)(implicit hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
+  def getSubscriptionsByGroupId(groupId: String)(using hc: HeaderCarrier): Future[List[TaxEnrolmentSubscription]] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/tax-enrolments/groups/$groupId/subscriptions"
 
     httpClientV2

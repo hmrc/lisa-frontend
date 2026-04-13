@@ -28,7 +28,7 @@ object OrganisationDetails {
   val COMPANY_NAME_REGEX = """^[A-Za-z0-9 \-,.&'\/]{1,65}$"""
   val UTR_REGEX          = "^[0-9]{10}$"
 
-  implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+  given formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
   val form: Form[OrganisationDetails] = Form(
     mapping(

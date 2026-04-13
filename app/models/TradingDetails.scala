@@ -26,7 +26,7 @@ object TradingDetails {
 
   val cacheKey = "tradingDetails"
 
-  implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
+  given formats: OFormat[TradingDetails] = Json.format[TradingDetails]
 
   val form: Form[TradingDetails] = Form(
     mapping(

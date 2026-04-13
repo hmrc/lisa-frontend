@@ -59,7 +59,7 @@ class TaxEnrolmentServiceSpec
     "return the appropriate state" when {
 
       "given a single lisa subscription in the connector response" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(List(lisaSuccessSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -68,7 +68,7 @@ class TaxEnrolmentServiceSpec
       }
 
       "given two lisa subscriptions in the connector response - newest first" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(List(lisaErrorSubscription, lisaSuccessSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -77,7 +77,7 @@ class TaxEnrolmentServiceSpec
       }
 
       "given two lisa subscriptions in the connector response - oldest first" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription)))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)
@@ -86,7 +86,7 @@ class TaxEnrolmentServiceSpec
       }
 
       "given multiple different subscriptions in the connector response" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any())).thenReturn(
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(using ArgumentMatchers.any())).thenReturn(
           Future.successful(List(lisaSuccessSubscription, lisaErrorSubscription, randomPendingSubscription))
         )
 
@@ -100,7 +100,7 @@ class TaxEnrolmentServiceSpec
     "return a does not exist state" when {
 
       "there are no lisa subscriptions" in {
-        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(mockConnector.getSubscriptionsByGroupId(ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(List()))
 
         val res = Await.result(SUT.getNewestLisaSubscription("1234567890"), Duration.Inf)

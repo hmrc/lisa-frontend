@@ -245,7 +245,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(Right("3456789")))
 
         val result = SUT.post(request)
@@ -274,7 +274,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
 
         val result = SUT.post(request)
@@ -305,7 +305,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
@@ -343,7 +343,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
           .thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))

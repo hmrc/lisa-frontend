@@ -32,12 +32,12 @@ class RosmConnector @Inject() (
 )(using ec: ExecutionContext)
     extends RosmJsonFormats with RawResponseReads {
 
-  def registerOnce(utr: String, request: RosmRegistration)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def registerOnce(utr: String, request: RosmRegistration)(using hc: HeaderCarrier): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/$utr/register"
     httpClientV2.post(url"$uri").withBody(Json.toJson(request)).execute[HttpResponse]
   }
 
-  def subscribe(lisaManagerRef: String, lisaSubscribe: LisaSubscription)(implicit
+  def subscribe(lisaManagerRef: String, lisaSubscribe: LisaSubscription)(using
     hc: HeaderCarrier
   ): Future[HttpResponse] = {
     val uri = s"${appConfig.lisaServiceUrl}/lisa/${lisaSubscribe.utr}/subscribe/$lisaManagerRef"

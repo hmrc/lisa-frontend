@@ -34,7 +34,6 @@ import scala.concurrent.Future
 
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
-//  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   given yourDetailsView: your_details = inject[your_details]
 
   val SUT = new YourDetailsController(
@@ -183,7 +182,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "store your details in cache" when {
       "the submitted data is valid" in {
 
-        when(authorisationService.userStatus(any()))
+        when(authorisationService.userStatus(using any()))
           .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
         when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))

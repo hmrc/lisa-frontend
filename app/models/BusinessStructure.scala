@@ -23,7 +23,7 @@ import play.api.libs.json.{Json, OFormat}
 case class BusinessStructure(businessStructure: String)
 
 object BusinessStructure {
-  implicit val formats: OFormat[BusinessStructure] = Json.format[BusinessStructure]
+  given formats: OFormat[BusinessStructure] = Json.format[BusinessStructure]
 
   val cacheKey = "businessStructure"
 

@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: ExecutionContext)
+class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: ExecutionContext)
     extends RosmJsonFormats with Logging {
 
   private def handleErrorResponse(rosmType: String, response: HttpResponse) =
@@ -45,7 +45,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: Exec
     else
       input.businessStructure
 
-  def rosmRegister(businessStructure: BusinessStructure, orgDetails: OrganisationDetails)(implicit
+  def rosmRegister(businessStructure: BusinessStructure, orgDetails: OrganisationDetails)(using
     hc: HeaderCarrier
   ): Future[Either[String, String]] = {
     val rosmRegistration = RosmRegistration(
@@ -73,7 +73,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: Exec
 
   def performSubscription(
     registration: LisaRegistration
-  )(implicit hc: HeaderCarrier): Future[Either[String, String]] = {
+  )(using hc: HeaderCarrier): Future[Either[String, String]] = {
 
     val utr              = registration.organisationDetails.ctrNumber
     val companyName      = registration.organisationDetails.companyName

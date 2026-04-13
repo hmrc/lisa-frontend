@@ -62,7 +62,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the submitted page with correct email address" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using ArgumentMatchers.any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentPending)))
 
       when(
@@ -91,7 +91,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the pending page" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using ArgumentMatchers.any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.pending()(fakeRequest.withCSRFToken)
@@ -110,7 +110,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the successful page" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using ArgumentMatchers.any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       when(
@@ -137,7 +137,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the unsuccessful page" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using ArgumentMatchers.any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest.withCSRFToken)

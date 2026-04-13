@@ -88,7 +88,7 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
     when(lisaCacheRepository.putSession(DataKey(any[String]()), any())(any(), any()))
       .thenReturn(Future.successful(("", "")))
 
-    when(authorisationService.userStatus(any()))
+    when(authorisationService.userStatus(using any()))
       .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
 
