@@ -31,9 +31,9 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: Executi
 
   private def handleErrorResponse(rosmType: String, response: HttpResponse) =
     response.json.validate[DesFailureResponse] match {
-      case failureResponse: JsSuccess[DesFailureResponse] =>
-        logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.get.code}")
-        Left(failureResponse.get.code)
+      case JsSuccess(failureResponse, _) =>
+        logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.code}")
+        Left(failureResponse.code)
       case _: JsError                                     =>
         logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure, unexpected error.")
         Left("INTERNAL_SERVER_ERROR")
@@ -61,7 +61,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: Executi
         logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber})")
 
         res.json.validate[RosmRegistrationSuccessResponse] match {
-          case successResponse: JsSuccess[RosmRegistrationSuccessResponse] => Right(successResponse.get.safeId)
+          case JsSuccess(successResponse, _) => Right(successResponse.safeId)
           case _: JsError                                                  => handleErrorResponse("registration", res)
         }
       }
@@ -101,7 +101,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: Executi
         logger.warn(s"[RosmService][performSubscription] response for $companyName ($utr)")
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
-          case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
+          case JsSuccess(successResponse, _) => Right(successResponse.subscriptionId)
           case _: JsError                                                 => handleErrorResponse("submission", subscribed)
         }
       }

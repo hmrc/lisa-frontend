@@ -26,7 +26,9 @@ import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
-import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
+import views.html.registration.{
+  application_pending, application_rejected, application_submitted, application_successful
+}
 
 import scala.concurrent.Future
 
