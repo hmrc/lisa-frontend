@@ -32,7 +32,6 @@ class SummaryController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   summaryView: views.html.registration.summary
 )(using ec: ExecutionContext, appConfig: AppConfig)

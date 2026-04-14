@@ -40,7 +40,6 @@ class RosmController @Inject() (
   val auditService: AuditService,
   val rosmService: RosmService,
   val emailConnector: EmailConnector,
-//  implicit val appConfig: AppConfig,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents,
   errorView: views.html.error_template

@@ -34,7 +34,6 @@ class ReapplyController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents
 )(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {

@@ -31,7 +31,6 @@ class SignOutController @Inject() (
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
-//  implicit val appConfig: AppConfig,
   val auditService: AuditService,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents,

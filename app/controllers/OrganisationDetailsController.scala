@@ -37,7 +37,6 @@ class OrganisationDetailsController @Inject() (
   val rosmService: RosmService,
   val auditService: AuditService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   organisationDetailsView: views.html.registration.organisation_details
 )(using ec: ExecutionContext, appConfig: AppConfig)

@@ -34,7 +34,6 @@ class YourDetailsController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   yourDetailsView: views.html.registration.your_details
 )(using ec: ExecutionContext, appConfig: AppConfig)

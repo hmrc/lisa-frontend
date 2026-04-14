@@ -34,7 +34,6 @@ class ApplicationSubmittedController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   applicationSubmittedView: views.html.registration.application_submitted,
   applicationPendingView: views.html.registration.application_pending,

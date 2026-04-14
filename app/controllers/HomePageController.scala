@@ -31,7 +31,6 @@ class HomePageController @Inject() (
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
-//  val appConfig: AppConfig,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents
 )(using ec: ExecutionContext, appConfig: AppConfig)

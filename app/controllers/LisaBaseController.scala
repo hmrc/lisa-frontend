@@ -38,7 +38,6 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     with Logging
     with WithUnsafeDefaultFormBinding {
 
-//  val appConfig: AppConfig
   val sessionCacheRepository: LisaCacheRepository
   val authorisationService: AuthorisationService
 

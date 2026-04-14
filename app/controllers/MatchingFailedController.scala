@@ -33,7 +33,6 @@ class MatchingFailedController @Inject() (
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
-//  implicit val appConfig: AppConfig,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents,
   matchingFailedView: views.html.registration.matching_failed

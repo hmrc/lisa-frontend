@@ -34,7 +34,6 @@ class BusinessStructureController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   businessStructureView: views.html.registration.business_structure
 )(using ec: ExecutionContext, appConfig: AppConfig)

@@ -34,7 +34,6 @@ class TradingDetailsController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   tradingDetailsView: views.html.registration.trading_details
 )(using ec: ExecutionContext, appConfig: AppConfig)
