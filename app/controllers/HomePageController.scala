@@ -31,10 +31,10 @@ class HomePageController @Inject() (
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
-  val appConfig: AppConfig,
+//  val appConfig: AppConfig,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {
 
   val home: Action[AnyContent] = Action.async { _ =>

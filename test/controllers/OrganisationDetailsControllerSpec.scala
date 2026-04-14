@@ -53,7 +53,6 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
     rosmService,
     auditService,
     messagesApi = messagesApi,
-    appConfig = appConfig,
     mcc,
     organisationDetailsView
   )

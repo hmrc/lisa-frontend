@@ -49,7 +49,6 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     config = configuration,
     authorisationService = authorisationService,
     messagesApi = messagesApi,
-    appConfig = appConfig,
     mcc,
     businessStructureView
   )

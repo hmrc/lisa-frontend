@@ -33,11 +33,11 @@ class MatchingFailedController @Inject() (
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
+//  implicit val appConfig: AppConfig,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents,
   matchingFailedView: views.html.registration.matching_failed
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

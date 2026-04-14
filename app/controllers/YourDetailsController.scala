@@ -34,10 +34,10 @@ class YourDetailsController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-  implicit val appConfig: AppConfig,
+//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   yourDetailsView: views.html.registration.your_details
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

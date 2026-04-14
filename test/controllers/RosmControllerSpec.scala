@@ -48,7 +48,6 @@ class RosmControllerSpec extends SpecBase with Injecting {
     rosmService,
     emailConnector,
     messagesApi = messagesApi,
-    appConfig = appConfig,
     mcc,
     errorView
   )

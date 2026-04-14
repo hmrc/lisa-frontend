@@ -32,10 +32,10 @@ class SummaryController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-  implicit val appConfig: AppConfig,
+//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   summaryView: views.html.registration.summary
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

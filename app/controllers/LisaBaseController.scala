@@ -31,13 +31,14 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents)(using
-  ec: ExecutionContext
+  ec: ExecutionContext,
+  appConfig: AppConfig
 ) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
     with I18nSupport
     with Logging
     with WithUnsafeDefaultFormBinding {
 
-  val appConfig: AppConfig
+//  val appConfig: AppConfig
   val sessionCacheRepository: LisaCacheRepository
   val authorisationService: AuthorisationService
 

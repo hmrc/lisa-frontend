@@ -34,10 +34,10 @@ class TradingDetailsController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-  implicit val appConfig: AppConfig,
+//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   tradingDetailsView: views.html.registration.trading_details
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>

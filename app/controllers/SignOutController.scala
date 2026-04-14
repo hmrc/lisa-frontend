@@ -31,12 +31,12 @@ class SignOutController @Inject() (
   val env: Environment,
   val config: Configuration,
   val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
+//  implicit val appConfig: AppConfig,
   val auditService: AuditService,
   override val messagesApi: MessagesApi,
   val messagesControllerComponents: MessagesControllerComponents,
   timeoutView: views.html.timeout_sign_out
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {
 
   def redirect: Action[AnyContent] = Action.async { _ =>

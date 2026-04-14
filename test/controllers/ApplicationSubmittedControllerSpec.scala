@@ -50,7 +50,6 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
     config = configuration,
     authorisationService = authorisationService,
     messagesApi = messagesApi,
-    appConfig = appConfig,
     mcc,
     applicationSubmittedView = submittedView,
     applicationPendingView = pendingView,

@@ -34,13 +34,13 @@ class ApplicationSubmittedController @Inject() (
   val config: Configuration,
   val authorisationService: AuthorisationService,
   override val messagesApi: MessagesApi,
-  implicit val appConfig: AppConfig,
+//  implicit val appConfig: AppConfig,
   val messagesControllerComponents: MessagesControllerComponents,
   applicationSubmittedView: views.html.registration.application_submitted,
   applicationPendingView: views.html.registration.application_pending,
   applicationSuccessfulView: views.html.registration.application_successful,
   applicationRejectedView: views.html.registration.application_rejected
-)(using ec: ExecutionContext)
+)(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>

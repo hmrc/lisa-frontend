@@ -36,7 +36,6 @@ class SignOutControllerSpec extends SpecBase with Injecting {
     authorisationService = authorisationService,
     auditService,
     messagesApi = messagesApi,
-    appConfig = appConfig,
     mcc,
     timeoutView
   )

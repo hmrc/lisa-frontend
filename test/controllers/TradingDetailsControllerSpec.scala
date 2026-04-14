@@ -54,7 +54,6 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     config = configuration,
     authorisationService = authorisationService,
     messagesApi = messagesApi,
-    appConfig = appConfig,
     mcc,
     tradingDetailsView
   )
