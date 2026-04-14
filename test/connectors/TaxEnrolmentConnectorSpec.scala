@@ -39,7 +39,6 @@ class TaxEnrolmentConnectorSpec
   val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
   val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
   val mockAppConfig: AppConfig           = mock[AppConfig]
-//  implicit override val hc: HeaderCarrier = HeaderCarrier()
 
   when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)

@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import models.*
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -63,7 +64,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(form)))
 
@@ -85,7 +86,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(None))
 
@@ -130,8 +131,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
         val result  = SUT.post(request)
@@ -152,8 +153,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
         verify(lisaCacheRepository).putSession[BusinessStructure](
           DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)),
-          ArgumentMatchers.any()
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          any()
+        )(any(), any())
       }
     }
 

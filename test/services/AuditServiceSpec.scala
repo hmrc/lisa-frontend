@@ -17,7 +17,8 @@
 package services
 
 import config.AppConfig
-import org.mockito.{ArgumentCaptor, ArgumentMatchers}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
@@ -65,7 +66,7 @@ class AuditServiceSpec
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
-      verify(mockAuditConnector).sendEvent(captor.capture())(ArgumentMatchers.any(), ArgumentMatchers.any())
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
       val event = captor.getValue
 

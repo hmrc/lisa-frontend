@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import models.*
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
@@ -61,13 +62,13 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the submitted page with correct email address" in {
 
-      when(authorisationService.userStatus(using ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentPending)))
 
       when(
         lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
@@ -88,8 +89,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
       when(
         lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(None))
@@ -108,7 +109,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the pending page" in {
 
-      when(authorisationService.userStatus(using ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.pending()(fakeRequest.withCSRFToken)
@@ -127,13 +128,13 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the successful page" in {
 
-      when(authorisationService.userStatus(using ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       when(
         lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some("Z9999")))
@@ -153,8 +154,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
       when(
         lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(None))
@@ -172,7 +173,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the unsuccessful page" in {
 
-      when(authorisationService.userStatus(using ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest.withCSRFToken)

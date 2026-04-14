@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import models.*
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.mvc.MessagesControllerComponents
@@ -50,8 +51,8 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
       when(
         lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
@@ -69,8 +70,8 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
       when(
         lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(None))

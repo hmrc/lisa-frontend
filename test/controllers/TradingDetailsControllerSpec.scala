@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import models.*
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
@@ -68,8 +69,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
         when(
           lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
+            any(),
+            any()
           )
         )
           .thenReturn(Future.successful(Some(tradingForm)))
@@ -92,8 +93,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the cache does not return a value" in {
         when(
           lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
+            any(),
+            any()
           )
         )
           .thenReturn(Future.successful(None))
@@ -137,8 +138,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[TradingDetails](
             DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
         val result  = SUT.post(request)
@@ -153,8 +154,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[TradingDetails](
             DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
         val result  = SUT.post(request)
@@ -170,8 +171,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         await(SUT.post(request))
         verify(lisaCacheRepository).putSession[TradingDetails](
           DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
-          ArgumentMatchers.any()
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          any()
+        )(any(), any())
       }
     }
 

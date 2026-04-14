@@ -17,7 +17,7 @@
 package services
 
 import models.*
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -59,9 +59,9 @@ class AuthorisationServiceSpec
 
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set(validEnrolment)))
 
@@ -73,13 +73,13 @@ class AuthorisationServiceSpec
       "a successful enrolment is in tax enrolments" in {
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(using any()))
           .thenReturn(Future.successful(Some(validTaxEnrolmentSubscription)))
 
         whenReady(SUT.userStatus) {
@@ -94,13 +94,13 @@ class AuthorisationServiceSpec
       "a pending state enrolment is in tax enrolments" in {
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(using any()))
           .thenReturn(
             Future.successful(Some(validTaxEnrolmentSubscription.copy(state = TaxEnrolmentPending, identifiers = Nil)))
           )
@@ -113,13 +113,13 @@ class AuthorisationServiceSpec
       "an error state enrolment is in tax enrolments" in {
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(using any()))
           .thenReturn(
             Future.successful(Some(validTaxEnrolmentSubscription.copy(state = TaxEnrolmentError, identifiers = Nil)))
           )
@@ -132,13 +132,13 @@ class AuthorisationServiceSpec
       "an enrolment is not in tax enrolments" in {
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(Some("1234"), Some("/"), Set()))
 
-        when(mockTaxEnrolmentService.getNewestLisaSubscription(ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(mockTaxEnrolmentService.getNewestLisaSubscription(any())(using any()))
           .thenReturn(Future.successful(None))
 
         whenReady(SUT.userStatus) {
@@ -153,9 +153,9 @@ class AuthorisationServiceSpec
       "a NoActiveSession exception is returned from auth" in {
         when(
           mockAuthConnector.authorise[~[Option[String], Option[String]]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.failed(BearerTokenExpired()))
 
@@ -171,9 +171,9 @@ class AuthorisationServiceSpec
       "a UnsupportedCredentialRole exception is returned from auth" in {
         when(
           mockAuthConnector.authorise[~[Option[String], Option[String]]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.failed(UnsupportedCredentialRole()))
 
@@ -189,9 +189,9 @@ class AuthorisationServiceSpec
       "an AuthorisationException exception is returned from auth" in {
         when(
           mockAuthConnector.authorise[~[Option[String], Option[String]]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.failed(InsufficientEnrolments()))
 
@@ -203,9 +203,9 @@ class AuthorisationServiceSpec
       "internalId retrieval from auth fails" in {
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(None, Some("/"), Set()))
 
@@ -217,9 +217,9 @@ class AuthorisationServiceSpec
       "groupId retrieval from auth fails" in {
         when(
           mockAuthConnector.authorise[~[~[Option[String], Option[String]], Enrolments]](
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any(),
+            any()
+          )(any(), any())
         )
           .thenReturn(buildRetrieval(Some("1234"), None, Set()))
 

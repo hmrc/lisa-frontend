@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.http.Status
 import play.api.test.Helpers.*
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.Injecting
 import views.html.error.{access_denied_assistant, access_denied_individual_or_agent}
 
 class ErrorControllerSpec extends SpecBase with Injecting {

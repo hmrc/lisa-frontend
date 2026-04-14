@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.when
 import play.api.http.Status
 import play.api.test.Helpers.*
@@ -32,8 +33,8 @@ class ReapplyControllerSpec extends SpecBase with Injecting {
     "redirect to the BusinessStructure controller endpoint" in {
       when(
         lisaCacheRepository.getFromSession[Boolean](DataKey(ArgumentMatchers.anyString()))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some(true)))

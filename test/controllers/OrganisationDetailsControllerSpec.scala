@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import models.*
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -67,14 +68,14 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
         when(
           lisaCacheRepository.getFromSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(organisationForm)))
 
@@ -98,14 +99,14 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
         when(
           lisaCacheRepository.getFromSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(None))
 
@@ -129,14 +130,14 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(None))
 
         when(
           lisaCacheRepository.getFromSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(None))
 
@@ -162,14 +163,14 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
         when(
           lisaCacheRepository.getFromSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(None))
 
@@ -194,14 +195,14 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
 
         when(
           lisaCacheRepository.getFromSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(None))
 
@@ -232,19 +233,19 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
 
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(any(), any())(using any()))
           .thenReturn(Future.successful(Right("3456789")))
 
         val result = SUT.post(request)
@@ -269,11 +270,11 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(any(), any())(using any()))
           .thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
 
         val result = SUT.post(request)
@@ -300,19 +301,19 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(any(), any())(using any()))
           .thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
         verify(lisaCacheRepository).putSession[OrganisationDetails](
           DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)),
-          ArgumentMatchers.any()
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          any()
+        )(any(), any())
       }
 
     }
@@ -330,27 +331,27 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[OrganisationDetails](
             DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
 
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          )(any(), any())
         )
           .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
 
-        when(rosmService.rosmRegister(ArgumentMatchers.any(), ArgumentMatchers.any())(using ArgumentMatchers.any()))
+        when(rosmService.rosmRegister(any(), any())(using any()))
           .thenReturn(Future.successful(Right("3456789")))
 
         await(SUT.post(request))
 
         verify(lisaCacheRepository).putSession[OrganisationDetails](
           DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey)),
-          ArgumentMatchers.any()
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          any()
+        )(any(), any())
       }
 
     }
