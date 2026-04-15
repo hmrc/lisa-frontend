@@ -31,7 +31,7 @@ class TaxEnrolmentService @Inject() (val connector: TaxEnrolmentConnector)(using
   def getNewestLisaSubscription(
     groupId: String
   )(using hc: HeaderCarrier): Future[Option[TaxEnrolmentSubscription]] = {
-    val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)(using hc)
+    val response: Future[List[TaxEnrolmentSubscription]] = connector.getSubscriptionsByGroupId(groupId)
 
     response.map { l =>
       val subs = l.filter(sub => sub.serviceName == "HMRC-LISA-ORG")

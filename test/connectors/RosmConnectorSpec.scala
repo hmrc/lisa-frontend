@@ -26,8 +26,8 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import java.time.LocalDate
 import scala.concurrent.duration.Duration
@@ -43,8 +43,6 @@ class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSu
   when(mockHttpClientV2.post(any())(any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
   when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
-
-//  implicit override val hc: HeaderCarrier = HeaderCarrier()
 
   val SUT = new RosmConnector(mockHttpClientV2, mockAppConfig)
 
