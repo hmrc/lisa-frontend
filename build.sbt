@@ -15,7 +15,7 @@ lazy val microservice = Project("lisa-frontend", file("."))
     ),
     routesGenerator := InjectedRoutesGenerator,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
-    scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:cat=unused-imports&src=html/.*:s", "-feature")
+    scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:msg=unused-imports&src=html/.*:s", "-feature")
   )
   .settings(CodeCoverageSettings())
 
