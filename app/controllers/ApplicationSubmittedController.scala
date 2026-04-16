@@ -49,7 +49,7 @@ class ApplicationSubmittedController @Inject() (
         sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
           case Some(application) =>
             Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
-          case None              => Redirect(routes.BusinessStructureController.get)
+          case None              => Redirect(routes.BusinessStructureController.get) // TODO Check if we can skip the cache call and remove the case-matching logic.
         },
       checkEnrolmentState = false
     )
@@ -67,7 +67,7 @@ class ApplicationSubmittedController @Inject() (
         sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
           case Some(lisaManagerReferenceNumber) =>
             Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
-          case None                             => Future.successful(Redirect(routes.BusinessStructureController.get))
+          case None                             => Future.successful(Redirect(routes.BusinessStructureController.get)) // TODO Check if we can skip the cache call and remove the case-matching logic.
         },
       checkEnrolmentState = false
     )
