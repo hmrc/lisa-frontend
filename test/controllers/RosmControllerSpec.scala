@@ -16,30 +16,41 @@
 
 package controllers
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import base.SpecBase
 import helpers.FullCacheTest
-import helpers.FullCacheTestData._
-import models._
+import helpers.FullCacheTestData.*
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{MessagesControllerComponents, Result}
-import play.api.test.Helpers._
+import play.api.mvc.Result
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.error_template
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.Future
 
 class RosmControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val errorView: error_template         = inject[error_template]
-  val SUT                                        = new RosmController()
+  val errorView: error_template = inject[error_template]
+
+  val SUT = new RosmController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    auditService,
+    rosmService,
+    emailConnector,
+    messagesApi = messagesApi,
+    mcc,
+    errorView
+  )
 
   val customTestEmail = "success@rosm.subscription"
 
@@ -126,17 +137,17 @@ class RosmControllerSpec extends SpecBase with Injecting {
 
     "handle a successful rosm registration" in new FullCacheTest(allDataComponents) {
 
-      when(rosmService.performSubscription(any)(any))
+      when(rosmService.performSubscription(any)(using any))
         .thenReturn(Future.successful(Right("123456789")))
 
-      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get.url))
+      redirectLocation(SUT.post(fakeRequest)) must be(Some(routes.ApplicationSubmittedController.get().url))
     }
 
     "email the user on a successful rosm registration" in new FullCacheTest(customDataComponents) {
       reset(emailConnector)
 
       val testSubId = "888777666"
-      when(rosmService.performSubscription(any)(any))
+      when(rosmService.performSubscription(any)(using any))
         .thenReturn(Future.successful(Right(testSubId)))
 
       await(SUT.post(fakeRequest))
@@ -153,13 +164,13 @@ class RosmControllerSpec extends SpecBase with Injecting {
             "last_name"             -> yourForm.lastName
           )
         )
-      )(any)
+      )(using any())
     }
 
     "handle a failed rosm registration" when {
       "the rosm service returns a failure" in new FullCacheTest(allDataComponents) {
 
-        when(rosmService.performSubscription(any)(any))
+        when(rosmService.performSubscription(any)(using any))
           .thenReturn(Future.successful(Left("INTERNAL_SERVER_ERROR")))
 
         val result: Future[Result] = SUT.post(fakeRequest)
@@ -173,7 +184,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
       val registrationDetails: LisaRegistration =
         LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(rosmService.performSubscription(any)(any))
+      when(rosmService.performSubscription(any)(using any))
         .thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
@@ -195,7 +206,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
             "emailAddress"                             -> registrationDetails.yourDetails.email
           )
         )
-      )(any)
+      )(using any)
     }
 
     "audit a failed rosm registration" when {
@@ -203,7 +214,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
         val registrationDetails: LisaRegistration =
           LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-        when(rosmService.performSubscription(any)(any))
+        when(rosmService.performSubscription(any)(using any))
           .thenReturn(Future.successful(Left("INVALID_LISA_MANAGER_REFERENCE_NUMBER")))
 
         await(SUT.post(fakeRequest))
@@ -225,7 +236,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
               "emailAddress"                             -> registrationDetails.yourDetails.email
             )
           )
-        )(any)
+        )(using any)
       }
     }
 
@@ -234,7 +245,7 @@ class RosmControllerSpec extends SpecBase with Injecting {
       val registrationDetails: LisaRegistration =
         LisaRegistration(organisationForm, tradingForm, businessStructureForm, yourForm, "123456")
 
-      when(rosmService.performSubscription(any)(any)).thenReturn(Future.successful(Right("123456789012")))
+      when(rosmService.performSubscription(any)(using any)).thenReturn(Future.successful(Right("123456789012")))
 
       await(SUT.post(fakeRequest))
 

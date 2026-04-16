@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.data.Forms._
-import play.api.data._
+import play.api.data.Forms.*
+import play.api.data.*
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(companyName: String, ctrNumber: String)
@@ -28,7 +28,7 @@ object OrganisationDetails {
   val COMPANY_NAME_REGEX = """^[A-Za-z0-9 \-,.&'\/]{1,65}$"""
   val UTR_REGEX          = "^[0-9]{10}$"
 
-  implicit val formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+  given formats: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
   val form: Form[OrganisationDetails] = Form(
     mapping(

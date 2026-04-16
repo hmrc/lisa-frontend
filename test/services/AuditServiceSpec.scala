@@ -18,8 +18,8 @@ package services
 
 import config.AppConfig
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -28,29 +28,29 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import repositories.LisaCacheRepository
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.test.MongoSupport
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.ExecutionContext
 
 class AuditServiceSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfter with MongoSupport {
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
     .overrides(
       bind(classOf[MongoComponent]).toInstance(mongoComponent)
     )
     .build()
 
-  implicit val hc: HeaderCarrier                        = HeaderCarrier()
-  val mockAuditConnector: AuditConnector                = mock[AuditConnector]
-  val mockAppConfig: AppConfig                          = mock[AppConfig]
-  implicit val ec: ExecutionContext                     = app.injector.instanceOf[ExecutionContext]
-  implicit val lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
+  given hc: HeaderCarrier                        = HeaderCarrier()
+  val mockAuditConnector: AuditConnector         = mock[AuditConnector]
+  val mockAppConfig: AppConfig                   = mock[AppConfig]
+  given ec: ExecutionContext                     = app.injector.instanceOf[ExecutionContext]
+  given lisaCacheRepository: LisaCacheRepository = mock[LisaCacheRepository]
 
   object SUT extends AuditService(mockAuditConnector, mockAppConfig)
 
@@ -66,7 +66,7 @@ class AuditServiceSpec
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
-      verify(mockAuditConnector).sendEvent(captor.capture())(ArgumentMatchers.any(), ArgumentMatchers.any())
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
       val event = captor.getValue
 

@@ -17,16 +17,17 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.CSRFTokenHelper.*
+import play.api.test.Helpers.*
 import play.api.test.Injecting
-import play.api.test.CSRFTokenHelper._
 import uk.gov.hmrc.mongo.cache.DataKey
+import views.html.error_template
 import views.html.registration.{
   application_pending, application_rejected, application_submitted, application_successful
 }
@@ -35,28 +36,41 @@ import scala.concurrent.Future
 
 class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter with Injecting {
 
-  val submittedPageTitle                              = "Application submitted"
-  val pendingPageTitle                                = "We are reviewing your application"
-  val successPageTitle                                = "Application successful"
-  val rejectedPageTitle                               = "Application not successful"
-  implicit val mcc: MessagesControllerComponents      = inject[MessagesControllerComponents]
-  implicit val submittedView: application_submitted   = inject[application_submitted]
-  implicit val pendingView: application_pending       = inject[application_pending]
-  implicit val successfulView: application_successful = inject[application_successful]
-  implicit val rejectedView: application_rejected     = inject[application_rejected]
-  val SUT                                             = new ApplicationSubmittedController()
+  val submittedPageTitle                     = "Application submitted"
+  val pendingPageTitle                       = "We are reviewing your application"
+  val successPageTitle                       = "Application successful"
+  val rejectedPageTitle                      = "Application not successful"
+  val submittedView: application_submitted   = inject[application_submitted]
+  val pendingView: application_pending       = inject[application_pending]
+  val successfulView: application_successful = inject[application_successful]
+  val rejectedView: application_rejected     = inject[application_rejected]
+  val errorView: error_template              = inject[error_template]
+
+  val SUT = new ApplicationSubmittedController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    mcc,
+    applicationSubmittedView = submittedView,
+    applicationPendingView = pendingView,
+    applicationSuccessfulView = successfulView,
+    applicationRejectedView = rejectedView,
+    errorView = errorView
+  )
 
   "GET Application Submitted" must {
 
     "return the submitted page with correct email address" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentPending)))
 
       when(
         lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some(ApplicationSent(email = "test@user.com", subscriptionId = "123456789"))))
@@ -73,13 +87,32 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     }
 
+    "redirect to the Try again page when when no session found" in {
+
+      when(
+        lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
+          any(),
+          any()
+        )
+      )
+        .thenReturn(Future.successful(None))
+
+      val result = SUT.get()(fakeRequest.withCSRFToken)
+
+      val content = contentAsString(result)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+
+      content must include(returnMessage("global.error.InternalServerError500.heading"))
+    }
+
   }
 
   "GET Application Pending" must {
 
     "return the pending page" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.pending()(fakeRequest.withCSRFToken)
@@ -98,13 +131,13 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     "return the successful page" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       when(
         lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some("Z9999")))
@@ -119,13 +152,32 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
       content must include("Z9999")
 
     }
+
+    "redirect to the Try again page when no session found for Application Successful" in {
+
+      when(
+        lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
+          any(),
+          any()
+        )
+      )
+        .thenReturn(Future.successful(None))
+
+      val result = SUT.successful()(fakeRequest.withCSRFToken)
+
+      val content = contentAsString(result)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+
+      content must include(returnMessage("global.error.InternalServerError500.heading"))
+    }
   }
 
   "GET Application Rejected" must {
 
     "return the unsuccessful page" in {
 
-      when(authorisationService.userStatus(ArgumentMatchers.any()))
+      when(authorisationService.userStatus(using any()))
         .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
       val result = SUT.rejected()(fakeRequest.withCSRFToken)

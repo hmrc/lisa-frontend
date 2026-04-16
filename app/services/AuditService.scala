@@ -20,16 +20,16 @@ import com.google.inject.Inject
 import config.AppConfig
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.AuditExtensions._
+import uk.gov.hmrc.play.audit.AuditExtensions.*
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuditService @Inject() (val connector: AuditConnector, val appConfig: AppConfig)(implicit ec: ExecutionContext)
+class AuditService @Inject() (val connector: AuditConnector, val appConfig: AppConfig)(using ec: ExecutionContext)
     extends Logging {
 
-  def audit(auditType: String, path: String, auditData: Map[String, String])(implicit
+  def audit(auditType: String, path: String, auditData: Map[String, String])(using
     hc: HeaderCarrier
   ): Future[AuditResult] = {
     val event = DataEvent(

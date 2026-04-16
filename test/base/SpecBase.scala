@@ -16,10 +16,10 @@
 
 package base
 
-import org.apache.pekko.actor.ActorSystem
 import config.AppConfig
 import connectors.EmailConnector
-import models._
+import models.*
+import org.apache.pekko.actor.ActorSystem
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
@@ -27,50 +27,50 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.MessagesApi
-import play.api.inject.Injector
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.{Injector, bind}
+import play.api.mvc.{AnyContentAsEmpty, MessagesControllerComponents}
 import play.api.test.FakeRequest
-import play.api.{Configuration, Environment}
+import play.api.test.Helpers.stubMessages
+import play.api.{Application, Configuration, Environment}
+import repositories.LisaCacheRepository
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.cache.DataKey
 import uk.gov.hmrc.mongo.test.MongoSupport
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.bind
-import repositories.LisaCacheRepository
-import uk.gov.hmrc.mongo.cache.DataKey
-
 import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with MongoSupport with BeforeAndAfter {
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("metrics.enabled" -> "false")
     .overrides(
       bind(classOf[MongoComponent]).toInstance(mongoComponent)
     )
     .build()
 
-  val sessionId: SessionId = SessionId(UUID.randomUUID().toString)
-  val fakeRequest          = FakeRequest().withSession(("sessionId", sessionId.toString))
+  val sessionId: SessionId                             = SessionId(UUID.randomUUID().toString)
+  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(("sessionId", sessionId.toString))
 
-  val injector: Injector                                  = fakeApplication.injector
-  implicit val system: ActorSystem                        = ActorSystem()
-  implicit val hc: HeaderCarrier                          = HeaderCarrier()
-  implicit val messagesApi: MessagesApi                   = injector.instanceOf[MessagesApi]
-  implicit val appConfig: AppConfig                       = injector.instanceOf[AppConfig]
-  implicit val env: Environment                           = injector.instanceOf[Environment]
-  implicit val configuration: Configuration               = injector.instanceOf[Configuration]
-  implicit val authorisationService: AuthorisationService = mock[AuthorisationService]
-  implicit val rosmService: RosmService                   = mock[RosmService]
-  implicit val auditService: AuditService                 = mock[AuditService]
-  implicit val emailConnector: EmailConnector             = mock[EmailConnector]
-  implicit val lisaCacheRepository: LisaCacheRepository   = mock[LisaCacheRepository]
+  val injector: Injector                           = fakeApplication().injector
+  given system: ActorSystem                        = ActorSystem()
+  given hc: HeaderCarrier                          = HeaderCarrier()
+  given messagesApi: MessagesApi                   = injector.instanceOf[MessagesApi]
+  given appConfig: AppConfig                       = injector.instanceOf[AppConfig]
+  given env: Environment                           = injector.instanceOf[Environment]
+  given configuration: Configuration               = injector.instanceOf[Configuration]
+  given authorisationService: AuthorisationService = mock[AuthorisationService]
+  given rosmService: RosmService                   = mock[RosmService]
+  given auditService: AuditService                 = mock[AuditService]
+  given emailConnector: EmailConnector             = mock[EmailConnector]
+  given lisaCacheRepository: LisaCacheRepository   = mock[LisaCacheRepository]
 
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  given mcc: MessagesControllerComponents = injector.instanceOf[MessagesControllerComponents]
+
+  given ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   before {
     reset(lisaCacheRepository)
@@ -85,8 +85,10 @@ trait SpecBase extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with 
     when(lisaCacheRepository.putSession(DataKey(any[String]()), any())(any(), any()))
       .thenReturn(Future.successful(("", "")))
 
-    when(authorisationService.userStatus(any()))
+    when(authorisationService.userStatus(using any()))
       .thenReturn(Future.successful(UserAuthorised("", TaxEnrolmentDoesNotExist)))
   }
+
+  def returnMessage(key: String): String = stubMessages(mcc.messagesApi).messages(key)
 
 }

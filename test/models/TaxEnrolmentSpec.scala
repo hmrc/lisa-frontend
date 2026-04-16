@@ -16,9 +16,9 @@
 
 package models
 
-import java.time.ZonedDateTime
 import org.scalatestplus.play.PlaySpec
 
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 class TaxEnrolmentSpec extends PlaySpec {

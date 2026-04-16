@@ -18,9 +18,9 @@ package controllers
 
 import com.google.inject.Inject
 import config.AppConfig
-import models._
+import models.*
 import play.api.i18n.MessagesApi
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService
@@ -28,20 +28,19 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessStructureController @Inject() (implicit
+class BusinessStructureController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents,
   businessStructureView: views.html.registration.business_structure
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+)(using ec: ExecutionContext, appConfig: AppConfig)
+    extends LisaBaseController(messagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId: String =>
+    authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).map {
         case Some(data) => Ok(businessStructureView(createPostCall, BusinessStructure.form.fill(data)))
         case None       => Ok(businessStructureView(createPostCall, BusinessStructure.form))
@@ -50,7 +49,7 @@ class BusinessStructureController @Inject() (implicit
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
+    authorisedForLisa { _ =>
       BusinessStructure.form
         .bindFromRequest()
         .fold(

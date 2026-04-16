@@ -18,7 +18,7 @@ package services
 
 import com.google.inject.Inject
 import connectors.{RosmConnector, RosmJsonFormats}
-import models._
+import models.*
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess}
 
@@ -26,15 +26,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: ExecutionContext)
+class RosmService @Inject() (val rosmConnector: RosmConnector)(using ec: ExecutionContext)
     extends RosmJsonFormats with Logging {
 
   private def handleErrorResponse(rosmType: String, response: HttpResponse) =
     response.json.validate[DesFailureResponse] match {
-      case failureResponse: JsSuccess[DesFailureResponse] =>
-        logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.get.code}")
-        Left(failureResponse.get.code)
-      case _: JsError                                     =>
+      case JsSuccess(failureResponse, _) =>
+        logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure: ${failureResponse.code}")
+        Left(failureResponse.code)
+      case _: JsError                    =>
         logger.error(s"[RosmService][handleErrorResponse] ROSM $rosmType failure, unexpected error.")
         Left("INTERNAL_SERVER_ERROR")
     }
@@ -45,7 +45,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: Exec
     else
       input.businessStructure
 
-  def rosmRegister(businessStructure: BusinessStructure, orgDetails: OrganisationDetails)(implicit
+  def rosmRegister(businessStructure: BusinessStructure, orgDetails: OrganisationDetails)(using
     hc: HeaderCarrier
   ): Future[Either[String, String]] = {
     val rosmRegistration = RosmRegistration(
@@ -61,8 +61,8 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: Exec
         logger.warn(s"[RosmService][rosmRegister] response for ${orgDetails.companyName} (${orgDetails.ctrNumber})")
 
         res.json.validate[RosmRegistrationSuccessResponse] match {
-          case successResponse: JsSuccess[RosmRegistrationSuccessResponse] => Right(successResponse.get.safeId)
-          case _: JsError                                                  => handleErrorResponse("registration", res)
+          case JsSuccess(successResponse, _) => Right(successResponse.safeId)
+          case _: JsError                    => handleErrorResponse("registration", res)
         }
       }
       .recover { case NonFatal(ex: Throwable) =>
@@ -73,7 +73,7 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: Exec
 
   def performSubscription(
     registration: LisaRegistration
-  )(implicit hc: HeaderCarrier): Future[Either[String, String]] = {
+  )(using hc: HeaderCarrier): Future[Either[String, String]] = {
 
     val utr              = registration.organisationDetails.ctrNumber
     val companyName      = registration.organisationDetails.companyName
@@ -101,8 +101,8 @@ class RosmService @Inject() (val rosmConnector: RosmConnector)(implicit ec: Exec
         logger.warn(s"[RosmService][performSubscription] response for $companyName ($utr)")
 
         subscribed.json.validate[DesSubscriptionSuccessResponse] match {
-          case successResponse: JsSuccess[DesSubscriptionSuccessResponse] => Right(successResponse.get.subscriptionId)
-          case _: JsError                                                 => handleErrorResponse("submission", subscribed)
+          case JsSuccess(successResponse, _) => Right(successResponse.subscriptionId)
+          case _: JsError                    => handleErrorResponse("submission", subscribed)
         }
       }
 

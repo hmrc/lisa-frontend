@@ -17,20 +17,20 @@
 package services
 
 import com.google.inject.Inject
-import models._
+import models.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
+import uk.gov.hmrc.auth.core.*
+import uk.gov.hmrc.auth.core.retrieve.*
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.*
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthorisationService @Inject() (val authConnector: AuthConnector, val taxEnrolmentService: TaxEnrolmentService)(
-  implicit ec: ExecutionContext
+  using ec: ExecutionContext
 ) extends AuthorisedFunctions {
 
-  def userStatus(implicit hc: HeaderCarrier): Future[UserStatus] =
+  def userStatus(using hc: HeaderCarrier): Future[UserStatus] =
     authorised(
       AffinityGroup.Organisation and AuthProviders(GovernmentGateway) and User
     ).retrieve(internalId and groupIdentifier and authorisedEnrolments) {
@@ -52,8 +52,8 @@ class AuthorisationService @Inject() (val authConnector: AuthConnector, val taxE
       zref      <- enrolment.getIdentifier("ZREF") if enrolment.isActivated
     } yield UserAuthorisedAndEnrolled(id, zref.value)
 
-  def statusFromTaxEnrolments(id: String, groupId: String)(implicit hc: HeaderCarrier): Future[Option[UserStatus]] =
-    taxEnrolmentService.getNewestLisaSubscription(groupId)(hc).map {
+  def statusFromTaxEnrolments(id: String, groupId: String)(using hc: HeaderCarrier): Future[Option[UserStatus]] =
+    taxEnrolmentService.getNewestLisaSubscription(groupId)(using hc).map {
       _.flatMap { subscription =>
         subscription.state match {
           case TaxEnrolmentSuccess      =>

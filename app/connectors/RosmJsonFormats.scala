@@ -16,15 +16,15 @@
 
 package connectors
 
-import models._
+import models.*
 
 import java.time.LocalDate
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 trait RosmJsonFormats {
 
-  implicit val indReads: Reads[RosmIndividual] = (
+  given indReads: Reads[RosmIndividual] = (
     (JsPath \ "firstName").read[String] and
       (JsPath \ "middleName").readNullable[String] and
       (JsPath \ "lastName").read[String] and
@@ -34,7 +34,7 @@ trait RosmJsonFormats {
       }
   )(RosmIndividual.apply _)
 
-  implicit val indWrites: Writes[RosmIndividual] = (
+  given indWrites: Writes[RosmIndividual] = (
     (JsPath \ "firstName").write[String] and
       (JsPath \ "middleName").writeNullable[String] and
       (JsPath \ "lastName").write[String] and
@@ -42,15 +42,15 @@ trait RosmJsonFormats {
         case Some(date) => Some(date.toString)
         case _          => None
       }
-  )(unlift(RosmIndividual.unapply))
+  )(o => Tuple.fromProductTyped(o))
 
-  implicit val orgFormats: OFormat[RosmOrganisation]                 = Json.format[RosmOrganisation]
-  implicit val addrFormats: OFormat[RosmAddress]                     = Json.format[RosmAddress]
-  implicit val contFormats: OFormat[RosmContactDetails]              = Json.format[RosmContactDetails]
-  implicit val succFormats: OFormat[RosmRegistrationSuccessResponse] = Json.format[RosmRegistrationSuccessResponse]
-  implicit val failFormats: OFormat[DesFailureResponse]              = Json.format[DesFailureResponse]
+  given orgFormats: OFormat[RosmOrganisation]                 = Json.format[RosmOrganisation]
+  given addrFormats: OFormat[RosmAddress]                     = Json.format[RosmAddress]
+  given contFormats: OFormat[RosmContactDetails]              = Json.format[RosmContactDetails]
+  given succFormats: OFormat[RosmRegistrationSuccessResponse] = Json.format[RosmRegistrationSuccessResponse]
+  given failFormats: OFormat[DesFailureResponse]              = Json.format[DesFailureResponse]
 
-  implicit val desSubscribeFormats: OFormat[DesSubscriptionSuccessResponse] =
+  given desSubscribeFormats: OFormat[DesSubscriptionSuccessResponse] =
     Json.format[DesSubscriptionSuccessResponse]
 
 }

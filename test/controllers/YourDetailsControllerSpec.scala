@@ -17,16 +17,16 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.libs.json._
-import play.api.mvc._
-import play.api.test.Helpers._
-import play.api.test._
-import play.api.test.CSRFTokenHelper._
+import play.api.libs.json.*
+import play.api.mvc.*
+import play.api.test.*
+import play.api.test.CSRFTokenHelper.*
+import play.api.test.Helpers.*
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.your_details
 
@@ -34,10 +34,17 @@ import scala.concurrent.Future
 
 class YourDetailsControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  implicit val yourDetailsView: your_details     = inject[your_details]
+  val yourDetailsView: your_details = inject[your_details]
 
-  val SUT = new YourDetailsController()
+  val SUT = new YourDetailsController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    mcc,
+    yourDetailsView
+  )
 
   def createFakePostRequest[T](uri: String, body: T): Request[T] = {
     val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
@@ -64,7 +71,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           .thenReturn(Future.successful(Some(yourForm)))
 
         val request: RequestHeader = fakeRequest.withCSRFToken
-        val result                 = SUT.get().apply(request)
+        val result                 = SUT.get.apply(request)
 
         status(result) mustBe Status.OK
 
@@ -84,7 +91,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
           .thenReturn(Future.successful(None))
 
         val request = fakeRequest.withCSRFToken
-        val result  = SUT.get().apply(request)
+        val result  = SUT.get.apply(request)
 
         status(result) mustBe Status.OK
 
@@ -174,7 +181,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "store your details in cache" when {
       "the submitted data is valid" in {
 
-        when(authorisationService.userStatus(any()))
+        when(authorisationService.userStatus(using any()))
           .thenReturn(Future.successful(UserAuthorised("id", TaxEnrolmentDoesNotExist)))
 
         when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))

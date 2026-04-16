@@ -22,30 +22,28 @@ import models.{BusinessStructure, OrganisationDetails}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Environment, Logging}
+import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.{AuditService, AuthorisationService, RosmService}
 import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationDetailsController @Inject() (implicit
+class OrganisationDetailsController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val rosmService: RosmService,
-  implicit val auditService: AuditService,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  val rosmService: RosmService,
+  val auditService: AuditService,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents,
   organisationDetailsView: views.html.registration.organisation_details
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext)
-    with Logging {
+)(using ec: ExecutionContext, appConfig: AppConfig)
+    extends LisaBaseController(messagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { userId =>
+    authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).flatMap {
         case None                    => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>
@@ -78,7 +76,7 @@ class OrganisationDetailsController @Inject() (implicit
   }
 
   val post: Action[AnyContent] = Action.async { implicit request =>
-    authorisedForLisa { cacheId =>
+    authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).flatMap {
         case None                    => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>

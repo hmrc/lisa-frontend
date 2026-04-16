@@ -32,22 +32,19 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RosmController @Inject() (implicit
+class RosmController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val auditService: AuditService,
-  implicit val rosmService: RosmService,
-  implicit val emailConnector: EmailConnector,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  val auditService: AuditService,
+  val rosmService: RosmService,
+  val emailConnector: EmailConnector,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents,
   errorView: views.html.error_template
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext)
-    with RosmJsonFormats
-    with Logging {
+)(using ec: ExecutionContext, appConfig: AppConfig)
+    extends LisaBaseController(messagesControllerComponents) with RosmJsonFormats with Logging {
 
   val post: Action[AnyContent] = Action.async { implicit request =>
     authorisedForLisa { cacheId =>
@@ -84,7 +81,7 @@ class RosmController @Inject() (implicit
                   )
                 )
 
-                Redirect(routes.ApplicationSubmittedController.get)
+                Redirect(routes.ApplicationSubmittedController.get())
               }
           case Left(error)           =>
             logger.error(

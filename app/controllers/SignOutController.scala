@@ -26,18 +26,17 @@ import services.{AuditService, AuthorisationService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SignOutController @Inject() (implicit
+class SignOutController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val auditService: AuditService,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  val auditService: AuditService,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents,
   timeoutView: views.html.timeout_sign_out
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+)(using ec: ExecutionContext, appConfig: AppConfig)
+    extends LisaBaseController(messagesControllerComponents) {
 
   def redirect: Action[AnyContent] = Action.async { _ =>
     Future.successful(Redirect(appConfig.feedbackRedirectUrl).withNewSession)

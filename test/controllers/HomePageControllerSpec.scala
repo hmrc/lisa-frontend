@@ -18,15 +18,20 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.CSRFTokenHelper.*
+import play.api.test.Helpers.*
 import play.api.test.Injecting
-import play.api.test.CSRFTokenHelper._
 
 class HomePageControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-  val SUT                                        = new HomePageController()
+  val SUT = new HomePageController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    mcc
+  )
 
   "GET /" should {
     "301 redirect the user to the company structure page" in {

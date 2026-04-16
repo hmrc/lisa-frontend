@@ -18,24 +18,29 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import views.html.error.{access_denied_assistant, access_denied_individual_or_agent}
 
 class ErrorControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
-
-  implicit val accessDeniedIndividualOrAgentView: access_denied_individual_or_agent =
+  val accessDeniedIndividualOrAgentView: access_denied_individual_or_agent =
     inject[access_denied_individual_or_agent]
 
-  implicit val accessDeniedAssistantView: access_denied_assistant = inject[access_denied_assistant]
-  lazy val SUT                                                    = new ErrorController()
+  val accessDeniedAssistantView: access_denied_assistant = inject[access_denied_assistant]
+
+  lazy val SUT = new ErrorController(
+    config = configuration,
+    env = env,
+    messagesApi = messagesApi,
+    messagesControllerComponents = mcc,
+    accessDeniedIndividualOrAgentView = accessDeniedIndividualOrAgentView,
+    accessDeniedAssistantView = accessDeniedAssistantView
+  )
 
   "Individual or Agent endpoint" should {
     "return a forbidden status page with correct messaging" in {
-      val result = SUT.accessDeniedIndividualOrAgent(fakeRequest)
+      val result = SUT.accessDeniedIndividualOrAgent.apply(fakeRequest)
       status(result) mustBe Status.FORBIDDEN
       val content = contentAsString(result)
 
@@ -46,7 +51,7 @@ class ErrorControllerSpec extends SpecBase with Injecting {
 
   "Assistant endpoint" should {
     "return a forbidden status page with correct messaging" in {
-      val result = SUT.accessDeniedAssistant(fakeRequest)
+      val result = SUT.accessDeniedAssistant.apply(fakeRequest)
       status(result) mustBe Status.FORBIDDEN
       val content = contentAsString(result)
 

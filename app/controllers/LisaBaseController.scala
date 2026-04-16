@@ -17,11 +17,11 @@
 package controllers
 
 import config.AppConfig
-import models._
+import models.*
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{JsValue, Reads}
-import play.api.mvc._
+import play.api.mvc.*
 import repositories.LisaCacheRepository
 import services.AuthorisationService
 import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
@@ -30,19 +30,18 @@ import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class LisaBaseController(
-  messagesControllerComponents: MessagesControllerComponents,
-  implicit val ec: ExecutionContext
+abstract class LisaBaseController(messagesControllerComponents: MessagesControllerComponents)(using
+  ec: ExecutionContext,
+  appConfig: AppConfig
 ) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
     with I18nSupport
     with Logging
     with WithUnsafeDefaultFormBinding {
 
-  val appConfig: AppConfig
   val sessionCacheRepository: LisaCacheRepository
   val authorisationService: AuthorisationService
 
-  def authorisedForLisa(callback: String => Future[Result], checkEnrolmentState: Boolean = true)(implicit
+  def authorisedForLisa(callback: String => Future[Result], checkEnrolmentState: Boolean = true)(using
     request: Request[AnyContent]
   ): Future[Result] =
     authorisationService.userStatus flatMap {
@@ -62,7 +61,7 @@ abstract class LisaBaseController(
       )
     )
 
-  private def isReapplication(user: UserAuthorised)(implicit request: Request[AnyContent]): Future[Boolean] =
+  private def isReapplication()(using request: Request[AnyContent]): Future[Boolean] =
     sessionCacheRepository
       .getFromSession[Boolean](DataKey(Reapplication.cacheKey))
       .map(_.getOrElse(false))
@@ -71,17 +70,17 @@ abstract class LisaBaseController(
     callback: String => Future[Result],
     checkEnrolmentState: Boolean,
     user: UserAuthorised
-  )(implicit request: Request[AnyContent]): Future[Result] = {
+  )(using request: Request[AnyContent]): Future[Result] = {
     logger.info("[LisaBaseController][handleUserAuthorised] User Authorised")
-    isReapplication(user) flatMap { isReapplication =>
+    isReapplication() flatMap { isReapplication =>
       if (checkEnrolmentState && !isReapplication) {
         user.enrolmentState match {
           case TaxEnrolmentPending      =>
             logger.info("[LisaBaseController][handleUserAuthorised] Enrollment Pending")
-            Future.successful(Redirect(routes.ApplicationSubmittedController.pending))
+            Future.successful(Redirect(routes.ApplicationSubmittedController.pending()))
           case TaxEnrolmentError        =>
             logger.error("[LisaBaseController][handleUserAuthorised] Enrollment Rejected")
-            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected))
+            Future.successful(Redirect(routes.ApplicationSubmittedController.rejected()))
           case TaxEnrolmentDoesNotExist =>
             logger.warn("[LisaBaseController][handleUserAuthorised] Enrollment Does Not Exist")
             callback(s"${user.internalId}-lisa-registration")
@@ -96,7 +95,7 @@ abstract class LisaBaseController(
     callback: String => Future[Result],
     checkEnrolmentState: Boolean,
     user: UserAuthorisedAndEnrolled
-  )(implicit request: Request[AnyContent]): Future[Result] = {
+  )(implicit using: Request[AnyContent]): Future[Result] = {
     logger.info(
       s"[LisaBaseController][handleUserAuthorisedAndEnrolled] User Authorised And Enrolled $checkEnrolmentState"
     )
@@ -105,7 +104,7 @@ abstract class LisaBaseController(
       sessionCacheRepository
         .putSession[String](DataKey("lisaManagerReferenceNumber"), user.lisaManagerReferenceNumber)
         .map { _ =>
-          Redirect(routes.ApplicationSubmittedController.successful)
+          Redirect(routes.ApplicationSubmittedController.successful())
         }
     } else {
       callback(s"${user.internalId}-lisa-registration")
@@ -114,7 +113,7 @@ abstract class LisaBaseController(
 
   def hasAllSubmissionData()(
     callback: LisaRegistration => Future[Result]
-  )(implicit request: Request[AnyContent]): Future[Result] =
+  )(using request: Request[AnyContent]): Future[Result] =
     sessionCacheRepository.getFullCache(request) flatMap {
       case Some(cache: CacheItem) =>
         val data                                          = cache.data.value
@@ -138,15 +137,15 @@ abstract class LisaBaseController(
       case None                   => Future.successful(Redirect(routes.BusinessStructureController.get))
     }
 
-  private def getOrRedirect[T](cache: collection.Map[String, JsValue], key: String, redirect: Result)(implicit
+  private def getOrRedirect[T](cache: collection.Map[String, JsValue], key: String, redirect: Result)(using
     reads: Reads[T]
   ): Either[Result, T] =
     cache.get(key).map(_.as[T]).toRight(redirect)
 
-  def createPostCall(implicit request: MessagesRequest[AnyContent]): Call =
+  def createPostCall(using request: MessagesRequest[AnyContent]): Call =
     Call("POST", request.uri)
 
-  def handleRedirect(redirectUrl: String)(implicit request: Request[AnyContent]): Future[Result] = {
+  def handleRedirect(redirectUrl: String)(using request: Request[AnyContent]): Future[Result] = {
     val returnUrl: Option[String] = request.getQueryString("returnUrl")
 
     returnUrl match {

@@ -17,12 +17,12 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.matching_failed
@@ -31,10 +31,17 @@ import scala.concurrent.Future
 
 class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
-  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
-  implicit val matchingFailedView: matching_failed = inject[matching_failed]
+  val matchingFailedView: matching_failed = inject[matching_failed]
 
-  val SUT = new MatchingFailedController()
+  val SUT = new MatchingFailedController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    mcc,
+    matchingFailedView
+  )
 
   "GET Matching Failed" must {
 
@@ -42,8 +49,8 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
 
       when(
         lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
-          ArgumentMatchers.any(),
-          ArgumentMatchers.any()
+          any(),
+          any()
         )
       )
         .thenReturn(Future.successful(Some(new BusinessStructure("LLP"))))
@@ -55,6 +62,24 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
       val content = contentAsString(result)
 
       content must include("Your company’s details could not be found</h1>")
+    }
+
+    "redirect the user to business structure when no session found" in {
+
+      when(
+        lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          any(),
+          any()
+        )
+      )
+        .thenReturn(Future.successful(None))
+
+      val result = SUT.get(fakeRequest)
+
+      status(result) mustBe SEE_OTHER
+
+      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
+
     }
 
   }

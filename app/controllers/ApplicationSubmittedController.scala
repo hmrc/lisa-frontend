@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.ApplicationSent
 import play.api.i18n.MessagesApi
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.{Configuration, Environment}
 import repositories.LisaCacheRepository
 import services.AuthorisationService
@@ -28,20 +28,20 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationSubmittedController @Inject() (implicit
+class ApplicationSubmittedController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents,
   applicationSubmittedView: views.html.registration.application_submitted,
   applicationPendingView: views.html.registration.application_pending,
   applicationSuccessfulView: views.html.registration.application_successful,
-  applicationRejectedView: views.html.registration.application_rejected
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+  applicationRejectedView: views.html.registration.application_rejected,
+  errorView: views.html.error_template
+)(using ec: ExecutionContext, appConfig: AppConfig)
+    extends LisaBaseController(messagesControllerComponents) {
 
   def get(): Action[AnyContent] = Action.async { implicit request =>
     logger.info("[ApplicationSubmittedController][get]")
@@ -50,6 +50,11 @@ class ApplicationSubmittedController @Inject() (implicit
         sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
           case Some(application) =>
             Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
+          case None              =>
+            logger.error("[ApplicationSubmittedController][get] Session not found, redirecting to error page")
+            InternalServerError(
+              errorView()
+            )
         },
       checkEnrolmentState = false
     )
@@ -67,6 +72,11 @@ class ApplicationSubmittedController @Inject() (implicit
         sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
           case Some(lisaManagerReferenceNumber) =>
             Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
+          case None                             =>
+            logger.error("[ApplicationSubmittedController][successful] Session not found, redirecting to error page")
+            Future.successful(
+              InternalServerError(errorView())
+            )
         },
       checkEnrolmentState = false
     )

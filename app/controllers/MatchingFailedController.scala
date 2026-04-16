@@ -28,21 +28,20 @@ import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MatchingFailedController @Inject() (implicit
+class MatchingFailedController @Inject() (
   val sessionCacheRepository: LisaCacheRepository,
-  implicit val env: Environment,
-  implicit val config: Configuration,
-  implicit val authorisationService: AuthorisationService,
-  implicit val appConfig: AppConfig,
-  implicit override val messagesApi: MessagesApi,
-  implicit override val ec: ExecutionContext,
-  implicit val messagesControllerComponents: MessagesControllerComponents,
+  val env: Environment,
+  val config: Configuration,
+  val authorisationService: AuthorisationService,
+  override val messagesApi: MessagesApi,
+  val messagesControllerComponents: MessagesControllerComponents,
   matchingFailedView: views.html.registration.matching_failed
-) extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents, ec: ExecutionContext) {
+)(using ec: ExecutionContext, appConfig: AppConfig)
+    extends LisaBaseController(messagesControllerComponents: MessagesControllerComponents) {
 
   val get: Action[AnyContent] = Action.async { implicit request =>
     logger.info("[MatchingFailedController][GET]")
-    authorisedForLisa { cacheId =>
+    authorisedForLisa { _ =>
       sessionCacheRepository.getFromSession[BusinessStructure](DataKey(BusinessStructure.cacheKey)).flatMap {
         case None                    => Future.successful(Redirect(routes.BusinessStructureController.get))
         case Some(businessStructure) =>

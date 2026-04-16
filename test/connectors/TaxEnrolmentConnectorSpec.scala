@@ -18,29 +18,27 @@ package connectors
 
 import base.SpecBase
 import config.AppConfig
-import models._
-
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import models.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json._
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import play.api.libs.json.*
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
+import java.time.{Instant, ZoneId, ZonedDateTime}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 class TaxEnrolmentConnectorSpec
     extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
 
-  val mockRequestBuilder: RequestBuilder  = mock[RequestBuilder]
-  val mockHttpClientV2: HttpClientV2      = mock[HttpClientV2]
-  val mockAppConfig: AppConfig            = mock[AppConfig]
-  implicit override val hc: HeaderCarrier = HeaderCarrier()
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
+  val mockAppConfig: AppConfig           = mock[AppConfig]
 
   when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
   when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)

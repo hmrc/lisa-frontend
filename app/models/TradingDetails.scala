@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.data.Forms._
-import play.api.data._
+import play.api.data.Forms.*
+import play.api.data.*
 import play.api.libs.json.{Json, OFormat}
 
 case class TradingDetails(fsrRefNumber: String, isaProviderRefNumber: String)
@@ -26,7 +26,7 @@ object TradingDetails {
 
   val cacheKey = "tradingDetails"
 
-  implicit val formats: OFormat[TradingDetails] = Json.format[TradingDetails]
+  given formats: OFormat[TradingDetails] = Json.format[TradingDetails]
 
   val form: Form[TradingDetails] = Form(
     mapping(

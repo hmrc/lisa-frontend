@@ -27,5 +27,5 @@ case class LisaRegistration(
 )
 
 object LisaRegistration {
-  implicit val formats: OFormat[LisaRegistration] = Json.format[LisaRegistration]
+  given formats: OFormat[LisaRegistration] = Json.format[LisaRegistration]
 }

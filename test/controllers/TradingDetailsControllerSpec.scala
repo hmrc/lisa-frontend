@@ -17,15 +17,16 @@
 package controllers
 
 import base.SpecBase
-import models._
+import models.*
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{AnyContentAsJson, MessagesControllerComponents, Request}
-import play.api.test.Helpers._
+import play.api.mvc.{AnyContentAsJson, Request}
+import play.api.test.CSRFTokenHelper.*
+import play.api.test.Helpers.*
 import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
-import play.api.test.CSRFTokenHelper._
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.trading_details
 
@@ -45,9 +46,17 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     CSRFTokenHelper.addCSRFToken(request)
   }
 
-  implicit val mcc: MessagesControllerComponents   = inject[MessagesControllerComponents]
-  implicit val tradingDetailsView: trading_details = inject[trading_details]
-  val SUT                                          = new TradingDetailsController()
+  val tradingDetailsView: trading_details = inject[trading_details]
+
+  val SUT = new TradingDetailsController(
+    sessionCacheRepository = lisaCacheRepository,
+    env = env,
+    config = configuration,
+    authorisationService = authorisationService,
+    messagesApi = messagesApi,
+    mcc,
+    tradingDetailsView
+  )
 
   "GET Trading Details" must {
 
@@ -59,8 +68,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
         when(
           lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
+            any(),
+            any()
           )
         )
           .thenReturn(Future.successful(Some(tradingForm)))
@@ -83,8 +92,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       "the cache does not return a value" in {
         when(
           lisaCacheRepository.getFromSession[TradingDetails](DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)))(
-            ArgumentMatchers.any(),
-            ArgumentMatchers.any()
+            any(),
+            any()
           )
         )
           .thenReturn(Future.successful(None))
@@ -128,8 +137,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[TradingDetails](
             DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
         val result  = SUT.post(request)
@@ -144,8 +153,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         when(
           lisaCacheRepository.putSession[TradingDetails](
             DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
-            ArgumentMatchers.any()
-          )(ArgumentMatchers.any(), ArgumentMatchers.any())
+            any()
+          )(any(), any())
         )
           .thenReturn(Future.successful(("", "")))
         val result  = SUT.post(request)
@@ -161,8 +170,8 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
         await(SUT.post(request))
         verify(lisaCacheRepository).putSession[TradingDetails](
           DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
-          ArgumentMatchers.any()
-        )(ArgumentMatchers.any(), ArgumentMatchers.any())
+          any()
+        )(any(), any())
       }
     }
 
