@@ -38,7 +38,8 @@ class ApplicationSubmittedController @Inject() (
   applicationSubmittedView: views.html.registration.application_submitted,
   applicationPendingView: views.html.registration.application_pending,
   applicationSuccessfulView: views.html.registration.application_successful,
-  applicationRejectedView: views.html.registration.application_rejected
+  applicationRejectedView: views.html.registration.application_rejected,
+  errorView: views.html.error_template
 )(using ec: ExecutionContext, appConfig: AppConfig)
     extends LisaBaseController(messagesControllerComponents) {
 
@@ -49,7 +50,11 @@ class ApplicationSubmittedController @Inject() (
         sessionCacheRepository.getFromSession[ApplicationSent](DataKey(ApplicationSent.cacheKey)).map {
           case Some(application) =>
             Ok(applicationSubmittedView(application.email, application.subscriptionId, appConfig.displayURBanner))
-          case None              => Redirect(routes.BusinessStructureController.get) // TODO Check if we can skip the cache call and remove the case-matching logic.
+          case None              =>
+            logger.error("[ApplicationSubmittedController][get] Session not found, redirecting to error page")
+            InternalServerError(
+              errorView()
+            )
         },
       checkEnrolmentState = false
     )
@@ -67,7 +72,11 @@ class ApplicationSubmittedController @Inject() (
         sessionCacheRepository.getFromSession[String](DataKey("lisaManagerReferenceNumber")).flatMap {
           case Some(lisaManagerReferenceNumber) =>
             Future.successful(Ok(applicationSuccessfulView(lisaManagerReferenceNumber)))
-          case None                             => Future.successful(Redirect(routes.BusinessStructureController.get)) // TODO Check if we can skip the cache call and remove the case-matching logic.
+          case None                             =>
+            logger.error("[ApplicationSubmittedController][successful] Session not found, redirecting to error page")
+            Future.successful(
+              InternalServerError(errorView())
+            )
         },
       checkEnrolmentState = false
     )

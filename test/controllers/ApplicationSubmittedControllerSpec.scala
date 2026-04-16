@@ -27,7 +27,10 @@ import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.Injecting
 import uk.gov.hmrc.mongo.cache.DataKey
-import views.html.registration.{application_pending, application_rejected, application_submitted, application_successful}
+import views.html.error_template
+import views.html.registration.{
+  application_pending, application_rejected, application_submitted, application_successful
+}
 
 import scala.concurrent.Future
 
@@ -41,6 +44,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
   val pendingView: application_pending       = inject[application_pending]
   val successfulView: application_successful = inject[application_successful]
   val rejectedView: application_rejected     = inject[application_rejected]
+  val errorView: error_template              = inject[error_template]
 
   val SUT = new ApplicationSubmittedController(
     sessionCacheRepository = lisaCacheRepository,
@@ -52,7 +56,8 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
     applicationSubmittedView = submittedView,
     applicationPendingView = pendingView,
     applicationSuccessfulView = successfulView,
-    applicationRejectedView = rejectedView
+    applicationRejectedView = rejectedView,
+    errorView = errorView
   )
 
   "GET Application Submitted" must {
@@ -82,7 +87,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     }
 
-    "redirect the user to business structure when no session found" in {
+    "redirect to the Try again page when when no session found" in {
 
       when(
         lisaCacheRepository.getFromSession[ApplicationSent](DataKey(ArgumentMatchers.eq(ApplicationSent.cacheKey)))(
@@ -94,10 +99,11 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
       val result = SUT.get()(fakeRequest.withCSRFToken)
 
-      status(result) mustBe SEE_OTHER
+      val content = contentAsString(result)
 
-      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
+      status(result) mustBe INTERNAL_SERVER_ERROR
 
+      content must include(returnMessage("global.error.InternalServerError500.heading"))
     }
 
   }
@@ -147,7 +153,7 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
     }
 
-    "redirect the user to business structure when no session found for Application Successful" in {
+    "redirect to the Try again page when no session found for Application Successful" in {
 
       when(
         lisaCacheRepository.getFromSession[String](DataKey(ArgumentMatchers.eq("lisaManagerReferenceNumber")))(
@@ -159,10 +165,11 @@ class ApplicationSubmittedControllerSpec extends SpecBase with BeforeAndAfter wi
 
       val result = SUT.successful()(fakeRequest.withCSRFToken)
 
-      status(result) mustBe SEE_OTHER
+      val content = contentAsString(result)
 
-      redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
+      status(result) mustBe INTERNAL_SERVER_ERROR
 
+      content must include(returnMessage("global.error.InternalServerError500.heading"))
     }
   }
 

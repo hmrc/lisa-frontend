@@ -18,7 +18,6 @@ package controllers
 
 import base.SpecBase
 import play.api.http.Status
-import play.api.mvc.MessagesControllerComponents
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
 import play.api.test.Injecting
