@@ -21,6 +21,9 @@ import play.api.data.{Form, FormError}
 
 class OrganisationDetailsSpec extends PlaySpec {
 
+  val SUT: Form[OrganisationDetails]            = OrganisationDetails.form
+  val PartnershipSUT: Form[OrganisationDetails] = OrganisationDetails.partnershipForm
+
   "Standard Organisation Details form" must {
 
     "show field required errors" when {
@@ -165,6 +168,17 @@ class OrganisationDetailsSpec extends PlaySpec {
 
     }
 
+    "bind to an OrganisationDetails" when {
+
+      "given a valid company name and 10-digit UTR" in {
+        val test = Map[String, String]("companyName" -> "ACME Ltd", "strNumber" -> "1234567890")
+        val res  = PartnershipSUT.bind(test)
+        res.errors      mustBe Seq.empty
+        res.value.value mustBe OrganisationDetails("ACME Ltd", "1234567890")
+      }
+
+    }
+
     "show utr invalid error" when {
 
       "given a empty utr" in {
@@ -210,8 +224,5 @@ class OrganisationDetailsSpec extends PlaySpec {
     }
 
   }
-
-  val SUT: Form[OrganisationDetails]            = OrganisationDetails.form
-  val PartnershipSUT: Form[OrganisationDetails] = OrganisationDetails.partnershipForm
 
 }

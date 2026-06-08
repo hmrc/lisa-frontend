@@ -22,11 +22,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, Request}
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Request}
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
-import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.business_structure
 
@@ -36,10 +35,8 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
 
   lazy val pageTitle = "What is your company structure?"
 
-  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
-    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
-    CSRFTokenHelper.addCSRFToken(request)
-  }
+  def createFakePostRequest(uri: String, body: (String, String)*): Request[AnyContentAsFormUrlEncoded] =
+    FakeRequest("POST", uri).withFormUrlEncodedBody(body*).withCSRFToken
 
   val businessStructureView: business_structure = inject[business_structure]
 
@@ -107,7 +104,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
     "return validation errors" when {
       "the submitted data is incomplete" in {
         val uri     = controllers.routes.BusinessStructureController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        val request = createFakePostRequest(uri)
         val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
@@ -126,7 +123,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid" in {
         val uri     = controllers.routes.BusinessStructureController.post.url
         val request =
-          createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
+          createFakePostRequest(uri, "companyStructure" -> "LLP")
         when(
           lisaCacheRepository.putSession[BusinessStructure](
             DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)),
@@ -146,7 +143,7 @@ class BusinessStructureControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid" in {
         val uri     = controllers.routes.BusinessStructureController.post.url
         val request =
-          createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj("companyStructure" -> "LLP")))
+          createFakePostRequest(uri, "companyStructure" -> "LLP")
 
         await(SUT.post(request))
 

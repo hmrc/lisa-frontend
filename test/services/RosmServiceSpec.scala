@@ -52,8 +52,52 @@ class RosmServiceSpec
     )
     .build()
 
-  implicit val hc: HeaderCarrier    = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  given hc: HeaderCarrier    = HeaderCarrier()
+  given ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+
+  val rosmAddress = RosmAddress(
+    addressLine1 = "Address Line 1",
+    postalCode = Some("AB1 1AB"),
+    countryCode = "GB"
+  )
+
+  val rosmContactDetails = RosmContactDetails(
+    primaryPhoneNumber = Some("0123 456 7890"),
+    emailAddress = Some("test@test.com")
+  )
+
+  val rosmSuccessResponse = RosmRegistrationSuccessResponse(
+    safeId = "XE0001234567890",
+    isEditable = true,
+    isAnAgent = false,
+    isAnIndividual = true,
+    individual = None,
+    address = rosmAddress,
+    contactDetails = rosmContactDetails
+  )
+
+  val rosmFailureResponse = DesFailureResponse(
+    code = "SERVICE_UNAVAILABLE",
+    reason = "Dependent systems are currently not responding."
+  )
+
+  val desSubscribeSuccessResponse = DesSubscriptionSuccessResponse("123456")
+
+  val org = OrganisationDetails("Test Company Name", "1234567890")
+
+  val registration = LisaRegistration(
+    organisationDetails = org,
+    tradingDetails = TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123"),
+    businessStructure = BusinessStructure("LLP"),
+    yourDetails = YourDetails(
+      firstName = "Test",
+      lastName = "User",
+      role = "Role",
+      phone = "0191 123 4567",
+      email = "test@test.com"
+    ),
+    safeId = "56789"
+  )
 
   val mockRosmConnector: RosmConnector = mock[RosmConnector]
 
@@ -131,6 +175,17 @@ class RosmServiceSpec
         res mustBe Left("INTERNAL_SERVER_ERROR")
       }
 
+      "the registration call fails with a non-fatal exception" in {
+        when(
+          mockRosmConnector.registerOnce(any(), any())(using any())
+        )
+          .thenReturn(Future.failed(new RuntimeException("connection refused")))
+
+        val res = Await.result(SUT.rosmRegister(BusinessStructure("LLP"), org), Duration.Inf)
+
+        res mustBe Left("INTERNAL_SERVER_ERROR")
+      }
+
     }
 
     "subscribe with ROSM" when {
@@ -181,49 +236,5 @@ class RosmServiceSpec
     }
 
   }
-
-  val rosmAddress = RosmAddress(
-    addressLine1 = "Address Line 1",
-    postalCode = Some("AB1 1AB"),
-    countryCode = "GB"
-  )
-
-  val rosmContactDetails = RosmContactDetails(
-    primaryPhoneNumber = Some("0123 456 7890"),
-    emailAddress = Some("test@test.com")
-  )
-
-  val rosmSuccessResponse = RosmRegistrationSuccessResponse(
-    safeId = "XE0001234567890",
-    isEditable = true,
-    isAnAgent = false,
-    isAnIndividual = true,
-    individual = None,
-    address = rosmAddress,
-    contactDetails = rosmContactDetails
-  )
-
-  val rosmFailureResponse = DesFailureResponse(
-    code = "SERVICE_UNAVAILABLE",
-    reason = "Dependent systems are currently not responding."
-  )
-
-  val desSubscribeSuccessResponse = DesSubscriptionSuccessResponse("123456")
-
-  val org = OrganisationDetails("Test Company Name", "1234567890")
-
-  val registration = LisaRegistration(
-    organisationDetails = org,
-    tradingDetails = TradingDetails(fsrRefNumber = "123", isaProviderRefNumber = "123"),
-    businessStructure = BusinessStructure("LLP"),
-    yourDetails = YourDetails(
-      firstName = "Test",
-      lastName = "User",
-      role = "Role",
-      phone = "0191 123 4567",
-      email = "test@test.com"
-    ),
-    safeId = "56789"
-  )
 
 }

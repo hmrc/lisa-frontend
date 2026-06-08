@@ -26,7 +26,7 @@ import repositories.LisaCacheRepository
 import services.AuthorisationService
 import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +36,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
 ) extends FrontendController(messagesControllerComponents: MessagesControllerComponents)
     with I18nSupport
     with Logging
-    with WithUnsafeDefaultFormBinding {
+    with WithUrlEncodedOnlyFormBinding {
 
   val sessionCacheRepository: LisaCacheRepository
   val authorisationService: AuthorisationService
@@ -95,7 +95,7 @@ abstract class LisaBaseController(messagesControllerComponents: MessagesControll
     callback: String => Future[Result],
     checkEnrolmentState: Boolean,
     user: UserAuthorisedAndEnrolled
-  )(implicit using: Request[AnyContent]): Future[Result] = {
+  )(using request: Request[AnyContent]): Future[Result] = {
     logger.info(
       s"[LisaBaseController][handleUserAuthorisedAndEnrolled] User Authorised And Enrolled $checkEnrolmentState"
     )

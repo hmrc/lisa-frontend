@@ -52,13 +52,13 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
     "return a 202 accepted" when {
 
       "correct emailId Id is passed" in {
-        implicit val hc: HeaderCarrier = HeaderCarrier()
-        val emailString                = "test@mail.com"
-        val templateId                 = "lisa_application_submit"
-        val params                     = Map("testParam" -> "testParam")
+        given hc: HeaderCarrier = HeaderCarrier()
+        val emailString         = "test@mail.com"
+        val templateId          = "lisa_application_submit"
+        val params              = Map("testParam" -> "testParam")
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(ACCEPTED, "")))
-        val response                   = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
+        val response            = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
         await(response) must be(EmailSent)
 
       }
@@ -67,10 +67,10 @@ class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterE
     "return other status" when {
 
       "incorrect email Id are passed" in {
-        implicit val hc: HeaderCarrier = HeaderCarrier()
-        val invalidEmailString         = "test@test1.com"
-        val templateId                 = "lisa_application_submit"
-        val params                     = Map("testParam" -> "testParam")
+        given hc: HeaderCarrier = HeaderCarrier()
+        val invalidEmailString  = "test@test1.com"
+        val templateId          = "lisa_application_submit"
+        val params              = Map("testParam" -> "testParam")
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))

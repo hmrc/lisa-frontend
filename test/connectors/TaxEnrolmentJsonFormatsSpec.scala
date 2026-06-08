@@ -111,6 +111,41 @@ class TaxEnrolmentJsonFormatsSpec extends PlaySpec with TaxEnrolmentJsonFormats 
           _ => fail("passed validation")
         )
       }
+
+    }
+
+    "serialize to json" when {
+      "given a subscription in each TaxEnrolmentState" in {
+        val timestamp = 1498726914908L
+        val zdt       = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault())
+
+        val subscriptions = Seq(
+          TaxEnrolmentError   -> "ERROR",
+          TaxEnrolmentSuccess -> "SUCCEEDED",
+          TaxEnrolmentPending -> "PENDING"
+        )
+
+        subscriptions.foreach { case (state, expected) =>
+          val subscription = TaxEnrolmentSubscription(
+            created = zdt,
+            lastModified = zdt,
+            credId = "cred",
+            serviceName = "HMRC-ORG-LISA",
+            identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
+            callback = "callback",
+            state = state,
+            etmpId = "etmp",
+            groupIdentifier = "group"
+          )
+
+          val json = Json.toJson(subscription)
+
+          (json \ "state").as[String]       mustBe expected
+          (json \ "created").as[Long]       mustBe timestamp
+          (json \ "lastModified").as[Long]  mustBe timestamp
+          (json \ "serviceName").as[String] mustBe "HMRC-ORG-LISA"
+        }
+      }
     }
 
   }

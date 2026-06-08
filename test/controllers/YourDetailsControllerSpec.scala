@@ -22,7 +22,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.libs.json.*
 import play.api.mvc.*
 import play.api.test.*
 import play.api.test.CSRFTokenHelper.*
@@ -46,10 +45,8 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     yourDetailsView
   )
 
-  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
-    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
-    CSRFTokenHelper.addCSRFToken(request)
-  }
+  def createFakePostRequest(uri: String, body: (String, String)*): Request[AnyContentAsFormUrlEncoded] =
+    FakeRequest("POST", uri).withFormUrlEncodedBody(body*).withCSRFToken
 
   "GET Your Details" must {
 
@@ -111,7 +108,7 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
       "the submitted data is incomplete" in {
 
         val uri     = controllers.routes.YourDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        val request = createFakePostRequest(uri)
         val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
@@ -130,16 +127,16 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "return validation errors" when {
       "the submitted data is incorrectly filled" in {
 
-        val uri         = controllers.routes.YourDetailsController.post.url
-        val invalidJson = Json.obj(
+        val uri     = controllers.routes.YourDetailsController.post.url
+        val request = createFakePostRequest(
+          uri,
           "firstName" -> "Test0",
           "lastName"  -> "User&",
           "role"      -> "Role.",
           "phone"     -> "0191 123 4567a",
           "email"     -> "test@eldf"
         )
-        val request     = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = invalidJson))
-        val result      = SUT.post()(request)
+        val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
 
@@ -159,18 +156,18 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
     "redirect the user to your details" when {
       "the submitted data is valid" in {
 
-        val uri       = controllers.routes.YourDetailsController.post.url
-        val validJson = Json.obj(
+        val uri     = controllers.routes.YourDetailsController.post.url
+        val request = createFakePostRequest(
+          uri,
           "firstName" -> "Test",
           "lastName"  -> "User",
           "role"      -> "Role",
           "phone"     -> "0191 123 4567",
           "email"     -> "test@test.com"
         )
-        val request   = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
         when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))
           .thenReturn(Future.successful(("", "")))
-        val result    = SUT.post(request)
+        val result  = SUT.post(request)
 
         status(result) mustBe Status.SEE_OTHER
 
@@ -187,16 +184,15 @@ class YourDetailsControllerSpec extends SpecBase with Injecting {
         when(lisaCacheRepository.putSession[YourDetails](DataKey(any[String]()), any())(any(), any()))
           .thenReturn(Future.successful(("", "")))
 
-        val uri       = controllers.routes.YourDetailsController.post.url
-        val validJson = Json.obj(
+        val uri     = controllers.routes.YourDetailsController.post.url
+        val request = createFakePostRequest(
+          uri,
           "firstName" -> "Test",
           "lastName"  -> "User",
           "role"      -> "Role",
           "phone"     -> "0191 123 4567",
           "email"     -> "test@test.com"
         )
-
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJson))
 
         await(SUT.post(request))
 
