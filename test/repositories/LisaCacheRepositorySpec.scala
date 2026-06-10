@@ -50,8 +50,8 @@ class LisaCacheRepositorySpec extends PlaySpec with MongoSupport with MockitoSug
       val ageToAddToCache: Int           = 18
       val ageDataKey: String             = "Age"
 
-      val sessionId: SessionId                                      = SessionId(UUID.randomUUID().toString)
-      implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+      val sessionId: SessionId                               = SessionId(UUID.randomUUID().toString)
+      given fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
         FakeRequest().withSession(("sessionId", sessionId.toString))
 
       val maybeFullCache: Future[Option[CacheItem]] = for {
@@ -81,7 +81,7 @@ class LisaCacheRepositorySpec extends PlaySpec with MongoSupport with MockitoSug
 
     "return None when there is no data in the cache for the session" in {
 
-      implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
+      given fakeRequest: FakeRequest[AnyContentAsEmpty.type] =
         FakeRequest().withSession(("sessionId", "not_a_session_id"))
 
       val fullCache: Option[CacheItem] = Await.result(lisaCacheRepository.getFullCache(fakeRequest), Duration.Inf)

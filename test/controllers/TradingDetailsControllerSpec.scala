@@ -22,11 +22,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{AnyContentAsJson, Request}
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Request}
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
-import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.trading_details
 
@@ -36,15 +35,13 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
 
   val pageTitle = "Your company’s reference numbers"
 
-  val validJsonUppercase: JsObject = Json.obj(
+  val validFormUppercase: Seq[(String, String)] = Seq(
     "fsrRefNumber"         -> "654321",
     "isaProviderRefNumber" -> "Z1234"
   )
 
-  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
-    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
-    CSRFTokenHelper.addCSRFToken(request)
-  }
+  def createFakePostRequest(uri: String, body: (String, String)*): Request[AnyContentAsFormUrlEncoded] =
+    FakeRequest("POST", uri).withFormUrlEncodedBody(body*).withCSRFToken
 
   val tradingDetailsView: trading_details = inject[trading_details]
 
@@ -117,7 +114,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     "return validation errors" when {
       "the submitted data is incomplete" in {
         val uri     = controllers.routes.TradingDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        val request = createFakePostRequest(uri)
         val result  = SUT.post()(request)
 
         status(result) mustBe Status.BAD_REQUEST
@@ -130,9 +127,10 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
       }
       "the submitted data is invalid - lowercase z" in {
         val uri     = controllers.routes.TradingDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](
+        val request = createFakePostRequest(
           uri,
-          AnyContentAsJson(json = Json.obj("fsrRefNumber" -> "654321", "isaProviderRefNumber" -> "z1234"))
+          "fsrRefNumber"         -> "654321",
+          "isaProviderRefNumber" -> "z1234"
         )
         when(
           lisaCacheRepository.putSession[TradingDetails](
@@ -149,7 +147,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     "redirect the user to your details" when {
       "the submitted data is valid - uppercase z" in {
         val uri     = controllers.routes.TradingDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
+        val request = createFakePostRequest(uri, validFormUppercase*)
         when(
           lisaCacheRepository.putSession[TradingDetails](
             DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),
@@ -166,7 +164,7 @@ class TradingDetailsControllerSpec extends SpecBase with Injecting {
     "store trading details in cache" when {
       "the submitted data is valid - uppercase z" in {
         val uri     = controllers.routes.TradingDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = validJsonUppercase))
+        val request = createFakePostRequest(uri, validFormUppercase*)
         await(SUT.post(request))
         verify(lisaCacheRepository).putSession[TradingDetails](
           DataKey(ArgumentMatchers.eq(TradingDetails.cacheKey)),

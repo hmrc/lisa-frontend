@@ -25,7 +25,7 @@ import uk.gov.hmrc.mongo.cache.CacheItem
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
-class FullCacheTest(dataComponents: Seq[(String, JsValue)])(implicit val lisaCacheRepository: LisaCacheRepository) {
+class FullCacheTest(dataComponents: Seq[(String, JsValue)])(using val lisaCacheRepository: LisaCacheRepository) {
 
   def generateMaybeCacheItem(data: Seq[(String, JsValue)]): Option[CacheItem] =
     data match {

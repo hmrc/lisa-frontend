@@ -45,8 +45,44 @@ class TaxEnrolmentServiceSpec
     )
     .build()
 
-  implicit val hc: HeaderCarrier    = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  given hc: HeaderCarrier    = HeaderCarrier()
+  given ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+
+  private val lisaSuccessSubscription = TaxEnrolmentSubscription(
+    created = ZonedDateTime.now(),
+    lastModified = ZonedDateTime.now(),
+    credId = "",
+    serviceName = "HMRC-LISA-ORG",
+    identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
+    callback = "",
+    state = TaxEnrolmentSuccess,
+    etmpId = "",
+    groupIdentifier = ""
+  )
+
+  private val lisaErrorSubscription = TaxEnrolmentSubscription(
+    created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
+    lastModified = ZonedDateTime.now(),
+    credId = "",
+    serviceName = "HMRC-LISA-ORG",
+    identifiers = Nil,
+    callback = "",
+    state = TaxEnrolmentError,
+    etmpId = "",
+    groupIdentifier = ""
+  )
+
+  private val randomPendingSubscription = TaxEnrolmentSubscription(
+    created = ZonedDateTime.now().plus(2, ChronoUnit.DAYS),
+    lastModified = ZonedDateTime.now(),
+    credId = "",
+    serviceName = "TEST",
+    identifiers = Nil,
+    callback = "",
+    state = TaxEnrolmentPending,
+    etmpId = "",
+    groupIdentifier = ""
+  )
 
   val mockConnector: TaxEnrolmentConnector = mock[TaxEnrolmentConnector]
 
@@ -109,41 +145,5 @@ class TaxEnrolmentServiceSpec
     }
 
   }
-
-  private val lisaSuccessSubscription = TaxEnrolmentSubscription(
-    created = ZonedDateTime.now(),
-    lastModified = ZonedDateTime.now(),
-    credId = "",
-    serviceName = "HMRC-LISA-ORG",
-    identifiers = List(TaxEnrolmentIdentifier("ZREF", "Z1234")),
-    callback = "",
-    state = TaxEnrolmentSuccess,
-    etmpId = "",
-    groupIdentifier = ""
-  )
-
-  private val lisaErrorSubscription = TaxEnrolmentSubscription(
-    created = ZonedDateTime.now().plus(1, ChronoUnit.DAYS),
-    lastModified = ZonedDateTime.now(),
-    credId = "",
-    serviceName = "HMRC-LISA-ORG",
-    identifiers = Nil,
-    callback = "",
-    state = TaxEnrolmentError,
-    etmpId = "",
-    groupIdentifier = ""
-  )
-
-  private val randomPendingSubscription = TaxEnrolmentSubscription(
-    created = ZonedDateTime.now().plus(2, ChronoUnit.DAYS),
-    lastModified = ZonedDateTime.now(),
-    credId = "",
-    serviceName = "TEST",
-    identifiers = Nil,
-    callback = "",
-    state = TaxEnrolmentPending,
-    etmpId = "",
-    groupIdentifier = ""
-  )
 
 }

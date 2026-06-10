@@ -12,7 +12,7 @@ object CodeCoverageSettings {
   private val settings: Seq[Setting[?]] =
     Seq(
       ScoverageKeys.coverageExcludedPackages := patterns.mkString("", ";", ""),
-      ScoverageKeys.coverageMinimumStmtTotal := 93,
+      ScoverageKeys.coverageMinimumStmtTotal := 95,
       ScoverageKeys.coverageFailOnMinimum := true,
       ScoverageKeys.coverageHighlighting := true
     )

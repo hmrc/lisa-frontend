@@ -22,11 +22,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import play.api.http.Status
-import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, Request}
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Request}
 import play.api.test.CSRFTokenHelper.*
 import play.api.test.Helpers.*
-import play.api.test.{CSRFTokenHelper, FakeHeaders, FakeRequest, Injecting}
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.mongo.cache.DataKey
 import views.html.registration.organisation_details
 
@@ -38,10 +37,8 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
   val businessStructureCacheKey   = "businessStructure"
   val pageTitle                   = "Your company’s details"
 
-  def createFakePostRequest[T](uri: String, body: T): Request[T] = {
-    val request: Request[T] = FakeRequest("POST", uri, FakeHeaders(), body)
-    CSRFTokenHelper.addCSRFToken(request)
-  }
+  def createFakePostRequest(uri: String, body: (String, String)*): Request[AnyContentAsFormUrlEncoded] =
+    FakeRequest("POST", uri).withFormUrlEncodedBody(body*).withCSRFToken
 
   val organisationDetailsView: organisation_details = inject[organisation_details]
 
@@ -120,6 +117,61 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
         content must not include "value=\'\'"
       }
 
+      "the business structure is not a partnership and the cache returns a value" in {
+        val organisationForm = new OrganisationDetails("Test Company Name", "1234567890")
+
+        when(
+          lisaCacheRepository.getFromSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
+          )(any(), any())
+        )
+          .thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
+
+        when(
+          lisaCacheRepository.getFromSession[OrganisationDetails](
+            DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
+          )(any(), any())
+        )
+          .thenReturn(Future.successful(Some(organisationForm)))
+
+        val request = fakeRequest.withCSRFToken
+        val result  = SUT.get.apply(request)
+
+        status(result) mustBe Status.OK
+
+        val content = contentAsString(result)
+
+        content must include(pageTitle)
+        content must include("Test Company Name")
+      }
+
+      "the business structure is not a partnership and the cache does not return a value" in {
+
+        when(
+          lisaCacheRepository.getFromSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
+          )(any(), any())
+        )
+          .thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
+
+        when(
+          lisaCacheRepository.getFromSession[OrganisationDetails](
+            DataKey(ArgumentMatchers.eq(OrganisationDetails.cacheKey))
+          )(any(), any())
+        )
+          .thenReturn(Future.successful(None))
+
+        val request = fakeRequest.withCSRFToken
+        val result  = SUT.get.apply(request)
+
+        status(result) mustBe Status.OK
+
+        val content = contentAsString(result)
+
+        content must include(pageTitle)
+        content must not include "value=\'\'"
+      }
+
     }
 
     "redirect the user to business structure" when {
@@ -157,7 +209,7 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
       "the submitted data is incomplete" in {
         val uri     = controllers.routes.OrganisationDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](uri, AnyContentAsJson(json = Json.obj()))
+        val request = createFakePostRequest(uri)
 
         when(
           lisaCacheRepository.getFromSession[BusinessStructure](
@@ -186,9 +238,10 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
       "the company name is invalid" in {
         val uri     = controllers.routes.OrganisationDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](
+        val request = createFakePostRequest(
           uri,
-          AnyContentAsJson(json = Json.obj("companyName" -> "George?", "ctrNumber" -> "X"))
+          "companyName" -> "George?",
+          "ctrNumber"   -> "X"
         )
 
         when(
@@ -224,9 +277,10 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
       "the submitted data is valid" in {
         val uri     = controllers.routes.OrganisationDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](
+        val request = createFakePostRequest(
           uri,
-          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890"))
+          "companyName" -> "X",
+          "ctrNumber"   -> "1234567890"
         )
 
         when(
@@ -261,9 +315,10 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
       "the ROSM registration fails" in {
 
         val uri     = controllers.routes.OrganisationDetailsController.post.url
-        val request = createFakePostRequest[AnyContentAsJson](
+        val request = createFakePostRequest(
           uri,
-          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "X"))
+          "companyName" -> "X",
+          "ctrNumber"   -> "X"
         )
 
         when(
@@ -287,14 +342,74 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
 
     }
 
+    "redirect to matching failed" when {
+
+      "the ROSM registration returns a Left for valid data" in {
+        val uri     = controllers.routes.OrganisationDetailsController.post.url
+        val request = createFakePostRequest(
+          uri,
+          "companyName" -> "X",
+          "ctrNumber"   -> "1234567890"
+        )
+
+        when(
+          lisaCacheRepository.getFromSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
+          )(any(), any())
+        )
+          .thenReturn(Future.successful(Some(new BusinessStructure("Limited Liability Partnership"))))
+
+        when(rosmService.rosmRegister(any(), any())(using any()))
+          .thenReturn(Future.successful(Left("SERVICE_UNAVAILABLE")))
+
+        val result = SUT.post(request)
+
+        status(result)           mustBe Status.SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.MatchingFailedController.get.url)
+
+        verify(auditService).audit(
+          auditType = ArgumentMatchers.eq("BusinessStructureFailed"),
+          path = ArgumentMatchers.eq(uri),
+          auditData = ArgumentMatchers.eq(Map("error" -> "SERVICE_UNAVAILABLE"))
+        )(using any())
+      }
+
+    }
+
+    "redirect to business structure" when {
+
+      "the business structure is missing from the cache on POST" in {
+        val uri     = controllers.routes.OrganisationDetailsController.post.url
+        val request = createFakePostRequest(
+          uri,
+          "companyName" -> "X",
+          "ctrNumber"   -> "1234567890"
+        )
+
+        when(
+          lisaCacheRepository.getFromSession[BusinessStructure](
+            DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey))
+          )(any(), any())
+        )
+          .thenReturn(Future.successful(None))
+
+        val result = SUT.post(request)
+
+        status(result)           mustBe Status.SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.BusinessStructureController.get.url)
+      }
+
+    }
+
     "store organisation details in cache" when {
 
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post.url
 
-        val request = createFakePostRequest[AnyContentAsJson](
+        val request = createFakePostRequest(
           uri,
-          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890"))
+          "companyName" -> "X",
+          "ctrNumber"   -> "1234567890"
         )
 
         when(
@@ -322,9 +437,10 @@ class OrganisationDetailsControllerSpec extends SpecBase with Injecting {
       "the submitted data is valid" in {
         val uri = controllers.routes.OrganisationDetailsController.post.url
 
-        val request = createFakePostRequest[AnyContentAsJson](
+        val request = createFakePostRequest(
           uri,
-          AnyContentAsJson(json = Json.obj("companyName" -> "X", "ctrNumber" -> "1234567890"))
+          "companyName" -> "X",
+          "ctrNumber"   -> "1234567890"
         )
 
         when(

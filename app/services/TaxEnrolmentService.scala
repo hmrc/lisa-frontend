@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class TaxEnrolmentService @Inject() (val connector: TaxEnrolmentConnector)(using ec: ExecutionContext) {
 
-  implicit def dateTimeOrdering: Ordering[ZonedDateTime] = Ordering.fromLessThan(_ isBefore _)
+  given dateTimeOrdering: Ordering[ZonedDateTime] = Ordering.fromLessThan(_ `isBefore` _)
 
   def getNewestLisaSubscription(
     groupId: String

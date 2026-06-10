@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class LisaCacheRepository @Inject() (
   mongoComponent: MongoComponent,
   configuration: Configuration
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends SessionCacheRepository(
       mongoComponent = mongoComponent,
       collectionName = "sessions",
