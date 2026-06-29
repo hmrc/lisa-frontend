@@ -45,7 +45,6 @@
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(title),
     serviceName = Some(messages("service.name")),
-    isWelshTranslationAvailable = true,
     banners = Banners(
         userResearchBanner = if(researchBannerUrl.isDefined) Some(UserResearchBanner(url = researchBannerUrl.get)) else None
     ),
