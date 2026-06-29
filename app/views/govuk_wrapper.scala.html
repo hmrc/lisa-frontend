@@ -14,26 +14,19 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukHeader, GovukLayout}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcReportTechnicalIssueHelper, HmrcScripts, HmrcStandardFooter, HmrcStandardHeader}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcReportTechnicalIssueHelper
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTimeoutDialogHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.{HmrcStandardPageParams, ServiceURLs, TemplateOverrides}
 
 @this(
-        govukLayout: GovukLayout,
-        header: GovukHeader,
-        hmrcHead: HmrcHead,
-        hmrcStandardHeader: HmrcStandardHeader,
-        hmrcStandardFooter: HmrcStandardFooter,
-        hmrcScripts: HmrcScripts,
+        hmrcStandardPage: HmrcStandardPage,
         hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
 @(title: String, beforeContentHtml: Option[Html] = None, researchBannerUrl: Option[String] = None, timeoutDialogEnabled: Boolean = true)(mainContent: Html)(implicit request: RequestHeader, messages: Messages, appConfig: config.AppConfig)
 
 @head ={
-    <meta name="format-detection" content="telephone=no" />
-    <link rel="stylesheet" media="all" href='@routes.Assets.versioned("stylesheets/lisa-app.css")' type="text/css"/>
     @if(timeoutDialogEnabled) {
         @hmrcTimeoutDialogHelper(
             timeoutUrl = Some(appConfig.timeOutUrl),
@@ -43,25 +36,24 @@
 }
 
 @content = {
-    <div id="content">
-        <div class="content__body">
-            @mainContent
-
-            @hmrcReportTechnicalIssueHelper()
-        </div>
+    @mainContent
+    <div class="govuk-!-margin-top-6">
+        @hmrcReportTechnicalIssueHelper()
     </div>
 }
 
-@govukLayout(
+@hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(title),
-    headBlock = Some(hmrcHead(Some(head))),
-    headerBlock = Some(hmrcStandardHeader(
-        serviceName = Some(messages("service.name")),
-        signOutUrl = Some(appConfig.signOutUrl),
-        userResearchBanner = if(researchBannerUrl.isDefined) Some(UserResearchBanner(url = researchBannerUrl.get)) else None,
-        serviceUrl = Some(controllers.routes.HomePageController.home.url)
-    )),
-    beforeContentBlock = beforeContentHtml,
-    scriptsBlock = Some(hmrcScripts()),
-    footerBlock = Some(hmrcStandardFooter())
-)(content)
+    serviceName = Some(messages("service.name")),
+    banners = Banners(
+        userResearchBanner = if(researchBannerUrl.isDefined) Some(UserResearchBanner(url = researchBannerUrl.get)) else None
+    ),
+    serviceURLs = ServiceURLs(
+        serviceUrl = Some(controllers.routes.HomePageController.home.url),
+        signOutUrl = Some(appConfig.signOutUrl)
+    ),
+    templateOverrides = TemplateOverrides(
+        additionalHeadBlock = Some(head),
+        beforeContentBlock = beforeContentHtml
+    )
+))(content)
