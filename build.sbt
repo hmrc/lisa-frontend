@@ -13,10 +13,7 @@ lazy val microservice = Project("lisa-frontend", file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     ),
-    routesGenerator := InjectedRoutesGenerator,
-    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:msg=unused import&src=html/.*:s", "-feature")
   )
-  .settings(CodeCoverageSettings())
 
 addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt")

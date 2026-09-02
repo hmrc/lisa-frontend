@@ -64,6 +64,28 @@ class MatchingFailedControllerSpec extends SpecBase with Injecting {
       content must include("Your company’s details could not be found</h1>")
     }
 
+    "return a page for a company that is not a partnership" in {
+
+      when(
+        lisaCacheRepository.getFromSession[BusinessStructure](DataKey(ArgumentMatchers.eq(BusinessStructure.cacheKey)))(
+          any(),
+          any()
+        )
+      )
+        .thenReturn(Future.successful(Some(new BusinessStructure("Corporate Body"))))
+
+      val result = SUT.get(fakeRequest)
+
+      status(result) mustBe Status.OK
+
+      val content = contentAsString(result)
+
+      content must include("Your company\u2019s details could not be found</h1>")
+      content must include("Limited or LTD")
+      content must include("corporation-tax-enquiries")
+      content must include("This is the same number that you use on your company\u2019s CT600 form.")
+    }
+
     "redirect the user to business structure when no session found" in {
 
       when(

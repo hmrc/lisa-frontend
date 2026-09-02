@@ -24,7 +24,18 @@
         hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper
 )
-@(title: String, beforeContentHtml: Option[Html] = None, researchBannerUrl: Option[String] = None, timeoutDialogEnabled: Boolean = true)(mainContent: Html)(implicit request: RequestHeader, messages: Messages, appConfig: config.AppConfig)
+@(title: String, showBackLink: Boolean = true, researchBannerUrl: Option[String] = None, timeoutDialogEnabled: Boolean = true)(mainContent: Html)(implicit request: RequestHeader, messages: Messages, appConfig: config.AppConfig)
+
+@backLink = @{
+    if(showBackLink) {
+        Some(BackLink(
+            href = "#",
+            content = Text("Back"),
+            classes = "js-enabled",
+            attributes = Map("id" -> "back", "data-module" -> "hmrc-back-link")
+        ))
+    } else None
+}
 
 @head ={
     @if(timeoutDialogEnabled) {
@@ -45,6 +56,7 @@
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(title),
     serviceName = Some(messages("service.name")),
+    backLink = backLink,
     banners = Banners(
         userResearchBanner = if(researchBannerUrl.isDefined) Some(UserResearchBanner(url = researchBannerUrl.get)) else None
     ),
@@ -53,7 +65,6 @@
         signOutUrl = Some(appConfig.signOutUrl)
     ),
     templateOverrides = TemplateOverrides(
-        additionalHeadBlock = Some(head),
-        beforeContentBlock = beforeContentHtml
+        additionalHeadBlock = Some(head)
     )
 ))(content)

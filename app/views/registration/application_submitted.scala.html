@@ -26,7 +26,7 @@
 
 @(email: String, subscriptionId: String, displayURBanner: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@govukWrapper(title = messages("title.application-submitted"), researchBannerUrl = if(displayURBanner) Some("https://signup.take-part-in-research.service.gov.uk/?utm_campaign=&utm_source=Other&utm_medium=other&t=HMRC&id=186") else None) {
+@govukWrapper(title = messages("title.application-submitted"), researchBannerUrl = if(displayURBanner) Some("https://signup.take-part-in-research.service.gov.uk/?utm_campaign=&utm_source=Other&utm_medium=other&t=HMRC&id=186") else None, showBackLink = false) {
 
     @govukPanel(Panel(
         title = Text(messages("applicationsubmitted.banner.heading")),

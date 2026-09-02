@@ -20,7 +20,7 @@
 
 @()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@govukWrapper(title = messages("title.application-pending")) {
+@govukWrapper(title = messages("title.application-pending"), showBackLink = false) {
 
     <h1 class="govuk-heading-l">@messages("applicationpending.heading")</h1>
 

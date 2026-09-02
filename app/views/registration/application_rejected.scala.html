@@ -20,7 +20,7 @@
 
 @()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@govukWrapper(title = messages("title.application-rejected")) {
+@govukWrapper(title = messages("title.application-rejected"), showBackLink = false) {
 
     <h1 class="govuk-heading-l">@messages("applicationrejected.heading")</h1>
 

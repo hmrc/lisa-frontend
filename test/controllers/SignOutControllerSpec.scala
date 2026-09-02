@@ -45,6 +45,11 @@ class SignOutControllerSpec extends SpecBase with Injecting {
       val result = SUT.redirect(fakeRequest)
       status(result) mustBe Status.SEE_OTHER
     }
+
+    "redirect to the exit survey with the service navigation parameter" in {
+      val result = SUT.redirect(fakeRequest)
+      redirectLocation(result) mustBe Some("http://localhost:9514/feedback/lifetime-isa?useServiceNavigation")
+    }
   }
 
   "Calling SignOutController.timeout" should {

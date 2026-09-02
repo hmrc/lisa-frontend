@@ -18,19 +18,11 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(govukWrapper: views.html.govuk_wrapper,
-        govukBackLink : GovukBackLink,
         govukButton : GovukButton)
 
 @(isPartnership: Boolean)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @govukWrapper(title = messages("title.matching-failed")) {
-
-    @govukBackLink(BackLink(
-        href = "#",
-        content = Text("Back"),
-        classes = "js-enabled",
-        attributes = Map("id" -> "back", "data-module" -> "hmrc-back-link", "data-journey-click" -> "navigation - link:Your company’s details could not be found:Back")
-    ))
 
     <h1 class="govuk-heading-l">@messages("matchingfailed.heading")</h1>
 

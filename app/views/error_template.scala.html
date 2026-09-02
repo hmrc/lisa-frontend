@@ -18,7 +18,7 @@
 
 @()(implicit request: RequestHeader, messages: Messages, appConfig: config.AppConfig)
 
-@govukWrapper(title = messages("global.error.InternalServerError500.title")){
+@govukWrapper(title = messages("global.error.InternalServerError500.title"), showBackLink = false){
  <h1 class="govuk-label--l">@messages("global.error.InternalServerError500.heading")</h1>
  <p class="govuk-body">@Html(messages("global.error.InternalServerError500.message"))</p>
 }
