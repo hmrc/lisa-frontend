@@ -18,7 +18,7 @@
 
 @(ggLoginUrl: String, registerOrgUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@govukWrapper(title = messages("title.access-denied-individual-or-agent")) {
+@govukWrapper(title = messages("title.access-denied-individual-or-agent"), showBackLink = false) {
     <h1 class="govuk-label--l">@messages("accessdenied.individualoragent.heading")</h1>
 
     <p class="govuk-body" id="error-message" >@messages("accessdenied.individualoragent.text.line1")</p>

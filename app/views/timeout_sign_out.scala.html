@@ -26,7 +26,7 @@
 
 @()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@govukWrapper(title = messages("title.timeout-sign-out"), timeoutDialogEnabled = false) {
+@govukWrapper(title = messages("title.timeout-sign-out"), timeoutDialogEnabled = false, showBackLink = false) {
     @hmrcPageHeading(PageHeading(
         text = messages("timeout.heading")
     ))

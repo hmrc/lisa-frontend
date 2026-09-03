@@ -22,7 +22,7 @@
 
 @(zref: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@govukWrapper(title = messages("title.application-successful")) {
+@govukWrapper(title = messages("title.application-successful"), showBackLink = false) {
     @govukPanel(Panel(
         title = Text(messages("applicationsuccessful.banner.heading")),
         content = HtmlContent(s"""${messages("applicationsuccessful.banner.subheading")}<br>$zref""")
