@@ -48,7 +48,7 @@
             name = "firstName",
             classes = "govuk-input--width-20",
             value = form("firstName").value,
-            autocomplete = Some("name"),
+            autocomplete = Some("given-name"),
             errorMessage = if(form("firstName").hasErrors){
                 Some(ErrorMessage(
                     attributes = Map("data-journey-click" -> "search-page:error:firstName"),
@@ -66,7 +66,7 @@
             name = "lastName",
             classes = "govuk-input--width-20",
             value = form("lastName").value,
-            autocomplete = Some("name"),
+            autocomplete = Some("family-name"),
             errorMessage = if(form("lastName").hasErrors){
                 Some(ErrorMessage(
                     attributes = Map("data-journey-click" -> "search-page:error:lastName"),
