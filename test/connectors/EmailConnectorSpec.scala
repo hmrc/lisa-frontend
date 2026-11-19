@@ -16,68 +16,51 @@
 
 package connectors
 
-import base.SpecBase
-import config.AppConfig
-import metrics.EmailMetrics
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.JsObject
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import helpers.ConnectorSpecHelper
+import play.api.libs.json.Json
 import play.api.test.Helpers.*
-import play.api.test.Injecting
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-import scala.concurrent.Future
+class EmailConnectorSpec extends ConnectorSpecHelper {
 
-class EmailConnectorSpec extends PlaySpec with MockitoSugar with BeforeAndAfterEach with SpecBase with Injecting {
+  lazy val emailConnector: EmailConnector = injector.instanceOf[EmailConnector]
 
-  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
-  val mockAppConfig: AppConfig           = mock[AppConfig]
-  val mockMetrics: EmailMetrics          = mock[EmailMetrics]
-  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  val testEmailConnector                 = new EmailConnector(mockHttpClientV2, mockAppConfig, mockMetrics)
-
-  override def beforeEach(): Unit = {
-    reset(mockHttpClientV2)
-    when(mockAppConfig.emailServiceUrl).thenReturn("http://localhost:8886")
-    when(mockHttpClientV2.post(any())(any())).thenReturn(mockRequestBuilder)
-    when(mockRequestBuilder.withBody(any[JsObject])(any(), any(), any())).thenReturn(mockRequestBuilder)
-  }
+  private val emailUrl   = "/hmrc/email"
+  private val templateId = "lisa_application_submit"
+  private val params     = Map("testParam" -> "testParam")
 
   "EmailConnector" must {
 
-    "return a 202 accepted" when {
+    "return EmailSent" when {
+      "the email service returns 202 ACCEPTED" in {
+        val emailString = "test@mail.com"
+        stubForPost(emailUrl, ACCEPTED)
 
-      "correct emailId Id is passed" in {
-        given hc: HeaderCarrier = HeaderCarrier()
-        val emailString         = "test@mail.com"
-        val templateId          = "lisa_application_submit"
-        val params              = Map("testParam" -> "testParam")
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(ACCEPTED, "")))
-        val response            = testEmailConnector.sendTemplatedEmail(emailString, templateId, params)
-        await(response) must be(EmailSent)
+        await(emailConnector.sendTemplatedEmail(emailString, templateId, params)) mustBe EmailSent
 
+        server.verify(
+          postRequestedFor(urlEqualTo(emailUrl))
+            .withRequestBody(
+              equalToJson(
+                Json
+                  .obj(
+                    "to"         -> Json.arr(emailString),
+                    "templateId" -> templateId,
+                    "parameters" -> params,
+                    "force"      -> true
+                  )
+                  .toString
+              )
+            )
+        )
       }
     }
 
-    "return other status" when {
+    "return EmailNotSent" when {
+      "the email service returns any other status" in {
+        stubForPost(emailUrl, NOT_FOUND)
 
-      "incorrect email Id are passed" in {
-        given hc: HeaderCarrier = HeaderCarrier()
-        val invalidEmailString  = "test@test1.com"
-        val templateId          = "lisa_application_submit"
-        val params              = Map("testParam" -> "testParam")
-
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(NOT_FOUND, "")))
-
-        val response = testEmailConnector.sendTemplatedEmail(invalidEmailString, templateId, params)
-        await(response) must be(EmailNotSent)
-
+        await(emailConnector.sendTemplatedEmail("test@test1.com", templateId, params)) mustBe EmailNotSent
       }
     }
 
