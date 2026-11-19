@@ -57,12 +57,10 @@ trait ConnectorSpecHelper extends PlaySpec with GuiceOneAppPerSuite with WireMoc
     }
   }
 
-  def stubForGet(url: String, returnStatus: Int, responseBody: String = ""): StubMapping = {
+  def stubForGet(url: String, returnStatus: Int, responseBody: String = ""): StubMapping =
     server.stubFor(get(urlEqualTo(url)).willReturn(buildResponse(returnStatus, responseBody)))
-  }
 
-  def stubForPost(url: String, returnStatus: Int, responseBody: String = ""): StubMapping = {
+  def stubForPost(url: String, returnStatus: Int, responseBody: String = ""): StubMapping =
     server.stubFor(post(urlEqualTo(url)).willReturn(buildResponse(returnStatus, responseBody)))
-  }
 
 }
