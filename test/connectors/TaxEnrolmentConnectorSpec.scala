@@ -22,8 +22,6 @@ import play.api.libs.json.*
 import play.api.test.Helpers.*
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 class TaxEnrolmentConnectorSpec extends ConnectorSpecHelper with TaxEnrolmentJsonFormats {
 
@@ -53,7 +51,7 @@ class TaxEnrolmentConnectorSpec extends ConnectorSpecHelper with TaxEnrolmentJso
       stubForGet(subscriptionsUrl, OK, Json.toJson(subs).toString)
 
       val response: Seq[TaxEnrolmentSubscription] =
-        Await.result(taxEnrolmentConnector.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
+        await(taxEnrolmentConnector.getSubscriptionsByGroupId("1234567890"))
 
       response mustBe subs
     }

@@ -24,8 +24,6 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HttpResponse
 
 import java.time.LocalDate
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 class RosmConnectorSpec extends ConnectorSpecHelper with RosmJsonFormats {
 
@@ -76,10 +74,10 @@ class RosmConnectorSpec extends ConnectorSpecHelper with RosmJsonFormats {
       "rosm returns a success message" in {
         stubForPost(registerUrl, CREATED, Json.toJson(rosmSuccessResponse).toString)
 
-        registrationRequest { response =>
-          response.status                                             mustBe CREATED
-          response.json.validate[RosmRegistrationSuccessResponse].get mustBe rosmSuccessResponse
-        }
+        val response = registrationRequest()
+
+        response.status                                             mustBe CREATED
+        response.json.validate[RosmRegistrationSuccessResponse].get mustBe rosmSuccessResponse
 
         server.verify(
           postRequestedFor(urlEqualTo(registerUrl))
@@ -92,17 +90,40 @@ class RosmConnectorSpec extends ConnectorSpecHelper with RosmJsonFormats {
       "rosm returns a success status but a failure response" in {
         stubForPost(registerUrl, CREATED, Json.toJson(rosmFailureResponse).toString)
 
-        registrationRequest { response =>
-          response.json.validate[DesFailureResponse].get mustBe rosmFailureResponse
-        }
+        val response = registrationRequest()
+
+        response.json.validate[DesFailureResponse].get mustBe rosmFailureResponse
       }
 
       "rosm returns a success status and an unexpected json response" in {
         stubForPost(registerUrl, CREATED, "{}")
 
-        registrationRequest { response =>
-          response.json mustBe Json.obj()
-        }
+        val response = registrationRequest()
+
+        response.json mustBe Json.obj()
+      }
+    }
+
+    "return the error status and body unchanged" when {
+      "rosm returns BAD_REQUEST" in {
+        val errorBody =
+          Json.toJson(DesFailureResponse("INVALID_PAYLOAD", "Submission has not passed validation.")).toString
+        stubForPost(registerUrl, BAD_REQUEST, errorBody)
+
+        val response = registrationRequest()
+
+        response.status mustBe BAD_REQUEST
+        response.body   mustBe errorBody
+      }
+
+      "rosm returns INTERNAL_SERVER_ERROR" in {
+        val errorBody = Json.toJson(rosmFailureResponse).toString
+        stubForPost(registerUrl, INTERNAL_SERVER_ERROR, errorBody)
+
+        val response = registrationRequest()
+
+        response.status mustBe INTERNAL_SERVER_ERROR
+        response.body   mustBe errorBody
       }
     }
   }
@@ -112,10 +133,10 @@ class RosmConnectorSpec extends ConnectorSpecHelper with RosmJsonFormats {
       "rosm returns a valid payload with utr" in {
         stubForPost(subscribeUrl, CREATED, Json.toJson(desSubscribeSuccessResponse).toString)
 
-        subscribeRequest { response =>
-          response.status                                            mustBe CREATED
-          response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
-        }
+        val response = subscribeRequest()
+
+        response.status                                            mustBe CREATED
+        response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
 
         server.verify(
           postRequestedFor(urlEqualTo(subscribeUrl))
@@ -140,14 +161,10 @@ class RosmConnectorSpec extends ConnectorSpecHelper with RosmJsonFormats {
     ApplicantDetails("name", "lastname", "role", ContactDetails("7234545", "email@email.com"))
   )
 
-  private def registrationRequest(callback: HttpResponse => Unit): Unit = {
-    val response = Await.result(rosmConnector.registerOnce("1234567890", registrationPayload), Duration.Inf)
-    callback(response)
-  }
+  private def registrationRequest(): HttpResponse =
+    await(rosmConnector.registerOnce("1234567890", registrationPayload))
 
-  private def subscribeRequest(callback: HttpResponse => Unit): Unit = {
-    val response = Await.result(rosmConnector.subscribe("Z1234", subscriptionPayload), Duration.Inf)
-    callback(response)
-  }
+  private def subscribeRequest(): HttpResponse =
+    await(rosmConnector.subscribe("Z1234", subscriptionPayload))
 
 }
