@@ -16,45 +16,26 @@
 
 package connectors
 
-import base.SpecBase
-import config.AppConfig
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import helpers.ConnectorSpecHelper
 import models.*
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
 import java.time.LocalDate
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 
-class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with RosmJsonFormats with SpecBase {
+class RosmConnectorSpec extends ConnectorSpecHelper with RosmJsonFormats {
 
-  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
-  val mockAppConfig: AppConfig           = mock[AppConfig]
-  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
-  when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockHttpClientV2.post(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
-  when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
+  lazy val rosmConnector: RosmConnector = injector.instanceOf[RosmConnector]
 
-  val SUT = new RosmConnector(mockHttpClientV2, mockAppConfig)
+  private val registerUrl  = "/lisa/1234567890/register"
+  private val subscribeUrl = "/lisa/4567890123/subscribe/Z1234"
 
   val rosmIndividual = RosmIndividual(
     firstName = "Test",
     lastName = "User",
     dateOfBirth = Some(LocalDate.parse("1980-01-01"))
-  )
-
-  val rosmIndividualNoDob = RosmIndividual(
-    firstName = "Test",
-    lastName = "User"
   )
 
   val rosmAddress = RosmAddress(
@@ -80,18 +61,6 @@ class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSu
     contactDetails = rosmContactDetails
   )
 
-  val rosmSuccessResponseNoDob = RosmRegistrationSuccessResponse(
-    safeId = "XE0001234567890",
-    agentReferenceNumber = Some("AARN1234567"),
-    isEditable = true,
-    isAnAgent = false,
-    isAnASAgent = Some(false),
-    isAnIndividual = true,
-    individual = Some(rosmIndividualNoDob),
-    address = rosmAddress,
-    contactDetails = rosmContactDetails
-  )
-
   val rosmFailureResponse = DesFailureResponse(
     code = "SERVICE_UNAVAILABLE",
     reason = "Dependent systems are currently not responding."
@@ -103,48 +72,58 @@ class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSu
 
     "return success" when {
       "rosm returns a success message" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                status = CREATED,
-                json = Json.toJson(rosmSuccessResponse),
-                headers = Map.empty
-              )
-            )
-          )
+        stubForPost(registerUrl, CREATED, Json.toJson(rosmSuccessResponse).toString)
 
-        doRegistrationRequest { response =>
-          response.json.validate[RosmRegistrationSuccessResponse].get mustBe rosmSuccessResponse
-        }
+        val response = registrationRequest()
+
+        response.status                                             mustBe CREATED
+        response.json.validate[RosmRegistrationSuccessResponse].get mustBe rosmSuccessResponse
+
+        server.verify(
+          postRequestedFor(urlEqualTo(registerUrl))
+            .withRequestBody(equalToJson(Json.toJson(registrationPayload).toString))
+        )
       }
     }
 
     "return failure" when {
       "rosm returns a success status but a failure response" in {
-        when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                status = CREATED,
-                json = Json.toJson(rosmFailureResponse),
-                headers = Map.empty
-              )
-            )
-          )
+        stubForPost(registerUrl, CREATED, Json.toJson(rosmFailureResponse).toString)
 
-        doRegistrationRequest { response =>
-          response.json.validate[DesFailureResponse].get mustBe rosmFailureResponse
-        }
+        val response = registrationRequest()
+
+        response.json.validate[DesFailureResponse].get mustBe rosmFailureResponse
       }
 
       "rosm returns a success status and an unexpected json response" in {
-        when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(status = CREATED, json = Json.parse("{}"), headers = Map.empty)))
+        stubForPost(registerUrl, CREATED, "{}")
 
-        doRegistrationRequest { response =>
-          response.body mustBe "{ }"
-        }
+        val response = registrationRequest()
+
+        response.json mustBe Json.obj()
+      }
+    }
+
+    "return the error status and body unchanged" when {
+      "rosm returns BAD_REQUEST" in {
+        val errorBody =
+          Json.toJson(DesFailureResponse("INVALID_PAYLOAD", "Submission has not passed validation.")).toString
+        stubForPost(registerUrl, BAD_REQUEST, errorBody)
+
+        val response = registrationRequest()
+
+        response.status mustBe BAD_REQUEST
+        response.body   mustBe errorBody
+      }
+
+      "rosm returns INTERNAL_SERVER_ERROR" in {
+        val errorBody = Json.toJson(rosmFailureResponse).toString
+        stubForPost(registerUrl, INTERNAL_SERVER_ERROR, errorBody)
+
+        val response = registrationRequest()
+
+        response.status mustBe INTERNAL_SERVER_ERROR
+        response.body   mustBe errorBody
       }
     }
   }
@@ -152,47 +131,40 @@ class RosmConnectorSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerSu
   "Subscribe any endpoint" must {
     "return success" when {
       "rosm returns a valid payload with utr" in {
-        when(mockHttpClientV2.post(any())(any()).execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                status = CREATED,
-                json = Json.toJson(desSubscribeSuccessResponse),
-                headers = Map.empty
-              )
-            )
-          )
+        stubForPost(subscribeUrl, CREATED, Json.toJson(desSubscribeSuccessResponse).toString)
 
-        doSubscribe { response =>
-          response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
-        }
+        val response = subscribeRequest()
+
+        response.status                                            mustBe CREATED
+        response.json.validate[DesSubscriptionSuccessResponse].get mustBe desSubscribeSuccessResponse
+
+        server.verify(
+          postRequestedFor(urlEqualTo(subscribeUrl))
+            .withRequestBody(equalToJson(Json.toJson(subscriptionPayload).toString))
+        )
       }
     }
   }
 
-  private def doRegistrationRequest(callback: HttpResponse => Unit): Unit = {
-    val request  = RosmRegistration(
-      regime = "LISA",
-      requiresNameMatch = false,
-      isAnAgent = false,
-      Organisation(organisationName = "CompName", organisationType = "LLP")
-    )
-    val response = Await.result(SUT.registerOnce("1234567890", request), Duration.Inf)
+  private val registrationPayload = RosmRegistration(
+    regime = "LISA",
+    requiresNameMatch = false,
+    isAnAgent = false,
+    Organisation(organisationName = "CompName", organisationType = "LLP")
+  )
 
-    callback(response)
-  }
+  private val subscriptionPayload = LisaSubscription(
+    "4567890123",
+    "SAFEID0124",
+    "FCA1234",
+    "compName",
+    ApplicantDetails("name", "lastname", "role", ContactDetails("7234545", "email@email.com"))
+  )
 
-  private def doSubscribe(callback: HttpResponse => Unit): Unit = {
-    val payload  = LisaSubscription(
-      "4567890123",
-      "SAFEID0124",
-      "FCA1234",
-      "compName",
-      ApplicantDetails("name", "lastname", "role", ContactDetails("7234545", "email@email.com"))
-    )
-    val response = Await.result(SUT.subscribe("Z1234", payload), Duration.Inf)
+  private def registrationRequest(): HttpResponse =
+    await(rosmConnector.registerOnce("1234567890", registrationPayload))
 
-    callback(response)
-  }
+  private def subscribeRequest(): HttpResponse =
+    await(rosmConnector.subscribe("Z1234", subscriptionPayload))
 
 }

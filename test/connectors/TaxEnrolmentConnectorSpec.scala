@@ -16,36 +16,19 @@
 
 package connectors
 
-import base.SpecBase
-import config.AppConfig
+import helpers.ConnectorSpecHelper
 import models.*
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.*
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 
-class TaxEnrolmentConnectorSpec
-    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with TaxEnrolmentJsonFormats with SpecBase {
+class TaxEnrolmentConnectorSpec extends ConnectorSpecHelper with TaxEnrolmentJsonFormats {
 
-  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  val mockHttpClientV2: HttpClientV2     = mock[HttpClientV2]
-  val mockAppConfig: AppConfig           = mock[AppConfig]
+  lazy val taxEnrolmentConnector: TaxEnrolmentConnector = injector.instanceOf[TaxEnrolmentConnector]
 
-  when(mockAppConfig.lisaServiceUrl).thenReturn("http://localhost:8886")
-  when(mockHttpClientV2.get(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
-  when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
+  private val subscriptionsUrl = "/lisa/tax-enrolments/groups/1234567890/subscriptions"
 
-  val SUT                          = new TaxEnrolmentConnector(mockHttpClientV2, mockAppConfig)
   val instant: Instant             = Instant.ofEpochMilli(1498726914908L)
   val zonedDateTime: ZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 
@@ -65,19 +48,10 @@ class TaxEnrolmentConnectorSpec
 
   "Get Subscriptions by Group ID endpoint" must {
     "return whatever it receives" in {
-      when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(
-          Future.successful(
-            HttpResponse(
-              status = OK,
-              json = Json.toJson(subs),
-              headers = Map[String, Seq[String]]("test" -> Seq("test1", "test2"))
-            )
-          )
-        )
+      stubForGet(subscriptionsUrl, OK, Json.toJson(subs).toString)
 
       val response: Seq[TaxEnrolmentSubscription] =
-        Await.result(SUT.getSubscriptionsByGroupId("1234567890"), Duration.Inf)
+        await(taxEnrolmentConnector.getSubscriptionsByGroupId("1234567890"))
 
       response mustBe subs
     }
